@@ -160,8 +160,59 @@ L'architecture Next.js + Docker de Tchoua App permet un déploiement facile sur 
 - **Google Cloud Run** : L'option la plus simple et scalable. Poussez votre image Docker sur Artifact Registry, puis déployez-la sur Cloud Run. La scalabilité sera automatique (de 0 à N instances selon le trafic).
 - **Compute Engine** : Équivalent à EC2, lancez une VM et utilisez Docker Compose.
 
-#### 4. OVHcloud
-- **VPS / Bare Metal** : Louez un VPS Ubuntu chez OVH. Connectez-vous en SSH, installez Docker et Docker Compose, et lancez l'application. C'est l'option la plus économique pour garantir une **souveraineté des données** avec un hébergement en Europe ou en Afrique.
+#### 4. OVHcloud Bare Metal — Déploiement Complet (Script Automatisé)
+
+OVHcloud est l'option recommandée par la Fondation NIFA pour garantir la **souveraineté des données** avec un hébergement en Europe ou directement en Afrique (datacenter de Johannesburg). Le script de déploiement automatisé couvre l'ensemble de la stack : Node.js, PostgreSQL, PM2 et Nginx.
+
+**Prérequis :**
+- Un serveur OVH Bare Metal ou VPS avec **Ubuntu 22.04 LTS**
+- Accès SSH en `root`
+- Un nom de domaine pointé vers l'IP du serveur (optionnel, pour HTTPS)
+
+**Déploiement en une seule commande :**
+
+```bash
+# 1. Télécharger et exécuter le script de déploiement
+curl -fsSL https://raw.githubusercontent.com/gridengineering/tchoua-app/master/scripts/deploy-ovh.sh -o deploy-tchoua.sh
+
+# 2. Ouvrir le script et définir au minimum DB_PASSWORD (et DOMAIN si vous en avez un)
+nano deploy-tchoua.sh
+
+# 3. Lancer le déploiement
+sudo bash deploy-tchoua.sh
+```
+
+**Ce que le script `scripts/deploy-ovh.sh` fait automatiquement :**
+
+| Étape | Action |
+|-------|--------|
+| 1 | Mise à jour complète du système Ubuntu |
+| 2 | Installation de Node.js 20 LTS via NodeSource |
+| 3 | Installation et configuration de **PostgreSQL** (création BDD + utilisateur) |
+| 4 | **Clone du dépôt** depuis `https://github.com/gridengineering/tchoua-app` |
+| 5 | Création du fichier `.env` de production avec génération automatique du `NEXTAUTH_SECRET` |
+| 6 | Installation des dépendances npm (`npm ci --omit=dev`) |
+| 7 | Migrations **Prisma** sur PostgreSQL (`prisma migrate deploy`) |
+| 8 | **Build de production** Next.js (`npm run build`) |
+| 9 | Démarrage via **PM2** avec persistance au redémarrage du serveur |
+| 10 | Configuration **Nginx** comme reverse proxy (si un domaine est défini) + règles UFW |
+
+**Après le déploiement, activer HTTPS gratuit (Let's Encrypt) :**
+
+```bash
+certbot --nginx -d votre-domaine.com -d www.votre-domaine.com
+```
+
+**Commandes de maintenance courantes :**
+
+```bash
+pm2 logs tchoua-app       # Voir les logs en temps réel
+pm2 restart tchoua-app    # Redémarrer l'application
+pm2 status                # Vérifier l'état des processus
+cd /var/www/tchoua-app && git pull && npm run build && pm2 restart tchoua-app  # Mise à jour
+```
+
+> 💡 Le script est idempotent : vous pouvez le relancer pour **mettre à jour** l'application. Il effectuera un `git reset --hard origin/master` pour récupérer la dernière version.
 
 ---
 
