@@ -51,23 +51,32 @@ Cinq principes fondamentaux guident chaque ligne de code, chaque décision produ
 
 ---
 
-## Fonctionnalités Principales de la Plateforme
+## 18 Modules. Un Écosystème Complet.
 
-Tchoua propose une suite de modules complets pour répondre aux exigences complexes de gouvernance de l'économie sociale :
+De l'adhésion à la comptabilité, chaque aspect de votre tontine trouve sa solution. Conçu pour les tontines cash, nature, services et solidarité.
 
-- **Module 1 : Configuration et Paramétrage Global** - Création guidée d'associations, paramétrage des règles, réunions, structure du bureau, validation du règlement intérieur article par article et gestion des relations associations parent/fille.
-- **Module 2 : Gestion des Membres** - Processus d'adhésion avec système de parrainage, suivi détaillé des profils (incluant les informations familiales essentielles pour les aides sociales), et historique des statuts.
-- **Module 3 : Gestion des Réunions et Discipline** - Suivi en temps réel par le Secrétariat des présences, gestion des retards, des absences justifiées/non justifiées, organisation de la collation rotative, et application d'amendes disciplinaires.
-- **Module 4 : Tontines (Cotisations)** - Support de modèles variés : tontines classiques à tirage et tontines à enchères. Gestion stricte des échecs de paiement, pénalités, garanties (avalistes) et redistribution des résidus.
-- **Module 5 : Fonds de Solidarité** - Alimentation par cotisations fixes ou prélèvements sur cagnottes. Gestion des décaissements et aides pour des événements spécifiques (santé, heureux événements, décès).
-- **Module 6 : Fonds d'Investissement et Prêts (Épargne & Crédit)** - Outil d'épargne avec octroi de crédits basé sur un algorithme d'arbitrage de solvabilité. Calcul automatisé des intérêts, échéanciers, pénalités de retard et versement de dividendes annuels.
-- **Module 7 : Gestion Financière, Recouvrement et Comptabilité** - Gestion de la caisse, traçabilité des virements, relevés de compte individuels, et algorithme de compensation des dettes (recouvrement croisé sur les avoirs du membre).
-- **Module 8 : Moteur de Fréquence et Planification** - Programmation flexible des sessions (journalière, hebdomadaire, mensuelle, annuelle) avec ajustement automatique pour les jours fériés.
-- **Module 9 : Répartition Financière (Algorithme)** - Système intelligent traitant un versement global de membre pour le répartir automatiquement entre ses différentes obligations (tontine, prêt, solidarité) selon un ordre de priorité strict.
-- **Module 10 : Architecture des Données** - Schéma relationnel robuste (Prisma) modélisant le multi-associations, les multi-activités et le cycle de vie financier.
-- **Module 11 : Authentification Sociale et Droits d'Accès** - Authentification fluide via réseaux sociaux (Google, Facebook). Séparation stricte via RBAC entre les Utilisateurs Système (Administration plateforme) et les Membres.
-- **Module 12 : Wallet Intégré (Portefeuille Électronique)** - Compte pivot personnel permettant au membre de payer ses engagements ou de recevoir des fonds (gains, dividendes). Intègre les paiements Mobile Money (Orange Money, MTN MoMo).
-- **Module 13 : Calendrier Financier Consolidé** - Vue unifiée de l'agenda d'un membre à travers toutes ses associations, prévoyant ses futures entrées (vert) et sorties (rouge) de fonds.
+- **Module 01 : Adhésion & Gestion des Profils** - L'entrée dans la confiance. Vérifiez, profilez, et organisez vos membres avec des rôles adaptés à chaque tradition communautaire. (Inscription multi-étapes, vérification d'identité, géolocalisation, rôles hiérarchiques, parrainage).
+- **Module 02 : Cotisations & Paiements Multi-Supports** - Cash, nature, services — chaque contribution a sa place. Un système de conversion dynamique qui respecte la réalité du terrain. (Configuration flexible, Mobile Money natif, catalogue nature, portefeuille de crédits-temps).
+- **Module 03 : Sessions, Rotation & Bénéficiaires** - La transparence du tirage au sort. Un algorithme vérifiable, un calendrier partagé, et la garantie que chacun recevra son tour. (Tirage au sort cryptographique, options de cession, calendrier interactif).
+- **Module 04 : Ventes, Achats Groupés & Commerce** - Transformez la force collective en pouvoir de négociation. Achetez ensemble pour moins cher, vendez ensemble pour plus. (Catalogue collaboratif, commandes collectives, répartition des coûts).
+- **Module 05 : Prêts, Crédit & Microfinance Interne** - Votre groupe comme banque communautaire. Des prêts accessibles, un scoring transparent, et des garanties qui se basent sur la confiance. (Score de crédit communautaire, plafonds progressifs, garanties flexibles).
+- **Module 06 : Investissement & Épargne Collective** - Faites fructifier la force de votre groupe. Des comptes d'épargne programmée aux projets d'investissement collectif — chaque FCFA compte. (Objectifs personnalisés, projets d'investissement, éducation financière).
+- **Module 07 : Solidarité, Aide Sociale & Assistance** - Parce que la tontine n'est pas que de l'argent. Naissances, mariages, décès, maladies — votre groupe est votre filet de sécurité. (Déclaration d'événements, barèmes paramétrables, fonds d'urgence).
+- **Module 08 : Budget, Comptabilité & Reporting** - Transparence radicale. Chaque membre voit, comprend, et vérifie. Une comptabilité automatique qui élimine les disputes et renforce la confiance. (Grand livre partagé, états financiers standards, rapports mensuels).
+- **Module 09 : Dons, Culture & Engagement Communautaire** - Votre tontine comme moteur de la vie communautaire. Cagnottes thématiques, fêtes traditionnelles, projets collectifs — et la reconnaissance de chaque engagement. (Campagnes de collecte, mur des remerciements, annuaire).
+- **Module 10 : Gestion des Tontines en Nature** - Pour les tontines agricoles et rurales. Du catalogue de produits à la cartographie des parcelles — une logistique complète pour la terre et ceux qui la travaillent. (Échelle de qualité, logistique optimisée, cartographie GPS).
+- **Module 11 : Chat de Groupe** - Communiquez en temps réel au sein de chaque tontine. Messagerie sécurisée, annonces et partage de médias pour garder votre communauté connectée. (Messagerie dédiée, messages vocaux, annonces épinglées).
+- **Module 12 : Rapports Croisés & Analytics** - Transformez vos données en décisions. Rapports individuels, analyses multi-tontines et prévisions intelligentes pour piloter votre parcours financier communautaire. (Analyses croisées, tableaux de bord comparatifs, prévisions).
+- **Module 13 : Conseiller Financier IA** - Un coach financier personnel propulsé par intelligence artificielle. Conseils adaptés, simulations et éducation pour maximiser l'impact de chaque FCFA. (Simulateur de budget, suivi d'objectifs).
+- **Module 14 : Épargne+** - Fixez des objectifs d'épargne, investissez collectivement, et apprenez la finance. Transformez vos cotisations en capital productif. (Portefeuille diversifié, prélèvement automatique).
+- **Module 15 : Marketplace** - Catalogue collaboratif, commandes groupées, et vente collective. Achetez ensemble pour moins cher, vendez ensemble pour plus.
+- **Module 16 : Assemblée & Comptabilité Avancée** - Grand livre partagé, rapports OHADA, et assemblée générale virtuelle. La transparence radicale au service de la confiance. (Vote démocratique sur les décisions).
+- **Module 17 : Alertes & Notifications Intelligentes** - Push, SMS, email — configurez vos alertes par tontine. Mode Ne Pas Déranger, fréquences personnalisées, et résumés intelligents. (Multi-canal, alertes croisées).
+- **Module 18 : Calendrier Fusionné** - Un seul calendrier pour toutes vos tontines. Synchronisation iCal, gestion des événements, et rappels personnalisés. (Détection automatique des conflits).
+
+---
+
+> **Tchoua ne remplace pas la tontine traditionnelle — il lui donne des ailes numériques.** Plus de portée, plus de sécurité, plus d'impact. Tout en préservant son cœur humain.
 
 ---
 
