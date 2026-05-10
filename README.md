@@ -120,6 +120,100 @@ yarn dev
 
 Ouvrez ensuite [http://localhost:3000](http://localhost:3000) dans votre navigateur. Les modifications apportées dans le code (dossier `src/app/`) sont mises à jour automatiquement.
 
-### Déploiement
+### Déploiement Vercel (Recommandé pour Next.js)
 
-La solution est optimisée pour être déployée via la [Plateforme Vercel](https://vercel.com/new). Consultez la [documentation Next.js](https://nextjs.org/docs/app/building-your-application/deploying) pour plus d'informations sur les environnements de production.
+La solution est optimisée pour être déployée via la [Plateforme Vercel](https://vercel.com/new). Consultez la [documentation Next.js](https://nextjs.org/docs/app/building-your-application/deploying) pour plus d'informations.
+
+---
+
+### Déploiement avec Docker
+
+Pour un déploiement agnostique et portable, le projet inclut un fichier `Dockerfile` et un `docker-compose.yml`.
+
+1. **Générer l'image Docker** :
+   ```bash
+   docker build -t tchoua-app .
+   ```
+
+2. **Lancer avec Docker Compose** (Recommandé pour inclure la base de données) :
+   ```bash
+   docker-compose up -d
+   ```
+   L'application sera accessible sur le port défini dans votre configuration.
+
+---
+
+### Déploiement sur le Cloud
+
+L'architecture Next.js + Docker de Tchoua App permet un déploiement facile sur les principaux fournisseurs Cloud.
+
+#### 1. AWS (Amazon Web Services)
+- **Approche Serveur (EC2)** : Lancez une instance EC2 (Ubuntu), installez Docker, clonez le dépôt et exécutez `docker-compose up -d`.
+- **Approche Container (ECS / Fargate)** : Poussez votre image Docker sur ECR (Elastic Container Registry), puis créez un cluster ECS pour faire tourner le conteneur sans gérer de serveur.
+- **Approche Serverless (Amplify)** : Connectez votre dépôt GitHub à AWS Amplify Hosting pour un déploiement CI/CD automatique natif pour Next.js.
+
+#### 2. Microsoft Azure
+- **Azure App Service** : Créez une "Web App for Containers", pointez vers votre registre Docker (ACR ou Docker Hub) et Azure gérera le conteneur.
+- **Azure Static Web Apps** : Connectez le dépôt GitHub pour un déploiement CI/CD automatisé (idéal si vous utilisez le rendu statique).
+
+#### 3. Google Cloud Platform (GCP)
+- **Google Cloud Run** : L'option la plus simple et scalable. Poussez votre image Docker sur Artifact Registry, puis déployez-la sur Cloud Run. La scalabilité sera automatique (de 0 à N instances selon le trafic).
+- **Compute Engine** : Équivalent à EC2, lancez une VM et utilisez Docker Compose.
+
+#### 4. OVHcloud
+- **VPS / Bare Metal** : Louez un VPS Ubuntu chez OVH. Connectez-vous en SSH, installez Docker et Docker Compose, et lancez l'application. C'est l'option la plus économique pour garantir une **souveraineté des données** avec un hébergement en Europe ou en Afrique.
+
+---
+
+### Migration de la Base de Données : De Prisma vers PostgreSQL
+
+Par défaut, pour le développement, le projet peut être configuré avec SQLite. Pour un environnement de production multi-utilisateurs comme Tchoua, il est **indispensable** de migrer vers **PostgreSQL**.
+
+#### 1. Configuration de Prisma pour PostgreSQL
+
+1. Ouvrez le fichier `prisma/schema.prisma`.
+2. Modifiez le bloc `datasource` pour utiliser le provider PostgreSQL :
+   ```prisma
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+#### 2. Déploiement Standalone (PostgreSQL local ou VPS)
+Si vous gérez votre propre serveur (ex: VPS OVH, EC2 AWS) :
+1. Installez PostgreSQL sur votre serveur (ou décommentez le conteneur `db` PostgreSQL dans le `docker-compose.yml`).
+2. Mettez à jour votre fichier `.env` avec la chaîne de connexion classique :
+   ```env
+   DATABASE_URL="postgresql://utilisateur:mot_de_passe@localhost:5432/tchoua_db?schema=public"
+   ```
+3. Exécutez les migrations Prisma pour générer les tables :
+   ```bash
+   npx prisma migrate dev --name init_postgres
+   ```
+
+#### 3. Déploiement avec Supabase (PostgreSQL Managé Cloud)
+[Supabase](https://supabase.com/) est l'alternative open-source idéale à Firebase, basée sur une architecture PostgreSQL robuste, parfaite pour Tchoua.
+
+1. Créez un projet sur la console Supabase.
+2. Allez dans *Project Settings* > *Database* et récupérez l'URI de connexion (Connection String).
+3. Mettez à jour votre `.env`. Avec Supabase, vous avez besoin de deux URLs (une pour le connection pooling, une pour les migrations directes) :
+   ```env
+   # URI pour les requêtes normales (Transaction Pooler - Port 6543)
+   DATABASE_URL="postgresql://postgres.[PROJET]:[MOT_DE_PASSE]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+   
+   # URI directe pour les migrations Prisma (Session - Port 5432)
+   DIRECT_URL="postgresql://postgres.[PROJET]:[MOT_DE_PASSE]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+   ```
+4. Dans `prisma/schema.prisma`, ajoutez la directive `directUrl` :
+   ```prisma
+   datasource db {
+     provider  = "postgresql"
+     url       = env("DATABASE_URL")
+     directUrl = env("DIRECT_URL")
+   }
+   ```
+5. Appliquez la structure de la base de données sur Supabase via le terminal :
+   ```bash
+   npx prisma migrate deploy
+   ```
