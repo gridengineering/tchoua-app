@@ -1,34 +1,33 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
-# 1. Installer les dépendances
+# ─── Stage 1 : Dépendances ───────────────────────────────────────────────────
 FROM base AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copier les fichiers de dépendances et le schéma Prisma
-COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
+COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i; \
-  else echo "Warning: Lockfile not found." && npm install; \
-  fi
+RUN npm ci
 
-# 2. Construire l'application Next.js
+# ─── Stage 2 : Build Next.js ─────────────────────────────────────────────────
 FROM base AS builder
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Générer le client Prisma
-RUN npx prisma generate
+# Variables d'environnement nécessaires au build (valeurs fictives, remplacées au runtime)
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV NEXTAUTH_SECRET="placeholder-secret-for-build-only"
+ENV NEXTAUTH_URL="http://localhost:3000"
 
-# Construire le projet
+# Générer le client Prisma et builder l'app
+RUN npx prisma generate
 RUN npm run build
 
-# 3. Image de production
+# ─── Stage 3 : Image de production (minimale) ───────────────────────────────
 FROM base AS runner
 WORKDIR /app
 
@@ -36,17 +35,21 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN apk add --no-cache openssl
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
+# Copier uniquement les artefacts de build nécessaires
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 USER nextjs
+
 EXPOSE 3000
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

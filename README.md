@@ -126,7 +126,44 @@ La solution est optimisée pour être déployée via la [Plateforme Vercel](http
 
 ---
 
-### Déploiement avec Docker
+### Déploiement via Docker Hub (`tchoua/tchoua-app`)
+
+L'image officielle de Tchoua App est publiée sur Docker Hub sous l'organisation **tchoua** :
+
+🔗 **[hub.docker.com/r/tchoua/tchoua-app](https://hub.docker.com/r/tchoua/tchoua-app)**
+
+**Lancer l'application depuis Docker Hub (le plus simple) :**
+
+```bash
+# 1. Créer le fichier d'environnement
+cat > .env << 'EOF'
+DB_PASSWORD=votre_mot_de_passe_securise
+NEXTAUTH_SECRET=votre_secret_nextauth
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_FIREBASE_API_KEY=votre_cle_firebase
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=votre-projet.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=votre-projet
+EOF
+
+# 2. Lancer la stack complète (app + PostgreSQL)
+docker compose up -d
+
+# 3. Appliquer les migrations de base de données
+docker exec tchoua-app npx prisma migrate deploy
+```
+
+L'application sera accessible sur **http://localhost:3000**.
+
+**Publier une nouvelle version vers Docker Hub :**
+
+```bash
+# Build multi-platform (amd64 + arm64) et push automatique
+bash scripts/push-dockerhub.sh 1.0.0
+```
+
+> Pour créer l'organisation `tchoua` sur Docker Hub, rendez-vous sur [hub.docker.com/orgs/tchoua/create](https://hub.docker.com/orgs/create) puis exécutez `docker login` avec les identifiants du compte **tchaouh**.
+
+---
 
 Pour un déploiement agnostique et portable, le projet inclut un fichier `Dockerfile` et un `docker-compose.yml`.
 

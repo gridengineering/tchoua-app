@@ -1,55 +1,63 @@
-version: '3.8'
-
 services:
+  # ─── Application Tchoua App ───────────────────────────────────────────────
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: tchoua_app
+    image: tchoua/tchoua-app:latest
+    container_name: tchoua-app
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://tchoua:tchoua123@db:5432/tchouadb?schema=public
-      - NEXTAUTH_SECRET=tchoua_super_secret_key_2024
-      - NEXTAUTH_URL=https://localhost
+      NODE_ENV: production
+      DATABASE_URL: postgresql://tchoua_user:${DB_PASSWORD}@db:5432/tchoua_db
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
     depends_on:
       db:
         condition: service_healthy
-    # Met à jour le schéma de la base de données avant de démarrer
-    command: sh -c "npx prisma db push && npm start"
+    networks:
+      - tchoua-network
 
+  # ─── Base de données PostgreSQL ───────────────────────────────────────────
   db:
-    image: postgres:15-alpine
-    container_name: tchoua_db
+    image: postgres:16-alpine
+    container_name: tchoua-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: tchoua
-      POSTGRES_PASSWORD: tchoua123
-      POSTGRES_DB: tchouadb
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: tchoua_db
+      POSTGRES_USER: tchoua_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - tchoua_pgdata:/var/lib/postgresql/data
+      - tchoua-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tchoua -d tchouadb"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U tchoua_user -d tchoua_db"]
+      interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - tchoua-network
 
-  nginx:
-    image: nginx:alpine
-    container_name: tchoua_nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
-    depends_on:
-      - app
+  # ─── Nginx Reverse Proxy (optionnel, décommentez si pas de reverse proxy externe) ──
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: tchoua-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - tchoua-network
 
 volumes:
-  tchoua_pgdata:
+  tchoua-db-data:
+
+networks:
+  tchoua-network:
+    driver: bridge
