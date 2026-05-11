@@ -37,8 +37,8 @@ export default function MembersDirectoryPage() {
         
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 flex-1 w-full max-w-md bg-white px-3 py-2 rounded-lg border focus-within:ring-2 focus-within:ring-[#0d3d28]">
-            <Search className="w-5 h-5 text-gray-400" />
+          <div className="flex items-center gap-2 flex-1 w-full max-w-md bg-warm-white px-3 py-2 rounded-lg border focus-within:ring-2 focus-within:ring-[#0d3d28]">
+            <Search className="w-5 h-5 text-ash" />
             <input 
               type="text"
               placeholder="Rechercher par nom ou email..."
@@ -49,8 +49,8 @@ export default function MembersDirectoryPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border text-sm">
-              <Filter className="w-4 h-4 text-gray-500" />
+            <div className="flex items-center gap-2 bg-warm-white px-3 py-2 rounded-lg border text-sm">
+              <Filter className="w-4 h-4 text-graphite" />
               <select 
                 className="bg-transparent focus:outline-none"
                 value={statusFilter}
@@ -72,7 +72,7 @@ export default function MembersDirectoryPage() {
               Approbations
             </Link>
 
-            <button className="flex items-center gap-2 bg-[#0d3d28] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition">
+            <button className="flex items-center gap-2 bg-forest text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition">
               <UserPlus className="w-4 h-4" />
               Inviter
             </button>
@@ -83,7 +83,7 @@ export default function MembersDirectoryPage() {
         <Card className="overflow-hidden border-0 shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
+              <thead className="bg-cream text-gray-600 text-xs uppercase font-semibold">
                 <tr>
                   <th className="px-6 py-4">Membre</th>
                   <th className="px-6 py-4">Contact</th>
@@ -92,28 +92,28 @@ export default function MembersDirectoryPage() {
                   <th className="px-6 py-4 text-center">Score Fiabilité</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody className="divide-y divide-gray-100 bg-warm-white">
                 {loading ? (
-                  <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Chargement de l'annuaire...</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-8 text-center text-graphite">Chargement de l'annuaire...</td></tr>
                 ) : filteredMembers.length === 0 ? (
-                  <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Aucun membre trouvé.</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-8 text-center text-graphite">Aucun membre trouvé.</td></tr>
                 ) : (
                   filteredMembers.map((m) => (
-                    <tr key={m.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={m.id} className="hover:bg-cream transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#0d3d28]/10 flex items-center justify-center text-[#0d3d28] font-bold">
+                          <div className="w-10 h-10 rounded-full bg-forest/10 flex items-center justify-center text-[#0d3d28] font-bold">
                             {m.user.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
                             <div className="font-semibold text-gray-900">{m.user.name}</div>
-                            <div className="text-xs text-gray-500">Adhésion : {new Date(m.createdAt).toLocaleDateString()}</div>
+                            <div className="text-xs text-graphite">Adhésion : {new Date(m.createdAt).toLocaleDateString()}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-gray-900">{m.user.phone || "-"}</div>
-                        <div className="text-gray-500 text-xs">{m.user.email}</div>
+                        <div className="text-graphite text-xs">{m.user.email}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -123,12 +123,12 @@ export default function MembersDirectoryPage() {
                       <td className="px-6 py-4">
                         {m.status === 'ACTIVE' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Actif</span>}
                         {m.status === 'PENDING' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">En attente</span>}
-                        {m.status === 'SUSPENDED' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Suspendu</span>}
-                        {m.status === 'LEFT' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Parti</span>}
+                        {m.status === 'SUSPENDED' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error/10 text-red-800">Suspendu</span>}
+                        {m.status === 'LEFT' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-graphite">Parti</span>}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <span className={`font-bold ${m.reliabilityScore >= 80 ? 'text-green-600' : m.reliabilityScore >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`font-bold ${m.reliabilityScore >= 80 ? 'text-green-600' : m.reliabilityScore >= 50 ? 'text-gold' : 'text-red-600'}`}>
                             {m.reliabilityScore}%
                           </span>
                         </div>

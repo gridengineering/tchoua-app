@@ -254,7 +254,7 @@ function getRoleBadgeClass(role: string): string {
   switch (role) {
     case "PRESIDENT": return "bg-amber-100 text-amber-800";
     case "TREASURER": return "bg-green-100 text-green-800";
-    case "SECRETARY": return "bg-blue-100 text-blue-800";
+    case "SECRETARY": return "bg-info/10 text-blue-800";
     case "VICE_PRESIDENT": return "bg-purple-100 text-purple-800";
     case "AUDITOR": return "bg-indigo-100 text-indigo-800";
     default: return "bg-gray-100 text-gray-700";
@@ -264,7 +264,7 @@ function getRoleBadgeClass(role: string): string {
 function getReliabilityColor(score: number): string {
   if (score >= 80) return "bg-green-500";
   if (score >= 50) return "bg-orange-400";
-  return "bg-red-500";
+  return "bg-error";
 }
 
 function isBureau(role: string): boolean {
@@ -290,11 +290,11 @@ function getDocTypeLabel(type: string): string {
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="bg-warm-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-gray-100 transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-graphite" />
           </button>
         </div>
         <div className="p-6">{children}</div>
@@ -511,7 +511,7 @@ export default function AssociationDetailPage() {
         <div className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin w-10 h-10 border-4 border-t-transparent rounded-full" style={{ borderColor: "#0d3d28", borderTopColor: "transparent" }} />
-            <p className="text-sm text-gray-500">Chargement de l&apos;association...</p>
+            <p className="text-sm text-graphite">Chargement de l&apos;association...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -558,14 +558,14 @@ export default function AssociationDetailPage() {
       <div className="space-y-6 pb-10">
 
         {/* Breadcrumb */}
-        <Link href="/associations" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+        <Link href="/associations" className="inline-flex items-center gap-2 text-sm text-graphite hover:text-gray-800 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Retour aux associations
         </Link>
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="rounded-2xl overflow-hidden shadow-md">
           <div className="h-3" style={{ backgroundColor: assoc.color }} />
-          <div className="bg-white px-6 py-5">
+          <div className="bg-warm-white px-6 py-5">
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               {/* Logo / Initials */}
               <div
@@ -579,11 +579,11 @@ export default function AssociationDetailPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold text-gray-900 leading-tight">{assoc.name}</h1>
-                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${assoc.status === "ACTIVE" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${assoc.status === "ACTIVE" ? "bg-green-100 text-green-800" : "bg-error/10 text-red-800"}`}>
                     {assoc.status === "ACTIVE" ? "Active" : "Suspendue"}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <div className="flex flex-wrap items-center gap-3 text-sm text-graphite">
                   <span className="flex items-center gap-1"><Building2 className="w-3.5 h-3.5" />{getAssocTypeLabel(assoc.type)}</span>
                   {assoc.region && <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" />{assoc.region}</span>}
                   <span className="flex items-center gap-1 text-amber-700 font-medium">
@@ -607,13 +607,13 @@ export default function AssociationDetailPage() {
                 {isBureauMember && (
                   <>
                     <button
-                      className="inline-flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-cream transition-colors"
                       onClick={() => {}}
                     >
                       <UserPlus className="w-4 h-4" /> Inviter un membre
                     </button>
                     <button
-                      className="inline-flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-cream transition-colors"
                       onClick={() => router.push(`/associations/${id}/parametres`)}
                     >
                       <Settings className="w-4 h-4" /> Paramètres
@@ -635,7 +635,7 @@ export default function AssociationDetailPage() {
                 className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                   tab === key
                     ? "border-[#0d3d28] text-[#0d3d28] bg-[#f7f3eb]"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-graphite hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -662,7 +662,7 @@ export default function AssociationDetailPage() {
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                        <p className="text-xs text-graphite mb-1">{stat.label}</p>
                         <p className="text-xl font-bold text-gray-900">{stat.value}</p>
                       </div>
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: stat.color }}>
@@ -699,7 +699,7 @@ export default function AssociationDetailPage() {
                       <button
                         key={it.label}
                         onClick={() => it.onClick ? it.onClick() : router.push(it.href)}
-                        className="flex flex-col items-start gap-1 p-3 rounded-xl border border-gray-200 bg-white hover:bg-[#f7f3eb] hover:border-[#0d3d28] transition-all text-left"
+                        className="flex flex-col items-start gap-1 p-3 rounded-xl border border-gray-200 bg-warm-white hover:bg-[#f7f3eb] hover:border-[#0d3d28] transition-all text-left"
                       >
                         <div className="flex items-center justify-between w-full">
                           <span className="text-2xl">{it.icon}</span>
@@ -731,7 +731,7 @@ export default function AssociationDetailPage() {
                   </CardHeader>
                   <CardContent className="p-0">
                     {myActivities.length === 0 ? (
-                      <div className="py-8 text-center text-gray-400 text-sm">Vous n&apos;êtes abonné à aucune activité</div>
+                      <div className="py-8 text-center text-ash text-sm">Vous n&apos;êtes abonné à aucune activité</div>
                     ) : (
                       <div className="divide-y divide-gray-50">
                         {myActivities.map(act => (
@@ -739,13 +739,13 @@ export default function AssociationDetailPage() {
                             <span className="text-2xl">{getActivityTypeIcon(act.type)}</span>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm text-gray-900 truncate">{act.name}</p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-graphite">
                                 {act.contributionAmount ? formatCurrency(act.contributionAmount) : "Variable"} · {getFrequencyLabel(act.contributionFrequency)}
                               </p>
                             </div>
                             <div className="text-right">
                               <p className="text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Abonné ✓</p>
-                              <p className="text-xs text-gray-400 mt-0.5">Caisse : {formatCurrency(act.caisseBalance)}</p>
+                              <p className="text-xs text-ash mt-0.5">Caisse : {formatCurrency(act.caisseBalance)}</p>
                             </div>
                           </div>
                         ))}
@@ -767,7 +767,7 @@ export default function AssociationDetailPage() {
                             <span className="text-2xl">{getActivityTypeIcon(act.type)}</span>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm text-gray-900 truncate">{act.name}</p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-graphite">
                                 {act.contributionAmount ? formatCurrency(act.contributionAmount) : "Variable"} · {getFrequencyLabel(act.contributionFrequency)}
                               </p>
                             </div>
@@ -805,12 +805,12 @@ export default function AssociationDetailPage() {
                             <span>{upcomingMeeting.location}</span>
                           </div>
                         )}
-                        <div className="mt-3 p-2 rounded-lg bg-amber-50 text-amber-800 text-xs">
+                        <div className="mt-3 p-2 rounded-lg bg-gold/10 text-amber-800 text-xs">
                           Ordre du jour à confirmer
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-400">Aucune réunion planifiée</p>
+                      <p className="text-sm text-ash">Aucune réunion planifiée</p>
                     )}
                   </CardContent>
                 </Card>
@@ -825,18 +825,18 @@ export default function AssociationDetailPage() {
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {members.filter(m => m.reliabilityScore < 50).length > 0 && (
-                        <div className="flex items-start gap-2 text-sm p-2 bg-red-50 rounded-lg text-red-800">
+                        <div className="flex items-start gap-2 text-sm p-2 bg-error/10 rounded-lg text-red-800">
                           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                           <span>{members.filter(m => m.reliabilityScore < 50).length} membre(s) avec faible fiabilité</span>
                         </div>
                       )}
-                      <div className="flex items-start gap-2 text-sm p-2 bg-amber-50 rounded-lg text-amber-800">
+                      <div className="flex items-start gap-2 text-sm p-2 bg-gold/10 rounded-lg text-amber-800">
                         <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" />
                         <span>2 cotisations en retard ce mois</span>
                       </div>
                       <button
                         onClick={() => setModalSocialAid(true)}
-                        className="w-full text-left flex items-start gap-2 text-sm p-2 bg-blue-50 rounded-lg text-blue-800"
+                        className="w-full text-left flex items-start gap-2 text-sm p-2 bg-info/10 rounded-lg text-blue-800"
                       >
                         <Heart className="w-4 h-4 flex-shrink-0 mt-0.5" />
                         <span>1 demande d&apos;aide sociale en attente</span>
@@ -862,8 +862,8 @@ export default function AssociationDetailPage() {
                 const participationColor = act.participation === "MANDATORY"
                   ? "bg-green-100 text-green-800"
                   : act.participation === "OPTIONAL"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-orange-100 text-orange-800";
+                    ? "bg-info/10 text-blue-800"
+                    : "bg-warning/10 text-orange-800";
                 const participationLabel = act.participation === "MANDATORY" ? "Obligatoire" : act.participation === "OPTIONAL" ? "Optionnel" : "Conditionnel";
 
                 return (
@@ -874,7 +874,7 @@ export default function AssociationDetailPage() {
                           <span className="text-3xl">{getActivityTypeIcon(act.type)}</span>
                           <div>
                             <p className="font-semibold text-gray-900">{act.name}</p>
-                            <p className="text-xs text-gray-500">{getDistributionLabel(act.distributionMode)}</p>
+                            <p className="text-xs text-graphite">{getDistributionLabel(act.distributionMode)}</p>
                           </div>
                         </div>
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${participationColor}`}>{participationLabel}</span>
@@ -882,29 +882,29 @@ export default function AssociationDetailPage() {
 
                       <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                         <div>
-                          <p className="text-xs text-gray-400">Cotisation</p>
+                          <p className="text-xs text-ash">Cotisation</p>
                           <p className="font-medium text-gray-900">
                             {act.contributionAmount ? formatCurrency(act.contributionAmount) : "Variable"}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">Fréquence</p>
+                          <p className="text-xs text-ash">Fréquence</p>
                           <p className="font-medium text-gray-900">{getFrequencyLabel(act.contributionFrequency)}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">Distribution</p>
+                          <p className="text-xs text-ash">Distribution</p>
                           <p className="font-medium text-gray-900 flex items-center gap-1">
                             {getDistributionIcon(act.distributionMode)} {getDistributionLabel(act.distributionMode)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">Abonnés</p>
+                          <p className="text-xs text-ash">Abonnés</p>
                           <p className="font-medium text-gray-900">{act.subscriptions?.length ?? 0} / {members.length}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div className="text-xs text-gray-500">
+                      <div className="flex items-center justify-between pt-3 border-t border-stone">
+                        <div className="text-xs text-graphite">
                           Caisse : <span className="font-semibold text-gray-800">{formatCurrency(act.caisseBalance)}</span>
                         </div>
                         {act.participation === "OPTIONAL" && !act.mySubscription ? (
@@ -933,7 +933,7 @@ export default function AssociationDetailPage() {
                     <span className="text-4xl">{getActivityTypeIcon(selectedActivity.type)}</span>
                     <div>
                       <p className="text-lg font-semibold text-gray-900">{selectedActivity.name}</p>
-                      <p className="text-sm text-gray-500">{getDistributionLabel(selectedActivity.distributionMode)}</p>
+                      <p className="text-sm text-graphite">{getDistributionLabel(selectedActivity.distributionMode)}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -945,17 +945,17 @@ export default function AssociationDetailPage() {
                       { label: "Mode distribution", value: getDistributionLabel(selectedActivity.distributionMode) },
                       { label: "Caisse", value: formatCurrency(selectedActivity.caisseBalance) },
                     ].map(({ label, value }) => (
-                      <div key={label} className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+                      <div key={label} className="bg-cream rounded-lg p-3">
+                        <p className="text-xs text-ash mb-0.5">{label}</p>
                         <p className="font-medium text-gray-900">{value}</p>
                       </div>
                     ))}
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
                       Voir les sessions
                     </button>
-                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
                       Voir les cotisations
                     </button>
                   </div>
@@ -973,7 +973,7 @@ export default function AssociationDetailPage() {
             {/* Search & Filters */}
             <div className="flex flex-wrap gap-3">
               <div className="relative flex-1 min-w-48">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ash" />
                 <input
                   type="text"
                   placeholder="Rechercher un membre..."
@@ -1018,7 +1018,7 @@ export default function AssociationDetailPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50">
+                    <tr className="border-b border-stone bg-cream">
                       <th className="text-left px-6 py-3 font-medium text-gray-600">Membre</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Rôle</th>
                       <th className="text-left px-4 py-3 font-medium text-gray-600">Statut</th>
@@ -1029,7 +1029,7 @@ export default function AssociationDetailPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {filteredMembers.map(member => (
-                      <tr key={member.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={member.id} className="hover:bg-cream transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div
@@ -1040,7 +1040,7 @@ export default function AssociationDetailPage() {
                             </div>
                             <div>
                               <p className="font-medium text-gray-900">{member.user.name}</p>
-                              <p className="text-xs text-gray-400">{member.user.email}</p>
+                              <p className="text-xs text-ash">{member.user.email}</p>
                             </div>
                           </div>
                         </td>
@@ -1081,12 +1081,12 @@ export default function AssociationDetailPage() {
                                 onClick={() => setEditingMemberRole(member)}
                                 disabled={member.role === "FOUNDER"}
                                 title={member.role === "FOUNDER" ? "Le fondateur ne peut être modifié" : "Modifier le rôle"}
-                                className="text-xs px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="text-xs px-2 py-1 rounded border border-gray-200 hover:bg-cream text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
                               >
                                 Rôle
                               </button>
                               {member.status === "ACTIVE" ? (
-                                <button className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-red-50 text-red-600">
+                                <button className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-error/10 text-red-600">
                                   Suspendre
                                 </button>
                               ) : (
@@ -1101,7 +1101,7 @@ export default function AssociationDetailPage() {
                     ))}
                     {filteredMembers.length === 0 && (
                       <tr>
-                        <td colSpan={isBureauMember ? 6 : 5} className="py-10 text-center text-gray-400">
+                        <td colSpan={isBureauMember ? 6 : 5} className="py-10 text-center text-ash">
                           Aucun membre trouvé
                         </td>
                       </tr>
@@ -1133,20 +1133,20 @@ export default function AssociationDetailPage() {
 
             {/* Upcoming meetings */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">À venir</h3>
+              <h3 className="text-sm font-semibold text-graphite uppercase tracking-wide mb-3">À venir</h3>
               <div className="space-y-3">
                 {meetings.filter(m => m.status === "UPCOMING").map(meeting => (
                   <Card key={meeting.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedMeeting(meeting)}>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-[#0d3d28]/10 flex flex-col items-center justify-center">
+                          <div className="w-12 h-12 rounded-xl bg-forest/10 flex flex-col items-center justify-center">
                             <span className="text-xs font-bold text-[#0d3d28]">{new Date(meeting.scheduledAt).toLocaleDateString("fr", { day: "2-digit" })}</span>
                             <span className="text-xs text-[#0d3d28]">{new Date(meeting.scheduledAt).toLocaleDateString("fr", { month: "short" })}</span>
                           </div>
                           <div>
                             <p className="font-semibold text-gray-900">{meeting.title ?? getMeetingTypeLabel(meeting.type)}</p>
-                            <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
+                            <p className="text-sm text-graphite flex items-center gap-1 mt-0.5">
                               <Clock className="w-3.5 h-3.5" />
                               {new Date(meeting.scheduledAt).toLocaleTimeString("fr", { hour: "2-digit", minute: "2-digit" })}
                               {meeting.location && <><span className="mx-1">·</span>{meeting.location}</>}
@@ -1154,7 +1154,7 @@ export default function AssociationDetailPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">{getMeetingTypeLabel(meeting.type)}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-blue-800">{getMeetingTypeLabel(meeting.type)}</span>
                           <StatusBadge status={meeting.status} />
                         </div>
                       </div>
@@ -1162,14 +1162,14 @@ export default function AssociationDetailPage() {
                   </Card>
                 ))}
                 {meetings.filter(m => m.status === "UPCOMING").length === 0 && (
-                  <div className="py-6 text-center text-gray-400 text-sm">Aucune réunion à venir</div>
+                  <div className="py-6 text-center text-ash text-sm">Aucune réunion à venir</div>
                 )}
               </div>
             </div>
 
             {/* Past meetings */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Passées</h3>
+              <h3 className="text-sm font-semibold text-graphite uppercase tracking-wide mb-3">Passées</h3>
               <div className="space-y-3">
                 {meetings.filter(m => m.status === "DONE").map(meeting => (
                   <Card key={meeting.id} className="cursor-pointer hover:shadow-md transition-shadow opacity-80" onClick={() => setSelectedMeeting(meeting)}>
@@ -1178,16 +1178,16 @@ export default function AssociationDetailPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-xl bg-gray-100 flex flex-col items-center justify-center">
                             <span className="text-xs font-bold text-gray-600">{new Date(meeting.scheduledAt).toLocaleDateString("fr", { day: "2-digit" })}</span>
-                            <span className="text-xs text-gray-500">{new Date(meeting.scheduledAt).toLocaleDateString("fr", { month: "short" })}</span>
+                            <span className="text-xs text-graphite">{new Date(meeting.scheduledAt).toLocaleDateString("fr", { month: "short" })}</span>
                           </div>
                           <div>
                             <p className="font-semibold text-gray-700">{meeting.title ?? getMeetingTypeLabel(meeting.type)}</p>
-                            <p className="text-sm text-gray-400 flex items-center gap-2 mt-0.5">
+                            <p className="text-sm text-ash flex items-center gap-2 mt-0.5">
                               <span>{meeting.attendeeCount ?? 0} présents</span>
                               {meeting.quorumReached ? (
                                 <span className="flex items-center gap-0.5 text-green-600"><CheckCircle className="w-3.5 h-3.5" /> Quorum atteint</span>
                               ) : (
-                                <span className="flex items-center gap-0.5 text-red-500"><AlertCircle className="w-3.5 h-3.5" /> Pas de quorum</span>
+                                <span className="flex items-center gap-0.5 text-error"><AlertCircle className="w-3.5 h-3.5" /> Pas de quorum</span>
                               )}
                             </p>
                           </div>
@@ -1205,29 +1205,29 @@ export default function AssociationDetailPage() {
               <Modal title={selectedMeeting.title ?? getMeetingTypeLabel(selectedMeeting.type)} onClose={() => setSelectedMeeting(null)}>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-400 mb-0.5">Date</p>
+                    <div className="bg-cream rounded-lg p-3">
+                      <p className="text-xs text-ash mb-0.5">Date</p>
                       <p className="font-medium">{formatDate(selectedMeeting.scheduledAt)}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-400 mb-0.5">Type</p>
+                    <div className="bg-cream rounded-lg p-3">
+                      <p className="text-xs text-ash mb-0.5">Type</p>
                       <p className="font-medium">{getMeetingTypeLabel(selectedMeeting.type)}</p>
                     </div>
                     {selectedMeeting.location && (
-                      <div className="bg-gray-50 rounded-lg p-3 col-span-2">
-                        <p className="text-xs text-gray-400 mb-0.5">Lieu</p>
+                      <div className="bg-cream rounded-lg p-3 col-span-2">
+                        <p className="text-xs text-ash mb-0.5">Lieu</p>
                         <p className="font-medium">{selectedMeeting.location}</p>
                       </div>
                     )}
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-400 mb-0.5">Quorum</p>
+                    <div className="bg-cream rounded-lg p-3">
+                      <p className="text-xs text-ash mb-0.5">Quorum</p>
                       <p className={`font-medium ${selectedMeeting.quorumReached ? "text-green-700" : "text-red-600"}`}>
                         {selectedMeeting.quorumReached ? "Atteint" : "Non atteint"}
                       </p>
                     </div>
                     {selectedMeeting.attendeeCount !== undefined && (
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-400 mb-0.5">Présents</p>
+                      <div className="bg-cream rounded-lg p-3">
+                        <p className="text-xs text-ash mb-0.5">Présents</p>
                         <p className="font-medium">{selectedMeeting.attendeeCount}</p>
                       </div>
                     )}
@@ -1266,9 +1266,9 @@ export default function AssociationDetailPage() {
               {activities.map(act => (
                 <Card key={act.id}>
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-500 mb-1 truncate">{act.name}</p>
+                    <p className="text-xs text-graphite mb-1 truncate">{act.name}</p>
                     <p className="text-lg font-bold text-gray-900">{formatCurrency(act.caisseBalance)}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Caisse</p>
+                    <p className="text-xs text-ash mt-0.5">Caisse</p>
                   </CardContent>
                 </Card>
               ))}
@@ -1297,7 +1297,7 @@ export default function AssociationDetailPage() {
                       <div key={c.id} className="flex items-center justify-between px-6 py-3">
                         <div>
                           <p className="text-sm font-medium text-gray-900">{c.memberName}</p>
-                          <p className="text-xs text-gray-500">{c.activityName} · {formatDate(c.date)}</p>
+                          <p className="text-xs text-graphite">{c.activityName} · {formatDate(c.date)}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-sm text-gray-900">{formatCurrency(c.amount)}</p>
@@ -1316,7 +1316,7 @@ export default function AssociationDetailPage() {
                   <div className="space-y-3">
                     {monthlyData.map(({ month, collected, expected }) => (
                       <div key={month}>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-graphite mb-1">
                           <span>{month}</span>
                           <span>{formatCurrency(collected)} / {formatCurrency(expected)}</span>
                         </div>
@@ -1355,7 +1355,7 @@ export default function AssociationDetailPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle>Comptes bancaires</CardTitle>
                   {(myRole === "PRESIDENT" || myRole === "TREASURER") && (
-                    <button className="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <button className="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
                       + Ajouter un compte
                     </button>
                   )}
@@ -1367,15 +1367,15 @@ export default function AssociationDetailPage() {
                     { label: "Compte Courant Principal", type: "COURANT", number: "****  ****  **42", bank: "Afriland First Bank" },
                     { label: "Compte Épargne Solidarité", type: "EPARGNE", number: "****  ****  **78", bank: "SCB Cameroun" },
                   ].map((account, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-cream border border-stone">
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#0d3d28" }}>
                         <Building2 className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm text-gray-900">{account.label}</p>
-                        <p className="text-xs text-gray-500">{account.bank} · {account.number}</p>
+                        <p className="text-xs text-graphite">{account.bank} · {account.number}</p>
                       </div>
-                      <span className="text-xs font-medium px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">{account.type}</span>
+                      <span className="text-xs font-medium px-2 py-0.5 bg-info/10 text-blue-800 rounded-full">{account.type}</span>
                     </div>
                   ))}
                 </div>
@@ -1404,16 +1404,16 @@ export default function AssociationDetailPage() {
                     {[
                       { name: "Thomas Biya", category: "SANTE", amount: 150000, date: "2026-05-01" },
                     ].map((req, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                      <div key={i} className="flex items-center justify-between p-3 bg-info/10 rounded-xl">
                         <div>
                           <p className="font-medium text-sm text-gray-900">{req.name}</p>
-                          <p className="text-xs text-gray-500">{req.category} · {formatDate(req.date)}</p>
+                          <p className="text-xs text-graphite">{req.category} · {formatDate(req.date)}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-sm text-gray-900">{formatCurrency(req.amount)}</p>
                           <div className="flex gap-1 mt-1">
                             <button className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200">Approuver</button>
-                            <button className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded hover:bg-red-200">Refuser</button>
+                            <button className="text-xs px-2 py-0.5 bg-error/10 text-red-700 rounded hover:bg-red-200">Refuser</button>
                           </div>
                         </div>
                       </div>
@@ -1461,12 +1461,12 @@ export default function AssociationDetailPage() {
                 <Card key={doc.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#0d3d28]/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center flex-shrink-0">
                         <FileText className="w-6 h-6 text-[#0d3d28]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{doc.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                        <div className="flex items-center gap-2 text-xs text-graphite mt-0.5">
                           <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{getDocTypeLabel(doc.type)}</span>
                           <span>·</span>
                           <span>{formatDate(doc.createdAt)}</span>
@@ -1480,7 +1480,7 @@ export default function AssociationDetailPage() {
                               href={doc.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+                              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-cream"
                             >
                               Voir
                             </a>
@@ -1500,7 +1500,7 @@ export default function AssociationDetailPage() {
                 </Card>
               ))}
               {filteredDocuments.length === 0 && (
-                <div className="py-10 text-center text-gray-400 text-sm">
+                <div className="py-10 text-center text-ash text-sm">
                   <FileText className="w-10 h-10 mx-auto mb-2 text-gray-200" />
                   Aucun document trouvé
                 </div>
@@ -1528,7 +1528,7 @@ export default function AssociationDetailPage() {
                   className={`text-sm font-medium px-3 py-1.5 rounded-full transition-all ${
                     chatChannel === ch.key
                       ? "text-white"
-                      : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
+                      : "bg-warm-white border border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                   style={chatChannel === ch.key ? { backgroundColor: "#0d3d28" } : {}}
                 >
@@ -1541,7 +1541,7 @@ export default function AssociationDetailPage() {
             <Card className="flex-1 flex flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                  <div className="flex items-center justify-center h-full text-ash text-sm">
                     <div className="text-center">
                       <MessageSquare className="w-10 h-10 mx-auto mb-2 text-gray-200" />
                       Aucun message dans ce canal
@@ -1561,7 +1561,7 @@ export default function AssociationDetailPage() {
                           {msg.senderId !== "me" && (
                             <span className="text-xs font-semibold text-gray-700">{msg.senderName}</span>
                           )}
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-ash">
                             {new Date(msg.createdAt).toLocaleTimeString("fr", { hour: "2-digit", minute: "2-digit" })}
                           </span>
                         </div>
@@ -1583,7 +1583,7 @@ export default function AssociationDetailPage() {
               </div>
 
               {/* Input */}
-              <div className="border-t border-gray-100 p-4">
+              <div className="border-t border-stone p-4">
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -1635,7 +1635,7 @@ export default function AssociationDetailPage() {
                   onChange={e => setSubscribeForm({ parts: Number(e.target.value) })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28]/20"
                 />
-                <p className="text-xs text-gray-400 mt-1">Entre 1 et 5 parts</p>
+                <p className="text-xs text-ash mt-1">Entre 1 et 5 parts</p>
               </div>
               {modalSubscribe.contributionAmount && (
                 <div className="p-3 rounded-xl bg-green-50 border border-green-200">
@@ -1645,7 +1645,7 @@ export default function AssociationDetailPage() {
                 </div>
               )}
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setModalSubscribe(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button onClick={() => setModalSubscribe(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
@@ -1739,7 +1739,7 @@ export default function AssociationDetailPage() {
                 />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setModalMeeting(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button onClick={() => setModalMeeting(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
@@ -1793,14 +1793,14 @@ export default function AssociationDetailPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Fichier</label>
                 <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-[#0d3d28]/40 transition-colors">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                  <p className="text-sm text-gray-500">Glisser-déposer ou</p>
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-ash/60" />
+                  <p className="text-sm text-graphite">Glisser-déposer ou</p>
                   <button className="mt-1 text-sm font-medium text-[#0d3d28] hover:underline">parcourir</button>
-                  <p className="text-xs text-gray-400 mt-1">PDF, DOCX, XLSX — max 10 MB</p>
+                  <p className="text-xs text-ash mt-1">PDF, DOCX, XLSX — max 10 MB</p>
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setModalDocument(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button onClick={() => setModalDocument(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
@@ -1877,7 +1877,7 @@ export default function AssociationDetailPage() {
                 />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setModalCotisation(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button onClick={() => setModalCotisation(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
@@ -1925,7 +1925,7 @@ export default function AssociationDetailPage() {
                 </select>
               </div>
               {socialAidCaps.length > 0 && (
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                <div className="p-3 rounded-xl bg-gold/10 border border-amber-200 text-xs text-amber-800">
                   Plafond pour cette catégorie : <strong>
                     {formatCurrency(socialAidCaps.find(c => c.category === socialAidForm.category)?.cap ?? 0)}
                   </strong>
@@ -1952,7 +1952,7 @@ export default function AssociationDetailPage() {
                 />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setModalSocialAid(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button onClick={() => setModalSocialAid(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
@@ -2035,21 +2035,21 @@ function MemberRoleModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-        <div className="px-5 py-3 border-b border-gray-100">
+      <div className="bg-warm-white rounded-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="px-5 py-3 border-b border-stone">
           <h3 className="text-base font-bold">Modifier le rôle</h3>
-          <p className="text-xs text-gray-500">{member.user.name} · {member.user.email}</p>
+          <p className="text-xs text-graphite">{member.user.name} · {member.user.email}</p>
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Rôle de base</label>
+            <label className="text-xs font-semibold text-graphite uppercase tracking-wide mb-1 block">Rôle de base</label>
             <select className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
               value={role} onChange={(e) => setRole(e.target.value)}>
               {BASE_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
+            <label className="text-xs font-semibold text-graphite uppercase tracking-wide mb-1 block">
               Rôle personnalisé (optionnel)
             </label>
             <select className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
@@ -2058,15 +2058,15 @@ function MemberRoleModal({
               {customRoles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
             {customRoles.length === 0 && (
-              <p className="text-xs text-gray-400 mt-1 italic">Créez des rôles personnalisés depuis Paramètres.</p>
+              <p className="text-xs text-ash mt-1 italic">Créez des rôles personnalisés depuis Paramètres.</p>
             )}
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
-        <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Annuler</button>
+        <div className="px-5 py-3 border-t border-stone flex justify-end gap-2">
+          <button onClick={onClose} className="px-3 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-cream">Annuler</button>
           <button onClick={save} disabled={saving}
-            className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-[#0d3d28] disabled:opacity-50">
+            className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-forest disabled:opacity-50">
             {saving ? "Enregistrement..." : "Enregistrer"}
           </button>
         </div>

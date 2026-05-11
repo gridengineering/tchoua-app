@@ -3,16 +3,16 @@
 :root {
   --background: #FAF7F2;
   --foreground: #1A1A1A;
-  --forest: #165E39;
-  --forest-dark: #0F3F26;
-  --forest-light: #2D8A5E;
+  --forest: #1B4D3E;
+  --forest-dark: #0F2E24;
+  --forest-light: #2D7A62;
   --primary: var(--forest);
   --primary-dark: var(--forest-dark);
   --primary-light: var(--forest-light);
-  --secondary: #E38513;
-  --secondary-light: #F5A542;
-  --gold: #E38513;
-  --gold-light: #F5A542;
+  --secondary: #C4782C;
+  --secondary-light: #E8A85C;
+  --gold: #D4A843;
+  --gold-light: #F0D78C;
   --teal: #0D7377;
   --teal-light: #14A3A8;
   --indigo: #3D2B5C;
@@ -29,15 +29,15 @@
   --error: #C44B4B;
   --info: #0D7377;
   --border: #E8E2D9;
-  --radius: 1.5rem;
+  --radius: 0.625rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-forest: var(--primary);
-  --color-forest-dark: var(--primary-dark);
-  --color-forest-light: var(--primary-light);
+  --color-forest: var(--forest);
+  --color-forest-dark: var(--forest-dark);
+  --color-forest-light: var(--forest-light);
   --color-terracotta: var(--secondary);
   --color-terracotta-light: var(--secondary-light);
   --color-gold: var(--gold);
@@ -57,6 +57,11 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
   --color-info: var(--info);
+
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-heading: var(--font-dm-sans), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-accent: var(--font-crimson-pro), Georgia, serif;
 }
 
 * {
@@ -66,8 +71,12 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }
@@ -79,9 +88,9 @@ body {
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
-  
+
   .text-display-xl {
-    font-family: var(--font-heading), system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(3rem, 6vw, 5.5rem);
     font-weight: 700;
     line-height: 1.05;
@@ -89,7 +98,7 @@ body {
   }
 
   .text-display-lg {
-    font-family: var(--font-heading), system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(2.5rem, 4vw, 4rem);
     font-weight: 700;
     line-height: 1.08;
@@ -97,11 +106,25 @@ body {
   }
 
   .text-display-md {
-    font-family: var(--font-heading), system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(1.75rem, 3vw, 2.5rem);
     font-weight: 600;
     line-height: 1.12;
     letter-spacing: -0.01em;
+  }
+
+  .text-body-lg {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.65;
+  }
+
+  .text-quote {
+    font-family: var(--font-accent);
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   .gradient-hero {
@@ -113,7 +136,7 @@ body {
   }
 
   .gradient-forest {
-    background: linear-gradient(180deg, #165E39 0%, #0F3F26 100%);
+    background: linear-gradient(180deg, #1B4D3E 0%, #0F2E24 100%);
   }
 
   .gradient-gold {
@@ -138,4 +161,19 @@ body {
 @keyframes float-delayed {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes caret-blink {
+  0%,70%,100% { opacity: 1; }
+  20%,50% { opacity: 0; }
 }

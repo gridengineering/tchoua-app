@@ -64,12 +64,12 @@ export default function PendingApprovalsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-500">Chargement...</div>
+          <div className="text-center py-12 text-graphite">Chargement...</div>
         ) : members.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+          <div className="text-center py-16 bg-warm-white rounded-xl border border-dashed border-gray-300">
             <CheckCircle className="w-12 h-12 text-green-200 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-gray-900">Tout est à jour !</h3>
-            <p className="text-gray-500 mt-1">Aucune demande d'adhésion en attente.</p>
+            <p className="text-graphite mt-1">Aucune demande d'adhésion en attente.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -79,14 +79,14 @@ export default function PendingApprovalsPage() {
 
               return (
                 <Card key={m.id} className="overflow-hidden shadow-sm hover:shadow-md transition">
-                  <div className="p-5 border-b bg-gray-50/50">
+                  <div className="p-5 border-b bg-cream/50">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-lg">
                         {m.user.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">{m.user.name}</h3>
-                        <p className="text-xs text-gray-500">{m.user.email}</p>
+                        <p className="text-xs text-graphite">{m.user.email}</p>
                       </div>
                     </div>
                   </div>
@@ -94,19 +94,19 @@ export default function PendingApprovalsPage() {
                   <CardContent className="p-5 space-y-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="block text-xs font-semibold text-gray-400 uppercase">Téléphone</span>
+                        <span className="block text-xs font-semibold text-ash uppercase">Téléphone</span>
                         <span className="text-gray-900">{m.user.phone || "-"}</span>
                       </div>
                       <div>
-                        <span className="block text-xs font-semibold text-gray-400 uppercase">Ville</span>
+                        <span className="block text-xs font-semibold text-ash uppercase">Ville</span>
                         <span className="text-gray-900">{m.user.location || "-"}</span>
                       </div>
                       <div>
-                        <span className="block text-xs font-semibold text-gray-400 uppercase">Profession</span>
+                        <span className="block text-xs font-semibold text-ash uppercase">Profession</span>
                         <span className="text-gray-900">{m.user.profession || "-"}</span>
                       </div>
                       <div>
-                        <span className="block text-xs font-semibold text-gray-400 uppercase text-amber-600 flex items-center gap-1">
+                        <span className="block text-xs font-semibold text-ash uppercase text-gold flex items-center gap-1">
                           <Users className="w-3 h-3" /> Parrain
                         </span>
                         <span className="text-gray-900 font-medium">
@@ -115,11 +115,11 @@ export default function PendingApprovalsPage() {
                       </div>
                     </div>
 
-                    <div className="bg-gray-50 p-3 rounded-lg border text-xs">
-                      <span className="block font-semibold text-gray-500 uppercase mb-2">Informations Familiales</span>
+                    <div className="bg-cream p-3 rounded-lg border text-xs">
+                      <span className="block font-semibold text-graphite uppercase mb-2">Informations Familiales</span>
                       <ul className="space-y-1 text-gray-700">
-                        <li><span className="text-gray-400">Conjointe:</span> {family.firstSpouseName || "-"}</li>
-                        <li><span className="text-gray-400">Enfants:</span> {family.childrenCount || "0"}</li>
+                        <li><span className="text-ash">Conjointe:</span> {family.firstSpouseName || "-"}</li>
+                        <li><span className="text-ash">Enfants:</span> {family.childrenCount || "0"}</li>
                       </ul>
                     </div>
 
@@ -127,7 +127,7 @@ export default function PendingApprovalsPage() {
                       <button
                         onClick={() => handleAction(m.id, "REJECTED")}
                         disabled={actionLoading === m.id}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold transition disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-error/10 text-sm font-semibold transition disabled:opacity-50"
                       >
                         <XCircle className="w-4 h-4" /> Rejeter
                       </button>

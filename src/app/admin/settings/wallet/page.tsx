@@ -166,11 +166,11 @@ export default function WalletSettingsPage() {
             <ShieldAlert className="w-5 h-5 text-gray-400" /> Seuils Sécurité OTP (2FA)
           </h2>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Retrait (> FCFA exige OTP)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Retrait ({'>'} FCFA exige OTP)</label>
             <input type="number" name="otpWithdrawalThreshold" value={config?.otpWithdrawalThreshold} onChange={handleChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold outline-none focus:ring-2 focus:ring-orange-500/20" />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Transfert (> FCFA exige OTP)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Transfert ({'>'} FCFA exige OTP)</label>
             <input type="number" name="otpTransferThreshold" value={config?.otpTransferThreshold} onChange={handleChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 font-bold outline-none focus:ring-2 focus:ring-orange-500/20" />
           </div>
           <p className="text-xs text-gray-400 mt-2">Les transactions au-dessus de ces seuils déclencheront systématiquement une validation par code (OTP).</p>

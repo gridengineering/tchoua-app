@@ -17,9 +17,9 @@ const levels = [
 ];
 
 const dimensions = [
-  { icon: Zap, title: 'Fiabilité Financière', score: 280, max: 400, color: 'bg-emerald-500' },
-  { icon: HeartHandshake, title: 'Solidarité', score: 210, max: 300, color: 'bg-blue-500' },
-  { icon: Sprout, title: 'Nature & Services', score: 140, max: 200, color: 'bg-orange-500' },
+  { icon: Zap, title: 'Fiabilité Financière', score: 280, max: 400, color: 'bg-forest' },
+  { icon: HeartHandshake, title: 'Solidarité', score: 210, max: 300, color: 'bg-info' },
+  { icon: Sprout, title: 'Nature & Services', score: 140, max: 200, color: 'bg-warning' },
   { icon: Shield, title: 'Conformité Éthique', score: 92, max: 100, color: 'bg-gold' },
 ];
 
@@ -38,8 +38,8 @@ export default function MemberGamificationPage() {
       <div className="space-y-8 animate-in fade-in duration-500">
         
         {/* Profile Card / Hero */}
-        <div className="bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-[2.5rem] p-10 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#e68a00]/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+        <div className="bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-2xl p-10 text-white shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
             <div className="relative">
               <div className="w-32 h-32 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-5xl">
@@ -52,7 +52,7 @@ export default function MemberGamificationPage() {
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/20 border border-gold/20 mb-4">
                 <Trophy className="w-3 h-3 text-gold" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-gold">Statut : {currentLevel.name}</span>
+                <span className="text-[9px] text-xs font-medium text-ash uppercase tracking-wider text-gold">Statut : {currentLevel.name}</span>
               </div>
               <h1 className="text-4xl font-black mb-2">{session?.user?.name || "Membre Tchoua"}</h1>
               <p className="text-emerald-100/60 font-medium max-w-md">
@@ -66,16 +66,16 @@ export default function MemberGamificationPage() {
         {/* Dimension Scores */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {dimensions.map((dim, i) => (
-            <div key={dim.title} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
+            <div key={dim.title} className="bg-warm-white rounded-3xl p-8 border border-stone shadow-sm hover:shadow-xl transition-all group">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-2xl ${dim.color} text-white flex items-center justify-center shadow-lg`}>
                     <dim.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-black text-gray-900">{dim.title}</h3>
+                  <h3 className="text-lg font-semibold text-charcoal">{dim.title}</h3>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl font-black text-gray-900">{dim.score} <span className="text-gray-300 text-sm font-bold">/ {dim.max}</span></div>
+                  <div className="text-xl font-semibold text-charcoal">{dim.score} <span className="text-ash/60 text-sm font-bold">/ {dim.max}</span></div>
                 </div>
               </div>
               <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -91,9 +91,9 @@ export default function MemberGamificationPage() {
         </div>
 
         {/* Levels Timeline */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-warm-white rounded-2xl p-10 border border-stone shadow-sm overflow-hidden">
           <div className="flex items-center justify-between mb-10">
-             <h2 className="text-2xl font-black text-gray-900">Progression des Niveaux</h2>
+             <h2 className="text-2xl font-semibold text-charcoal">Progression des Niveaux</h2>
              <Target className="w-6 h-6 text-gray-200" />
           </div>
           <div className="relative">
@@ -109,13 +109,13 @@ export default function MemberGamificationPage() {
                   <div key={lvl.name} className="flex flex-col items-center">
                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border-4 transition-all ${
                       isActive ? 'bg-gold text-white border-gold shadow-xl scale-110' : 
-                      isPassed ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-gray-200 border-gray-100'
+                      isPassed ? 'bg-forest text-white border-emerald-500' : 'bg-warm-white text-gray-200 border-stone'
                     }`}>
                       <lvl.icon className="w-8 h-8" />
                     </div>
                     <div className="text-center">
-                      <div className={`text-sm font-black ${isActive ? 'text-gray-900' : isPassed ? 'text-emerald-600' : 'text-gray-400'}`}>{lvl.name}</div>
-                      <div className="text-[10px] font-bold text-gray-400 mt-1">{lvl.xp} XP</div>
+                      <div className={`text-sm font-black ${isActive ? 'text-gray-900' : isPassed ? 'text-forest' : 'text-ash'}`}>{lvl.name}</div>
+                      <div className="text-[10px] font-bold text-ash mt-1">{lvl.xp} XP</div>
                     </div>
                   </div>
                 );
@@ -125,24 +125,24 @@ export default function MemberGamificationPage() {
         </div>
 
         {/* Privileges */}
-        <div className="bg-[#f7f3eb] rounded-[2.5rem] p-10 border border-[#e2ddd4]">
-           <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-             <Zap className="w-6 h-6 text-[#e68a00]" /> Vos Privilèges Actuels
+        <div className="bg-[#f7f3eb] rounded-2xl p-10 border border-[#e2ddd4]">
+           <h2 className="text-2xl font-semibold text-charcoal mb-8 flex items-center gap-3">
+             <Zap className="w-6 h-6 text-gold" /> Vos Privilèges Actuels
            </h2>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {currentLevel.privileges.map((p, i) => (
-                <div key={i} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm">
-                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <div key={i} className="flex items-center gap-4 bg-warm-white p-5 rounded-2xl shadow-sm">
+                   <div className="w-10 h-10 rounded-xl bg-forest/10 text-forest flex items-center justify-center flex-shrink-0">
                       <Star className="w-5 h-5 fill-current" />
                    </div>
                    <span className="font-bold text-gray-700">{p}</span>
                 </div>
               ))}
               <div className="flex items-center gap-4 bg-white/50 border border-dashed border-gray-300 p-5 rounded-2xl opacity-60">
-                 <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center flex-shrink-0">
+                 <div className="w-10 h-10 rounded-xl bg-gray-100 text-ash flex items-center justify-center flex-shrink-0">
                     <Zap className="w-5 h-5" />
                  </div>
-                 <span className="font-bold text-gray-400">Prochain : Prêts prioritaires</span>
+                 <span className="font-bold text-ash">Prochain : Prêts prioritaires</span>
               </div>
            </div>
         </div>

@@ -45,13 +45,13 @@ export default function RapportsPage() {
     <DashboardLayout>
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div><h1 className="text-2xl font-bold text-gray-900">Rapports & Analyses</h1><p className="text-gray-500 text-sm">Vue consolidée multi-tontines</p></div>
-          <button onClick={exportCSV} className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50"><Download className="w-4 h-4" /> Exporter CSV</button>
+          <div><h1 className="text-2xl font-bold text-gray-900">Rapports & Analyses</h1><p className="text-graphite text-sm">Vue consolidée multi-tontines</p></div>
+          <button onClick={exportCSV} className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-cream"><Download className="w-4 h-4" /> Exporter CSV</button>
         </div>
 
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit overflow-x-auto">
           {[{id:"overview",label:"Vue globale"},{id:"tontines",label:"Par tontine"},{id:"monthly",label:"Évolution"},{id:"score",label:"Score"}].map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id as typeof tab)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${tab===t.id?"bg-white text-violet-600 shadow-sm":"text-gray-600 hover:text-gray-900"}`}>{t.label}</button>
+            <button key={t.id} onClick={() => setTab(t.id as typeof tab)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${tab===t.id?"bg-warm-white text-violet-600 shadow-sm":"text-gray-600 hover:text-gray-900"}`}>{t.label}</button>
           ))}
         </div>
 
@@ -60,21 +60,21 @@ export default function RapportsPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: "Total cotisé", value: formatCurrency(summary.totalContributed), icon: Wallet, color: "bg-violet-500" },
-                { label: "Prêts en cours", value: formatCurrency(summary.activeLoanTotal), icon: CreditCard, color: "bg-orange-500" },
+                { label: "Prêts en cours", value: formatCurrency(summary.activeLoanTotal), icon: CreditCard, color: "bg-warning" },
                 { label: "Épargne totale", value: formatCurrency(summary.totalSavings), icon: PiggyBank, color: "bg-green-500" },
-                { label: "Tontines actives", value: summary.tontineCount.toString(), icon: Users, color: "bg-blue-500" },
+                { label: "Tontines actives", value: summary.tontineCount.toString(), icon: Users, color: "bg-info" },
               ].map((kpi) => (
-                <div key={kpi.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div key={kpi.label} className="bg-warm-white rounded-xl p-4 shadow-sm border border-stone">
                   <div className={`w-10 h-10 ${kpi.color} rounded-xl flex items-center justify-center mb-3`}><kpi.icon className="w-5 h-5 text-white" /></div>
                   <div className="text-xl font-bold text-gray-900">{kpi.value}</div>
-                  <div className="text-xs text-gray-500">{kpi.label}</div>
+                  <div className="text-xs text-graphite">{kpi.label}</div>
                 </div>
               ))}
             </div>
 
             {summary.totalLate > 0 ? (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="bg-error/10 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
                 <div><div className="font-semibold text-red-800">Cotisations en retard</div><p className="text-sm text-red-600">{summary.totalLate} cotisation(s) en retard. Réglez-les pour protéger votre score.</p></div>
               </div>
             ) : (
@@ -84,7 +84,7 @@ export default function RapportsPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
               <h3 className="font-semibold text-gray-900 mb-4">Balance nette par tontine</h3>
               <div className="space-y-3">
                 {tontineBreakdown.map((t) => {
@@ -94,7 +94,7 @@ export default function RapportsPage() {
                     <div key={t.tontineId}>
                       <div className="flex items-center justify-between text-sm mb-1">
                         <span className="text-gray-700 font-medium truncate max-w-xs">{t.tontineName}</span>
-                        <span className={`font-semibold ${t.netBalance >= 0 ? "text-green-600" : "text-red-500"}`}>{t.netBalance >= 0 ? "+" : ""}{formatCurrency(t.netBalance)}</span>
+                        <span className={`font-semibold ${t.netBalance >= 0 ? "text-green-600" : "text-error"}`}>{t.netBalance >= 0 ? "+" : ""}{formatCurrency(t.netBalance)}</span>
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className={`h-full rounded-full transition-all duration-500 ${t.netBalance >= 0 ? "bg-green-400" : "bg-red-400"}`} style={{ width: `${pct}%` }} /></div>
                     </div>
@@ -104,16 +104,16 @@ export default function RapportsPage() {
             </div>
 
             {savingsGoals.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <div className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
                 <h3 className="font-semibold text-gray-900 mb-4">Objectifs d&apos;épargne</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {savingsGoals.map((g, i) => {
                     const pct = Math.min((g.currentAmount / g.targetAmount) * 100, 100);
                     return (
-                      <div key={i} className="bg-gray-50 rounded-lg p-3">
+                      <div key={i} className="bg-cream rounded-lg p-3">
                         <div className="flex justify-between text-sm mb-1"><span className="font-medium text-gray-800">{g.name}</span><span className="text-xs text-violet-600">{Math.round(pct)}%</span></div>
                         <div className="h-1.5 bg-gray-200 rounded-full"><div className={`h-full rounded-full ${g.status === "COMPLETED" ? "bg-green-500" : "bg-violet-500"}`} style={{ width: `${pct}%` }} /></div>
-                        <div className="flex justify-between text-xs text-gray-400 mt-1"><span>{formatCurrency(g.currentAmount)}</span><span>{formatCurrency(g.targetAmount)}</span></div>
+                        <div className="flex justify-between text-xs text-ash mt-1"><span>{formatCurrency(g.currentAmount)}</span><span>{formatCurrency(g.targetAmount)}</span></div>
                       </div>
                     );
                   })}
@@ -126,7 +126,7 @@ export default function RapportsPage() {
         {tab === "tontines" && (
           <div className="space-y-4">
             {tontineBreakdown.map((t) => (
-              <div key={t.tontineId} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <div key={t.tontineId} className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="font-bold text-gray-900">{t.tontineName}</h3>
@@ -135,18 +135,18 @@ export default function RapportsPage() {
                       <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{ROLES[t.role]||t.role}</span>
                     </div>
                   </div>
-                  <div className={`text-lg font-bold ${t.netBalance >= 0 ? "text-green-600" : "text-red-500"}`}>{t.netBalance >= 0 ? "+" : ""}{formatCurrency(t.netBalance)}</div>
+                  <div className={`text-lg font-bold ${t.netBalance >= 0 ? "text-green-600" : "text-error"}`}>{t.netBalance >= 0 ? "+" : ""}{formatCurrency(t.netBalance)}</div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: "Total cotisé", value: formatCurrency(t.totalContributed), color: "text-violet-600" },
                     { label: "Total reçu", value: formatCurrency(t.totalReceived), color: "text-green-600" },
-                    { label: "Prêt en cours", value: formatCurrency(t.loanBalance), color: "text-orange-500" },
-                    { label: "Retards", value: t.totalLate.toString(), color: t.totalLate > 0 ? "text-red-500" : "text-gray-600" },
+                    { label: "Prêt en cours", value: formatCurrency(t.loanBalance), color: "text-warning" },
+                    { label: "Retards", value: t.totalLate.toString(), color: t.totalLate > 0 ? "text-error" : "text-gray-600" },
                   ].map((stat) => (
-                    <div key={stat.label} className="bg-gray-50 rounded-lg p-3 text-center">
+                    <div key={stat.label} className="bg-cream rounded-lg p-3 text-center">
                       <div className={`text-lg font-bold ${stat.color}`}>{stat.value}</div>
-                      <div className="text-xs text-gray-400">{stat.label}</div>
+                      <div className="text-xs text-ash">{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -156,7 +156,7 @@ export default function RapportsPage() {
         )}
 
         {tab === "monthly" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+          <div className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
             <h3 className="font-semibold text-gray-900 mb-6">Évolution mensuelle (12 derniers mois)</h3>
             <div className="flex items-end gap-1 h-48">
               {monthlyEvolution.map((m) => (
@@ -165,7 +165,7 @@ export default function RapportsPage() {
                     <div className="flex-1 bg-violet-400 rounded-t-sm min-h-[2px]" style={{ height: `${(m.contributed / maxM) * 100}%` }} />
                     <div className="flex-1 bg-green-400 rounded-t-sm min-h-[2px]" style={{ height: `${(m.received / maxM) * 100}%` }} />
                   </div>
-                  <div className="text-xs text-gray-400 truncate w-full text-center">{m.month.slice(5)}</div>
+                  <div className="text-xs text-ash truncate w-full text-center">{m.month.slice(5)}</div>
                 </div>
               ))}
             </div>
@@ -175,14 +175,14 @@ export default function RapportsPage() {
             </div>
             <div className="mt-6 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 text-gray-500">Mois</th><th className="text-right py-2 text-gray-500">Cotisé</th><th className="text-right py-2 text-gray-500">Reçu</th><th className="text-right py-2 text-gray-500">Net</th></tr></thead>
+                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 text-graphite">Mois</th><th className="text-right py-2 text-graphite">Cotisé</th><th className="text-right py-2 text-graphite">Reçu</th><th className="text-right py-2 text-graphite">Net</th></tr></thead>
                 <tbody>
                   {[...monthlyEvolution].reverse().map((m) => (
-                    <tr key={m.month} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={m.month} className="border-b border-stone hover:bg-cream">
                       <td className="py-2 text-gray-700">{m.month}</td>
                       <td className="py-2 text-right text-violet-600">{formatCurrency(m.contributed)}</td>
                       <td className="py-2 text-right text-green-600">{formatCurrency(m.received)}</td>
-                      <td className={`py-2 text-right font-medium ${m.received-m.contributed>=0?"text-green-600":"text-red-500"}`}>{m.received-m.contributed>=0?"+":""}{formatCurrency(m.received-m.contributed)}</td>
+                      <td className={`py-2 text-right font-medium ${m.received-m.contributed>=0?"text-green-600":"text-error"}`}>{m.received-m.contributed>=0?"+":""}{formatCurrency(m.received-m.contributed)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -193,7 +193,7 @@ export default function RapportsPage() {
 
         {tab === "score" && (
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
               <h3 className="font-semibold text-gray-900 mb-4">Répartition du score</h3>
               <div className="space-y-4">
                 {Object.entries(SCORE_META).map(([key, info]) => {
@@ -202,18 +202,18 @@ export default function RapportsPage() {
                   return (
                     <div key={key}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2"><span className="text-sm font-medium text-gray-800">{info.label}</span><span className="text-xs text-gray-400">(objectif {info.target}%)</span></div>
-                        <div className="flex items-center gap-2"><span className="text-sm font-bold text-violet-600">{pts} pts</span><span className="text-xs text-gray-400">{pct}%</span></div>
+                        <div className="flex items-center gap-2"><span className="text-sm font-medium text-gray-800">{info.label}</span><span className="text-xs text-ash">(objectif {info.target}%)</span></div>
+                        <div className="flex items-center gap-2"><span className="text-sm font-bold text-violet-600">{pts} pts</span><span className="text-xs text-ash">{pct}%</span></div>
                       </div>
                       <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-700" style={{ width: `${pct}%` }} /></div>
                     </div>
                   );
                 })}
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between"><span className="font-semibold text-gray-900">Score total</span><span className="text-2xl font-bold text-violet-600">{totalScore} pts</span></div>
+              <div className="mt-4 pt-4 border-t border-stone flex items-center justify-between"><span className="font-semibold text-gray-900">Score total</span><span className="text-2xl font-bold text-violet-600">{totalScore} pts</span></div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div className="bg-warm-white rounded-xl shadow-sm border border-stone p-5">
               <h3 className="font-semibold text-gray-900 mb-6">Progression des niveaux</h3>
               <div className="flex items-center justify-around">
                 {[
@@ -228,8 +228,8 @@ export default function RapportsPage() {
                   return (
                     <div key={level.name} className="flex flex-col items-center">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${isPassed ? level.color : isActive ? `${level.color} ring-4 ring-offset-2 ring-violet-300` : "bg-gray-200"}`}>{isPassed ? "✓" : i + 1}</div>
-                      <div className={`text-xs mt-1.5 font-medium ${isActive ? "text-violet-700" : isPassed ? "text-gray-700" : "text-gray-400"}`}>{level.name}</div>
-                      <div className="text-xs text-gray-400">{level.min}+</div>
+                      <div className={`text-xs mt-1.5 font-medium ${isActive ? "text-violet-700" : isPassed ? "text-gray-700" : "text-ash"}`}>{level.name}</div>
+                      <div className="text-xs text-ash">{level.min}+</div>
                     </div>
                   );
                 })}

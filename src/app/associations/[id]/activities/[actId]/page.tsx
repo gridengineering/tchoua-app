@@ -108,7 +108,7 @@ export default function ActivityPage() {
     <DashboardLayout title={activity?.name || "Activité"}>
       <div className="space-y-5">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-graphite">
           <button onClick={() => router.push(`/associations/${id}`)} className="hover:text-[#0d3d28] flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" /> Association
           </button>
@@ -129,7 +129,7 @@ export default function ActivityPage() {
                   {activity.participation}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mt-0.5">{activity.type} · {activity.contributionFrequency}</p>
+              <p className="text-sm text-graphite mt-0.5">{activity.type} · {activity.contributionFrequency}</p>
               {activity.contributionAmount && (
                 <p className="text-sm font-semibold mt-1" style={{ color: "#0d3d28" }}>{formatCurrency(activity.contributionAmount)} / cotisation</p>
               )}
@@ -149,7 +149,7 @@ export default function ActivityPage() {
         <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${tab === t.key ? "border-[#0d3d28] text-[#0d3d28]" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${tab === t.key ? "border-[#0d3d28] text-[#0d3d28]" : "border-transparent text-graphite hover:text-gray-700"}`}>
               {t.label}
             </button>
           ))}
@@ -167,7 +167,7 @@ export default function ActivityPage() {
               <Card key={label}><CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className="w-4 h-4" style={{ color: "#0d3d28" }} />
-                  <span className="text-xs text-gray-500">{label}</span>
+                  <span className="text-xs text-graphite">{label}</span>
                 </div>
                 <div className="text-xl font-bold text-gray-900">{value}</div>
               </CardContent></Card>
@@ -179,31 +179,31 @@ export default function ActivityPage() {
         {tab === "sessions" && (
           <div className="space-y-3">
             {sessions.length === 0 ? (
-              <Card><CardContent className="py-12 text-center text-gray-400">Aucune session. Créez la première session.</CardContent></Card>
+              <Card><CardContent className="py-12 text-center text-ash">Aucune session. Créez la première session.</CardContent></Card>
             ) : sessions.map(s => (
               <Card key={s.id}><CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-semibold text-gray-900">Session #{s.sessionNumber}</div>
-                    <div className="text-sm text-gray-500">{new Date(s.scheduledAt).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+                    <div className="text-sm text-graphite">{new Date(s.scheduledAt).toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
                     {s.status === "HELD" && (
                       <div className="flex gap-4 mt-1 text-sm">
                         <span>Distribué: <strong>{formatCurrency(s.distributed)}</strong></span>
-                        {s.reliquat > 0 && <span className="text-amber-600">Reliquat: <strong>{formatCurrency(s.reliquat)}</strong></span>}
+                        {s.reliquat > 0 && <span className="text-gold">Reliquat: <strong>{formatCurrency(s.reliquat)}</strong></span>}
                       </div>
                     )}
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${s.status === "HELD" ? "bg-green-100 text-green-700" : s.status === "CANCELLED" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${s.status === "HELD" ? "bg-green-100 text-green-700" : s.status === "CANCELLED" ? "bg-error/10 text-red-700" : "bg-info/10 text-blue-700"}`}>
                     {s.status}
                   </span>
                 </div>
                 {s.drawResult && (
-                  <div className="mt-2 p-2 rounded bg-gray-50 text-xs text-gray-600 border border-gray-100">
+                  <div className="mt-2 p-2 rounded bg-cream text-xs text-gray-600 border border-stone">
                     <strong>Résultat tirage :</strong> {JSON.stringify(JSON.parse(s.drawResult), null, 2)}
                   </div>
                 )}
                 {s.auctionResult && (
-                  <div className="mt-2 p-3 rounded bg-amber-50 text-xs text-amber-900 border border-amber-100">
+                  <div className="mt-2 p-3 rounded bg-gold/10 text-xs text-amber-900 border border-amber-100">
                     <strong className="block mb-1">Résultat enchères :</strong>
                     <pre className="whitespace-pre-wrap font-sans">{JSON.stringify(JSON.parse(s.auctionResult), null, 2)}</pre>
                   </div>
@@ -249,20 +249,20 @@ export default function ActivityPage() {
             </div>
             <Card><CardContent className="p-0 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead><tr className="border-b border-gray-100">
+                <thead><tr className="border-b border-stone">
                   {["Membre", "Montant", "Statut", "Mode paiement", "Date"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-graphite">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
                   {contributions.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">Aucune cotisation enregistrée</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-ash">Aucune cotisation enregistrée</td></tr>
                   ) : contributions.map(c => (
-                    <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50">
-                      <td className="px-4 py-3 font-mono text-xs text-gray-500">{c.membershipId.slice(-6)}</td>
+                    <tr key={c.id} className="border-b border-gray-50 hover:bg-cream">
+                      <td className="px-4 py-3 font-mono text-xs text-graphite">{c.membershipId.slice(-6)}</td>
                       <td className="px-4 py-3 font-semibold">{formatCurrency(c.amount)}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status === "PAID" ? "bg-green-100 text-green-700" : c.status === "LATE" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status === "PAID" ? "bg-green-100 text-green-700" : c.status === "LATE" ? "bg-error/10 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
                           {c.status === "PAID" ? <><CheckCircle className="w-3 h-3 inline mr-1" />Payé</> : c.status === "LATE" ? <><XCircle className="w-3 h-3 inline mr-1" />En retard</> : <><Clock className="w-3 h-3 inline mr-1" />En attente</>}
                         </span>
                       </td>
@@ -280,7 +280,7 @@ export default function ActivityPage() {
         {tab === "beneficiaries" && (
           <Card><CardContent className="p-5">
             <h3 className="font-semibold text-gray-800 mb-3">Mode: {activity?.distributionMode}</h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-graphite">
               {activity?.distributionMode === "ROTATION" && "Rotation fixe par ordre d'ancienneté. Les bénéficiaires sont listés dans l'ordre de passage."}
               {activity?.distributionMode === "LOTTERY_MONTHLY" && "Tirage au sort mensuel. Chaque session désigne aléatoirement le(s) bénéficiaire(s) parmi les membres non encore bénéficiaires du cycle."}
               {activity?.distributionMode === "LOTTERY_UNIQUE" && "Tirage unique au début du cycle. L'ordre est irrevocable pour toute la durée du cycle."}
@@ -301,11 +301,11 @@ export default function ActivityPage() {
               <div className="flex items-center gap-3 mb-4">
                 <Vault className="w-6 h-6" style={{ color: "#0d3d28" }} />
                 <div>
-                  <div className="text-xs text-gray-500">Solde en caisse</div>
+                  <div className="text-xs text-graphite">Solde en caisse</div>
                   <div className="text-2xl font-bold" style={{ color: "#0d3d28" }}>{formatCurrency(activity?.caisseBalance || 0)}</div>
                 </div>
               </div>
-              <p className="text-sm text-gray-500">Les reliquats non distribués s'accumulent en caisse et peuvent être prêtés aux membres à taux d'intérêt.</p>
+              <p className="text-sm text-graphite">Les reliquats non distribués s'accumulent en caisse et peuvent être prêtés aux membres à taux d'intérêt.</p>
             </CardContent></Card>
           </div>
         )}
@@ -314,7 +314,7 @@ export default function ActivityPage() {
       {/* Modal Nouvelle Session */}
       {showSessionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-warm-white rounded-2xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-lg font-bold" style={{ color: "#0d3d28" }}>Nouvelle Session</h2>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Date & heure *</label>
@@ -342,7 +342,7 @@ export default function ActivityPage() {
       {/* Modal Enregistrer Paiement */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-warm-white rounded-2xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-lg font-bold" style={{ color: "#0d3d28" }}>Enregistrer un paiement</h2>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">ID Membre (membershipId)</label>

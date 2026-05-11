@@ -66,13 +66,13 @@ export default function GamificationPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-amber-200">
+            <div className="w-20 h-20 bg-amber-100 text-gold rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-amber-200">
               <Trophy className="w-10 h-10" />
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-semibold text-charcoal mb-8 leading-tight">
               La Solidarité devient un <span className="text-amber-500">Jeu.</span>
             </h1>
-            <p className="text-xl text-gray-500 font-medium leading-relaxed mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-graphite font-medium leading-relaxed mb-10 max-w-2xl mx-auto">
               Tchoua transforme l&apos;engagement communautaire en une expérience gratifiante. 
               Gagnez des points, débloquez des badges et grimpez dans le classement.
             </p>
@@ -107,13 +107,13 @@ export default function GamificationPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all"
+              className="p-8 bg-warm-white rounded-2xl border border-stone shadow-sm hover:shadow-xl transition-all"
             >
               <div className={`w-14 h-14 rounded-2xl bg-${item.color}-50 text-${item.color}-600 flex items-center justify-center mb-6`}>
                 <item.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-4">{item.title}</h3>
-              <p className="text-gray-500 font-medium text-sm leading-relaxed">{item.description}</p>
+              <h3 className="text-xl font-semibold text-charcoal mb-4">{item.title}</h3>
+              <p className="text-graphite font-medium text-sm leading-relaxed">{item.description}</p>
             </motion.div>
           ))}
         </section>
@@ -121,8 +121,8 @@ export default function GamificationPage() {
         {/* Badge Collection */}
         <section className="space-y-12">
           <div className="text-center space-y-4">
-            <h2 className="text-3xl md:text-5xl font-black text-gray-900">Collectionnez les Badges</h2>
-            <p className="text-gray-500 font-medium">Chaque badge raconte une histoire de votre parcours dans l&apos;association.</p>
+            <h2 className="text-3xl md:text-5xl font-semibold text-charcoal">Collectionnez les Badges</h2>
+            <p className="text-graphite font-medium">Chaque badge raconte une histoire de votre parcours dans l&apos;association.</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
@@ -133,17 +133,17 @@ export default function GamificationPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
-                className="group relative p-6 bg-white rounded-3xl border border-gray-100 hover:bg-[#0d3d28] transition-all duration-500 overflow-hidden"
+                className="group relative p-6 bg-warm-white rounded-3xl border border-stone hover:bg-forest transition-all duration-500 overflow-hidden"
               >
                 <div className="relative z-10 space-y-4">
                   <div className={`w-12 h-12 rounded-xl bg-${badge.color}-50 text-${badge.color}-600 flex items-center justify-center group-hover:bg-white/10 group-hover:text-white transition-colors`}>
                     <badge.icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-black text-gray-900 group-hover:text-white transition-colors">{badge.name}</h4>
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase group-hover:text-emerald-400">{badge.requirement}</p>
+                    <h4 className="font-semibold text-charcoal group-hover:text-white transition-colors">{badge.name}</h4>
+                    <p className="text-[10px] font-bold text-forest uppercase group-hover:text-emerald-400">{badge.requirement}</p>
                   </div>
-                  <p className="text-xs text-gray-500 group-hover:text-gray-300 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                  <p className="text-xs text-graphite group-hover:text-ash/60 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
                     {badge.description}
                   </p>
                 </div>
@@ -156,14 +156,14 @@ export default function GamificationPage() {
         </section>
 
         {/* Ethical Note */}
-        <section className="bg-gray-900 rounded-[3rem] p-12 md:p-20 text-white text-center space-y-8">
+        <section className="bg-gray-900 rounded-2xl p-12 md:p-20 text-white text-center space-y-8">
           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto">
             <Shield className="w-8 h-8 text-emerald-400" />
           </div>
           <h2 className="text-3xl md:text-5xl font-black max-w-3xl mx-auto leading-tight">
             Une Gamification <span className="text-emerald-400">Éthique</span> & Humaine.
           </h2>
-          <p className="text-lg text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-ash font-medium max-w-2xl mx-auto leading-relaxed">
             Contrairement aux systèmes qui poussent à la consommation, Tchoua utilise la gamification 
             pour renforcer la discipline financière et les liens de solidarité.
           </p>
@@ -183,9 +183,9 @@ export default function GamificationPage() {
         </section>
 
         {/* CTA */}
-        <section className="text-center py-20 bg-amber-50 rounded-[3rem] border-2 border-amber-100">
-          <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-8">Devenez un Pilier de votre Communauté.</h2>
-          <Link href="/register" className="inline-flex items-center gap-4 px-10 py-5 bg-[#0d3d28] text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+        <section className="text-center py-20 bg-gold/10 rounded-2xl border-2 border-amber-100">
+          <h2 className="text-3xl md:text-5xl font-semibold text-charcoal mb-8">Devenez un Pilier de votre Communauté.</h2>
+          <Link href="/register" className="inline-flex items-center gap-4 px-10 py-5 bg-forest text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
              Commencer mon aventure <ArrowRight className="w-5 h-5" />
           </Link>
         </section>

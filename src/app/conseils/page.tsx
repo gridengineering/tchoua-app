@@ -117,7 +117,7 @@ export default function ConseilsPage() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto bg-cream p-4 space-y-4">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex gap-3 ${msg.role === "USER" ? "flex-row-reverse" : ""}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -132,7 +132,7 @@ export default function ConseilsPage() {
                   <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
                     msg.role === "USER"
                       ? "bg-violet-600 text-white rounded-tr-sm"
-                      : "bg-white shadow-sm border border-gray-100 text-gray-800 rounded-tl-sm"
+                      : "bg-warm-white shadow-sm border border-stone text-gray-800 rounded-tl-sm"
                   }`}>
                     {msg.content.split("\n").map((line, j) => (
                       <div key={j} className={j > 0 ? "mt-1" : ""}>
@@ -154,7 +154,7 @@ export default function ConseilsPage() {
                   <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center">
                     <Bot className="w-4 h-4 text-white" />
                   </div>
-                  <div className="bg-white shadow-sm border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
+                  <div className="bg-warm-white shadow-sm border border-stone rounded-2xl rounded-tl-sm px-4 py-3">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                       <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -167,12 +167,12 @@ export default function ConseilsPage() {
             </div>
 
             {/* Quick questions */}
-            <div className="bg-gray-50 border-t border-gray-200 px-4 py-2 flex gap-2 overflow-x-auto">
+            <div className="bg-cream border-t border-gray-200 px-4 py-2 flex gap-2 overflow-x-auto">
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="whitespace-nowrap text-xs bg-white border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 hover:border-violet-400 hover:text-violet-600 transition-colors flex-shrink-0"
+                  className="whitespace-nowrap text-xs bg-warm-white border border-gray-200 rounded-full px-3 py-1.5 text-gray-600 hover:border-violet-400 hover:text-violet-600 transition-colors flex-shrink-0"
                 >
                   {q}
                 </button>
@@ -180,7 +180,7 @@ export default function ConseilsPage() {
             </div>
 
             {/* Input */}
-            <div className="bg-white rounded-b-2xl border-t border-gray-200 p-3">
+            <div className="bg-warm-white rounded-b-2xl border-t border-gray-200 p-3">
               <div className="flex items-end gap-2">
                 <div className="flex-1 bg-gray-100 rounded-2xl px-4 py-2.5">
                   <textarea
@@ -207,16 +207,16 @@ export default function ConseilsPage() {
           <div className="space-y-4">
             <div>
               <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-yellow-500" /> Conseils personnalisés
+                <Sparkles className="w-4 h-4 text-gold" /> Conseils personnalisés
               </h2>
               {advice.length === 0 ? (
-                <div className="bg-white rounded-xl p-4 border border-gray-100 text-sm text-gray-400">
+                <div className="bg-warm-white rounded-xl p-4 border border-stone text-sm text-ash">
                   Chargement des conseils...
                 </div>
               ) : (
                 <div className="space-y-3">
                   {advice.map((tip, i) => (
-                    <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div key={i} className="bg-warm-white rounded-xl p-4 shadow-sm border border-stone">
                       <p className="text-sm text-gray-700 leading-relaxed">{tip}</p>
                     </div>
                   ))}

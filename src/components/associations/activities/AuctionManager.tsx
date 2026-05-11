@@ -90,18 +90,18 @@ export function AuctionManager({ sessionId, activityId, associationId, potAmount
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-warm-white rounded-xl border border-gray-200 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4 border-b pb-4">
         <div>
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Gavel className="w-5 h-5 text-amber-600" />
+            <Gavel className="w-5 h-5 text-gold" />
             Séance d'Enchères
           </h3>
-          <p className="text-sm text-gray-500">Cagnotte totale : <strong className="text-gray-900">{formatCurrency(potAmount)}</strong></p>
+          <p className="text-sm text-graphite">Cagnotte totale : <strong className="text-gray-900">{formatCurrency(potAmount)}</strong></p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-500 uppercase font-semibold">Mise à prix ({minBidPct}%)</p>
-          <p className="text-lg font-bold text-amber-600">{formatCurrency(minBid)}</p>
+          <p className="text-xs text-graphite uppercase font-semibold">Mise à prix ({minBidPct}%)</p>
+          <p className="text-lg font-bold text-gold">{formatCurrency(minBid)}</p>
         </div>
       </div>
 
@@ -110,9 +110,9 @@ export function AuctionManager({ sessionId, activityId, associationId, potAmount
         <div className="space-y-4">
           <h4 className="font-semibold text-sm text-gray-700">Enregistrer une offre</h4>
           
-          <form onSubmit={handleAddBid} className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-100">
+          <form onSubmit={handleAddBid} className="space-y-3 p-4 bg-cream rounded-lg border border-stone">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Membre enchérisseur</label>
+              <label className="block text-xs font-semibold text-graphite mb-1">Membre enchérisseur</label>
               <select 
                 className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm"
                 value={selectedMember}
@@ -126,7 +126,7 @@ export function AuctionManager({ sessionId, activityId, associationId, potAmount
             </div>
             
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Montant proposé (Minimum: {formatCurrency(nextMinBid)})</label>
+              <label className="block text-xs font-semibold text-graphite mb-1">Montant proposé (Minimum: {formatCurrency(nextMinBid)})</label>
               <input 
                 type="number" 
                 className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm font-bold"
@@ -158,19 +158,19 @@ export function AuctionManager({ sessionId, activityId, associationId, potAmount
           
           <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
             {bids.length === 0 ? (
-              <div className="p-4 text-center text-gray-400 border border-dashed rounded-lg text-sm">
+              <div className="p-4 text-center text-ash border border-dashed rounded-lg text-sm">
                 En attente de la première enchère...
               </div>
             ) : (
               bids.map((bid, i) => (
-                <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${i === 0 ? 'bg-amber-50 border-amber-200' : 'bg-white border-gray-100'}`}>
+                <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${i === 0 ? 'bg-gold/10 border-amber-200' : 'bg-warm-white border-stone'}`}>
                   <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-amber-200 text-amber-800' : 'bg-gray-100 text-gray-500'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-amber-200 text-amber-800' : 'bg-gray-100 text-graphite'}`}>
                       {i + 1}
                     </div>
                     <span className={`text-sm ${i === 0 ? 'font-bold text-gray-900' : 'text-gray-600'}`}>{bid.memberName}</span>
                   </div>
-                  <span className={`font-mono text-sm ${i === 0 ? 'font-bold text-amber-700' : 'text-gray-500'}`}>
+                  <span className={`font-mono text-sm ${i === 0 ? 'font-bold text-amber-700' : 'text-graphite'}`}>
                     {formatCurrency(bid.amount)}
                   </span>
                 </div>
@@ -187,7 +187,7 @@ export function AuctionManager({ sessionId, activityId, associationId, potAmount
               >
                 {loading ? "Enregistrement..." : <><Check className="w-4 h-4"/> Adjugé vendu</>}
               </button>
-              <p className="text-xs text-center text-gray-500 mt-2">
+              <p className="text-xs text-center text-graphite mt-2">
                 Le gagnant recevra {formatCurrency(potAmount - bids[0].amount)} nets.
               </p>
             </div>

@@ -38,9 +38,9 @@ interface Tontine {
 const EMOJIS = ["👍", "❤️", "😂", "😮", "🙏", "🎉", "💰", "✅"];
 
 const levelColors: Record<string, string> = {
-  NOVICE: "text-gray-500",
+  NOVICE: "text-graphite",
   ACTIF: "text-green-600",
-  ENGAGE: "text-blue-600",
+  ENGAGE: "text-info",
   LEADER: "text-violet-600",
   LEGENDE: "text-yellow-600",
 };
@@ -187,12 +187,12 @@ export default function ChatPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-warm-white rounded-xl shadow-sm border border-gray-200">
         {/* Left: Tontines + Channels */}
-        <div className="w-64 border-r border-gray-200 flex flex-col bg-gray-50">
+        <div className="w-64 border-r border-gray-200 flex flex-col bg-cream">
           {/* Tontine selector */}
           <div className="p-3 border-b border-gray-200">
-            <div className="text-xs font-semibold text-gray-500 uppercase mb-2">Mes Tontines</div>
+            <div className="text-xs font-semibold text-graphite uppercase mb-2">Mes Tontines</div>
             {Array.isArray(tontines) && tontines.map((t) => (
               <button
                 key={t.id}
@@ -217,8 +217,8 @@ export default function ChatPage() {
           {selectedTontine && (
             <div className="flex-1 overflow-y-auto p-3">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Canaux</div>
-                <button onClick={() => setShowChannelModal(true)} className="text-gray-400 hover:text-violet-600">
+                <div className="text-xs font-semibold text-graphite uppercase">Canaux</div>
+                <button onClick={() => setShowChannelModal(true)} className="text-ash hover:text-violet-600">
                   <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -258,29 +258,29 @@ export default function ChatPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-sm text-gray-900">{selectedTontine.name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-graphite">
                     {selectedChannel ? `#${selectedChannel.name}` : "Général"}
                   </div>
                 </div>
               </>
             ) : (
-              <span className="text-gray-500 text-sm">Sélectionnez une tontine</span>
+              <span className="text-graphite text-sm">Sélectionnez une tontine</span>
             )}
           </div>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
             {!selectedTontine ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-ash">
                 <div className="text-center">
-                  <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <MessageCircle className="w-12 h-12 mx-auto mb-3 text-ash/60" />
                   <p>Sélectionnez une tontine pour commencer à chatter</p>
                 </div>
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-ash">
                 <div className="text-center">
-                  <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <MessageCircle className="w-12 h-12 mx-auto mb-3 text-ash/60" />
                   <p>Aucun message encore. Soyez le premier à écrire !</p>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export default function ChatPage() {
                       {showSender && (
                         <div className={`flex items-center gap-2 mb-0.5 ${isOwn ? "flex-row-reverse" : ""}`}>
                           <span className="text-xs font-semibold text-gray-700">{msg.sender.name}</span>
-                          <span className={`text-xs ${levelColors[msg.sender.level] || "text-gray-400"}`}>
+                          <span className={`text-xs ${levelColors[msg.sender.level] || "text-ash"}`}>
                             {msg.sender.level}
                           </span>
                         </div>
@@ -313,7 +313,7 @@ export default function ChatPage() {
 
                       {/* Reply preview */}
                       {msg.replyTo && (
-                        <div className={`text-xs bg-gray-100 border-l-2 border-violet-400 px-2 py-1 rounded mb-1 text-gray-500 ${isOwn ? "text-right" : ""}`}>
+                        <div className={`text-xs bg-gray-100 border-l-2 border-violet-400 px-2 py-1 rounded mb-1 text-graphite ${isOwn ? "text-right" : ""}`}>
                           <span className="font-medium">{msg.replyTo.sender.name}</span>: {msg.replyTo.content.slice(0, 60)}
                         </div>
                       )}
@@ -322,10 +322,10 @@ export default function ChatPage() {
                       <div className={`relative px-3 py-2 rounded-2xl text-sm shadow-sm ${
                         isOwn
                           ? "bg-violet-600 text-white rounded-tr-sm"
-                          : "bg-white border border-gray-200 text-gray-900 rounded-tl-sm"
+                          : "bg-warm-white border border-gray-200 text-gray-900 rounded-tl-sm"
                       } ${msg.isDeleted ? "opacity-50 italic" : ""}`}>
                         {msg.content}
-                        <span className={`text-xs ml-2 ${isOwn ? "text-violet-200" : "text-gray-400"}`}>
+                        <span className={`text-xs ml-2 ${isOwn ? "text-violet-200" : "text-ash"}`}>
                           {new Date(msg.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                         </span>
 
@@ -334,20 +334,20 @@ export default function ChatPage() {
                           <div className={`absolute top-0 ${isOwn ? "right-full mr-1" : "left-full ml-1"} hidden group-hover:flex items-center gap-1`}>
                             <button
                               onClick={() => setShowEmoji(showEmoji === msg.id ? null : msg.id)}
-                              className="p-1 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50"
+                              className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-cream"
                             >
-                              <Smile className="w-3 h-3 text-gray-500" />
+                              <Smile className="w-3 h-3 text-graphite" />
                             </button>
                             <button
                               onClick={() => setReplyTo(msg)}
-                              className="p-1 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50"
+                              className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-cream"
                             >
-                              <Reply className="w-3 h-3 text-gray-500" />
+                              <Reply className="w-3 h-3 text-graphite" />
                             </button>
                             {isOwn && (
                               <button
                                 onClick={() => deleteMessage(msg.id)}
-                                className="p-1 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-red-50"
+                                className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-error/10"
                               >
                                 <Trash2 className="w-3 h-3 text-red-400" />
                               </button>
@@ -357,7 +357,7 @@ export default function ChatPage() {
 
                         {/* Emoji picker */}
                         {showEmoji === msg.id && (
-                          <div className="absolute bottom-full mb-1 bg-white border border-gray-200 rounded-xl shadow-lg p-2 flex gap-1 z-10">
+                          <div className="absolute bottom-full mb-1 bg-warm-white border border-gray-200 rounded-xl shadow-lg p-2 flex gap-1 z-10">
                             {EMOJIS.map((e) => (
                               <button key={e} onClick={() => react(msg.id, e)} className="text-lg hover:scale-125 transition-transform">
                                 {e}
@@ -374,7 +374,7 @@ export default function ChatPage() {
                             <button
                               key={emoji}
                               onClick={() => react(msg.id, emoji)}
-                              className="flex items-center gap-0.5 bg-white border border-gray-200 rounded-full px-1.5 py-0.5 text-xs shadow-sm hover:bg-gray-50"
+                              className="flex items-center gap-0.5 bg-warm-white border border-gray-200 rounded-full px-1.5 py-0.5 text-xs shadow-sm hover:bg-cream"
                             >
                               <span>{emoji}</span>
                               <span className="text-gray-600">{count}</span>
@@ -428,7 +428,7 @@ export default function ChatPage() {
       {/* Create channel modal */}
       {showChannelModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+          <div className="bg-warm-white rounded-2xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Créer un canal</h3>
             <input
               type="text"
@@ -438,7 +438,7 @@ export default function ChatPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-4 outline-none focus:ring-2 focus:ring-violet-500"
             />
             <div className="flex gap-2">
-              <button onClick={() => setShowChannelModal(false)} className="flex-1 border border-gray-300 rounded-lg py-2 text-sm hover:bg-gray-50">
+              <button onClick={() => setShowChannelModal(false)} className="flex-1 border border-gray-300 rounded-lg py-2 text-sm hover:bg-cream">
                 Annuler
               </button>
               <button onClick={createChannel} className="flex-1 bg-violet-600 text-white rounded-lg py-2 text-sm hover:bg-violet-700">

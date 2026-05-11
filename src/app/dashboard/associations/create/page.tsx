@@ -96,8 +96,8 @@ export default function WizardCreationAssociation() {
     <div className="max-w-4xl mx-auto py-8">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-black text-gray-900 mb-2">Créer une Association</h1>
-        <p className="text-gray-500 font-medium">Assistant de configuration complet (Mode Wizard)</p>
+        <h1 className="text-3xl font-semibold text-charcoal mb-2">Créer une Association</h1>
+        <p className="text-graphite font-medium">Assistant de configuration complet (Mode Wizard)</p>
       </div>
 
       {/* Stepper */}
@@ -115,38 +115,38 @@ export default function WizardCreationAssociation() {
             <div className={cn(
               "w-12 h-12 rounded-full flex items-center justify-center font-black transition-all",
               step === s.num ? "bg-[#165E39] text-white shadow-lg ring-4 ring-[#165E39]/20" : 
-              step > s.num ? "bg-emerald-500 text-white" : "bg-white border-2 border-gray-200 text-gray-400"
+              step > s.num ? "bg-forest text-white" : "bg-warm-white border-2 border-gray-200 text-ash"
             )}>
               {step > s.num ? <Check className="w-6 h-6" /> : s.num}
             </div>
-            <span className={cn("text-xs font-bold", step >= s.num ? "text-gray-900" : "text-gray-400")}>{s.label}</span>
+            <span className={cn("text-xs font-bold", step >= s.num ? "text-gray-900" : "text-ash")}>{s.label}</span>
           </div>
         ))}
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-xl font-bold border border-red-100">
+        <div className="mb-8 p-4 bg-error/10 text-red-600 rounded-xl font-bold border border-red-100">
           {error}
         </div>
       )}
 
       {/* Forms */}
-      <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 min-h-[400px]">
+      <div className="bg-warm-white p-8 rounded-3xl shadow-sm border border-stone min-h-[400px]">
         {step === 1 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <h2 className="text-xl font-black text-gray-900 mb-6">Informations Générales</h2>
+            <h2 className="text-xl font-semibold text-charcoal mb-6">Informations Générales</h2>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Nom de l'association *</label>
-              <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: Tontine des Anciens" />
+              <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: Tontine des Anciens" />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
-              <textarea name="description" value={formData.description} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-[#165E39]/20 outline-none min-h-[100px]" placeholder="But et objectifs de l'association..."></textarea>
+              <textarea name="description" value={formData.description} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-[#165E39]/20 outline-none min-h-[100px]" placeholder="But et objectifs de l'association..."></textarea>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Type</label>
-                <select name="type" value={formData.type} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none">
+                <select name="type" value={formData.type} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none">
                   <option value="TONTINE_CLUB">Club de Tontine</option>
                   <option value="COOPERATIVE">Coopérative</option>
                   <option value="SOLIDARITY">Fonds de Solidarité</option>
@@ -158,7 +158,7 @@ export default function WizardCreationAssociation() {
                 <label className="block text-sm font-bold text-gray-700 mb-2">Couleur du thème</label>
                 <div className="flex gap-2">
                   <input type="color" name="color" value={formData.color} onChange={handleInputChange} className="h-12 w-12 rounded-xl cursor-pointer" />
-                  <input type="text" value={formData.color} readOnly className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 font-mono text-sm" />
+                  <input type="text" value={formData.color} readOnly className="flex-1 bg-cream border border-gray-200 rounded-xl px-4 font-mono text-sm" />
                 </div>
               </div>
             </div>
@@ -167,19 +167,19 @@ export default function WizardCreationAssociation() {
 
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <h2 className="text-xl font-black text-gray-900 mb-6">Contact & Localisation</h2>
+            <h2 className="text-xl font-semibold text-charcoal mb-6">Contact & Localisation</h2>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Région / Ville</label>
-              <input type="text" name="region" value={formData.region} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: Douala, Cameroun" />
+              <input type="text" name="region" value={formData.region} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: Douala, Cameroun" />
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Email de contact</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="contact@asso.com" />
+                <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="contact@asso.com" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Téléphone</label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="+237 XXX XX XX XX" />
+                <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="+237 XXX XX XX XX" />
               </div>
             </div>
           </div>
@@ -187,14 +187,14 @@ export default function WizardCreationAssociation() {
 
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <h2 className="text-xl font-black text-gray-900 mb-6">Hiérarchie (Association Parente)</h2>
-            <div className="p-4 bg-blue-50 text-blue-800 rounded-xl font-medium text-sm border border-blue-100">
+            <h2 className="text-xl font-semibold text-charcoal mb-6">Hiérarchie (Association Parente)</h2>
+            <div className="p-4 bg-info/10 text-blue-800 rounded-xl font-medium text-sm border border-blue-100">
               Si cette association est une "section" ou "filiale" d'une association plus grande, sélectionnez-la ci-dessous. Les membres de votre nouvelle association seront automatiquement inscrits à l'association parente.
             </div>
             
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Association Parente (Optionnel)</label>
-              <select name="parentId" value={formData.parentId} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none">
+              <select name="parentId" value={formData.parentId} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none">
                 <option value="">Aucune (Association indépendante)</option>
                 {myAssociations.map(a => (
                   <option key={a.id} value={a.id}>{a.name}</option>
@@ -205,8 +205,8 @@ export default function WizardCreationAssociation() {
             {formData.parentId && (
               <div className="animate-in fade-in zoom-in">
                 <label className="block text-sm font-bold text-gray-700 mb-2">Frais de souscription au parent (FCFA)</label>
-                <input type="number" name="parentSubscriptionFee" value={formData.parentSubscriptionFee} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: 5000" />
-                <p className="text-xs text-gray-500 mt-2">Ce montant sera exigé pour tout nouveau membre rejoignant cette section.</p>
+                <input type="number" name="parentSubscriptionFee" value={formData.parentSubscriptionFee} onChange={handleInputChange} className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none" placeholder="Ex: 5000" />
+                <p className="text-xs text-graphite mt-2">Ce montant sera exigé pour tout nouveau membre rejoignant cette section.</p>
               </div>
             )}
           </div>
@@ -215,7 +215,7 @@ export default function WizardCreationAssociation() {
         {step === 4 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-black text-gray-900">Règlement Intérieur</h2>
+              <h2 className="text-xl font-semibold text-charcoal">Règlement Intérieur</h2>
               <button onClick={handleAddRegulation} className="flex items-center gap-2 text-sm font-bold text-[#165E39] bg-[#165E39]/10 px-4 py-2 rounded-lg hover:bg-[#165E39]/20 transition-colors">
                 <Plus className="w-4 h-4" /> Ajouter un article
               </button>
@@ -223,13 +223,13 @@ export default function WizardCreationAssociation() {
             
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
               {formData.regulations.map((reg, index) => (
-                <div key={index} className="p-4 bg-gray-50 border border-gray-200 rounded-2xl relative group">
+                <div key={index} className="p-4 bg-cream border border-gray-200 rounded-2xl relative group">
                   <div className="flex justify-between items-center mb-3">
                     <input 
                       type="text" 
                       value={reg.title} 
                       onChange={(e) => handleRegulationChange(index, "title", e.target.value)}
-                      className="font-black text-gray-900 bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
+                      className="font-semibold text-charcoal bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
                       placeholder="Titre de l'article"
                     />
                     {formData.regulations.length > 1 && (
@@ -241,7 +241,7 @@ export default function WizardCreationAssociation() {
                   <textarea 
                     value={reg.content}
                     onChange={(e) => handleRegulationChange(index, "content", e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none min-h-[80px]"
+                    className="w-full bg-warm-white border border-gray-200 rounded-xl px-4 py-3 font-medium outline-none min-h-[80px]"
                     placeholder="Contenu des règles..."
                     required
                   ></textarea>

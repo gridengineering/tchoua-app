@@ -54,16 +54,16 @@ export function DrawManager({ sessionId, activityId, associationId, potAmount, m
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+    <div className="bg-warm-white rounded-xl border border-gray-200 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4 border-b pb-4">
         <div>
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Shuffle className="w-5 h-5 text-blue-600" />
+            <Shuffle className="w-5 h-5 text-info" />
             Tirage au sort
           </h3>
-          <p className="text-sm text-gray-500">Cagnotte à distribuer : <strong className="text-gray-900">{formatCurrency(potAmount)}</strong></p>
+          <p className="text-sm text-graphite">Cagnotte à distribuer : <strong className="text-gray-900">{formatCurrency(potAmount)}</strong></p>
         </div>
-        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
+        <div className="bg-info/10 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
           <Users className="w-3.5 h-3.5" />
           {members.length} membres éligibles
         </div>
@@ -72,8 +72,8 @@ export function DrawManager({ sessionId, activityId, associationId, potAmount, m
       {!result ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="relative mb-6">
-            <div className={`w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center ${loading ? 'animate-spin' : ''}`}>
-              <Shuffle className="w-10 h-10 text-blue-600" />
+            <div className={`w-20 h-20 bg-info/10 rounded-full flex items-center justify-center ${loading ? 'animate-spin' : ''}`}>
+              <Shuffle className="w-10 h-10 text-info" />
             </div>
             {loading && <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />}
           </div>
@@ -102,7 +102,7 @@ export function DrawManager({ sessionId, activityId, associationId, potAmount, m
             {result.beneficiaries.map((b, i) => (
               <div key={i} className="mt-4">
                 <div className="text-2xl font-bold text-gray-900">{b.name}</div>
-                <div className="text-sm text-gray-500 mt-1">Montant alloué : <span className="font-bold text-[#0d3d28]">{formatCurrency(b.amount)}</span></div>
+                <div className="text-sm text-graphite mt-1">Montant alloué : <span className="font-bold text-[#0d3d28]">{formatCurrency(b.amount)}</span></div>
               </div>
             ))}
           </div>
@@ -110,13 +110,13 @@ export function DrawManager({ sessionId, activityId, associationId, potAmount, m
           <div className="flex gap-3">
             <button 
               onClick={() => setResult(null)}
-              className="flex-1 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-cream transition-colors"
             >
               Recommencer
             </button>
             <button 
               onClick={handleConfirmDraw}
-              className="flex-1 py-2.5 bg-[#0d3d28] text-white font-semibold rounded-lg hover:bg-[#0a2f1f] transition-colors"
+              className="flex-1 py-2.5 bg-forest text-white font-semibold rounded-lg hover:bg-[#0a2f1f] transition-colors"
             >
               Valider le résultat
             </button>

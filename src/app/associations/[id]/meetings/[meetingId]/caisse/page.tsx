@@ -110,7 +110,7 @@ export default function MeetingCaissePage() {
         {/* KPIs Dashboard */}
         {kpis && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-[#0d3d28] text-white">
+            <Card className="bg-forest text-white">
               <CardContent className="p-4">
                 <div className="text-sm text-green-100/70 uppercase font-semibold mb-1">Total Collecté</div>
                 <div className="text-2xl font-bold">{formatCurrency(kpis.totalCollected)}</div>
@@ -118,21 +118,21 @@ export default function MeetingCaissePage() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold mb-1">
+                <div className="flex items-center gap-2 text-sm text-graphite uppercase font-semibold mb-1">
                   <CheckCircle className="w-4 h-4 text-green-600" /> Membres à jour
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{kpis.membersPaid} <span className="text-sm font-normal text-gray-500">/ {kpis.totalMembers}</span></div>
+                <div className="text-2xl font-bold text-gray-900">{kpis.membersPaid} <span className="text-sm font-normal text-graphite">/ {kpis.totalMembers}</span></div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold mb-1">
-                  <Users className="w-4 h-4 text-blue-600" /> En attente
+                <div className="flex items-center gap-2 text-sm text-graphite uppercase font-semibold mb-1">
+                  <Users className="w-4 h-4 text-info" /> En attente
                 </div>
                 <div className="text-2xl font-bold text-gray-900">{kpis.membersNotPaid}</div>
               </CardContent>
             </Card>
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-red-200 bg-error/10">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-sm text-red-600 uppercase font-semibold mb-1">
                   <AlertTriangle className="w-4 h-4" /> En échec / Sanctions
@@ -146,7 +146,7 @@ export default function MeetingCaissePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Formulaire d'encaissement */}
-          <div className="lg:col-span-1 bg-white p-5 rounded-xl border border-gray-200">
+          <div className="lg:col-span-1 bg-warm-white p-5 rounded-xl border border-gray-200">
             <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4">
               <Coins className="w-5 h-5 text-[#0d3d28]" />
               Saisie Versement Global
@@ -154,7 +154,7 @@ export default function MeetingCaissePage() {
             
             <form onSubmit={handleDistribute} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Membre présent</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Membre présent</label>
                 <select 
                   className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
                   value={selectedMemberId}
@@ -171,7 +171,7 @@ export default function MeetingCaissePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Montant versé (FCFA)</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Montant versé (FCFA)</label>
                 <input 
                   type="number" 
                   min="1"
@@ -184,7 +184,7 @@ export default function MeetingCaissePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Mode de paiement</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Mode de paiement</label>
                 <select 
                   className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
                   value={paymentMethod}
@@ -199,7 +199,7 @@ export default function MeetingCaissePage() {
               <button 
                 type="submit" 
                 disabled={loading || !selectedMemberId || !amount}
-                className="w-full flex items-center justify-center gap-2 bg-[#0d3d28] text-white py-2.5 rounded-lg font-semibold hover:bg-[#0a2f1f] disabled:opacity-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-forest text-white py-2.5 rounded-lg font-semibold hover:bg-[#0a2f1f] disabled:opacity-50 transition-colors"
               >
                 {loading ? "Répartition..." : "Répartir les fonds"}
               </button>
@@ -209,15 +209,15 @@ export default function MeetingCaissePage() {
           {/* Résultat / Rapport de l'algorithme */}
           <div className="lg:col-span-2">
             {!result && !error ? (
-              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center flex flex-col items-center justify-center text-gray-400 h-full bg-gray-50/50">
-                <Coins className="w-12 h-12 mb-3 text-gray-300" />
+              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center flex flex-col items-center justify-center text-ash h-full bg-cream/50">
+                <Coins className="w-12 h-12 mb-3 text-ash/60" />
                 <p>Sélectionnez un membre pour traiter son versement.</p>
                 <p className="text-sm mt-2 max-w-md">
                   Le système vérifiera d'abord ses dettes, puis honorera la Tontine (Priorité 1), la Solidarité (Priorité 2), etc. Si le montant est insuffisant pour les priorités 1 ou 2, des sanctions seront générées automatiquement.
                 </p>
               </div>
             ) : (
-              <div className={`p-5 rounded-xl border ${result?.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className={`p-5 rounded-xl border ${result?.success ? 'bg-green-50 border-green-200' : 'bg-error/10 border-red-200'}`}>
                 {/* Contenu du résultat, similaire à la page de caisse précédente */}
                 <div className="flex items-start gap-3 mb-4">
                   {result?.success ? (
@@ -237,9 +237,9 @@ export default function MeetingCaissePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border overflow-hidden">
+                <div className="bg-warm-white rounded-lg border overflow-hidden">
                   <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
+                    <thead className="bg-cream text-gray-600 text-xs uppercase">
                       <tr>
                         <th className="px-4 py-2">Priorité</th>
                         <th className="px-4 py-2">Obligation</th>
@@ -250,7 +250,7 @@ export default function MeetingCaissePage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {result?.allocations?.map((alloc: any, i: number) => (
-                        <tr key={i} className={alloc.status === 'FAILED' ? 'bg-red-50/50 text-red-900' : ''}>
+                        <tr key={i} className={alloc.status === 'FAILED' ? 'bg-error/10 text-red-900' : ''}>
                           <td className="px-4 py-2 font-semibold">
                             {alloc.priority < 5 ? `Priorité ${alloc.priority}` : "-"}
                           </td>
@@ -264,13 +264,13 @@ export default function MeetingCaissePage() {
                           <td className="px-4 py-2 text-center">
                             {alloc.status === 'SUCCESS' && <span className="text-green-600 font-semibold">✔ Payé</span>}
                             {alloc.status === 'FAILED' && <span className="text-red-600 font-semibold">✖ Sanctionné</span>}
-                            {alloc.status === 'SKIPPED' && <span className="text-gray-400">Ignoré</span>}
-                            {alloc.status === 'PARTIAL' && <span className="text-amber-600 font-semibold">Partiel</span>}
+                            {alloc.status === 'SKIPPED' && <span className="text-ash">Ignoré</span>}
+                            {alloc.status === 'PARTIAL' && <span className="text-gold font-semibold">Partiel</span>}
                           </td>
                         </tr>
                       ))}
                     </tbody>
-                    <tfoot className="bg-gray-50 font-bold border-t">
+                    <tfoot className="bg-cream font-bold border-t">
                       <tr>
                         <td colSpan={3} className="px-4 py-3 text-right">Excédent ajouté au solde membre :</td>
                         <td className="px-4 py-3 text-right text-[#0d3d28]">{result?.remainingBalance?.toLocaleString()} F</td>
@@ -283,7 +283,7 @@ export default function MeetingCaissePage() {
                 <div className="mt-4 flex justify-end">
                   <button 
                     onClick={() => { setResult(null); setError(null); setAmount(""); }}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 bg-warm-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-cream"
                   >
                     Traiter un autre membre
                   </button>

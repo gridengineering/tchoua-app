@@ -74,7 +74,7 @@ function parseJson<T>(raw: string | null, fallback: T): T {
 
 const inputCls = "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28]";
 const inputStyle = { border: "1px solid #e2ddd4", background: "white" } as const;
-const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block";
+const labelCls = "text-xs font-semibold text-graphite uppercase tracking-wide mb-1 block";
 
 export default function ParametresPage() {
   const router = useRouter();
@@ -120,7 +120,7 @@ export default function ParametresPage() {
   if (loading) {
     return (
       <DashboardLayout title="Paramètres">
-        <div className="p-8 text-center text-gray-400">Chargement...</div>
+        <div className="p-8 text-center text-ash">Chargement...</div>
       </DashboardLayout>
     );
   }
@@ -128,7 +128,7 @@ export default function ParametresPage() {
   if (!assoc) {
     return (
       <DashboardLayout title="Paramètres">
-        <div className="p-8 text-center text-gray-500">Association introuvable</div>
+        <div className="p-8 text-center text-graphite">Association introuvable</div>
       </DashboardLayout>
     );
   }
@@ -139,7 +139,7 @@ export default function ParametresPage() {
         <div className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto mb-3" />
           <p className="text-gray-700 font-semibold mb-1">Accès réservé au bureau</p>
-          <p className="text-sm text-gray-500 mb-4">Seuls les membres du bureau peuvent modifier les paramètres.</p>
+          <p className="text-sm text-graphite mb-4">Seuls les membres du bureau peuvent modifier les paramètres.</p>
           <Link href={`/associations/${id}`} className="text-sm font-semibold text-[#0d3d28] hover:underline">
             ← Retour à l&apos;association
           </Link>
@@ -199,11 +199,11 @@ function SectionCard({
 }) {
   const [justSaved, setJustSaved] = useState(false);
   return (
-    <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
+    <section className="bg-warm-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-5 py-3 border-b border-stone flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-base font-bold text-gray-900">{title}</h3>
-          {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+          {description && <p className="text-xs text-graphite mt-0.5">{description}</p>}
         </div>
         <button
           type="button"
@@ -360,17 +360,17 @@ function ReglementSection({ assoc, onSave }: { assoc: Association; onSave: (d: R
     <SectionCard title="Règlement intérieur (Articles)" description="Définissez les règles article par article" dirty={s.dirty} saving={s.saving} onSave={save}>
       <div className="space-y-4">
         {s.value.regulations.map((reg, i) => (
-          <div key={i} className="p-3 bg-gray-50 border border-gray-200 rounded-xl relative group">
+          <div key={i} className="p-3 bg-cream border border-gray-200 rounded-xl relative group">
             <div className="flex justify-between items-center mb-2">
               <input className="font-bold text-sm bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
                 value={reg.title ?? ""} onChange={(e) => updateArticle(i, "title", e.target.value)} placeholder="Titre de l'article" />
               <button onClick={() => removeArticle(i)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
             </div>
-            <textarea className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none min-h-[60px]"
+            <textarea className="w-full bg-warm-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none min-h-[60px]"
               value={reg.content} onChange={(e) => updateArticle(i, "content", e.target.value)} placeholder="Contenu de l'article" />
           </div>
         ))}
-        <button onClick={addArticle} className="text-xs px-3 py-2 rounded-lg font-medium text-[#0d3d28] bg-[#0d3d28]/10 w-full text-center hover:bg-[#0d3d28]/20 transition-colors">+ Ajouter un article</button>
+        <button onClick={addArticle} className="text-xs px-3 py-2 rounded-lg font-medium text-[#0d3d28] bg-forest/10 w-full text-center hover:bg-forest/20 transition-colors">+ Ajouter un article</button>
       </div>
     </SectionCard>
   );
@@ -436,10 +436,10 @@ function MultiPerson({ label, items, onChange }: { label: string; items: Person[
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <span className={labelCls}>{label}</span>
-        <button type="button" className="text-xs px-2 py-1 rounded-lg font-medium text-[#0d3d28] bg-[#0d3d28]/10"
+        <button type="button" className="text-xs px-2 py-1 rounded-lg font-medium text-[#0d3d28] bg-forest/10"
           onClick={() => onChange([...items, emptyPerson()])}>+ Ajouter</button>
       </div>
-      {items.length === 0 && <p className="text-xs text-gray-400 italic">Aucun</p>}
+      {items.length === 0 && <p className="text-xs text-ash italic">Aucun</p>}
       {items.map((p, i) => (
         <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-2">
           <input className={inputCls} style={inputStyle} placeholder="Nom" value={p.name}
@@ -715,22 +715,22 @@ function CustomRolesSection({ associationId }: { associationId: string }) {
   };
 
   return (
-    <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+    <section className="bg-warm-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-5 py-3 border-b border-stone flex items-center justify-between">
         <div>
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Shield className="w-4 h-4" /> Rôles personnalisés
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">Définissez des rôles avec permissions sur mesure</p>
+          <p className="text-xs text-graphite mt-0.5">Définissez des rôles avec permissions sur mesure</p>
         </div>
         <button type="button" onClick={() => setEditing("new")}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0d3d28]">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-forest">
           <Plus className="w-3.5 h-3.5" /> Nouveau rôle
         </button>
       </div>
       <div className="p-5 space-y-2">
         {roles.length === 0 && (
-          <p className="text-sm text-gray-400 italic">Aucun rôle personnalisé. Cliquez sur "Nouveau rôle".</p>
+          <p className="text-sm text-ash italic">Aucun rôle personnalisé. Cliquez sur "Nouveau rôle".</p>
         )}
         {roles.map((r) => {
           const perms = parsePerms(r.permissions);
@@ -740,17 +740,17 @@ function CustomRolesSection({ associationId }: { associationId: string }) {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-3 h-3 rounded-full" style={{ background: r.color }} />
                   <span className="font-semibold text-sm text-gray-900">{r.name}</span>
-                  <span className="text-xs text-gray-400">({perms.length} permission{perms.length > 1 ? "s" : ""})</span>
+                  <span className="text-xs text-ash">({perms.length} permission{perms.length > 1 ? "s" : ""})</span>
                 </div>
-                <p className="text-xs text-gray-500 line-clamp-2">
+                <p className="text-xs text-graphite line-clamp-2">
                   {perms.length === 0 ? "Aucune permission" : perms.map((p) => PERMISSIONS[p]).join(" · ")}
                 </p>
               </div>
               <div className="flex items-center gap-1.5">
                 <button type="button" onClick={() => setEditing(r)}
-                  className="text-xs px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-700">Éditer</button>
+                  className="text-xs px-2 py-1 rounded border border-gray-200 hover:bg-cream text-gray-700">Éditer</button>
                 <button type="button" onClick={() => remove(r.id)}
-                  className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-red-50 text-red-600">Supprimer</button>
+                  className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-error/10 text-red-600">Supprimer</button>
               </div>
             </div>
           );
@@ -811,10 +811,10 @@ function RoleEditorModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-warm-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="px-5 py-3 border-b border-stone flex items-center justify-between">
           <h3 className="text-base font-bold">{role ? "Éditer le rôle" : "Nouveau rôle"}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="text-ash hover:text-gray-700"><X className="w-4 h-4" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div className="grid grid-cols-3 gap-3">
@@ -833,12 +833,12 @@ function RoleEditorModal({
             <label className={labelCls}>Permissions</label>
             <div className="space-y-1.5 max-h-72 overflow-y-auto p-3 rounded-lg border" style={{ borderColor: "#e2ddd4" }}>
               {ALL_PERMISSIONS.map((p) => (
-                <label key={p} className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                <label key={p} className="flex items-start gap-2 cursor-pointer hover:bg-cream p-1 rounded">
                   <input type="checkbox" className="mt-0.5 w-4 h-4 accent-[#0d3d28]"
                     checked={perms.includes(p)} onChange={() => togglePerm(p)} />
                   <div className="text-sm">
                     <span className="font-medium text-gray-900">{PERMISSIONS[p]}</span>
-                    <span className="text-xs text-gray-400 ml-2">{p}</span>
+                    <span className="text-xs text-ash ml-2">{p}</span>
                   </div>
                 </label>
               ))}
@@ -846,10 +846,10 @@ function RoleEditorModal({
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
-        <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Annuler</button>
+        <div className="px-5 py-3 border-t border-stone flex justify-end gap-2">
+          <button onClick={onClose} className="px-3 py-1.5 rounded-lg text-sm text-gray-700 hover:bg-cream">Annuler</button>
           <button onClick={save} disabled={saving}
-            className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-[#0d3d28] disabled:opacity-50">
+            className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-forest disabled:opacity-50">
             {saving ? "Enregistrement..." : "Enregistrer"}
           </button>
         </div>
@@ -860,8 +860,8 @@ function RoleEditorModal({
 
 function DangerZone({ onDissolve }: { onDissolve: () => void }) {
   return (
-    <section className="bg-white rounded-xl border-2 border-red-200 overflow-hidden">
-      <div className="px-5 py-3 bg-red-50 border-b border-red-200">
+    <section className="bg-warm-white rounded-xl border-2 border-red-200 overflow-hidden">
+      <div className="px-5 py-3 bg-error/10 border-b border-red-200">
         <h3 className="text-base font-bold text-red-700 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4" /> Zone de danger
         </h3>

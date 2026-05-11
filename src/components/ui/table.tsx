@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function Table({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="relative w-full overflow-auto rounded-[1.5rem] border border-stone shadow-sm bg-white">
+    <div className="relative w-full overflow-auto rounded-xl border border-stone shadow-sm bg-white">
       <table
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
@@ -40,7 +40,7 @@ export function TableHead({ className, ...props }: React.ThHTMLAttributes<HTMLTa
   return (
     <th
       className={cn(
-        "h-12 px-6 text-left align-middle font-black text-forest uppercase tracking-widest text-[10px] [&:has([role=checkbox])]:pr-0",
+        "h-10 px-4 text-left align-middle font-heading text-xs font-semibold text-charcoal uppercase tracking-wider [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ export function TableHead({ className, ...props }: React.ThHTMLAttributes<HTMLTa
 export function TableCell({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <td
-      className={cn("p-6 align-middle font-bold text-charcoal [&:has([role=checkbox])]:pr-0", className)}
+      className={cn("p-4 align-middle text-sm text-charcoal [&:has([role=checkbox])]:pr-0", className)}
       {...props}
     />
   );

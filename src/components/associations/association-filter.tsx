@@ -14,11 +14,11 @@ interface Props {
 export function AssociationFilter({ associations, value, onChange, className }: Props) {
   return (
     <div className={`flex items-center gap-2 ${className ?? ""}`}>
-      <Building2 className="w-4 h-4 text-gray-400" />
+      <Building2 className="w-4 h-4 text-ash" />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="px-3 py-2 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0d3d28]"
+        className="px-3 py-2 rounded-lg text-sm bg-warm-white focus:outline-none focus:ring-2 focus:ring-[#0d3d28]"
         style={{ border: "1px solid #e2ddd4", minWidth: 220 }}
       >
         <option value="">Toutes mes associations ({associations.length})</option>

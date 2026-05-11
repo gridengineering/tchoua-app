@@ -2,12 +2,12 @@ import { cn } from "@/lib/utils";
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "purple";
+  variant?: "default" | "success" | "warning" | "danger" | "info" | "purple" | "forest" | "gold";
   className?: string;
 }
 
 const variants = {
-  default: "bg-stone/20 text-graphite border border-stone/50",
+  default: "bg-stone/30 text-graphite border border-stone/50",
   success: "bg-success/10 text-success border border-success/20",
   warning: "bg-warning/10 text-warning border border-warning/20",
   danger: "bg-error/10 text-error border border-error/20",

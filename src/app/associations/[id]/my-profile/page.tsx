@@ -78,7 +78,7 @@ export default function MyProfilePage() {
         
         {/* Résumé du Profil */}
         <div className="md:col-span-1 space-y-6">
-          <Card className="bg-[#0d3d28] text-white">
+          <Card className="bg-forest text-white">
             <CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
@@ -97,7 +97,7 @@ export default function MyProfilePage() {
           </Card>
 
           {membership.sanctions && membership.sanctions.length > 0 && (
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-red-200 bg-error/10">
               <CardHeader className="pb-2">
                 <CardTitle className="text-red-800 flex items-center gap-2 text-sm">
                   <AlertTriangle className="w-4 h-4" /> Dettes & Sanctions (Priorité 0)
@@ -125,32 +125,32 @@ export default function MyProfilePage() {
                 <Settings className="w-5 h-5 text-[#0d3d28]" />
                 Clés de Répartition (Activités Optionnelles)
               </CardTitle>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-graphite">
                 Configurez comment vos excédents de versement doivent être alloués automatiquement.
               </p>
             </CardHeader>
             <CardContent>
               {message && (
-                <div className={`p-3 rounded-lg mb-4 text-sm font-semibold ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                <div className={`p-3 rounded-lg mb-4 text-sm font-semibold ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-error/10 text-red-700'}`}>
                   {message.text}
                 </div>
               )}
 
               {configurableSubs.length === 0 ? (
-                <p className="text-sm text-gray-500 italic">Vous n'êtes souscrit à aucune activité optionnelle configurable (ex: Épargne).</p>
+                <p className="text-sm text-graphite italic">Vous n'êtes souscrit à aucune activité optionnelle configurable (ex: Épargne).</p>
               ) : (
                 <div className="space-y-6">
                   {configurableSubs.map(sub => (
-                    <div key={sub.id} className="p-4 border rounded-xl bg-gray-50/50">
+                    <div key={sub.id} className="p-4 border rounded-xl bg-cream/50">
                       <h4 className="font-semibold text-gray-900 mb-3">{sub.activityName}</h4>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type d'allocation</label>
+                          <label className="block text-xs font-semibold text-graphite uppercase mb-1">Type d'allocation</label>
                           <select
                             value={sub.allocationType}
                             onChange={(e) => handleSubChange(sub.id, 'allocationType', e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg border bg-white focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
+                            className="w-full px-3 py-2 rounded-lg border bg-warm-white focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
                           >
                             <option value="NONE">Aucune (Ne pas allouer)</option>
                             <option value="RESIDUAL">Tout le reste (Excédent total)</option>
@@ -161,7 +161,7 @@ export default function MyProfilePage() {
                         
                         {(sub.allocationType === "FIXED" || sub.allocationType === "PERCENTAGE") && (
                           <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                            <label className="block text-xs font-semibold text-graphite uppercase mb-1">
                               {sub.allocationType === "FIXED" ? "Montant (FCFA)" : "Pourcentage (%)"}
                             </label>
                             <input
@@ -169,7 +169,7 @@ export default function MyProfilePage() {
                               min="1"
                               value={sub.allocationValue || ""}
                               onChange={(e) => handleSubChange(sub.id, 'allocationValue', e.target.value)}
-                              className="w-full px-3 py-2 rounded-lg border bg-white focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
+                              className="w-full px-3 py-2 rounded-lg border bg-warm-white focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
                               placeholder={sub.allocationType === "FIXED" ? "ex: 5000" : "ex: 10"}
                             />
                           </div>
@@ -182,7 +182,7 @@ export default function MyProfilePage() {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="flex items-center gap-2 bg-[#0d3d28] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition-colors disabled:opacity-50"
+                      className="flex items-center gap-2 bg-forest text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition-colors disabled:opacity-50"
                     >
                       <Save className="w-4 h-4" />
                       {saving ? "Sauvegarde..." : "Enregistrer les clés"}

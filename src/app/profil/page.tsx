@@ -7,9 +7,9 @@ import { getLevelInfo, getInitials } from "@/lib/utils";
 import { Trophy, Star, Shield, Leaf } from "lucide-react";
 
 const levels = [
-  { key: "NOVICE", icon: "🌱", label: "Novice", min: 0, max: 99, color: "bg-amber-500" },
+  { key: "NOVICE", icon: "🌱", label: "Novice", min: 0, max: 99, color: "bg-gold" },
   { key: "ACTIF", icon: "🌿", label: "Actif", min: 100, max: 299, color: "bg-gray-400" },
-  { key: "ENGAGE", icon: "🌳", label: "Engagé", min: 300, max: 599, color: "bg-yellow-500" },
+  { key: "ENGAGE", icon: "🌳", label: "Engagé", min: 300, max: 599, color: "bg-gold" },
   { key: "LEADER", icon: "🦁", label: "Leader", min: 600, max: 999, color: "bg-cyan-500" },
   { key: "LEGENDE", icon: "👑", label: "Légende", min: 1000, max: 9999, color: "bg-yellow-400" },
 ];
@@ -67,7 +67,7 @@ export default function ProfilPage() {
               {!nextLevel && <span>Niveau maximum !</span>}
             </div>
             <div className="w-full bg-white/20 rounded-full h-3">
-              <div className="bg-white h-3 rounded-full transition-all" style={{ width: `${progressToNext}%` }} />
+              <div className="bg-warm-white h-3 rounded-full transition-all" style={{ width: `${progressToNext}%` }} />
             </div>
             {nextLevel && (
               <p className="text-xs text-violet-200 mt-1">
@@ -80,7 +80,7 @@ export default function ProfilPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Scoring Categories */}
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-yellow-500" /> Catégories de score</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Star className="w-5 h-5 text-gold" /> Catégories de score</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {[
@@ -92,9 +92,9 @@ export default function ProfilPage() {
                   <div key={i}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-gray-700">{c.icon} {c.label}</span>
-                      <span className="text-xs text-gray-500 font-medium">{c.pct}%</span>
+                      <span className="text-xs text-graphite font-medium">{c.pct}%</span>
                     </div>
-                    <p className="text-xs text-gray-400 mb-1">{c.desc}</p>
+                    <p className="text-xs text-ash mb-1">{c.desc}</p>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div className="bg-violet-600 h-2 rounded-full" style={{ width: `${c.pct}%` }} />
                     </div>
@@ -106,7 +106,7 @@ export default function ProfilPage() {
 
           {/* Level Tiers */}
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-500" /> Niveaux & Privilèges</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Trophy className="w-5 h-5 text-gold" /> Niveaux & Privilèges</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {levels.map((l) => {
@@ -115,7 +115,7 @@ export default function ProfilPage() {
                   return (
                     <div key={l.key} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                       isCurrentLevel ? "bg-violet-50 border-2 border-violet-300" :
-                      isPassed ? "bg-gray-50 opacity-60" : "opacity-40"
+                      isPassed ? "bg-cream opacity-60" : "opacity-40"
                     }`}>
                       <span className="text-2xl">{l.icon}</span>
                       <div className="flex-1">
@@ -125,7 +125,7 @@ export default function ProfilPage() {
                             <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full">Votre niveau</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-500">{l.min} – {l.max === 9999 ? "∞" : l.max} pts</span>
+                        <span className="text-xs text-graphite">{l.min} – {l.max === 9999 ? "∞" : l.max} pts</span>
                       </div>
                       <div className={`w-3 h-3 rounded-full ${isPassed ? l.color : "bg-gray-200"}`} />
                     </div>
@@ -151,7 +151,7 @@ export default function ProfilPage() {
                 }`}>
                   <div className="text-3xl mb-2">{b.icon}</div>
                   <div className="font-semibold text-sm text-gray-900">{b.name}</div>
-                  <div className="text-xs text-gray-500 mt-1">{b.desc}</div>
+                  <div className="text-xs text-graphite mt-1">{b.desc}</div>
                   <div className="text-xs mt-2 text-violet-600 font-medium">{b.category}</div>
                   {b.earned && <div className="text-xs text-green-600 font-medium mt-1">✓ Obtenu</div>}
                 </div>
@@ -175,7 +175,7 @@ export default function ProfilPage() {
                 { action: "Contribution qualité A en nature", pts: "+15 pts" },
                 { action: "Formation dispensée à des membres", pts: "+25 pts" },
               ].map((r, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={i} className="flex items-center justify-between p-3 bg-cream rounded-lg">
                   <span className="text-sm text-gray-700">{r.action}</span>
                   <span className="text-sm font-bold text-green-600">{r.pts}</span>
                 </div>

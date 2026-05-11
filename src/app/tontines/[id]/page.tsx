@@ -35,7 +35,7 @@ export default function TontineDetailPage() {
 
   if (!data?.tontine) return (
     <DashboardLayout>
-      <div className="text-center py-16 text-gray-500">Tontine introuvable</div>
+      <div className="text-center py-16 text-graphite">Tontine introuvable</div>
     </DashboardLayout>
   );
 
@@ -55,7 +55,7 @@ export default function TontineDetailPage() {
       <div className="space-y-6">
         {/* Breadcrumb & Header */}
         <div>
-          <Link href="/tontines" className="flex items-center gap-2 text-sm text-gray-500 hover:text-violet-600 mb-4 transition-colors">
+          <Link href="/tontines" className="flex items-center gap-2 text-sm text-graphite hover:text-violet-600 mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Retour aux tontines
           </Link>
           <div className="flex items-start justify-between">
@@ -63,7 +63,7 @@ export default function TontineDetailPage() {
               <h2 className="text-2xl font-bold text-gray-900">{t.name}</h2>
               <div className="flex items-center gap-3 mt-1">
                 <StatusBadge status={t.status} />
-                <span className="text-sm text-gray-500">{getTontineTypeLabel(t.type)}</span>
+                <span className="text-sm text-graphite">{getTontineTypeLabel(t.type)}</span>
                 {myRole && <span className="text-sm text-violet-600 font-medium">Mon rôle : {myRole}</span>}
               </div>
             </div>
@@ -85,7 +85,7 @@ export default function TontineDetailPage() {
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-1">{s.icon}</div>
                 <div className="text-xl font-bold text-gray-900">{s.value}</div>
-                <div className="text-xs text-gray-500">{s.label}</div>
+                <div className="text-xs text-graphite">{s.label}</div>
               </CardContent>
             </Card>
           ))}
@@ -110,7 +110,7 @@ export default function TontineDetailPage() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   tab === key
                     ? "border-violet-600 text-violet-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
+                    : "border-transparent text-graphite hover:text-gray-700"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -136,7 +136,7 @@ export default function TontineDetailPage() {
                     { label: "Accès", value: t.isPublic ? "Public" : "Privé" },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between text-sm">
-                      <dt className="text-gray-500">{label}</dt>
+                      <dt className="text-graphite">{label}</dt>
                       <dd className="font-medium text-gray-900">{value}</dd>
                     </div>
                   ))}
@@ -174,14 +174,14 @@ export default function TontineDetailPage() {
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{m.user.name}</p>
-                      <p className="text-xs text-gray-500">Score : {m.user.score} pts · {m.user.level}</p>
+                      <p className="text-xs text-graphite">Score : {m.user.score} pts · {m.user.level}</p>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                       m.role === "PRESIDENT" ? "bg-violet-100 text-violet-700" :
                       m.role === "TREASURER" ? "bg-green-100 text-green-700" :
                       "bg-gray-100 text-gray-600"
                     }`}>{m.role}</span>
-                    {m.joinedAt && <span className="text-xs text-gray-400">{formatDate(m.joinedAt)}</span>}
+                    {m.joinedAt && <span className="text-xs text-ash">{formatDate(m.joinedAt)}</span>}
                   </div>
                 ))}
               </div>
@@ -203,20 +203,20 @@ export default function TontineDetailPage() {
             </CardHeader>
             <CardContent className="p-0">
               {t.sessions?.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">
-                  <RotateCcw className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                <div className="py-12 text-center text-graphite">
+                  <RotateCcw className="w-10 h-10 mx-auto mb-3 text-ash/60" />
                   <p>Aucune session planifiée</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {t.sessions?.map((s: any) => (
                     <div key={s.id} className="flex items-center gap-4 px-6 py-4">
-                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <span className="font-bold text-blue-600">#{s.sessionNumber}</span>
+                      <div className="w-10 h-10 bg-info/10 rounded-xl flex items-center justify-center">
+                        <span className="font-bold text-info">#{s.sessionNumber}</span>
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">Session {s.sessionNumber}</p>
-                        <p className="text-xs text-gray-500">{formatDate(s.startDate)} · {formatCurrency(s.amount)}</p>
+                        <p className="text-xs text-graphite">{formatDate(s.startDate)} · {formatCurrency(s.amount)}</p>
                       </div>
                       <StatusBadge status={s.status} />
                     </div>
@@ -239,14 +239,14 @@ export default function TontineDetailPage() {
             </CardHeader>
             <CardContent className="p-0">
               {t.contributions?.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">Aucune cotisation</div>
+                <div className="py-12 text-center text-graphite">Aucune cotisation</div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {t.contributions?.map((c: any) => (
                     <div key={c.id} className="flex items-center gap-4 px-6 py-3">
                       <div className="flex-1">
                         <p className="font-medium text-sm text-gray-900">{c.user?.name}</p>
-                        <p className="text-xs text-gray-500">{formatDate(c.createdAt)}</p>
+                        <p className="text-xs text-graphite">{formatDate(c.createdAt)}</p>
                       </div>
                       <span className="font-semibold text-gray-900">{formatCurrency(c.amount)}</span>
                       <StatusBadge status={c.status} />
@@ -270,14 +270,14 @@ export default function TontineDetailPage() {
             </CardHeader>
             <CardContent className="p-0">
               {t.loans?.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">Aucun prêt en cours</div>
+                <div className="py-12 text-center text-graphite">Aucun prêt en cours</div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {t.loans?.map((l: any) => (
                     <div key={l.id} className="flex items-center gap-4 px-6 py-3">
                       <div className="flex-1">
                         <p className="font-medium text-sm text-gray-900">{l.borrower?.name}</p>
-                        <p className="text-xs text-gray-500">{l.purpose}</p>
+                        <p className="text-xs text-graphite">{l.purpose}</p>
                       </div>
                       <span className="font-semibold text-gray-900">{formatCurrency(l.amount)}</span>
                       <StatusBadge status={l.status} />

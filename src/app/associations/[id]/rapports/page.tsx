@@ -144,13 +144,13 @@ export default function RapportsPage() {
     <DashboardLayout title="Analyses & Rapports">
       <div className="space-y-8 animate-in fade-in duration-500 pb-10">
         {/* Banner */}
-        <div className="bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-[2.5rem] p-10 text-white shadow-xl relative overflow-hidden mb-8">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#e68a00]/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+        <div className="bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-2xl p-10 text-white shadow-xl relative overflow-hidden mb-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-md mb-4">
-                <Sparkles className="w-3 h-3 text-[#e68a00]" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-[#e68a00]">Intelligence Financière</span>
+                <Sparkles className="w-3 h-3 text-gold" />
+                <span className="text-[9px] text-xs font-medium text-ash uppercase tracking-wider text-gold">Intelligence Financière</span>
               </div>
               <h1 className="text-4xl font-black mb-4 tracking-tight">Analyses & Rapports</h1>
               <p className="text-emerald-100/60 font-medium leading-relaxed max-w-xl">
@@ -159,14 +159,14 @@ export default function RapportsPage() {
               </p>
             </div>
             <button onClick={exportCSV} disabled={!report || report.type === "CROSS"}
-              className="bg-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50">
+              className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50">
               <Download className="w-4 h-4" /> Exporter le rapport
             </button>
           </div>
         </div>
 
         {/* Tabs Selection */}
-        <div className="flex flex-wrap gap-2 p-1.5 bg-white rounded-2xl border border-gray-100 shadow-sm w-fit">
+        <div className="flex flex-wrap gap-2 p-1.5 bg-warm-white rounded-2xl border border-stone shadow-sm w-fit">
           {([
             { type: "ACTIVITY" as const, label: "Activités", icon: Activity },
             { type: "MEMBER" as const, label: "Membres", icon: Users },
@@ -174,8 +174,8 @@ export default function RapportsPage() {
             { type: "CROSS" as const, label: "Multi-associations", icon: Star },
           ]).map(({ type, label, icon: Icon }) => (
             <button key={type} onClick={() => switchType(type)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                reportType === type ? 'bg-[#0d3d28] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] text-xs font-medium text-ash uppercase tracking-wider transition-all ${
+                reportType === type ? 'bg-forest text-white shadow-lg' : 'text-ash hover:text-gray-600 hover:bg-cream'
               }`}>
               <Icon className="w-4 h-4" /> {label}
             </button>
@@ -185,13 +185,13 @@ export default function RapportsPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-64 bg-white rounded-[2.5rem] border border-gray-100 animate-pulse" />
+              <div key={i} className="h-64 bg-warm-white rounded-2xl border border-stone animate-pulse" />
             ))}
           </div>
         ) : !report ? (
           <div className="py-20 text-center">
             <BarChart3 className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-500 font-bold">Aucune donnée disponible</p>
+            <p className="text-graphite font-bold">Aucune donnée disponible</p>
           </div>
         ) : (
           <div className="animate-in slide-in-from-bottom-4 duration-500">
@@ -199,36 +199,36 @@ export default function RapportsPage() {
             {report.type === "ACTIVITY" && report.activities && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {report.activities.map(a => (
-                  <div key={a.id} className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all">
+                  <div key={a.id} className="bg-warm-white rounded-2xl p-8 border border-stone shadow-sm hover:shadow-xl transition-all">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <h3 className="text-xl font-black text-gray-900 mb-1">{a.name}</h3>
-                        <div className="text-[10px] font-black text-[#e68a00] uppercase tracking-widest">{a.type} · {a.memberCount} Membres</div>
+                        <h3 className="text-xl font-semibold text-charcoal mb-1">{a.name}</h3>
+                        <div className="text-[10px] font-black text-gold uppercase tracking-widest">{a.type} · {a.memberCount} Membres</div>
                       </div>
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
+                      <div className="w-12 h-12 rounded-2xl bg-forest/10 text-forest flex items-center justify-center font-black">
                         {a.memberCount}
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-[#f7f3eb]">
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Cotisations</div>
+                        <div className="text-[9px] font-black text-ash uppercase tracking-widest mb-1">Cotisations</div>
                         <div className="text-lg font-black text-[#0d3d28]">{formatCurrency(a.totalContributionsAmount)}</div>
-                        <div className="text-[9px] font-black text-gray-400">{a.totalContributions} versements</div>
+                        <div className="text-[9px] font-black text-ash">{a.totalContributions} versements</div>
                       </div>
                       <div className="p-4 rounded-2xl bg-[#f7f3eb]">
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Distributions</div>
+                        <div className="text-[9px] font-black text-ash uppercase tracking-widest mb-1">Distributions</div>
                         <div className="text-lg font-black text-[#d4a343]">{formatCurrency(a.totalBeneficiariesAmount)}</div>
-                        <div className="text-[9px] font-black text-gray-400">{a.totalBeneficiaries} bénéficiaires</div>
+                        <div className="text-[9px] font-black text-ash">{a.totalBeneficiaries} bénéficiaires</div>
                       </div>
                       <div className="p-4 rounded-2xl bg-[#f7f3eb]">
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Solde Caisse</div>
-                        <div className="text-lg font-black text-blue-600">{formatCurrency(a.caisseBalance)}</div>
+                        <div className="text-[9px] font-black text-ash uppercase tracking-widest mb-1">Solde Caisse</div>
+                        <div className="text-lg font-black text-info">{formatCurrency(a.caisseBalance)}</div>
                       </div>
                       <div className="p-4 rounded-2xl bg-[#f7f3eb]">
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Prêts Actifs</div>
+                        <div className="text-[9px] font-black text-ash uppercase tracking-widest mb-1">Prêts Actifs</div>
                         <div className="text-lg font-black text-red-600">{formatCurrency(a.activeLoanAmount)}</div>
-                        <div className="text-[9px] font-black text-gray-400">{a.activeLoans} emprunts</div>
+                        <div className="text-[9px] font-black text-ash">{a.activeLoans} emprunts</div>
                       </div>
                     </div>
                   </div>
@@ -238,24 +238,24 @@ export default function RapportsPage() {
 
             {/* MEMBER REPORT */}
             {report.type === "MEMBER" && report.members && (
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-warm-white rounded-2xl border border-stone shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gray-50/50">
-                        <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Membre</th>
-                        <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Score</th>
-                        <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Cotisé</th>
-                        <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Reçu</th>
-                        <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Présence</th>
+                      <tr className="bg-cream/50">
+                        <th className="px-8 py-6 text-[10px] font-black text-ash uppercase tracking-widest">Membre</th>
+                        <th className="px-8 py-6 text-[10px] font-black text-ash uppercase tracking-widest">Score</th>
+                        <th className="px-8 py-6 text-[10px] font-black text-ash uppercase tracking-widest text-right">Cotisé</th>
+                        <th className="px-8 py-6 text-[10px] font-black text-ash uppercase tracking-widest text-right">Reçu</th>
+                        <th className="px-8 py-6 text-[10px] font-black text-ash uppercase tracking-widest text-center">Présence</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {report.members.map(m => (
-                        <tr key={m.membershipId} className="hover:bg-gray-50/30 transition-colors">
+                        <tr key={m.membershipId} className="hover:bg-cream/30 transition-colors">
                           <td className="px-8 py-6">
-                            <div className="font-black text-gray-900">{m.name || m.email}</div>
-                            <div className="text-[10px] font-black text-[#e68a00] uppercase tracking-widest">{m.role}</div>
+                            <div className="font-semibold text-charcoal">{m.name || m.email}</div>
+                            <div className="text-[10px] font-black text-gold uppercase tracking-widest">{m.role}</div>
                           </td>
                           <td className="px-8 py-6">
                             <div className="flex items-center gap-3">
@@ -265,17 +265,17 @@ export default function RapportsPage() {
                               <span className="font-black text-sm" style={{ color: SCORE_COLOR(m.reliabilityScore) }}>{m.reliabilityScore}%</span>
                             </div>
                           </td>
-                          <td className="px-8 py-6 text-right font-black text-gray-900">{formatCurrency(m.totalContributed)}</td>
-                          <td className="px-8 py-6 text-right font-black text-emerald-600">{formatCurrency(m.totalReceived)}</td>
+                          <td className="px-8 py-6 text-right font-semibold text-charcoal">{formatCurrency(m.totalContributed)}</td>
+                          <td className="px-8 py-6 text-right font-black text-forest">{formatCurrency(m.totalReceived)}</td>
                           <td className="px-8 py-6">
                             <div className="flex justify-center gap-4 text-[10px] font-black">
                               <div className="text-center">
-                                <div className="text-gray-400 uppercase tracking-widest">Réunions</div>
+                                <div className="text-ash uppercase tracking-widest">Réunions</div>
                                 <div className="text-gray-900">{m.attendedMeetings}</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-gray-400 uppercase tracking-widest">Retards</div>
-                                <div className="text-red-500">{m.lateCount}</div>
+                                <div className="text-ash uppercase tracking-widest">Retards</div>
+                                <div className="text-error">{m.lateCount}</div>
                               </div>
                             </div>
                           </td>
@@ -299,37 +299,37 @@ export default function RapportsPage() {
                     { label: "Remboursements reçus", value: report.dashboard.remboursementsRecus, color: "#3b82f6", icon: Users },
                     { label: "Prêt cumulé",          value: report.dashboard.pretCumule,         color: "#7c2d12", icon: Activity },
                   ].map(card => (
-                    <div key={card.label} className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm flex items-center gap-6">
+                    <div key={card.label} className="bg-warm-white rounded-xl p-8 border border-stone shadow-sm flex items-center gap-6">
                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white" style={{ background: card.color }}>
                          <card.icon className="w-6 h-6" />
                        </div>
                        <div>
-                         <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{card.label}</div>
-                         <div className="text-xl font-black text-gray-900">{formatCurrency(card.value)}</div>
+                         <div className="text-[9px] font-black text-ash uppercase tracking-widest mb-1">{card.label}</div>
+                         <div className="text-xl font-semibold text-charcoal">{formatCurrency(card.value)}</div>
                        </div>
                     </div>
                   ))}
                 </div>
 
                 {report.investmentMembers && (
-                  <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="px-8 py-6 bg-gray-50/50 border-b border-gray-100 text-[10px] font-black uppercase tracking-widest text-[#0d3d28]">Quote-part des investisseurs</div>
+                  <div className="bg-warm-white rounded-2xl border border-stone shadow-sm overflow-hidden">
+                    <div className="px-8 py-6 bg-cream/50 border-b border-stone text-[10px] text-xs font-medium text-ash uppercase tracking-wider text-[#0d3d28]">Quote-part des investisseurs</div>
                     <div className="overflow-x-auto">
                        <table className="w-full text-left">
                         <thead>
-                          <tr className="bg-gray-50/30">
-                            <th className="px-8 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Investisseur</th>
-                            <th className="px-8 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Part %</th>
-                            <th className="px-8 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Capital</th>
-                            <th className="px-8 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Gains</th>
+                          <tr className="bg-cream/30">
+                            <th className="px-8 py-4 text-[9px] font-black text-ash uppercase tracking-widest">Investisseur</th>
+                            <th className="px-8 py-4 text-[9px] font-black text-ash uppercase tracking-widest text-right">Part %</th>
+                            <th className="px-8 py-4 text-[9px] font-black text-ash uppercase tracking-widest text-right">Capital</th>
+                            <th className="px-8 py-4 text-[9px] font-black text-ash uppercase tracking-widest text-right">Gains</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                            {report.investmentMembers.map(m => (
                              <tr key={m.membershipId}>
                                <td className="px-8 py-5">
-                                 <div className="font-black text-gray-900">{m.name}</div>
-                                 <div className="text-[9px] font-black text-gray-400">Depuis {new Date(m.joinedAt).toLocaleDateString()}</div>
+                                 <div className="font-semibold text-charcoal">{m.name}</div>
+                                 <div className="text-[9px] font-black text-ash">Depuis {new Date(m.joinedAt).toLocaleDateString()}</div>
                                </td>
                                <td className="px-8 py-5 text-right font-black text-gray-600">{m.partPct.toFixed(2)} %</td>
                                <td className="px-8 py-5 text-right font-black text-[#0d3d28]">{formatCurrency(m.capitalCumule)}</td>
@@ -347,7 +347,7 @@ export default function RapportsPage() {
             {/* CROSS-ASSOCIATION REPORT */}
             {report.type === "CROSS" && report.cross && (
               <div className="space-y-6 max-w-4xl mx-auto">
-                 <div className="bg-gradient-to-r from-[#0d3d28] to-[#051f14] rounded-[2.5rem] p-10 text-white flex items-center gap-10">
+                 <div className="bg-gradient-to-r from-[#0d3d28] to-[#051f14] rounded-2xl p-10 text-white flex items-center gap-10">
                     <div className="w-32 h-32 rounded-full border-8 border-white/10 flex items-center justify-center relative">
                        <div className="absolute inset-2 rounded-full border-4 border-[#e68a00] border-t-transparent animate-spin duration-[3s]"></div>
                        <div className="text-center">
@@ -366,19 +366,19 @@ export default function RapportsPage() {
 
                  <div className="grid grid-cols-1 gap-4">
                    {report.cross.associations.map(a => (
-                     <div key={a.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center justify-between group hover:shadow-lg transition-all">
+                     <div key={a.id} className="bg-warm-white rounded-3xl p-6 border border-stone shadow-sm flex items-center justify-between group hover:shadow-lg transition-all">
                        <div className="flex items-center gap-6">
-                         <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl font-black text-[#0d3d28]">
+                         <div className="w-14 h-14 rounded-2xl bg-cream flex items-center justify-center text-2xl font-black text-[#0d3d28]">
                            {a.name[0]}
                          </div>
                          <div>
-                            <h4 className="font-black text-gray-900 group-hover:text-[#0d3d28] transition-colors">{a.name}</h4>
-                            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{a.myRole} · {a.type}</div>
+                            <h4 className="font-semibold text-charcoal group-hover:text-[#0d3d28] transition-colors">{a.name}</h4>
+                            <div className="text-[10px] font-black text-ash uppercase tracking-widest">{a.myRole} · {a.type}</div>
                          </div>
                        </div>
                        <div className="flex gap-10 items-center">
                           <div className="text-right">
-                            <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Score local</div>
+                            <div className="text-[9px] font-black text-ash uppercase tracking-widest">Score local</div>
                             <div className="font-black text-sm" style={{ color: SCORE_COLOR(a.reliabilityScore) }}>{a.reliabilityScore}%</div>
                           </div>
                           <div className="w-10 h-1 bg-gray-100 rounded-full overflow-hidden">

@@ -34,7 +34,7 @@ interface Event {
 }
 
 const EVENT_TYPES = [
-  { value: "REUNION", label: "Réunion", emoji: "🤝", color: "bg-blue-100 text-blue-700" },
+  { value: "REUNION", label: "Réunion", emoji: "🤝", color: "bg-info/10 text-blue-700" },
   { value: "FETE", label: "Fête", emoji: "🎉", color: "bg-yellow-100 text-yellow-700" },
   { value: "CEREMONIE", label: "Cérémonie", emoji: "🎗️", color: "bg-pink-100 text-pink-700" },
   { value: "FORMATION", label: "Formation", emoji: "📖", color: "bg-green-100 text-green-700" },
@@ -42,10 +42,10 @@ const EVENT_TYPES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  PLANNED: "bg-blue-100 text-blue-700",
+  PLANNED: "bg-info/10 text-blue-700",
   ONGOING: "bg-green-100 text-green-700",
   COMPLETED: "bg-gray-100 text-gray-700",
-  CANCELLED: "bg-red-100 text-red-700",
+  CANCELLED: "bg-error/10 text-red-700",
 };
 
 export default function EvenementsPage() {
@@ -121,7 +121,7 @@ export default function EvenementsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Événements & Culture</h1>
-            <p className="text-gray-500 text-sm">Réunions, fêtes, cérémonies et formations de vos tontines</p>
+            <p className="text-graphite text-sm">Réunions, fêtes, cérémonies et formations de vos tontines</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
@@ -156,10 +156,10 @@ export default function EvenementsPage() {
             <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
-            <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <div className="bg-warm-white rounded-xl p-12 text-center shadow-sm border border-stone">
+            <Calendar className="w-16 h-16 mx-auto mb-4 text-ash/60" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun événement</h3>
-            <p className="text-gray-500 text-sm mb-4">Créez un événement pour rassembler votre communauté</p>
+            <p className="text-graphite text-sm mb-4">Créez un événement pour rassembler votre communauté</p>
             <button onClick={() => setShowCreate(true)} className="bg-violet-600 text-white px-5 py-2 rounded-xl text-sm hover:bg-violet-700">
               Créer un événement
             </button>
@@ -173,7 +173,7 @@ export default function EvenementsPage() {
               const isUpcoming = new Date(event.startDate) >= now;
 
               return (
-                <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div key={event.id} className="bg-warm-white rounded-xl shadow-sm border border-stone overflow-hidden">
                   <div className="flex">
                     {/* Date column */}
                     <div className="w-20 bg-gradient-to-b from-violet-500 to-indigo-600 flex flex-col items-center justify-center p-3 flex-shrink-0">
@@ -201,12 +201,12 @@ export default function EvenementsPage() {
                             </span>
                           </div>
                           {event.description && (
-                            <p className="text-sm text-gray-500 mb-2">{event.description}</p>
+                            <p className="text-sm text-graphite mb-2">{event.description}</p>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
+                      <div className="flex flex-wrap gap-3 text-xs text-graphite mb-3">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5" />
                           {new Date(event.startDate).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
@@ -247,8 +247,8 @@ export default function EvenementsPage() {
                             onClick={() => rsvp(event.id, "DECLINED")}
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                               userRsvp?.status === "DECLINED"
-                                ? "bg-red-500 text-white"
-                                : "bg-red-50 text-red-700 hover:bg-red-100"
+                                ? "bg-error text-white"
+                                : "bg-error/10 text-red-700 hover:bg-error/10"
                             }`}
                           >
                             <XCircle className="w-3.5 h-3.5" /> Absent
@@ -258,7 +258,7 @@ export default function EvenementsPage() {
                               href={event.meetingLink}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-info/10 text-blue-700 hover:bg-info/10"
                             >
                               <Video className="w-3.5 h-3.5" /> Rejoindre
                             </a>
@@ -277,10 +277,10 @@ export default function EvenementsPage() {
       {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 my-4">
+          <div className="bg-warm-white rounded-2xl w-full max-w-lg p-6 my-4">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-gray-900">Créer un événement</h3>
-              <button onClick={() => setShowCreate(false)}><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowCreate(false)}><X className="w-5 h-5 text-ash" /></button>
             </div>
             <div className="space-y-3">
               <div>

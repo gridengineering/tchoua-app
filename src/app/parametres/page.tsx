@@ -70,7 +70,7 @@ export default function ParametresPage() {
       <div className="space-y-6 max-w-2xl">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Paramètres du compte</h2>
-          <p className="text-sm text-gray-500">Gérez vos informations personnelles et préférences</p>
+          <p className="text-sm text-graphite">Gérez vos informations personnelles et préférences</p>
         </div>
 
         <Card>
@@ -117,20 +117,20 @@ export default function ParametresPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Globe className="w-5 h-5 text-emerald-700" />Langues personnalisées</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Globe className="w-5 h-5 text-forest" />Langues personnalisées</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-500">Ajoutez les langues de votre choix. Les clés non traduites retombent automatiquement sur le français.</p>
+            <p className="text-sm text-graphite">Ajoutez les langues de votre choix. Les clés non traduites retombent automatiquement sur le français.</p>
 
-            {customs.length === 0 && <p className="text-sm text-gray-400 italic">Aucune langue personnalisée pour l'instant.</p>}
+            {customs.length === 0 && <p className="text-sm text-ash italic">Aucune langue personnalisée pour l'instant.</p>}
             {customs.map((c) => (
               <div key={c.code} className="border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center gap-3">
                   <input value={c.flag} onChange={(e) => setCustoms(customs.map(x => x.code === c.code ? { ...x, flag: e.target.value } : x))} onBlur={() => updateLang(c.code, { flag: c.flag })} className="w-12 text-center text-xl border rounded px-1 py-1" maxLength={4} />
                   <input value={c.name} onChange={(e) => setCustoms(customs.map(x => x.code === c.code ? { ...x, name: e.target.value } : x))} onBlur={() => updateLang(c.code, { name: c.name })} className="flex-1 border rounded px-2 py-1 text-sm" />
-                  <span className="text-xs text-gray-500 font-mono">{c.code}</span>
-                  <button onClick={() => setEditing(editing === c.code ? null : c.code)} className="text-xs text-emerald-700 hover:underline">{editing === c.code ? "Fermer" : "Traductions"}</button>
-                  <button onClick={() => deleteLang(c.code)} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
+                  <span className="text-xs text-graphite font-mono">{c.code}</span>
+                  <button onClick={() => setEditing(editing === c.code ? null : c.code)} className="text-xs text-forest hover:underline">{editing === c.code ? "Fermer" : "Traductions"}</button>
+                  <button onClick={() => deleteLang(c.code)} className="text-error hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
                 </div>
                 {editing === c.code && (
                   <div className="mt-3">
@@ -142,7 +142,7 @@ export default function ParametresPage() {
                       }}
                       className="w-full font-mono text-xs border rounded p-2 h-48"
                     />
-                    <p className="text-xs text-gray-400 mt-1">Format: {`{ "nav": {...}, "common": {...}, ... }`}. Sauvegarde automatique au blur.</p>
+                    <p className="text-xs text-ash mt-1">Format: {`{ "nav": {...}, "common": {...}, ... }`}. Sauvegarde automatique au blur.</p>
                   </div>
                 )}
               </div>

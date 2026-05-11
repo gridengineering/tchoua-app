@@ -237,7 +237,7 @@ function applyTemplate(templateName: string, current: WizardState): Partial<Wiza
 
 // ── CSS Helpers ───────────────────────────────────────────────────────────────
 
-const inputCls = "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28] bg-white";
+const inputCls = "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28] bg-warm-white";
 const labelCls = "block text-xs font-semibold text-gray-600 mb-1";
 const sectionCls = "p-4 rounded-xl space-y-3";
 
@@ -276,9 +276,9 @@ function MultiPersonFields({ label, items, onChange, accent = "#0d3d28", singula
           + Ajouter
         </button>
       </div>
-      {items.length === 0 && <p className="text-xs text-gray-400 italic">Aucun {singular} défini.</p>}
+      {items.length === 0 && <p className="text-xs text-ash italic">Aucun {singular} défini.</p>}
       {items.map((p, i) => (
-        <div key={i} className="space-y-2 pt-2 border-t border-gray-100">
+        <div key={i} className="space-y-2 pt-2 border-t border-stone">
           <div className="flex items-center gap-2">
             <input className={inputCls} style={{ border: "1px solid #e2ddd4", flex: 1 }} placeholder={`${singular} ${i + 1} — Nom`}
               value={p.name} onChange={e => { const arr = [...items]; arr[i] = { ...arr[i], name: e.target.value }; onChange(arr); }} />
@@ -440,12 +440,12 @@ export default function AssociationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Mes Associations</h2>
-            <p className="text-sm text-gray-500">{associations.length} association(s)</p>
+            <p className="text-sm text-graphite">{associations.length} association(s)</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowJoin(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm border transition-all hover:bg-gray-50"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm border transition-all hover:bg-cream"
               style={{ borderColor: "#e68a00", color: "#7c2d12" }}>
               <Hash className="w-4 h-4" /> Rejoindre
             </button>
@@ -466,9 +466,9 @@ export default function AssociationsPage() {
         ) : associations.length === 0 ? (
           <Card>
             <CardContent className="py-20 text-center">
-              <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <Building2 className="w-16 h-16 text-ash/60 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-700 mb-2">Aucune association</h3>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              <p className="text-graphite mb-6 max-w-sm mx-auto">
                 Créez votre première association ou rejoignez une association existante avec un code d'invitation.
               </p>
               <div className="flex items-center justify-center gap-3">
@@ -478,7 +478,7 @@ export default function AssociationsPage() {
                   <Plus className="w-4 h-4" /> Créer une association
                 </button>
                 <button onClick={() => setShowJoin(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm border transition-all hover:bg-gray-50"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm border transition-all hover:bg-cream"
                   style={{ borderColor: "#e68a00", color: "#7c2d12" }}>
                   <Hash className="w-4 h-4" /> Rejoindre
                 </button>
@@ -506,37 +506,37 @@ export default function AssociationsPage() {
                       </span>
                     </div>
                     <h3 className="font-bold text-gray-900 text-base mb-1 line-clamp-1">{a.name}</h3>
-                    <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                    <p className="text-sm text-graphite mb-3 line-clamp-2">
                       {a.description || ASSOC_TYPES.find(t => t.value === a.type)?.label || a.type}
                     </p>
                     <div className="space-y-1.5">
                       {a.region && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                          <MapPin className="w-3.5 h-3.5 text-ash" />
                           <span>{a.region}</span>
                         </div>
                       )}
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Users className="w-3.5 h-3.5 text-gray-400" />
+                        <Users className="w-3.5 h-3.5 text-ash" />
                         <span>{a._count?.members ?? 0} membre(s)</span>
                       </div>
                       {a._count?.activities > 0 && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <BadgeCheck className="w-3.5 h-3.5 text-gray-400" />
+                          <BadgeCheck className="w-3.5 h-3.5 text-ash" />
                           <span>{a._count.activities} activité(s)</span>
                         </div>
                       )}
                       {a.nextMeeting && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                          <Calendar className="w-3.5 h-3.5 text-ash" />
                           <span>{new Date(a.nextMeeting).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
                         </div>
                       )}
                     </div>
                     {a.myRole && (
-                      <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Rôle : <strong>{a.myRole}</strong></span>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      <div className="mt-3 pt-3 border-t border-stone flex items-center justify-between">
+                        <span className="text-xs text-graphite">Rôle : <strong>{a.myRole}</strong></span>
+                        <ChevronRight className="w-4 h-4 text-ash" />
                       </div>
                     )}
                   </CardContent>
@@ -549,9 +549,9 @@ export default function AssociationsPage() {
               onMouseEnter={e => { e.currentTarget.style.borderColor = "#0d3d28"; e.currentTarget.style.background = "rgba(13,61,40,0.04)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2ddd4"; e.currentTarget.style.background = "transparent"; }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#f7f3eb" }}>
-                <Plus className="w-6 h-6 text-gray-400" />
+                <Plus className="w-6 h-6 text-ash" />
               </div>
-              <span className="text-sm text-gray-500 font-medium">Créer une association</span>
+              <span className="text-sm text-graphite font-medium">Créer une association</span>
             </button>
           </div>
         )}
@@ -560,20 +560,20 @@ export default function AssociationsPage() {
       {/* ── Join Modal ────────────────────────────────────────────────────── */}
       {showJoin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-warm-white rounded-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900">Rejoindre une association</h3>
-              <button onClick={() => { setShowJoin(false); setJoinCode(""); setJoinError(""); }} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => { setShowJoin(false); setJoinCode(""); setJoinError(""); }} className="text-ash hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-sm text-gray-500">Entrez le code d'invitation transmis par un membre de l'association.</p>
+            <p className="text-sm text-graphite">Entrez le code d'invitation transmis par un membre de l'association.</p>
             <input className={inputCls} style={{ border: "1px solid #e2ddd4" }}
               placeholder="Code d'invitation (ex: ASSOC-XK9P2)"
               value={joinCode} onChange={e => setJoinCode(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") handleJoin(); }} />
             {joinError && (
-              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-error/10 p-3 rounded-lg">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" /> {joinError}
               </div>
             )}
@@ -595,18 +595,18 @@ export default function AssociationsPage() {
       {/* ── Wizard Modal ──────────────────────────────────────────────────── */}
       {showWizard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.55)" }}>
-          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[94vh] flex flex-col shadow-2xl">
+          <div className="bg-warm-white rounded-2xl w-full max-w-3xl max-h-[94vh] flex flex-col shadow-2xl">
 
             {/* Wizard Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex-shrink-0">
+            <div className="px-6 py-4 border-b border-stone flex-shrink-0">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h2 className="text-lg font-bold" style={{ color: "#0d3d28" }}>
                     {wizard.name ? `Créer "${wizard.name}"` : "Créer une association"}
                   </h2>
-                  <p className="text-xs text-gray-400 mt-0.5">{STEPS[wizard.step - 1]}</p>
+                  <p className="text-xs text-ash mt-0.5">{STEPS[wizard.step - 1]}</p>
                 </div>
-                <button onClick={() => { setShowWizard(false); resetWizard(); }} className="text-gray-400 hover:text-gray-600 ml-4">
+                <button onClick={() => { setShowWizard(false); resetWizard(); }} className="text-ash hover:text-gray-600 ml-4">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -626,7 +626,7 @@ export default function AssociationsPage() {
                           }}>
                           {done ? <CheckCircle2 className="w-4 h-4" /> : s}
                         </div>
-                        <span className="hidden sm:block text-[9px] text-gray-400 whitespace-nowrap">{label}</span>
+                        <span className="hidden sm:block text-[9px] text-ash whitespace-nowrap">{label}</span>
                       </div>
                       {s < 7 && <div className="flex-1 h-0.5 mx-0.5 rounded transition-all" style={{ background: done ? "#e68a00" : "#e2ddd4" }} />}
                     </div>
@@ -721,7 +721,7 @@ export default function AssociationsPage() {
               {/* ── Step 2: Template ─────────────────────────────────────── */}
               {wizard.step === 2 && (
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-500">Choisissez un template pour pré-configurer votre association ou partez de zéro.</p>
+                  <p className="text-sm text-graphite">Choisissez un template pour pré-configurer votre association ou partez de zéro.</p>
                   {Object.entries(TEMPLATES).map(([key, tpl]) => (
                     <button key={key} type="button"
                       onClick={() => handleSelectTemplate(key)}
@@ -738,7 +738,7 @@ export default function AssociationsPage() {
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: "#e68a00" }} />
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{tpl.description}</p>
+                        <p className="text-xs text-graphite mt-0.5 leading-relaxed">{tpl.description}</p>
                         {key === "A30" && (
                           <div className="mt-2 flex flex-wrap gap-1">
                             {["Président", "VP", "SG", "SA", "Trésorier", "TA", "Conseillers"].map(r => (
@@ -776,7 +776,7 @@ export default function AssociationsPage() {
               {/* ── Step 3: Activités ────────────────────────────────────── */}
               {wizard.step === 3 && (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-500">Définissez les activités financières de l'association. Au moins une activité est obligatoire.</p>
+                  <p className="text-sm text-graphite">Définissez les activités financières de l'association. Au moins une activité est obligatoire.</p>
                   {wizard.activities.map((act, i) => (
                     <div key={i} className={sectionCls} style={{ background: "rgba(13,61,40,0.03)", border: "1px solid rgba(13,61,40,0.1)" }}>
                       <div className="flex items-center justify-between">
@@ -832,7 +832,7 @@ export default function AssociationsPage() {
                     </div>
                   ))}
                   <button type="button" onClick={addActivity}
-                    className="w-full py-3 rounded-xl border-2 border-dashed text-sm font-medium transition-all hover:bg-gray-50"
+                    className="w-full py-3 rounded-xl border-2 border-dashed text-sm font-medium transition-all hover:bg-cream"
                     style={{ borderColor: "#e68a00", color: "#7c2d12" }}>
                     <Plus className="w-4 h-4 inline mr-1" /> Ajouter une activité
                   </button>
@@ -842,7 +842,7 @@ export default function AssociationsPage() {
               {/* ── Step 4: Bureau ───────────────────────────────────────── */}
               {wizard.step === 4 && (
                 <div className="space-y-3">
-                  <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">Configurez les membres du bureau. Tous les champs sont optionnels à cette étape.</p>
+                  <p className="text-xs text-graphite bg-cream p-3 rounded-lg">Configurez les membres du bureau. Tous les champs sont optionnels à cette étape.</p>
                   <PersonFields label="Président(e)" value={wizard.bureauConfig.president}
                     onChange={v => updateBureau({ president: v })} />
                   <PersonFields label="Vice-Président(e)" value={wizard.bureauConfig.vicePresident}
@@ -934,7 +934,7 @@ export default function AssociationsPage() {
                             background: wizard.membershipConfig.approvalProcess === opt.value ? "rgba(37,99,235,0.08)" : "white",
                           }}>
                           <p className="text-xs font-semibold text-gray-800">{opt.label}</p>
-                          <p className="text-[10px] text-gray-500">{opt.desc}</p>
+                          <p className="text-[10px] text-graphite">{opt.desc}</p>
                         </button>
                       ))}
                     </div>
@@ -1114,35 +1114,35 @@ export default function AssociationsPage() {
                         </div>
                         <div>
                           <p className="font-bold text-gray-900">{wizard.name}</p>
-                          <p className="text-xs text-gray-500">{ASSOC_TYPES.find(t => t.value === wizard.type)?.label} {wizard.region && `— ${wizard.region}`}</p>
+                          <p className="text-xs text-graphite">{ASSOC_TYPES.find(t => t.value === wizard.type)?.label} {wizard.region && `— ${wizard.region}`}</p>
                         </div>
                         <div className="ml-auto w-5 h-5 rounded-full flex-shrink-0" style={{ background: wizard.color }} />
                       </div>
-                      {wizard.description && <p className="text-xs text-gray-600 bg-white p-2 rounded-lg">{wizard.description}</p>}
+                      {wizard.description && <p className="text-xs text-gray-600 bg-warm-white p-2 rounded-lg">{wizard.description}</p>}
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Template</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Template</span>
                         <span className="font-medium">{TEMPLATES[wizard.templateUsed as keyof typeof TEMPLATES]?.label || wizard.templateUsed}</span>
                       </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Activités</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Activités</span>
                         <span className="font-medium">{wizard.activities.length} configurée(s)</span>
                       </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Réunions</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Réunions</span>
                         <span className="font-medium">{wizard.meetingConfig.frequency === "MONTHLY" ? "Mensuelles" : "Trimestrielles"} — {DAYS[wizard.meetingConfig.dayOfWeek]} {wizard.meetingConfig.hour}h</span>
                       </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Approbation</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Approbation</span>
                         <span className="font-medium">{wizard.membershipConfig.approvalProcess === "UNANIMOUS" ? "Unanime" : wizard.membershipConfig.approvalProcess === "MAJORITY" ? "Majorité" : "Automatique"}</span>
                       </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Parrainage</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Parrainage</span>
                         <span className="font-medium">{wizard.membershipConfig.sponsorshipRequired ? `Requis (${wizard.membershipConfig.sponsorshipCount})` : "Non requis"}</span>
                       </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <span className="text-gray-400 block">Quorum</span>
+                      <div className="bg-warm-white rounded-lg p-2">
+                        <span className="text-ash block">Quorum</span>
                         <span className="font-medium">{wizard.meetingConfig.quorumPercent}%</span>
                       </div>
                     </div>
@@ -1172,7 +1172,7 @@ export default function AssociationsPage() {
                       placeholder="membre1@email.com, +237 6xx xxx xxx, membre2@email.com…"
                       value={wizard.inviteEmails}
                       onChange={e => updateWizard("inviteEmails", e.target.value)} />
-                    <p className="text-xs text-gray-400">Séparez les adresses par des virgules. Les invitations seront envoyées après la création.</p>
+                    <p className="text-xs text-ash">Séparez les adresses par des virgules. Les invitations seront envoyées après la création.</p>
                   </div>
 
                   <div className="flex items-start gap-3 p-3 rounded-xl text-sm"
@@ -1187,23 +1187,23 @@ export default function AssociationsPage() {
 
               {/* Error display */}
               {error && (
-                <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-red-600 bg-error/10 p-3 rounded-lg">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
                 </div>
               )}
             </div>
 
             {/* Wizard Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-stone flex gap-3 flex-shrink-0">
               {wizard.step > 1 ? (
                 <button type="button" onClick={prevStep}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border font-medium text-sm transition-all hover:bg-gray-50"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border font-medium text-sm transition-all hover:bg-cream"
                   style={{ borderColor: "#e2ddd4", color: "#374151" }}>
                   <ChevronLeft className="w-4 h-4" /> Précédent
                 </button>
               ) : (
                 <button type="button" onClick={() => { setShowWizard(false); resetWizard(); }}
-                  className="px-4 py-2.5 rounded-xl border font-medium text-sm transition-all hover:bg-gray-50"
+                  className="px-4 py-2.5 rounded-xl border font-medium text-sm transition-all hover:bg-cream"
                   style={{ borderColor: "#e2ddd4", color: "#374151" }}>
                   Annuler
                 </button>

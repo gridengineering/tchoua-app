@@ -5,30 +5,30 @@ import { cn } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "success";
+  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "success" | "indigo" | "terracotta";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "md", loading, children, disabled, ...props }, ref) => {
-    const base = "inline-flex items-center justify-center gap-2 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 disabled:opacity-50 disabled:pointer-events-none active:scale-95 hover:scale-[1.02]";
+    const base = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/50 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
 
     const variants = {
-      default: "bg-forest text-white hover:bg-forest-dark focus:ring-forest/20 shadow-lg shadow-forest/10",
-      secondary: "bg-gold text-charcoal hover:bg-gold-light focus:ring-gold/20 shadow-lg shadow-gold/10",
-      outline: "bg-white/50 border-2 border-stone text-graphite hover:border-forest/30 hover:bg-white focus:ring-forest/10",
-      ghost: "text-graphite hover:bg-forest/5 hover:text-forest",
-      destructive: "bg-error text-white hover:bg-error/90 focus:ring-error/20 shadow-lg shadow-error/10",
-      success: "bg-success text-white hover:bg-success/90 focus:ring-success/20 shadow-lg shadow-success/10",
-      indigo: "bg-indigo text-white hover:opacity-90 focus:ring-indigo/20 shadow-lg shadow-indigo/10",
-      terracotta: "bg-terracotta text-white hover:bg-terracotta-light focus:ring-terracotta/20 shadow-lg shadow-terracotta/10",
+      default: "bg-forest text-white hover:bg-forest-dark shadow-sm",
+      secondary: "bg-gold text-charcoal hover:bg-gold-light shadow-sm",
+      outline: "border border-stone bg-warm-white text-charcoal hover:bg-cream hover:text-forest hover:border-forest/30",
+      ghost: "text-graphite hover:bg-stone/50 hover:text-charcoal",
+      destructive: "bg-error text-white hover:bg-error/90 shadow-sm",
+      success: "bg-success text-white hover:bg-success/90 shadow-sm",
+      indigo: "bg-indigo text-white hover:opacity-90 shadow-sm",
+      terracotta: "bg-terracotta text-white hover:bg-terracotta-light shadow-sm",
     };
 
     const sizes = {
-      sm: "h-9 px-4",
-      md: "h-12 px-6",
-      lg: "h-14 px-8 text-xs",
+      sm: "h-8 px-3 text-xs",
+      md: "h-10 px-4",
+      lg: "h-11 px-6",
     };
 
     return (

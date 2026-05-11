@@ -70,7 +70,7 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="bg-white rounded-3xl p-8 flex items-center gap-4">
+        <div className="bg-warm-white rounded-3xl p-8 flex items-center gap-4">
           <Loader2 className="w-6 h-6 animate-spin text-[#165E39]" />
           <span className="font-bold text-gray-700">Chargement du règlement...</span>
         </div>
@@ -85,10 +85,10 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-warm-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-[#165E39] to-[#0F3F26] rounded-t-3xl text-white">
+        <div className="p-6 border-b border-stone bg-gradient-to-r from-[#165E39] to-[#0F3F26] rounded-t-3xl text-white">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
@@ -120,12 +120,12 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {justActivated ? (
             <div className="text-center py-12 space-y-4">
-              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+              <div className="w-20 h-20 bg-forest/10 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10 text-forest" />
               </div>
-              <h3 className="text-xl font-black text-gray-900">Bienvenue !</h3>
-              <p className="text-gray-500 font-medium">
-                Vous avez approuvé tous les articles. Votre adhésion est maintenant <strong className="text-emerald-600">Active</strong> !
+              <h3 className="text-xl font-semibold text-charcoal">Bienvenue !</h3>
+              <p className="text-graphite font-medium">
+                Vous avez approuvé tous les articles. Votre adhésion est maintenant <strong className="text-forest">Active</strong> !
               </p>
             </div>
           ) : (
@@ -135,15 +135,15 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
               return (
                 <div
                   key={article.id}
-                  className={`p-4 rounded-2xl border transition-all ${isApproved ? "bg-emerald-50 border-emerald-200" : "bg-gray-50 border-gray-200"}`}
+                  className={`p-4 rounded-2xl border transition-all ${isApproved ? "bg-forest/10 border-emerald-200" : "bg-cream border-gray-200"}`}
                 >
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-6 h-6 rounded-full text-xs font-black flex items-center justify-center flex-shrink-0 ${isApproved ? "bg-emerald-500 text-white" : "bg-gray-300 text-gray-600"}`}>
+                        <div className={`w-6 h-6 rounded-full text-xs font-black flex items-center justify-center flex-shrink-0 ${isApproved ? "bg-forest text-white" : "bg-gray-300 text-gray-600"}`}>
                           {isApproved ? <Check className="w-3.5 h-3.5" /> : article.articleNumber}
                         </div>
-                        <h4 className={`font-bold text-sm ${isApproved ? "text-emerald-700" : "text-gray-800"}`}>
+                        <h4 className={`font-bold text-sm ${isApproved ? "text-forest" : "text-gray-800"}`}>
                           {article.title || `Article ${article.articleNumber}`}
                         </h4>
                       </div>
@@ -153,7 +153,7 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
                       onClick={() => approveArticle(article.id)}
                       disabled={isApproved || !!approving}
                       className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold transition-all ${isApproved
-                        ? "bg-emerald-100 text-emerald-600 cursor-default"
+                        ? "bg-forest/10 text-forest cursor-default"
                         : "bg-[#165E39] text-white hover:bg-[#0F3F26] disabled:opacity-50"
                         }`}
                     >
@@ -168,7 +168,7 @@ export function RegulationApprovalModal({ associationId, associationName, onAllA
 
         {/* Footer warning */}
         {!justActivated && approvedCount < total && (
-          <div className="p-4 border-t border-gray-100 bg-amber-50 rounded-b-3xl">
+          <div className="p-4 border-t border-stone bg-gold/10 rounded-b-3xl">
             <div className="flex items-center gap-2 text-sm text-amber-700 font-medium">
               <ShieldAlert className="w-4 h-4 flex-shrink-0" />
               Vous ne pouvez pas accéder à l'espace de l'association tant que tous les articles ne sont pas approuvés.

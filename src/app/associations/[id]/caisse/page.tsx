@@ -115,7 +115,7 @@ export default function CaissePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Formulaire d'encaissement */}
-          <div className="md:col-span-1 bg-white p-5 rounded-xl border border-gray-200">
+          <div className="md:col-span-1 bg-warm-white p-5 rounded-xl border border-gray-200">
             <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4">
               <Coins className="w-5 h-5 text-[#0d3d28]" />
               Nouvel Encaissement
@@ -123,7 +123,7 @@ export default function CaissePage() {
             
             <form onSubmit={handleDistribute} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Membre</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Membre</label>
                 <select 
                   className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#0d3d28] focus:outline-none"
                   value={selectedMemberId}
@@ -138,7 +138,7 @@ export default function CaissePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Montant global versé (FCFA)</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Montant global versé (FCFA)</label>
                 <input 
                   type="number" 
                   min="1"
@@ -151,7 +151,7 @@ export default function CaissePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Mode de paiement</label>
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Mode de paiement</label>
                 <select 
                   className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#0d3d28] focus:outline-none"
                   value={paymentMethod}
@@ -166,7 +166,7 @@ export default function CaissePage() {
               <button 
                 type="submit" 
                 disabled={loading || !selectedMemberId || !amount}
-                className="w-full flex items-center justify-center gap-2 bg-[#0d3d28] text-white py-2.5 rounded-lg font-semibold hover:bg-[#0a2f1f] disabled:opacity-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-forest text-white py-2.5 rounded-lg font-semibold hover:bg-[#0a2f1f] disabled:opacity-50 transition-colors"
               >
                 {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Répartir les fonds"}
               </button>
@@ -177,7 +177,7 @@ export default function CaissePage() {
           <div className="md:col-span-2 space-y-4">
             
             {error && !result && (
-              <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-start gap-3 border border-red-200">
+              <div className="p-4 bg-error/10 text-red-700 rounded-lg flex items-start gap-3 border border-red-200">
                 <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-semibold">Erreur lors de la répartition</h4>
@@ -187,7 +187,7 @@ export default function CaissePage() {
             )}
 
             {result && (
-              <div className={`p-5 rounded-xl border ${result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className={`p-5 rounded-xl border ${result.success ? 'bg-green-50 border-green-200' : 'bg-error/10 border-red-200'}`}>
                 <div className="flex items-start gap-3 mb-4">
                   {result.success ? (
                     <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />
@@ -206,9 +206,9 @@ export default function CaissePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg border overflow-hidden">
+                <div className="bg-warm-white rounded-lg border overflow-hidden">
                   <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
+                    <thead className="bg-cream text-gray-600 text-xs uppercase">
                       <tr>
                         <th className="px-4 py-2">Priorité</th>
                         <th className="px-4 py-2">Activité / Obligation</th>
@@ -219,7 +219,7 @@ export default function CaissePage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {result.allocations.map((alloc, i) => (
-                        <tr key={i} className={alloc.status === 'FAILED' ? 'bg-red-50' : alloc.status === 'SKIPPED' ? 'text-gray-400' : ''}>
+                        <tr key={i} className={alloc.status === 'FAILED' ? 'bg-error/10' : alloc.status === 'SKIPPED' ? 'text-ash' : ''}>
                           <td className="px-4 py-3 font-semibold">
                             {alloc.priority < 5 ? `Priorité ${alloc.priority}` : "-"}
                           </td>
@@ -233,14 +233,14 @@ export default function CaissePage() {
                           <td className="px-4 py-3 text-center">
                             {alloc.status === 'SUCCESS' && <span className="text-green-600 font-semibold">✔ Payé</span>}
                             {alloc.status === 'FAILED' && <span className="text-red-600 font-semibold">✖ Échec</span>}
-                            {alloc.status === 'SKIPPED' && <span className="text-gray-500 text-xs">Ignoré</span>}
-                            {alloc.status === 'PARTIAL' && <span className="text-amber-600 font-semibold">Partiel</span>}
+                            {alloc.status === 'SKIPPED' && <span className="text-graphite text-xs">Ignoré</span>}
+                            {alloc.status === 'PARTIAL' && <span className="text-gold font-semibold">Partiel</span>}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                     {result.success && (
-                      <tfoot className="bg-gray-50 font-bold border-t">
+                      <tfoot className="bg-cream font-bold border-t">
                         <tr>
                           <td colSpan={3} className="px-4 py-3 text-right">Montant restant (Non alloué) :</td>
                           <td className="px-4 py-3 text-right text-[#0d3d28]">{result.remainingBalance.toLocaleString()} F</td>
@@ -254,7 +254,7 @@ export default function CaissePage() {
                 <div className="mt-4 flex justify-end">
                   <button 
                     onClick={resetForm}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 bg-warm-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-cream"
                   >
                     Nouveau versement
                   </button>
@@ -263,8 +263,8 @@ export default function CaissePage() {
             )}
 
             {!result && !error && (
-              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center flex flex-col items-center justify-center text-gray-400 h-full">
-                <Coins className="w-12 h-12 mb-3 text-gray-300" />
+              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center flex flex-col items-center justify-center text-ash h-full">
+                <Coins className="w-12 h-12 mb-3 text-ash/60" />
                 <p>Sélectionnez un membre et saisissez un montant global.</p>
                 <p className="text-sm mt-2 max-w-sm">
                   Le moteur de répartition va automatiquement cascader le paiement sur les Tontines (Prio 1), Remboursements de Prêts (Prio 1), Solidarité (Prio 2) et Épargne (Prio 4).
