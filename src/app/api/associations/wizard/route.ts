@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { validateAssociationName, validateMaxAssociationsPerMember } from "@/lib/association/rules";
 
 export async function POST(req: Request) {
   try {
@@ -32,12 +33,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Le nom est requis" }, { status: 400 });
     }
 
+    // ─── Validation V9 ──────────────────────────────────────────────────────
+    const nameValidation = await validateAssociationName(name, prisma);
+    if (!nameValidation.valid) {
+      return NextResponse.json({ error: nameValidation.error }, { status: 400 });
+    }
+
+    const limitValidation = await validateMaxAssociationsPerMember(userId, prisma);
+    if (!limitValidation.valid) {
+      return NextResponse.json({ error: limitValidation.error }, { status: 400 });
+    }
+
+    const nameSlug = name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
     // Process inside a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Créer l'association
+      // 1. Créer l'association (statut DRAFT par défaut — spec V9)
       const newAssoc = await tx.association.create({
         data: {
           name,
+          nameSlug,
           description,
           type: type || "TONTINE_CLUB",
           color: color || "#165E39",
@@ -48,7 +67,7 @@ export async function POST(req: Request) {
           parentId,
           parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null,
           creatorId: userId,
-          status: "ACTIVE",
+          // status: "DRAFT" — laissé au défaut Prisma
         }
       });
 
