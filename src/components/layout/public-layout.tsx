@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, ChevronRight } from "lucide-react";
 
 type NavItem = 
   | { href: string; key: keyof typeof import("@/lib/i18n/translations").translations.fr.nav }
@@ -127,7 +127,7 @@ export function PublicHeader() {
                   <ChevronDown className="w-3.5 h-3.5 opacity-50 group-hover:rotate-180 transition-transform duration-300" />
                 </button>
                 <div className="absolute top-full left-0 mt-2 w-56 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 bg-white border border-[#e2ddd4] shadow-xl rounded-2xl overflow-hidden py-2 z-50">
-                  {item.items.map(subItem => (
+                  {item.items.map((subItem: { href: string; key: string }) => (
                     <Link key={subItem.href} href={subItem.href} className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-[#f7f3eb] hover:text-[#0d3d28] transition-colors">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#e68a00] opacity-0 group-hover:opacity-100 transition-opacity" />
                       {t.nav[subItem.key as keyof typeof t.nav]}
@@ -205,7 +205,7 @@ export function PublicHeader() {
                     </div>
                   ))
                 ) : item.items ? (
-                  item.items.map(subItem => (
+                  item.items.map((subItem: { href: string; key: string }) => (
                     <Link key={subItem.href} href={subItem.href} className="text-sm font-bold text-gray-600 py-1 flex items-center gap-3" onClick={() => setOpen(false)}>
                       <ChevronRight className="w-4 h-4 text-[#e68a00]" />
                       {t.nav[subItem.key as keyof typeof t.nav]}

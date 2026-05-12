@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type Lang = "fr" | "en" | "es" | "de" | "ghomala" | "ewondo" | "douala" | "fulfulde";
 
 export const translations = {

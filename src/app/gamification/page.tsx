@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { 
   Trophy, Medal, Star, Target, Zap, Shield, 
   Users, TrendingUp, Heart, Award, CheckCircle2,
-  Lock, Flame, Crown, Gem
+  Lock, Flame, Crown, Gem, Globe, ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { PublicLayout } from "@/components/layout/public-layout";

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, CheckCircle, Globe, Facebook } from "lucide-react";
+import { Mail, Lock, CheckCircle, Globe } from "lucide-react";
 import { auth, googleProvider, facebookProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 
