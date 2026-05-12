@@ -410,7 +410,7 @@ export default function HomePage() {
                   Commencer gratuitement
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="https://github.com/tchoua-app/tchoua" target="_blank" rel="noopener noreferrer"
+                <a href="https://github.com/gridengineering/tchoua-app" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-semibold border transition-all hover:bg-gray-50"
                   style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
                   ⭐ GitHub — Code source

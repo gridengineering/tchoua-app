@@ -120,6 +120,25 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.65;
   }
 
+  .text-body {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .text-caption {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ash);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
   .text-quote {
     font-family: var(--font-accent);
     font-size: 1.5rem;

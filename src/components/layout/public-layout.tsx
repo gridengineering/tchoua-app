@@ -21,7 +21,7 @@ const PUBLIC_NAV: NavItem[] = [
     items: [
       {
         title: "Gestion Financière",
-        image: "/tontine_cotisation_illustration_1778172868476.png",
+        image: "/hero-app-mockup.png",
         links: [
           { href: "/fonctionnalites", key: "cotisations", icon: "💰" },
           { href: "/fonctionnalites", key: "sessions", icon: "🔄" },
@@ -30,7 +30,7 @@ const PUBLIC_NAV: NavItem[] = [
       },
       {
         title: "Épargne & Crédit",
-        image: "/epargne_credit_illustration_1778172885121.png",
+        image: "/hero-app-mockup.png",
         links: [
           { href: "/fonctionnalites", key: "epargne", icon: "💹" },
           { href: "/fonctionnalites", key: "prets", icon: "🤝" },
@@ -39,7 +39,7 @@ const PUBLIC_NAV: NavItem[] = [
       },
       {
         title: "Organisation",
-        image: "/modeles_association_illustration_1778172899319.png",
+        image: "/hero-app-mockup.png",
         links: [
           { href: "/fonctionnalites", key: "modeles_association", icon: "🏛️" },
           { href: "/#modules", key: "modules", icon: "⚙️" },

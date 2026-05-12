@@ -311,7 +311,7 @@ export default function DeveloppeursPage() {
                  <Link href="#reference" className="px-8 py-4 bg-gold text-charcoal font-black rounded-2xl hover:bg-gold-light transition-all shadow-xl shadow-gold/20">
                     Explorer l&apos;API
                  </Link>
-                 <Link href="https://github.com/tchoua" className="px-8 py-4 bg-white/10 border border-white/10 text-white font-black rounded-2xl hover:bg-white/20 transition-all flex items-center gap-2">
+                 <Link href="https://github.com/gridengineering/tchoua-app" className="px-8 py-4 bg-white/10 border border-white/10 text-white font-black rounded-2xl hover:bg-white/20 transition-all flex items-center gap-2">
                     <GitBranch className="w-5 h-5" /> GitHub
                  </Link>
               </div>
