@@ -639,6 +639,7 @@ export default function AssociationDetailPage() {
             {tabs.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
+                data-testid={`tab-${key}`}
                 onClick={() => setTab(key)}
                 className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                   tab === key

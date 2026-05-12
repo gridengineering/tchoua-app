@@ -86,7 +86,7 @@ export default function NotificationsBell({ associationId }: NotificationsBellPr
   const latest = notifications.slice(0, 5);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-testid="notifications-bell">
       <button
         onClick={() => setOpen((o) => !o)}
         className="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#0d3d28]/10 transition-colors"

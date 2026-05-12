@@ -37,6 +37,7 @@ export default function LifecycleBadge({ status }: LifecycleBadgeProps) {
 
   return (
     <span
+      data-testid="lifecycle-badge"
       className={cn(
         "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border",
         config.classes

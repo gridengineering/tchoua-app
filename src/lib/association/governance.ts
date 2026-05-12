@@ -156,7 +156,7 @@ export async function canVote(
   if (election.endDate && new Date(election.endDate) < now) return false;
 
   const membership = await prisma.associationMembership.findFirst({
-    where: { id: membershipId, associationId: election.associationId, status: { not: "LEFT" } },
+    where: { id: membershipId, associationId: election.associationId, status: "ACTIVE" },
   });
   if (!membership) return false;
 
