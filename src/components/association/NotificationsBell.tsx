@@ -91,6 +91,8 @@ export default function NotificationsBell({ associationId }: NotificationsBellPr
         onClick={() => setOpen((o) => !o)}
         className="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#0d3d28]/10 transition-colors"
         aria-label="Notifications"
+        aria-expanded={open}
+        aria-haspopup="dialog"
       >
         <Bell className="w-5 h-5 text-[#0d3d28]" />
         {unreadCount > 0 && (

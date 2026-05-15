@@ -129,6 +129,8 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
           <button
             onClick={() => setAssocDropOpen(!assocDropOpen)}
             className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all bg-white/5 text-cream/80 hover:bg-white/10 hover:text-white"
+            aria-expanded={assocDropOpen}
+            aria-haspopup="menu"
           >
             <Building2 className="w-4 h-4 flex-shrink-0 text-gold" />
             <span className="flex-1 text-left truncate">
