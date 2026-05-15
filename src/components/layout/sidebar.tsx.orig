@@ -11,7 +11,7 @@ import {
   Heart, BarChart3, Settings, LogOut, ChevronLeft, ChevronDown,
   MessageCircle, Calendar, Bot, Globe, FileText,
   Building2, UserCircle, ArrowLeftRight, Check, ShieldCheck, Plus,
-  ShoppingBag, PartyPopper, Trophy, GraduationCap, Coins, Leaf, Cog
+  ShoppingBag, PartyPopper, Trophy, GraduationCap, Coins, Leaf
 } from "lucide-react";
 
 // ─── Structure du menu Membre (15 Modules complets) ─────────────────────────
@@ -94,8 +94,6 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
     { href: `/associations/${currentAssocId}/rapports`,     label: "Rapports",       icon: BarChart3 },
     { href: `/associations/${currentAssocId}?tab=members`,  label: "Membres",        icon: Users },
     { href: `/associations/${currentAssocId}/parametres`,   label: "Paramètres",     icon: Cog },
-
-
   ] : [];
 
   const inAssocContext = !!currentAssocId;
