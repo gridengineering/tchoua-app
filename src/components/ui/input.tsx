@@ -8,10 +8,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, leftIcon, ...props }, ref) => {
+  ({ className, label, error, leftIcon, id, ...props }, ref) => {
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
+    const errorId = error ? `${inputId}-error` : undefined;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={inputId} className="block text-sm font-medium text-charcoal">{label}</label>}
         <div className="relative group">
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors">
@@ -20,6 +24,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
+            id={inputId}
+            aria-invalid={!!error}
+            aria-describedby={errorId}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal placeholder:text-ash/70",
               "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
@@ -31,7 +38,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
