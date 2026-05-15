@@ -7,6 +7,7 @@ import {
   ArrowLeft, Star, Users, LayoutGrid, ChevronDown, ChevronUp,
   Lightbulb, Target, BookOpen, AlertTriangle, ArrowRight
 } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 
 const PRIORITY_MAP: Record<string, { label: string; color: string }> = {
   MANDATORY: { label: "Priorité 1 — Obligatoire", color: "text-red-400" },
@@ -182,7 +183,7 @@ export default function TemplateDetailPage() {
             <h2 className="text-xl font-bold mb-4">Règlement intérieur type</h2>
             <div
               className="prose prose-invert prose-sm max-w-none bg-white/5 border border-white/10 rounded-xl p-6"
-              dangerouslySetInnerHTML={{ __html: template.reglementHtml }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(template.reglementHtml) }}
             />
           </div>
         )}
