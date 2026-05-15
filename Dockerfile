@@ -22,6 +22,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 ENV NEXTAUTH_SECRET="placeholder-secret-for-build-only"
 ENV NEXTAUTH_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_FIREBASE_API_KEY="dummy-key"
+ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="dummy-domain"
+ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID="dummy-id"
+ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="dummy-bucket"
+ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="dummy-sender"
+ENV NEXT_PUBLIC_FIREBASE_APP_ID="dummy-app"
 
 # Générer le client Prisma et builder l'app
 RUN npx prisma generate
