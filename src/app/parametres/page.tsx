@@ -130,7 +130,7 @@ export default function ParametresPage() {
                   <input value={c.name} onChange={(e) => setCustoms(customs.map(x => x.code === c.code ? { ...x, name: e.target.value } : x))} onBlur={() => updateLang(c.code, { name: c.name })} className="flex-1 border rounded px-2 py-1 text-sm" />
                   <span className="text-xs text-graphite font-mono">{c.code}</span>
                   <button onClick={() => setEditing(editing === c.code ? null : c.code)} className="text-xs text-forest hover:underline">{editing === c.code ? "Fermer" : "Traductions"}</button>
-                  <button onClick={() => deleteLang(c.code)} className="text-error hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
+                  <button aria-label="Supprimer" onClick={() => deleteLang(c.code)} className="text-error hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
                 </div>
                 {editing === c.code && (
                   <div className="mt-3">

@@ -127,7 +127,7 @@ export default function CotisationsPage() {
           <div className="bg-warm-white rounded-2xl w-full max-w-md">
             <div className="border-b border-stone px-6 py-4 flex items-center justify-between">
               <h2 className="text-lg font-bold">Enregistrer une cotisation</h2>
-              <button onClick={() => setShowForm(false)}><X className="w-5 h-5 text-ash" /></button>
+              <button aria-label="Fermer" onClick={() => setShowForm(false)}><X className="w-5 h-5 text-ash" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <Select label="Tontine *" value={form.tontineId}
