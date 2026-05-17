@@ -364,7 +364,7 @@ function ReglementSection({ assoc, onSave }: { assoc: Association; onSave: (d: R
             <div className="flex justify-between items-center mb-2">
               <input className="font-bold text-sm bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
                 value={reg.title ?? ""} onChange={(e) => updateArticle(i, "title", e.target.value)} placeholder="Titre de l'article" />
-              <button onClick={() => removeArticle(i)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
+              <button aria-label="Supprimer" onClick={() => removeArticle(i)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
             </div>
             <textarea className="w-full bg-warm-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none min-h-[60px]"
               value={reg.content} onChange={(e) => updateArticle(i, "content", e.target.value)} placeholder="Contenu de l'article" />
@@ -814,7 +814,7 @@ function RoleEditorModal({
       <div className="bg-warm-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="px-5 py-3 border-b border-stone flex items-center justify-between">
           <h3 className="text-base font-bold">{role ? "Éditer le rôle" : "Nouveau rôle"}</h3>
-          <button onClick={onClose} className="text-ash hover:text-gray-700"><X className="w-4 h-4" /></button>
+          <button aria-label="Fermer" onClick={onClose} className="text-ash hover:text-gray-700"><X className="w-4 h-4" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div className="grid grid-cols-3 gap-3">

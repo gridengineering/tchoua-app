@@ -280,7 +280,7 @@ export default function EvenementsPage() {
           <div className="bg-warm-white rounded-2xl w-full max-w-lg p-6 my-4">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-gray-900">Créer un événement</h3>
-              <button onClick={() => setShowCreate(false)}><X className="w-5 h-5 text-ash" /></button>
+              <button aria-label="Fermer" onClick={() => setShowCreate(false)}><X className="w-5 h-5 text-ash" /></button>
             </div>
             <div className="space-y-3">
               <div>
