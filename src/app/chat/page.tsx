@@ -218,7 +218,12 @@ export default function ChatPage() {
             <div className="flex-1 overflow-y-auto p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="text-xs font-semibold text-graphite uppercase">Canaux</div>
-                <button onClick={() => setShowChannelModal(true)} className="text-ash hover:text-violet-600">
+                <button
+                  onClick={() => setShowChannelModal(true)}
+                  className="text-ash hover:text-violet-600"
+                  aria-label="Créer un canal"
+                  title="Créer un canal"
+                >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -335,12 +340,16 @@ export default function ChatPage() {
                             <button
                               onClick={() => setShowEmoji(showEmoji === msg.id ? null : msg.id)}
                               className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-cream"
+                              aria-label="Réagir avec un emoji"
+                              title="Réagir avec un emoji"
                             >
                               <Smile className="w-3 h-3 text-graphite" />
                             </button>
                             <button
                               onClick={() => setReplyTo(msg)}
                               className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-cream"
+                              aria-label="Répondre au message"
+                              title="Répondre au message"
                             >
                               <Reply className="w-3 h-3 text-graphite" />
                             </button>
@@ -348,6 +357,8 @@ export default function ChatPage() {
                               <button
                                 onClick={() => deleteMessage(msg.id)}
                                 className="p-1 bg-warm-white border border-gray-200 rounded-full shadow-sm hover:bg-error/10"
+                                aria-label="Supprimer le message"
+                                title="Supprimer le message"
                               >
                                 <Trash2 className="w-3 h-3 text-red-400" />
                               </button>
@@ -398,7 +409,14 @@ export default function ChatPage() {
                   <span className="text-violet-700">
                     Réponse à <strong>{replyTo.sender.name}</strong>: {replyTo.content.slice(0, 50)}
                   </span>
-                  <button onClick={() => setReplyTo(null)} className="text-violet-400 hover:text-violet-600 ml-2">✕</button>
+                  <button
+                    onClick={() => setReplyTo(null)}
+                    className="text-violet-400 hover:text-violet-600 ml-2"
+                    aria-label="Annuler la réponse"
+                    title="Annuler la réponse"
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
               <div className="flex items-end gap-2">
@@ -416,6 +434,8 @@ export default function ChatPage() {
                   onClick={sendMessage}
                   disabled={!input.trim() || sending}
                   className="w-10 h-10 bg-violet-600 hover:bg-violet-700 text-white rounded-full flex items-center justify-center disabled:opacity-50 transition-colors flex-shrink-0"
+                  aria-label="Envoyer le message"
+                  title="Envoyer le message"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
