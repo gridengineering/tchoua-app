@@ -1,0 +1,3 @@
+## 2023-10-27 - Icon-Only Button Accessibility in Layouts
+**Learning:** Adding dynamic `aria-label` and `title` attributes (e.g., toggling between "Ouvrir" and "Fermer") to icon-only buttons like those in `header.tsx`, `sidebar.tsx`, and `public-layout.tsx` significantly improves both screen reader accessibility and visual clarity for sighted users (via tooltips). Using French strings maintains context with the rest of the application.
+**Action:** When adding or modifying interactive icon-only elements, especially those that toggle state, ensure they have dynamic `aria-label` and `title` attributes localized appropriately (French).

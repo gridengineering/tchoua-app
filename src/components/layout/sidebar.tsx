@@ -117,7 +117,8 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
         <button
           onClick={onToggle}
           className="flex-shrink-0 transition-colors ml-auto p-1.5 rounded-lg text-cream/60 hover:text-white hover:bg-white/5"
-          aria-label="Toggle sidebar"
+          aria-label={collapsed ? "Agrandir le menu latéral" : "Réduire le menu latéral"}
+          title={collapsed ? "Agrandir le menu latéral" : "Réduire le menu latéral"}
         >
           <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
         </button>
@@ -297,6 +298,8 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
         <button
           onClick={onToggle}
           className="hidden lg:flex items-center gap-3 px-3 py-2.5 rounded-xl text-cream/60 hover:text-white hover:bg-white/5 transition-all w-full"
+          aria-label={collapsed ? "Agrandir le menu latéral" : "Réduire le menu latéral"}
+          title={collapsed ? "Agrandir le menu latéral" : "Réduire le menu latéral"}
         >
           <ChevronLeft className={cn("w-4 h-4 flex-shrink-0 transition-transform", collapsed && "rotate-180")} />
           {!collapsed && <span className="text-sm font-medium">Réduire</span>}
