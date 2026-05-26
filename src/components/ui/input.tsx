@@ -8,18 +8,25 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, leftIcon, ...props }, ref) => {
+  ({ className, label, error, leftIcon, id, ...props }, ref) => {
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
+    const errorId = `${inputId}-error`;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={inputId} className="block text-sm font-medium text-charcoal">{label}</label>}
         <div className="relative group">
           {leftIcon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors pointer-events-none">
               {leftIcon}
             </div>
           )}
           <input
             ref={ref}
+            id={inputId}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal placeholder:text-ash/70",
               "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
@@ -31,7 +38,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} role="alert" className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
@@ -46,10 +53,14 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, leftIcon, ...props }, ref) => {
+  ({ className, label, error, options, leftIcon, id, ...props }, ref) => {
+    const generatedId = React.useId();
+    const selectId = id || generatedId;
+    const errorId = `${selectId}-error`;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={selectId} className="block text-sm font-medium text-charcoal">{label}</label>}
         <div className="relative group">
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors pointer-events-none">
@@ -58,6 +69,9 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           )}
           <select
             ref={ref}
+            id={selectId}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal appearance-none",
               "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
@@ -76,7 +90,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
           </div>
         </div>
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} role="alert" className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
@@ -89,12 +103,19 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, error, ...props }, ref) => {
+  ({ className, label, error, id, ...props }, ref) => {
+    const generatedId = React.useId();
+    const textareaId = id || generatedId;
+    const errorId = `${textareaId}-error`;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={textareaId} className="block text-sm font-medium text-charcoal">{label}</label>}
         <textarea
           ref={ref}
+          id={textareaId}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
             "w-full bg-warm-white border border-stone rounded-xl px-4 py-3 text-sm font-body text-charcoal placeholder:text-ash/70 min-h-[80px]",
             "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all resize-none",
@@ -104,7 +125,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           )}
           {...props}
         />
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} role="alert" className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
