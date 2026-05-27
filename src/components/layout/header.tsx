@@ -84,15 +84,18 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
         <button 
           onClick={onMobileMenuOpen} 
           className="lg:hidden p-2 rounded-lg text-charcoal hover:bg-stone transition-colors"
+          aria-label="Ouvrir le menu de navigation"
+          title="Ouvrir le menu de navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <div className="hidden sm:flex items-center bg-warm-white border border-stone rounded-xl px-3 py-2 w-64">
-          <Search className="w-4 h-4 text-ash mr-2" />
+          <Search className="w-4 h-4 text-ash mr-2" aria-hidden="true" />
           <input 
             type="text" 
             placeholder="Rechercher..." 
+            aria-label="Rechercher"
             className="bg-transparent text-sm font-body text-charcoal placeholder:text-ash outline-none w-full"
           />
         </div>
@@ -166,7 +169,12 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
       {/* Right: Actions */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Chat Button */}
-        <Link href="/chat" className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group">
+        <Link
+          href="/chat"
+          className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group"
+          aria-label="Ouvrir la messagerie"
+          title="Ouvrir la messagerie"
+        >
           <MessageSquare className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-forest border-2 border-cream" />
         </Link>
@@ -180,7 +188,11 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
         </Link>
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group">
+        <button
+          className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group"
+          aria-label="Voir les notifications"
+          title="Voir les notifications"
+        >
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error border-2 border-cream" />
         </button>
@@ -190,6 +202,9 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
           <button 
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             className="flex items-center gap-2 p-1 rounded-xl hover:bg-stone transition-colors"
+            aria-label="Ouvrir le menu utilisateur"
+            title="Menu utilisateur"
+            aria-expanded={isUserMenuOpen}
           >
             <div className="w-8 h-8 rounded-full bg-forest text-white flex items-center justify-center font-heading text-sm font-semibold">
               {getInitials(user?.name || "U")}
