@@ -1,0 +1,3 @@
+## 2024-05-28 - ARIA Labels and Titles on Icon-Only Buttons
+**Learning:** Found several icon-only buttons (like mobile menu toggles, notification bells, close buttons, and user menus) that either completely lacked `aria-label` attributes or lacked `title` attributes for visual tooltips, causing poor experiences for both screen reader users and visual users. Many also lacked explicit keyboard focus states.
+**Action:** When creating or modifying icon-only interactive elements, ensure they have an appropriate `aria-label` for screen readers, a `title` for visual tooltips, and explicitly defined focus classes (e.g., `focus:outline-none focus-visible:ring-2`) to ensure full accessibility.
