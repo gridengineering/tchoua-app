@@ -1,0 +1,3 @@
+## 2024-06-25 - Improve accessibility of header icon-only buttons
+**Learning:** Found that multiple icon-only navigation and action elements (like Messages, Notifications, and Menu toggles) lacked proper ARIA labels and focus indicators, which is a common accessibility trap in dashboard navigation headers. Adding focus states enhances keyboard navigability for quick-access actions.
+**Action:** Always verify that navigation elements, especially those without visible text like notification bells or user menu toggles, include `aria-label`, `title` (for tooltips), and explicit `focus-visible` styling.
