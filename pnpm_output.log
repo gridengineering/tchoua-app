@@ -1,0 +1,194 @@
+
+> tchoua-app@0.1.0 start /app
+> next start
+
+▲ Next.js 16.2.4
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 197ms
+[AUTH] Attempting login for: demo@tchoua.cm
+[AUTH] Login successful: demo@tchoua.cm (Role: MEMBER)
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+[GET /api/dashboard] Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async y (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:3616)
+    at async l (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:7900)
+    at async s (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:8941) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+[AUTH] Attempting login for: demo@tchoua.cm
+[AUTH] Login successful: demo@tchoua.cm (Role: MEMBER)
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+[GET /api/dashboard] Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async y (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:3616)
+    at async l (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:7900)
+    at async s (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:8941) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+[AUTH] Attempting login for: demo@tchoua.cm
+[AUTH] Login successful: demo@tchoua.cm (Role: MEMBER)
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+[GET /api/dashboard] Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async y (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:3616)
+    at async l (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:7900)
+    at async s (.next/server/chunks/[root-of-the-server]__0rxv7ou._.js:1:8941) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
+prisma:error
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+⨯ Error [PrismaClientKnownRequestError]:
+Invalid `prisma.associationMembership.findMany()` invocation:
+
+
+The column `main.association_memberships.blacklistedAt` does not exist in the current database.
+    at async w (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:3659)
+    at async l (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:10215)
+    at async o (.next/server/chunks/[root-of-the-server]__11z1xf4._.js:1:11256) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AssociationMembership',
+    column: 'main.association_memberships.blacklistedAt'
+  }
+}
