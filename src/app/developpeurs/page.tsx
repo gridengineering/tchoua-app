@@ -63,8 +63,9 @@ function CopyCode({ code }: { code: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="absolute top-3 right-3 p-1.5 rounded-md bg-white/80 hover:bg-white text-graphite hover:text-forest transition-all z-10"
-      title="Copier"
+      className="absolute top-3 right-3 p-1.5 rounded-md bg-white/80 hover:bg-white text-graphite hover:text-forest transition-all z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest"
+      title={copied ? "Copié !" : "Copier"}
+      aria-label={copied ? "Code copié" : "Copier le code"}
     >
       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
     </button>
@@ -332,7 +333,12 @@ export default function DeveloppeursPage() {
                   className="w-full pl-14 pr-14 py-5 bg-warm-white border-2 border-stone rounded-3xl font-bold text-charcoal focus:border-forest outline-none transition-all shadow-sm"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-stone rounded-xl">
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-stone rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest"
+                    aria-label="Effacer la recherche"
+                    title="Effacer la recherche"
+                  >
                     <X className="w-5 h-5 text-ash" />
                   </button>
                 )}
@@ -397,9 +403,20 @@ export default function DeveloppeursPage() {
                  <h2 className="text-3xl font-black text-charcoal mb-12 flex items-center gap-3">
                    <FileJson className="w-8 h-8 text-forest" /> Référence API
                  </h2>
-                 {filteredCategories.map(cat => (
-                   <CategorySection key={cat.id} category={cat} />
-                 ))}
+                 {filteredCategories.length === 0 ? (
+                   <div className="text-center py-12 bg-warm-white border border-stone rounded-3xl">
+                     <Search className="w-12 h-12 text-ash mx-auto mb-4" />
+                     <h3 className="text-xl font-bold text-charcoal mb-2">Aucun résultat trouvé</h3>
+                     <p className="text-graphite mb-6">Nous n'avons pas trouvé de résultat pour "{searchQuery}".</p>
+                     <Button onClick={() => setSearchQuery('')} variant="outline">
+                       Effacer la recherche
+                     </Button>
+                   </div>
+                 ) : (
+                   filteredCategories.map(cat => (
+                     <CategorySection key={cat.id} category={cat} />
+                   ))
+                 )}
               </div>
 
               {/* Webhooks */}
