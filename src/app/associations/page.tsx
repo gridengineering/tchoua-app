@@ -282,7 +282,7 @@ function MultiPersonFields({ label, items, onChange, accent = "#0d3d28", singula
           <div className="flex items-center gap-2">
             <input className={inputCls} style={{ border: "1px solid #e2ddd4", flex: 1 }} placeholder={`${singular} ${i + 1} — Nom`}
               value={p.name} onChange={e => { const arr = [...items]; arr[i] = { ...arr[i], name: e.target.value }; onChange(arr); }} />
-            <button type="button" onClick={() => onChange(items.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-600 transition-colors">
+            <button type="button" onClick={() => onChange(items.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-600 transition-colors focus-visible:ring-2 focus-visible:ring-forest focus:outline-none rounded" aria-label="Supprimer" title="Supprimer">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
@@ -563,7 +563,7 @@ export default function AssociationsPage() {
           <div className="bg-warm-white rounded-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900">Rejoindre une association</h3>
-              <button onClick={() => { setShowJoin(false); setJoinCode(""); setJoinError(""); }} className="text-ash hover:text-gray-600">
+              <button onClick={() => { setShowJoin(false); setJoinCode(""); setJoinError(""); }} className="text-ash hover:text-gray-600 focus-visible:ring-2 focus-visible:ring-forest focus:outline-none rounded" aria-label="Fermer" title="Fermer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -606,7 +606,7 @@ export default function AssociationsPage() {
                   </h2>
                   <p className="text-xs text-ash mt-0.5">{STEPS[wizard.step - 1]}</p>
                 </div>
-                <button onClick={() => { setShowWizard(false); resetWizard(); }} className="text-ash hover:text-gray-600 ml-4">
+                <button onClick={() => { setShowWizard(false); resetWizard(); }} className="text-ash hover:text-gray-600 ml-4 focus-visible:ring-2 focus-visible:ring-forest focus:outline-none rounded" aria-label="Fermer" title="Fermer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -782,7 +782,7 @@ export default function AssociationsPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold" style={{ color: "#0d3d28" }}>Activité {i + 1}</span>
                         {wizard.activities.length > 1 && (
-                          <button type="button" onClick={() => removeActivity(i)} className="text-red-400 hover:text-red-600 transition-colors">
+                          <button type="button" onClick={() => removeActivity(i)} className="text-red-400 hover:text-red-600 transition-colors focus-visible:ring-2 focus-visible:ring-forest focus:outline-none rounded" aria-label="Supprimer l'activité" title="Supprimer l'activité">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}

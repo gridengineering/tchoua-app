@@ -1,0 +1,3 @@
+## 2024-05-19 - Accessible Icon-Only Buttons in Modals & Wizards
+**Learning:** Icon-only buttons (like `X` for close or `Trash2` for delete) in dynamic contexts such as modals and wizards frequently lack accessible names and keyboard focus states. In a French-language app context, these must have explicit `aria-label` (e.g., "Fermer", "Supprimer") and `title` attributes for tooltips, along with proper `focus-visible` styling to support keyboard navigation.
+**Action:** When auditing or building modals and wizards, always check icon-only buttons for `aria-label`, `title`, and `focus-visible:ring-2 focus-visible:ring-forest focus:outline-none` classes.
