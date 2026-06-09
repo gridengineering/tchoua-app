@@ -82,8 +82,10 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
       {/* Left: Mobile menu + Search */}
       <div className="flex items-center gap-3">
         <button 
-          onClick={onMobileMenuOpen} 
-          className="lg:hidden p-2 rounded-lg text-charcoal hover:bg-stone transition-colors"
+          onClick={onMobileMenuOpen}
+          aria-label="Ouvrir le menu"
+          title="Ouvrir le menu"
+          className="lg:hidden p-2 rounded-lg text-charcoal hover:bg-stone transition-colors focus-visible:ring-2 focus-visible:ring-forest focus:outline-none"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -180,7 +182,11 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
         </Link>
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group">
+        <button
+          aria-label="Notifications"
+          title="Notifications"
+          className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group focus-visible:ring-2 focus-visible:ring-forest focus:outline-none"
+        >
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error border-2 border-cream" />
         </button>

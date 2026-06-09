@@ -178,7 +178,7 @@ export function PublicHeader() {
         </div>
 
         {/* Mobile Toggle */}
-        <button className="lg:hidden p-2 rounded-xl bg-gray-50 text-[#0d3d28]" onClick={() => setOpen(!open)}>
+        <button aria-label="Menu principal" title="Menu principal" className="lg:hidden p-2 rounded-xl bg-gray-50 text-[#0d3d28] focus-visible:ring-2 focus-visible:ring-[#0d3d28] focus:outline-none" onClick={() => setOpen(!open)}>
           {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
