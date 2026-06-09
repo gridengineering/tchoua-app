@@ -147,7 +147,7 @@ export function PublicHeader() {
         <div className="hidden lg:flex items-center gap-3">
           {/* Enhanced Lang Selector */}
           <div className="relative group mr-2">
-            <button className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#e2ddd4] bg-gray-50/50 hover:bg-white transition-all text-sm font-bold text-gray-700">
+            <button aria-label="Changer de langue" className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#e2ddd4] bg-gray-50/50 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0d3d28] transition-all text-sm font-bold text-gray-700">
               <Globe className="w-4 h-4 text-[#0d3d28]" />
               <span className="uppercase">{lang.slice(0, 2)}</span>
             </button>
@@ -178,7 +178,7 @@ export function PublicHeader() {
         </div>
 
         {/* Mobile Toggle */}
-        <button className="lg:hidden p-2 rounded-xl bg-gray-50 text-[#0d3d28]" onClick={() => setOpen(!open)}>
+        <button aria-label="Ouvrir le menu principal" className="lg:hidden p-2 rounded-xl bg-gray-50 text-[#0d3d28] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0d3d28]" onClick={() => setOpen(!open)}>
           {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>

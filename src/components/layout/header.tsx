@@ -83,7 +83,8 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
       <div className="flex items-center gap-3">
         <button 
           onClick={onMobileMenuOpen} 
-          className="lg:hidden p-2 rounded-lg text-charcoal hover:bg-stone transition-colors"
+          aria-label="Menu principal"
+          className="lg:hidden p-2 rounded-lg text-charcoal hover:bg-stone focus:outline-none focus-visible:ring-2 focus-visible:ring-forest transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -166,7 +167,7 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
       {/* Right: Actions */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Chat Button */}
-        <Link href="/chat" className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group">
+        <Link href="/chat" aria-label="Messagerie" className="relative p-2 rounded-xl text-graphite hover:bg-stone focus:outline-none focus-visible:ring-2 focus-visible:ring-forest transition-colors group">
           <MessageSquare className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-forest border-2 border-cream" />
         </Link>
@@ -180,7 +181,7 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
         </Link>
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-xl text-graphite hover:bg-stone transition-colors group">
+        <button aria-label="Notifications" className="relative p-2 rounded-xl text-graphite hover:bg-stone focus:outline-none focus-visible:ring-2 focus-visible:ring-forest transition-colors group">
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error border-2 border-cream" />
         </button>
@@ -189,7 +190,8 @@ export function Header({ onMobileMenuOpen, title }: HeaderProps) {
         <div className="relative">
           <button 
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="flex items-center gap-2 p-1 rounded-xl hover:bg-stone transition-colors"
+            aria-label="Menu utilisateur"
+            className="flex items-center gap-2 p-1 rounded-xl hover:bg-stone focus:outline-none focus-visible:ring-2 focus-visible:ring-forest transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-forest text-white flex items-center justify-center font-heading text-sm font-semibold">
               {getInitials(user?.name || "U")}
