@@ -35,8 +35,9 @@ export function Tooltip({ text, title, position = "top", children }: TooltipProp
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="ml-1 text-gray-400 hover:text-[#0d3d28] transition-colors"
+        className="ml-1 text-gray-400 hover:text-[#0d3d28] transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0d3d28]/50"
         aria-label="Aide"
+        title="Aide"
       >
         <HelpCircle className="w-3.5 h-3.5" />
       </button>
@@ -47,7 +48,12 @@ export function Tooltip({ text, title, position = "top", children }: TooltipProp
             style={{ background: "#0d3d28", borderColor: "rgba(212,163,67,0.3)" }}>
             <div className="flex items-start justify-between px-3 py-2 border-b" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               {title && <span className="font-semibold text-white text-xs">{title}</span>}
-              <button onClick={() => setOpen(false)} className="ml-auto text-white/50 hover:text-white">
+              <button
+                onClick={() => setOpen(false)}
+                className="ml-auto text-white/50 hover:text-white rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                aria-label="Fermer"
+                title="Fermer"
+              >
                 <X className="w-3 h-3" />
               </button>
             </div>
