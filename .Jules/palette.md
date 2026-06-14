@@ -1,0 +1,3 @@
+## 2026-05-24 - Implicit/Explicit Form Label Associations
+**Learning:** Reusable UI components like Input, Select, and Textarea were missing explicit HTML label associations and ARIA states for error tracking. Relying simply on wrapping labels around inputs or rendering them nearby isn't enough for robust screen reader support and good UX (like clicking the label to focus the input).
+**Action:** When building custom form components, always use `React.useId()` to generate a unique ID for the input element, use the `htmlFor` attribute on the associated `<label>`, and use `aria-describedby` linking to a separate ID for the error message to ensure full accessibility and usability.
