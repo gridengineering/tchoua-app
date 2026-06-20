@@ -1,0 +1,3 @@
+## 2024-05-19 - [Form Component Accessibility]
+**Learning:** Reusable form components like Input, Select, and Textarea must dynamically link `<label>` and error messages to the inputs to ensure screen readers correctly announce the label and any associated errors. A hardcoded ID won't work when components are instantiated multiple times. Using `React.useId()` allows dynamic ID generation when an explicit ID is not provided.
+**Action:** Always check form inputs for associated labels (linked via `htmlFor` matching the input's `id`), `aria-describedby` matching the error message `id`, and `aria-invalid` based on validation state. Utilize `React.useId()` when building custom reusable input wrapper components.
