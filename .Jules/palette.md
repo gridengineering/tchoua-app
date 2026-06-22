@@ -1,0 +1,3 @@
+## 2024-05-14 - [Form Field Accessibility Links]
+**Learning:** In highly reusable design system form components (`Input`, `Select`, `Textarea`), passing just an `error` string or a `label` is not enough for screen readers. If IDs are not explicitly provided by the consumer and internally linked via `htmlFor`, `aria-invalid`, and `aria-describedby`, screen readers will fail to announce validation errors or associate labels correctly.
+**Action:** Always use `React.useId()` inside generic form components to generate fallback unique IDs, ensuring that `<label htmlFor={id}>` and `<input aria-describedby={errorId}>` are automatically wired up without relying on the developer to remember to pass IDs every time.
