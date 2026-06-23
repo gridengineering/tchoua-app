@@ -1,0 +1,3 @@
+## 2024-05-24 - Explicit Label Linking in Generic Form Components
+**Learning:** Found that custom generic form components (`Input`, `Select`, `Textarea`) lacked explicit linking between `<label>` and the form control (`input`, `select`, `textarea`), causing screen readers to miss label associations. Additionally, error messages weren't programmatically linked. Using implicit wrapping `<label><input/></label>` is sometimes insufficient or difficult to style, so explicit linking via `id` and `htmlFor` is preferred.
+**Action:** Always utilize `React.useId()` inside generic form components to generate unique IDs if none are provided, ensuring explicit `htmlFor` linking on labels, and use `aria-describedby` alongside `aria-invalid` for error message associations.
