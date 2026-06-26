@@ -1,0 +1,3 @@
+## 2025-02-09 - [Accessible Layout Navigation]
+**Learning:** Primary navigation layout components (like the header) often miss accessible descriptions and focus states for icon-only actions, requiring explicit ARIA properties (like `aria-label`, `aria-haspopup`, `aria-expanded`) and `focus-visible` styles to be usable for keyboard and screen reader users.
+**Action:** When creating layout components with icon-only actions or dropdowns, always add `aria-label`, `title`, and keyboard focus styling (`focus-visible:ring-2 focus:outline-none`) to ensure full accessibility.
