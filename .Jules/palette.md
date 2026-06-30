@@ -1,0 +1,3 @@
+## 2024-07-01 - Form Component Accessibility
+**Learning:** Custom wrapper components for `<input>`, `<select>`, and `<textarea>` must programmatically generate stable, unique IDs to properly associate `<label>` tags (via `htmlFor`) and error text (via `aria-describedby`) for full keyboard and screen reader accessibility, even if an ID is not explicitly provided as a prop.
+**Action:** Use `React.useId()` in custom form components to guarantee a unique fallback ID, explicitly link the `<label>` using `htmlFor`, and link validation messages using `aria-describedby` when errors are present.
