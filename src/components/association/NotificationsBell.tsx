@@ -89,8 +89,10 @@ export default function NotificationsBell({ associationId }: NotificationsBellPr
     <div className="relative" ref={dropdownRef} data-testid="notifications-bell">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#0d3d28]/10 transition-colors"
+        className="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#0d3d28]/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0d3d28]"
         aria-label="Notifications"
+        title="Notifications"
+        aria-expanded={open}
       >
         <Bell className="w-5 h-5 text-[#0d3d28]" />
         {unreadCount > 0 && (
