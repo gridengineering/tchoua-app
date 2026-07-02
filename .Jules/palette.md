@@ -1,0 +1,3 @@
+## 2024-07-03 - Form Component Accessibility
+**Learning:** Custom form components (like Input, Select, Textarea) often lack proper accessibility linkages for screen readers when they wrap labels, inputs, and error messages together. Specifically, screen readers need `<label>` to be linked to inputs via `htmlFor`/`id`, and error messages need to be linked to inputs via `aria-describedby`.
+**Action:** Use `React.useId()` to generate a unique ID for the input if one isn't provided by the parent. Then, use this ID to set the `htmlFor` on the label and the `id` on the input. Similarly, construct an error ID (e.g., `${id}-error`) and use it for the error message's `id` and the input's `aria-describedby` attribute. Always add `aria-invalid={!!error}` to communicate state.
