@@ -1,0 +1,3 @@
+## 2026-07-03 - [Accessible Form Controls with `useId()`]
+**Learning:** Using React's `useId()` hook is critical for custom form controls like `Input`, `Select`, and `Textarea` to ensure they have properly linked labels (`htmlFor`) and error messages (`aria-describedby`) without relying on the consumer to manually pass an `id`. This improves screen reader experience and clickability of labels.
+**Action:** When creating or modifying form components, always leverage `React.useId()` as a fallback when an explicit `id` prop is missing, and use it to automatically link associated descriptive elements like `<label>` and error text.
