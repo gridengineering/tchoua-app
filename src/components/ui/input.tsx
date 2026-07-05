@@ -9,9 +9,17 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, leftIcon, ...props }, ref) => {
+    const fallbackId = React.useId();
+    const id = props.id ?? fallbackId;
+    const errorId = error ? `${id}-error` : undefined;
+
+    // Extract aria-describedby from props to prevent overriding
+    const { "aria-describedby": ariaDescribedBy, ...restProps } = props;
+    const combinedAriaDescribedBy = [ariaDescribedBy, errorId].filter(Boolean).join(" ") || undefined;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={id} className="block text-sm font-medium text-charcoal">{label}</label>}
         <div className="relative group">
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors">
@@ -20,6 +28,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
+            id={id}
+            aria-describedby={combinedAriaDescribedBy}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal placeholder:text-ash/70",
               "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
@@ -28,10 +38,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               leftIcon && "pl-11",
               className
             )}
-            {...props}
+            {...restProps}
           />
         </div>
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
@@ -47,9 +57,17 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, options, leftIcon, ...props }, ref) => {
+    const fallbackId = React.useId();
+    const id = props.id ?? fallbackId;
+    const errorId = error ? `${id}-error` : undefined;
+
+    // Extract aria-describedby from props to prevent overriding
+    const { "aria-describedby": ariaDescribedBy, ...restProps } = props;
+    const combinedAriaDescribedBy = [ariaDescribedBy, errorId].filter(Boolean).join(" ") || undefined;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={id} className="block text-sm font-medium text-charcoal">{label}</label>}
         <div className="relative group">
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-ash group-focus-within:text-forest transition-colors pointer-events-none">
@@ -58,6 +76,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           )}
           <select
             ref={ref}
+            id={id}
+            aria-describedby={combinedAriaDescribedBy}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal appearance-none",
               "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
@@ -66,7 +86,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               leftIcon && "pl-11",
               className
             )}
-            {...props}
+            {...restProps}
           >
             {options.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -76,7 +96,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
           </div>
         </div>
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
@@ -90,11 +110,21 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, ...props }, ref) => {
+    const fallbackId = React.useId();
+    const id = props.id ?? fallbackId;
+    const errorId = error ? `${id}-error` : undefined;
+
+    // Extract aria-describedby from props to prevent overriding
+    const { "aria-describedby": ariaDescribedBy, ...restProps } = props;
+    const combinedAriaDescribedBy = [ariaDescribedBy, errorId].filter(Boolean).join(" ") || undefined;
+
     return (
       <div className="space-y-1.5">
-        {label && <label className="block text-sm font-medium text-charcoal">{label}</label>}
+        {label && <label htmlFor={id} className="block text-sm font-medium text-charcoal">{label}</label>}
         <textarea
           ref={ref}
+          id={id}
+          aria-describedby={combinedAriaDescribedBy}
           className={cn(
             "w-full bg-warm-white border border-stone rounded-xl px-4 py-3 text-sm font-body text-charcoal placeholder:text-ash/70 min-h-[80px]",
             "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all resize-none",
@@ -102,9 +132,9 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             error && "border-error focus:border-error focus:ring-error bg-error/5",
             className
           )}
-          {...props}
+          {...restProps}
         />
-        {error && <p className="text-xs text-error ml-1">{error}</p>}
+        {error && <p id={errorId} className="text-xs text-error ml-1">{error}</p>}
       </div>
     );
   }
