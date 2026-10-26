@@ -3,10 +3,22 @@ import { PrismaClient } from "@prisma/client";
 import {
   validateAssociationName,
   validateActivationRequirements,
+  validateSingleParent,
+  validateMaxChildAssociations,
   validateMaxAssociationsPerMember,
+  validateNotSuspendedInAnyAssociation,
+  validateMemberCanLeave,
   validateLoanToFundRatio,
+  validateInterestRateCap,
   validateDoubleValidation,
+  validateTemplateDeletionOrArchival,
+  anonymizeAssociationForTemplate,
+  calculateTemplatePopularityScore,
   validateTemplateConversionEligibility,
+  getDefaultMeetingQuorum,
+  calculateProgressiveAbsenceFine,
+  calculateLoanPriorityScore,
+  calculateDeceasedLiquidation,
   validateStatusTransition,
 } from "@/lib/association/rules";
 
@@ -105,8 +117,8 @@ describe("rules", () => {
     it("succeeds when ratio is below 80%", async () => {
       prisma.associationActivity.findMany.mockResolvedValue([
         { caisseBalance: 1000 },
-      ]);
-      prisma.assocLoan.findMany.mockResolvedValue([{ amount: 500 }]);
+      ] as any);
+      prisma.assocLoan.findMany.mockResolvedValue([{ amount: 500 }] as any);
       const result = await validateLoanToFundRatio("assoc-1", prisma);
       expect(result).toEqual({ valid: true });
     });
@@ -114,8 +126,8 @@ describe("rules", () => {
     it("fails when ratio exceeds 80%", async () => {
       prisma.associationActivity.findMany.mockResolvedValue([
         { caisseBalance: 1000 },
-      ]);
-      prisma.assocLoan.findMany.mockResolvedValue([{ amount: 900 }]);
+      ] as any);
+      prisma.assocLoan.findMany.mockResolvedValue([{ amount: 900 }] as any);
       const result = await validateLoanToFundRatio("assoc-1", prisma);
       expect(result.valid).toBe(false);
       expect(result.error).toContain("90.0%");
@@ -157,7 +169,7 @@ describe("rules", () => {
       prisma.association.findUnique.mockResolvedValue({
         status: "ACTIVE",
         activatedAt,
-      });
+      } as any);
       const result = await validateTemplateConversionEligibility(
         "assoc-1",
         prisma
@@ -173,7 +185,7 @@ describe("rules", () => {
       prisma.association.findUnique.mockResolvedValue({
         status: "ACTIVE",
         activatedAt,
-      });
+      } as any);
       const result = await validateTemplateConversionEligibility(
         "assoc-1",
         prisma
@@ -197,7 +209,7 @@ describe("rules", () => {
       prisma.association.findUnique.mockResolvedValue({
         status: "DRAFT",
         activatedAt: new Date(),
-      });
+      } as any);
       const result = await validateTemplateConversionEligibility(
         "assoc-1",
         prisma
@@ -232,6 +244,172 @@ describe("rules", () => {
 
     it("forbids unknown transitions", () => {
       expect(validateStatusTransition("DRAFT", "ACTIVE")).toBe(false);
+    });
+  });
+
+  describe("validateSingleParent (R-004)", () => {
+    it("fails when association already has a parentId", async () => {
+      prisma.association.findUnique.mockResolvedValue({ parentId: "mother-1" } as any);
+      const res = await validateSingleParent("child-1", prisma);
+      expect(res.valid).toBe(false);
+      expect(res.code).toBe("ASSOC_003");
+    });
+
+    it("succeeds when association has no parent", async () => {
+      prisma.association.findUnique.mockResolvedValue({ parentId: null } as any);
+      prisma.associationRelation.findFirst.mockResolvedValue(null);
+      const res = await validateSingleParent("child-1", prisma);
+      expect(res).toEqual({ valid: true });
+    });
+  });
+
+  describe("validateMaxChildAssociations (R-005)", () => {
+    it("fails when mother association already has 20 children", async () => {
+      prisma.associationRelation.count.mockResolvedValue(20);
+      const res = await validateMaxChildAssociations("mother-1", prisma);
+      expect(res.valid).toBe(false);
+      expect(res.code).toBe("ASSOC_004");
+    });
+
+    it("succeeds when mother association has fewer than 20 children", async () => {
+      prisma.associationRelation.count.mockResolvedValue(5);
+      const res = await validateMaxChildAssociations("mother-1", prisma);
+      expect(res).toEqual({ valid: true });
+    });
+  });
+
+  describe("validateNotSuspendedInAnyAssociation (R-018)", () => {
+    it("fails when user is suspended in an association", async () => {
+      prisma.associationMembership.count.mockResolvedValue(1);
+      const res = await validateNotSuspendedInAnyAssociation("user-1", prisma);
+      expect(res.valid).toBe(false);
+    });
+
+    it("succeeds when user has no suspended memberships", async () => {
+      prisma.associationMembership.count.mockResolvedValue(0);
+      const res = await validateNotSuspendedInAnyAssociation("user-1", prisma);
+      expect(res).toEqual({ valid: true });
+    });
+  });
+
+  describe("validateMemberCanLeave (R-020)", () => {
+    it("fails when member has active loans", async () => {
+      prisma.assocLoan.count.mockResolvedValue(1);
+      const res = await validateMemberCanLeave("m-1", prisma);
+      expect(res.valid).toBe(false);
+    });
+
+    it("succeeds when member has no active loans or unpaid sanctions", async () => {
+      prisma.assocLoan.count.mockResolvedValue(0);
+      prisma.assocSanction.count.mockResolvedValue(0);
+      const res = await validateMemberCanLeave("m-1", prisma);
+      expect(res).toEqual({ valid: true });
+    });
+  });
+
+  describe("validateInterestRateCap (R-022)", () => {
+    it("accepts interest rate <= 10%", () => {
+      expect(validateInterestRateCap(8)).toEqual({ valid: true });
+    });
+
+    it("rejects interest rate > 10%", () => {
+      expect(validateInterestRateCap(12).valid).toBe(false);
+    });
+  });
+
+  describe("validateTemplateDeletionOrArchival (R-028)", () => {
+    it("requires archival when usageCount > 10", () => {
+      const res = validateTemplateDeletionOrArchival(15);
+      expect(res.canDelete).toBe(false);
+      expect(res.shouldArchive).toBe(true);
+    });
+
+    it("allows deletion when usageCount <= 10", () => {
+      const res = validateTemplateDeletionOrArchival(10);
+      expect(res.canDelete).toBe(true);
+      expect(res.shouldArchive).toBe(false);
+    });
+  });
+
+  describe("anonymizeAssociationForTemplate (R-029) & Popularity (§11.5.2)", () => {
+    it("strips personal and financial data while preserving structure", () => {
+      const raw = {
+        name: "Tontine Privée",
+        type: "TONTINE_CLUB",
+        members: [{ name: "Jean" }],
+        bankAccounts: [{ accountNumber: "12345" }],
+        activities: [{ name: "Épargne", type: "EPARGNE", caisseBalance: 500000 }],
+      };
+      const anon = anonymizeAssociationForTemplate(raw);
+      expect(anon.members).toBeUndefined();
+      expect(anon.bankAccounts).toBeUndefined();
+      expect(anon.activities[0].caisseBalance).toBeUndefined();
+      expect(anon.activities[0].name).toBe("Épargne");
+    });
+
+    it("computes template popularity score in [0..100]", () => {
+      const score = calculateTemplatePopularityScore({
+        usageCount: 50,
+        activeAssociations: 40,
+        ratingAvg: 4.5,
+        ratingCount: 10,
+        completionRate: 90,
+      });
+      expect(score).toBeGreaterThan(0);
+      expect(score).toBeLessThanOrEqual(100);
+    });
+  });
+
+  describe("Meeting Quorums (§9.1), Progressive Fines (§3.2 / R-050), Loan Priority (§6.2), Deceased Liquidation (§2.2 / §7.3)", () => {
+    it("returns spec default quorums by meeting type", () => {
+      expect(getDefaultMeetingQuorum("REGULAR")).toBe(50);
+      expect(getDefaultMeetingQuorum("EXTRAORDINARY")).toBe(66);
+      expect(getDefaultMeetingQuorum("BUREAU_MEETING")).toBe(66);
+      expect(getDefaultMeetingQuorum("AG_ORDINARY")).toBe(75);
+      expect(getDefaultMeetingQuorum("COMMISSION_MEETING")).toBe(50);
+      expect(getDefaultMeetingQuorum("SPEECH_CIRCLE")).toBeNull();
+    });
+
+    it("computes progressive absence fines and R-050 alerts", () => {
+      expect(calculateProgressiveAbsenceFine(1)).toEqual({
+        fineAmount: 1000,
+        action: "FINE",
+        notifyBureau: false,
+      });
+      expect(calculateProgressiveAbsenceFine(2)).toEqual({
+        fineAmount: 3000,
+        action: "FINE",
+        notifyBureau: false,
+      });
+      expect(calculateProgressiveAbsenceFine(3)).toEqual({
+        fineAmount: 5000,
+        action: "FINE",
+        notifyBureau: true,
+      });
+      expect(calculateProgressiveAbsenceFine(6).action).toBe("WARNING_AND_FINE");
+      expect(calculateProgressiveAbsenceFine(9).action).toBe("PROPOSE_RADIATION");
+    });
+
+    it("computes loan priority score and deceased 75%/25% liquidation", () => {
+      const score = calculateLoanPriorityScore({
+        reliabilityScore: 90,
+        regularityRate: 95,
+        seniorityMonths: 18,
+        capitalContributed: 200000,
+        totalFundCapital: 1000000,
+      });
+      expect(score).toBeGreaterThan(70);
+
+      const liq = calculateDeceasedLiquidation({
+        totalAssets: 500000,
+        unpaidLoans: 100000,
+        unpaidFines: 0,
+        solidarityAidAmount: 200000,
+      });
+      expect(liq.netBalance).toBe(400000);
+      expect(liq.totalDistributable).toBe(600000);
+      expect(liq.childrenShare75).toBe(450000);
+      expect(liq.rightfulClaimantsShare25).toBe(150000);
     });
   });
 });

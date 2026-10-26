@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  generateNameSlug,
+  validateAssociationName,
+  validateMaxAssociationsPerMember,
+  validateNotSuspendedInAnyAssociation,
+} from "@/lib/association/rules";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -76,9 +82,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "name et type sont requis" }, { status: 400 });
   }
 
+  // R-001 : Unicité du nom / slug
+  const nameCheck = await validateAssociationName(name, prisma);
+  if (!nameCheck.valid) {
+    return NextResponse.json({ error: nameCheck.error, code: "ASSOC_001" }, { status: 409 });
+  }
+
+  // R-016 : Max 10 associations actives par membre
+  const maxAssocCheck = await validateMaxAssociationsPerMember(session.user.id, prisma);
+  if (!maxAssocCheck.valid) {
+    return NextResponse.json({ error: maxAssocCheck.error, code: "ASSOC_005" }, { status: 400 });
+  }
+
+  // R-018 : Un membre suspendu ne peut pas créer une nouvelle association
+  const suspendedCheck = await validateNotSuspendedInAnyAssociation(session.user.id, prisma);
+  if (!suspendedCheck.valid) {
+    return NextResponse.json({ error: suspendedCheck.error }, { status: 403 });
+  }
+
   const association = await prisma.association.create({
     data: {
       name,
+      nameSlug: generateNameSlug(name),
       description,
       type,
       isPublic: isPublic ?? false,
@@ -95,6 +120,7 @@ export async function POST(req: NextRequest) {
       bankConfig: bankConfig ? JSON.stringify(bankConfig) : null,
       creatorId: session.user.id,
       status: "ACTIVE",
+      activatedAt: new Date(),
     },
   });
 
@@ -110,7 +136,8 @@ export async function POST(req: NextRequest) {
     data: {
       userId: session.user.id,
       associationId: association.id,
-      role: "PRESIDENT",
+      role: "FOUNDER",
+      memberNumber: "M-001",
       status: "ACTIVE",
       joinedAt: new Date(),
     },
@@ -181,5 +208,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ association: result }, { status: 201 });
+  return NextResponse.json({ id: association.id, association: result }, { status: 201 });
 }

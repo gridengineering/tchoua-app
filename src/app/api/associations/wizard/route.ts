@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { validateAssociationName, validateMaxAssociationsPerMember } from "@/lib/association/rules";
+import {
+  validateAssociationName,
+  validateMaxAssociationsPerMember,
+  validateNotSuspendedInAnyAssociation,
+  validateMaxChildAssociations,
+} from "@/lib/association/rules";
 
 export async function POST(req: Request) {
   try {
@@ -41,7 +46,24 @@ export async function POST(req: Request) {
 
     const limitValidation = await validateMaxAssociationsPerMember(userId, prisma);
     if (!limitValidation.valid) {
-      return NextResponse.json({ error: limitValidation.error }, { status: 400 });
+      return NextResponse.json({ error: limitValidation.error, code: "ASSOC_005" }, { status: 400 });
+    }
+
+    // R-018 : Un membre suspendu ne peut pas créer une nouvelle association
+    const suspendedValidation = await validateNotSuspendedInAnyAssociation(userId, prisma);
+    if (!suspendedValidation.valid) {
+      return NextResponse.json({ error: suspendedValidation.error }, { status: 403 });
+    }
+
+    // R-005 : Maximum 20 associations filles pour une association mère
+    if (parentId) {
+      const parentLimitValidation = await validateMaxChildAssociations(parentId, prisma);
+      if (!parentLimitValidation.valid) {
+        return NextResponse.json(
+          { error: parentLimitValidation.error, code: parentLimitValidation.code },
+          { status: 400 }
+        );
+      }
     }
 
     const nameSlug = name

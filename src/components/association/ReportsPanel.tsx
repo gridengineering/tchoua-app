@@ -40,6 +40,14 @@ const REPORT_TYPES = [
   { value: "COMPTE_RESULTAT", label: "Compte de résultat" },
   { value: "TRESORERIE", label: "Trésorerie" },
   { value: "OHADA_SYSCOHADA", label: "OHADA SYSCOHADA" },
+  { value: "SOLIDARITY", label: "Solidarité" },
+  { value: "LOANS", label: "Prêts" },
+  { value: "ATTENDANCE", label: "Présence" },
+  { value: "INVESTMENT", label: "Investissement & Dividendes" },
+  { value: "CROSS", label: "Croisé Multi-Activités" },
+  { value: "CONSOLIDATED", label: "Consolidé (Mère + Filles)" },
+  { value: "ATTESTATION", label: "Attestation de Cotisation (QR)" },
+  { value: "AUDIT", label: "Journal d'Audit" },
 ];
 
 export default function ReportsPanel({ associationId }: ReportsPanelProps) {

@@ -379,7 +379,7 @@ export default function AssociationsPage() {
       if (!res.ok) { setError(data.error || "Erreur lors de la création."); setSubmitting(false); return; }
       setShowWizard(false);
       resetWizard();
-      router.push(`/associations/${data.id}`);
+      router.push(`/associations/${data.association?.id || data.id}`);
     } catch {
       setError("Erreur réseau. Veuillez réessayer.");
       setSubmitting(false);
@@ -402,7 +402,7 @@ export default function AssociationsPage() {
       if (!res.ok) { setJoinError(data.error || "Code invalide."); setJoining(false); return; }
       setShowJoin(false);
       setJoinCode("");
-      router.push(`/associations/${data.id}`);
+      router.push(`/associations/${data.association?.id || data.id}`);
     } catch {
       setJoinError("Erreur réseau.");
       setJoining(false);

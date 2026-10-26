@@ -79,6 +79,20 @@ export default function RelationsPanel({ associationId }: RelationsPanelProps) {
     }
   }
 
+  async function handleDissolve(relationId: string) {
+    try {
+      const res = await fetch(
+        `/api/associations/${associationId}/relations?relationId=${encodeURIComponent(relationId)}`,
+        { method: "DELETE" }
+      );
+      if (res.ok) {
+        fetchRelations();
+      }
+    } catch {
+      // silent
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -196,6 +210,16 @@ export default function RelationsPanel({ associationId }: RelationsPanelProps) {
                 >
                   {rel.status === "ACTIVE" ? "Active" : rel.status}
                 </span>
+                {rel.status === "ACTIVE" && (
+                  <button
+                    type="button"
+                    onClick={() => handleDissolve(rel.id)}
+                    className="text-xs px-2.5 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                    title="Rompre la relation sans supprimer l'association"
+                  >
+                    Détacher
+                  </button>
+                )}
               </div>
             );
           })}

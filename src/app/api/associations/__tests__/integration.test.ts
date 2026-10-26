@@ -36,7 +36,7 @@ function mockNextRequest(method: RequestMethod, body?: any, query?: Record<strin
   return req;
 }
 
-function mockParams(associationId: string, membershipId?: string) {
+function mockParams(associationId: string, membershipId?: string): any {
   if (membershipId) {
     return Promise.resolve({ id: associationId, membershipId });
   }
@@ -318,6 +318,67 @@ describe("Associations API Integration", () => {
       expect(res.status).toBe(201);
       const json = await res.json();
       expect(json.webhook.url).toBe("https://hook.example.com");
+    });
+  });
+
+  describe("Specification Compliance Rules (R-043, §7.4, §2.2/§7.3)", () => {
+    it("blocks report generation when association is SUSPENDED (R-043 / ASSOC_010)", async () => {
+      prismaMock.associationMembership.findFirst.mockResolvedValue({
+        id: "mem-1",
+        role: "PRESIDENT",
+        status: "ACTIVE",
+      } as any);
+      prismaMock.association.findUnique.mockResolvedValue({
+        id: "assoc-1",
+        status: "SUSPENDED",
+      } as any);
+
+      const req = mockNextRequest("POST", { type: "FINANCIAL", title: "Rapport" });
+      const res = await postReport(req, { params: mockParams("assoc-1") });
+
+      expect(res.status).toBe(403);
+      const json = await res.json();
+      expect(json.code).toBe("ASSOC_010");
+    });
+
+    it("rejects member REJECT action when reason is shorter than 20 chars (§7.4)", async () => {
+      prismaMock.associationMembership.findFirst
+        .mockResolvedValueOnce({ id: "actor-1", role: "PRESIDENT", status: "ACTIVE" } as any)
+        .mockResolvedValueOnce({ id: "target-1", status: "PENDING" } as any);
+
+      const req = mockNextRequest("POST", { action: "REJECT", reason: "Trop court" });
+      const res = await postMemberAction(req, { params: mockParams("assoc-1", "target-1") as any });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("executes DECEASED liquidation protocol with 75%/25% split (§2.2 & §7.3)", async () => {
+      prismaMock.associationMembership.findFirst
+        .mockResolvedValueOnce({ id: "actor-1", role: "PRESIDENT", status: "ACTIVE" } as any)
+        .mockResolvedValueOnce({ id: "target-1", status: "ACTIVE" } as any);
+      prismaMock.activityContribution.findMany.mockResolvedValue([
+        { amount: 400000 },
+      ] as any);
+      prismaMock.assocLoan.findMany.mockResolvedValue([]);
+      prismaMock.assocSanction.findMany.mockResolvedValue([]);
+      prismaMock.associationMembership.update.mockResolvedValue({
+        id: "target-1",
+        status: "LEFT",
+      } as any);
+      prismaMock.associationAuditLog.create.mockResolvedValue({ id: "audit-1" } as any);
+
+      const req = mockNextRequest("POST", {
+        action: "DECEASED",
+        reason: "Certificat de décès fourni",
+        solidarityAidAmount: 200000,
+      });
+      const res = await postMemberAction(req, { params: mockParams("assoc-1", "target-1") as any });
+
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.liquidation.totalDistributable).toBe(600000);
+      expect(json.liquidation.childrenShare75).toBe(450000);
+      expect(json.liquidation.rightfulClaimantsShare25).toBe(150000);
     });
   });
 });

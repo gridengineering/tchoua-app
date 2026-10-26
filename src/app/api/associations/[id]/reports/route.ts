@@ -3,8 +3,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateReportData } from "@/lib/association/reports";
+import { API_ERROR_CODES } from "@/lib/association/rules";
 
-const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
+const BUREAU_ROLES = [
+  "PRESIDENT",
+  "FOUNDER",
+  "VICE_PRESIDENT",
+  "SECRETARY",
+  "SECRETARY_ADJ",
+  "TREASURER",
+  "TREASURER_ADJ",
+  "SOLIDARITY_OFFICER",
+  "AUDITOR",
+];
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -51,17 +62,60 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const { id } = await params;
-  const membership = await getMembership(session.user.id, id);
-  if (!membership || !BUREAU_ROLES.includes(membership.role)) {
-    return NextResponse.json({ error: "Réservé aux membres du bureau" }, { status: 403 });
+  const [membership, association] = await Promise.all([
+    getMembership(session.user.id, id),
+    prisma.association.findUnique
+      ? prisma.association.findUnique({ where: { id }, select: { status: true } })
+      : Promise.resolve(null),
+  ]);
+
+  if (!membership) {
+    return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+  }
+
+  // R-043 : La génération de rapports est bloquée si l'association est en statut SUSPENDED
+  if (association?.status === "SUSPENDED") {
+    return NextResponse.json(
+      {
+        error: API_ERROR_CODES.ASSOC_010.message,
+        code: API_ERROR_CODES.ASSOC_010.code,
+      },
+      { status: API_ERROR_CODES.ASSOC_010.httpStatus }
+    );
   }
 
   const body = await req.json();
   const { type, title, format = "PDF", parameters } = body;
 
+  const isBureau = BUREAU_ROLES.includes(membership.role);
+  const isGlobalAdmin = ["SUPER_ADMIN", "ADMIN"].includes((session.user as any)?.role ?? "");
+
+  // R-038 : Le rapport d'audit est réservé au fondateur et aux administrateurs système
+  if (type === "AUDIT" && membership.role !== "FOUNDER" && !isGlobalAdmin) {
+    return NextResponse.json(
+      { error: "Le rapport d'audit est réservé au fondateur et aux administrateurs système" },
+      { status: 403 }
+    );
+  }
+
+  // R-036 & R-042 : Un membre simple ne peut générer que son propre rapport d'activité (MEMBER) ou son attestation (ATTESTATION)
+  const isPersonalMemberReport =
+    (type === "ATTESTATION" ||
+      (type === "MEMBER" && parameters?.membershipId === membership.id)) &&
+    membership.status === "ACTIVE";
+
+  if (!isBureau && !isGlobalAdmin && !isPersonalMemberReport) {
+    return NextResponse.json({ error: "Réservé aux membres du bureau" }, { status: 403 });
+  }
+
   if (!type || !title) {
     return NextResponse.json({ error: "type et title sont requis" }, { status: 400 });
   }
+
+  const resolvedParams =
+    !isBureau && !isGlobalAdmin
+      ? { ...(parameters ?? {}), membershipId: membership.id }
+      : parameters ?? {};
 
   const report = await prisma.associationReport.create({
     data: {
@@ -70,14 +124,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       title,
       format,
       status: "PENDING",
-      parameters: parameters ? JSON.stringify(parameters) : null,
+      parameters: Object.keys(resolvedParams).length ? JSON.stringify(resolvedParams) : null,
       generatedById: session.user.id,
     },
   });
 
   // Simulate async generation synchronously for now
   try {
-    await generateReportData(type, id, parameters ?? {}, prisma);
+    await generateReportData(type, id, resolvedParams, prisma);
     await prisma.associationReport.update({
       where: { id: report.id },
       data: { status: "READY", generatedAt: new Date() },

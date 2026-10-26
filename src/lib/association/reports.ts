@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { PrismaClient } from "@prisma/client";
 import {
   addDays,
@@ -13,6 +14,12 @@ import {
   startOfMonth,
   getDay,
 } from "date-fns";
+
+export function computeReportChecksum(payload: unknown): string {
+  return createHash("sha256")
+    .update(JSON.stringify(payload))
+    .digest("hex");
+}
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -671,17 +678,37 @@ async function generateInvestmentReport(
     capitalByMembership[c.membershipId] = (capitalByMembership[c.membershipId] ?? 0) + c.amount;
   }
 
+  // SPECIFICATION.md §6.5 : Exclusion du partage des intérêts pour les membres ayant emprunté durant la période
+  const borrowerMembershipIds = new Set(
+    loans
+      .filter((l) => ["APPROVED", "ACTIVE", "REPAID", "DEFAULTED", "OVERDUE"].includes(l.status))
+      .map((l) => l.borrowerMembership.id)
+  );
+
+  const eligibleCapitalTotal = members.reduce((sum, m) => {
+    if (borrowerMembershipIds.has(m.id)) return sum;
+    return sum + (capitalByMembership[m.id] ?? 0);
+  }, 0);
+
+  const effectiveDividendCapital = eligibleCapitalTotal > 0 ? eligibleCapitalTotal : capitalTotal;
+
   const memberRows = members
     .map((m) => {
       const versement = capitalByMembership[m.id] ?? 0;
+      const excludedFromDividends = borrowerMembershipIds.has(m.id) && eligibleCapitalTotal > 0;
       const part = capitalTotal > 0 ? versement / capitalTotal : 0;
-      const gainInteret = interetsGeneres * part;
+      const dividendShare =
+        excludedFromDividends || effectiveDividendCapital <= 0
+          ? 0
+          : versement / effectiveDividendCapital;
+      const gainInteret = interetsGeneres * dividendShare;
       return {
         membershipId: m.id,
         memberNumber: m.memberNumber,
         name: m.user.name || m.user.email,
         joinedAt: fmtDate(m.joinedAt),
         versementInitial: versement,
+        excludedFromDividends,
         gainInteret: Math.round(gainInteret * 100) / 100,
         capitalCumule: Math.round((versement + gainInteret) * 100) / 100,
         partPct: Math.round(part * 10000) / 100,
@@ -713,6 +740,7 @@ async function generateInvestmentReport(
     generatedAt: new Date().toISOString(),
     dashboard: {
       capitalTotal,
+      eligibleCapitalTotal,
       pretEnCours,
       pretCumule,
       remboursementsRecus,
@@ -721,6 +749,357 @@ async function generateInvestmentReport(
     },
     members: memberRows,
     loans: loanRows,
+  };
+}
+
+// ─── §12.1 : Rapport de Solidarité (SOLIDARITY) ────────────────────────────
+async function generateSolidarityReport(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const dateFilter = toDateFilter(parameters);
+
+  const [solidarityActivities, aidRequests] = await Promise.all([
+    prisma.associationActivity.findMany({
+      where: { associationId, type: "SOLIDARITE" },
+      include: { actContributions: { where: { status: "PAID" } } },
+    }),
+    prisma.assocSocialAidRequest.findMany({
+      where: {
+        associationId,
+        ...(dateFilter && { createdAt: dateFilter }),
+      },
+      include: {
+        membership: { include: { user: { select: { name: true, email: true } } } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const totalCollected = solidarityActivities.reduce(
+    (s, a) => s + a.actContributions.reduce((sc, c) => sc + c.amount, 0),
+    0
+  );
+  const caisseBalance = solidarityActivities.reduce((s, a) => s + a.caisseBalance, 0);
+  const paidAids = aidRequests.filter((r) => r.status === "PAID" || r.status === "APPROVED");
+  const totalDisbursed = paidAids.reduce(
+    (s, r) => s + (r.approvedAmount ?? r.requestedAmount ?? 0),
+    0
+  );
+
+  return {
+    type: "SOLIDARITY",
+    associationId,
+    generatedAt: new Date().toISOString(),
+    summary: {
+      totalCollected,
+      totalDisbursed,
+      caisseBalance,
+      requestCount: aidRequests.length,
+      approvedCount: paidAids.length,
+    },
+    requests: aidRequests.map((r) => ({
+      id: r.id,
+      member: r.membership.user.name || r.membership.user.email,
+      category: r.category,
+      requestedAmount: r.requestedAmount,
+      approvedAmount: r.approvedAmount,
+      status: r.status,
+      createdAt: fmtDate(r.createdAt),
+      paidAt: fmtDate(r.paidAt),
+    })),
+  };
+}
+
+// ─── §12.1 : Rapport de Prêts (LOANS) ──────────────────────────────────────
+async function generateLoansReport(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const dateFilter = toDateFilter(parameters);
+  const loans = await prisma.assocLoan.findMany({
+    where: {
+      activity: { associationId },
+      ...(dateFilter && { createdAt: dateFilter }),
+    },
+    include: {
+      repayments: true,
+      activity: { select: { name: true } },
+      borrowerMembership: {
+        include: { user: { select: { name: true, email: true } } },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const rows = loans.map((l) => {
+    const repaid = l.repayments.reduce((s, r) => s + r.amount, 0);
+    const interestPaid = l.repayments.reduce((s, r) => s + (r.interest ?? 0), 0);
+    return {
+      loanId: l.id,
+      activityName: l.activity.name,
+      borrower: l.borrowerMembership.user.name || l.borrowerMembership.user.email,
+      amount: l.amount,
+      interestRate: l.interestRate,
+      totalDue: l.totalDue,
+      repaid,
+      interestPaid,
+      remainingDue: Math.max(0, l.totalDue - repaid),
+      status: l.status,
+      dueDate: fmtDate(l.dueDate),
+    };
+  });
+
+  const totalLoaned = rows.reduce((s, r) => s + r.amount, 0);
+  const totalRepaid = rows.reduce((s, r) => s + r.repaid, 0);
+  const totalDue = rows.reduce((s, r) => s + r.totalDue, 0);
+
+  return {
+    type: "LOANS",
+    associationId,
+    generatedAt: new Date().toISOString(),
+    summary: {
+      count: rows.length,
+      totalLoaned,
+      totalRepaid,
+      totalRemaining: rows.reduce((s, r) => s + r.remainingDue, 0),
+      recoveryRatePct: totalDue > 0 ? Math.round((totalRepaid / totalDue) * 1000) / 10 : 100,
+    },
+    loans: rows,
+  };
+}
+
+// ─── §12.1 : Rapport de Présence (ATTENDANCE) ──────────────────────────────
+async function generateAttendanceReport(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const dateFilter = toDateFilter(parameters);
+  const meetings = await prisma.assocMeeting.findMany({
+    where: {
+      associationId,
+      ...(dateFilter && { scheduledAt: dateFilter }),
+    },
+    include: {
+      attendances: {
+        include: {
+          membership: { include: { user: { select: { name: true, email: true } } } },
+        },
+      },
+      fines: true,
+    },
+    orderBy: { scheduledAt: "desc" },
+  });
+
+  const memberStatsMap = new Map<
+    string,
+    {
+      membershipId: string;
+      name: string;
+      present: number;
+      late: number;
+      excused: number;
+      absent: number;
+      totalFines: number;
+    }
+  >();
+
+  for (const mtg of meetings) {
+    for (const att of mtg.attendances) {
+      const current = memberStatsMap.get(att.membershipId) ?? {
+        membershipId: att.membershipId,
+        name: att.membership.user.name || att.membership.user.email,
+        present: 0,
+        late: 0,
+        excused: 0,
+        absent: 0,
+        totalFines: 0,
+      };
+      if (att.status === "PRESENT") current.present += 1;
+      else if (att.status === "LATE") current.late += 1;
+      else if (att.status === "EXCUSED") current.excused += 1;
+      else current.absent += 1;
+      memberStatsMap.set(att.membershipId, current);
+    }
+    for (const fine of mtg.fines) {
+      const current = memberStatsMap.get(fine.membershipId);
+      if (current) {
+        current.totalFines += fine.amount;
+      }
+    }
+  }
+
+  const totalMeetings = meetings.length;
+  const members = Array.from(memberStatsMap.values()).map((m) => ({
+    ...m,
+    attendanceRatePct:
+      totalMeetings > 0
+        ? Math.round(((m.present + m.late) / totalMeetings) * 1000) / 10
+        : 100,
+  }));
+
+  return {
+    type: "ATTENDANCE",
+    associationId,
+    generatedAt: new Date().toISOString(),
+    totalMeetings,
+    members,
+  };
+}
+
+// ─── §12.1 & R-038 : Rapport d'Audit (AUDIT) ───────────────────────────────
+async function generateAuditReport(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const dateFilter = toDateFilter(parameters);
+  const logs = await prisma.associationAuditLog.findMany({
+    where: {
+      associationId,
+      ...(dateFilter && { createdAt: dateFilter }),
+    },
+    orderBy: { createdAt: "desc" },
+    take: 500,
+  });
+
+  return {
+    type: "AUDIT",
+    associationId,
+    generatedAt: new Date().toISOString(),
+    totalEntries: logs.length,
+    logs: logs.map((l) => ({
+      id: l.id,
+      userId: l.userId,
+      action: l.action,
+      entity: l.entity,
+      entityId: l.entityId,
+      details: l.details,
+      createdAt: fmtDate(l.createdAt),
+    })),
+  };
+}
+
+// ─── §12.1 & R-042 : Attestation de Cotisation avec QR/Hash (ATTESTATION) ─
+async function generateContributionAttestation(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const association = await prisma.association.findUnique({
+    where: { id: associationId },
+    select: { id: true, name: true },
+  });
+
+  const membershipWhere: any = { associationId };
+  if (parameters?.membershipId) membershipWhere.id = parameters.membershipId;
+
+  const membership = await prisma.associationMembership.findFirst({
+    where: membershipWhere,
+    include: {
+      user: { select: { name: true, email: true } },
+      contributions: { where: { status: "PAID" } },
+    },
+  });
+
+  const totalPaid = membership
+    ? membership.contributions.reduce((s, c) => s + c.amount, 0)
+    : 0;
+  const generatedAt = new Date().toISOString();
+  const verificationHash = computeReportChecksum({
+    associationId,
+    membershipId: membership?.id ?? null,
+    totalPaid,
+    generatedAt,
+  });
+
+  return {
+    type: "ATTESTATION",
+    associationId,
+    associationName: association?.name ?? "",
+    currency: "XAF",
+    generatedAt,
+    member: membership
+      ? {
+          membershipId: membership.id,
+          memberNumber: membership.memberNumber,
+          name: membership.user.name || membership.user.email,
+          status: membership.status,
+          totalPaid,
+          contributionsCount: membership.contributions.length,
+        }
+      : null,
+    verificationHash,
+    qrCodePayload: `TCHOUA-ATTESTATION:${associationId}:${membership?.id ?? "ALL"}:${verificationHash.slice(0, 16)}`,
+  };
+}
+
+// ─── §12.1 & R-041 : Rapport Consolidé Multi-Associations (CONSOLIDATED) ──
+async function generateConsolidatedReport(
+  associationId: string,
+  parameters: any,
+  prisma: PrismaClient
+) {
+  const relations = await prisma.associationRelation.findMany({
+    where: {
+      status: "ACTIVE",
+      OR: [
+        { sourceId: associationId, type: "MOTHER" },
+        { targetId: associationId, type: "CHILD" },
+      ],
+    },
+  });
+
+  const childIds = Array.from(
+    new Set(
+      relations.map((r) => (r.sourceId === associationId ? r.targetId : r.sourceId))
+    )
+  );
+  const allAssociationIds = [associationId, ...childIds];
+
+  const associations = await prisma.association.findMany({
+    where: { id: { in: allAssociationIds } },
+    include: {
+      activities: { select: { caisseBalance: true } },
+      _count: { select: { memberships: true, activities: true } },
+    },
+  });
+
+  const breakdown = await Promise.all(
+    associations.map(async (assoc) => {
+      const fin = await generateFinancialReport(assoc.id, parameters, prisma);
+      const caisseTotal = assoc.activities.reduce((s, a) => s + a.caisseBalance, 0);
+      return {
+        associationId: assoc.id,
+        name: assoc.name,
+        roleInHierarchy: assoc.id === associationId ? "MOTHER" : "CHILD",
+        memberCount: assoc._count.memberships,
+        activityCount: assoc._count.activities,
+        caisseTotal,
+        entriesTotal: fin.entries.total,
+        exitsTotal: fin.exits.total,
+        netBalance: fin.balance,
+      };
+    })
+  );
+
+  return {
+    type: "CONSOLIDATED",
+    associationId,
+    generatedAt: new Date().toISOString(),
+    childCount: childIds.length,
+    associations: breakdown,
+    consolidatedTotals: {
+      totalMembers: breakdown.reduce((s, b) => s + b.memberCount, 0),
+      totalActivities: breakdown.reduce((s, b) => s + b.activityCount, 0),
+      totalCaisse: breakdown.reduce((s, b) => s + b.caisseTotal, 0),
+      totalEntries: breakdown.reduce((s, b) => s + b.entriesTotal, 0),
+      totalExits: breakdown.reduce((s, b) => s + b.exitsTotal, 0),
+      totalNetBalance: breakdown.reduce((s, b) => s + b.netBalance, 0),
+    },
   };
 }
 
@@ -746,30 +1125,66 @@ export async function generateReportData(
   parameters: any,
   prisma: PrismaClient
 ) {
+  let rawReport: Record<string, any>;
   switch (type) {
     case "ACTIVITY":
-      return generateActivityReport(associationId, parameters, prisma);
+      rawReport = await generateActivityReport(associationId, parameters, prisma);
+      break;
     case "MEMBER":
-      return generateMemberReport(associationId, parameters, prisma);
+      rawReport = await generateMemberReport(associationId, parameters, prisma);
+      break;
     case "FINANCIAL":
-      return generateFinancialReport(associationId, parameters, prisma);
+      rawReport = await generateFinancialReport(associationId, parameters, prisma);
+      break;
     case "BILAN":
-      return generateBilanReport(associationId, prisma);
+      rawReport = await generateBilanReport(associationId, prisma);
+      break;
     case "COMPTE_RESULTAT":
-      return generateCompteResultatReport(associationId, parameters, prisma);
+      rawReport = await generateCompteResultatReport(associationId, parameters, prisma);
+      break;
     case "TRESORERIE":
-      return generateTresorerieReport(associationId, parameters, prisma);
+      rawReport = await generateTresorerieReport(associationId, parameters, prisma);
+      break;
     case "OHADA_SYSCOHADA":
-      return generateOhadaReport(associationId, prisma);
+      rawReport = await generateOhadaReport(associationId, prisma);
+      break;
     case "CROSS":
-      return generateCrossReport(associationId, prisma);
+      rawReport = await generateCrossReport(associationId, prisma);
+      break;
     case "INVESTMENT":
-      return generateInvestmentReport(associationId, parameters, prisma);
+      rawReport = await generateInvestmentReport(associationId, parameters, prisma);
+      break;
+    case "SOLIDARITY":
+      rawReport = await generateSolidarityReport(associationId, parameters, prisma);
+      break;
+    case "LOANS":
+      rawReport = await generateLoansReport(associationId, parameters, prisma);
+      break;
+    case "ATTENDANCE":
+      rawReport = await generateAttendanceReport(associationId, parameters, prisma);
+      break;
+    case "AUDIT":
+      rawReport = await generateAuditReport(associationId, parameters, prisma);
+      break;
+    case "ATTESTATION":
+      rawReport = await generateContributionAttestation(associationId, parameters, prisma);
+      break;
+    case "CONSOLIDATED":
+      rawReport = await generateConsolidatedReport(associationId, parameters, prisma);
+      break;
     case "CUSTOM":
-      return generateCustomReport(associationId, parameters, prisma);
+      rawReport = await generateCustomReport(associationId, parameters, prisma);
+      break;
     default:
       throw new Error(`Type de rapport non supporté: ${type}`);
   }
+
+  // R-039 : Hash d'intégrité SHA-256 pour chaque rapport généré
+  const checksum = computeReportChecksum(rawReport);
+  return {
+    ...rawReport,
+    checksum,
+  };
 }
 
 export function scheduleNextRun(schedule: {

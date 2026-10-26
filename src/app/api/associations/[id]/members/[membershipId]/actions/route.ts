@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isSuperAdmin } from "@/lib/permissions";
+import {
+  validateMemberCanLeave,
+  calculateDeceasedLiquidation,
+} from "@/lib/association/rules";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -23,12 +27,17 @@ function canPerformAction(
 }
 
 type ActionType =
+  | "ACCEPT"
+  | "REJECT"
   | "SUSPEND"
   | "REACTIVATE"
   | "EXCLUDE"
   | "BLACKLIST"
   | "PROMOTE"
   | "RETROGRADE"
+  | "CHANGE_ROLE"
+  | "RESIGN"
+  | "DECEASED"
   | "TRANSFER_OWNERSHIP";
 
 export async function POST(
@@ -42,11 +51,12 @@ export async function POST(
 
   const { id: associationId, membershipId } = await params;
   const body = await req.json().catch(() => ({}));
-  const { action, reason, newRole, newOwnerId } = body as {
+  const { action, reason, newRole, newOwnerId, solidarityAidAmount } = body as {
     action: ActionType;
     reason?: string;
     newRole?: string;
     newOwnerId?: string;
+    solidarityAidAmount?: number;
   };
 
   if (!action) {
@@ -54,7 +64,9 @@ export async function POST(
   }
 
   const actorMembership = await getMembership(session.user.id, associationId);
-  if (!canPerformAction(session, actorMembership)) {
+  const isSelfResign = action === "RESIGN" && actorMembership?.id === membershipId;
+
+  if (!isSelfResign && !canPerformAction(session, actorMembership)) {
     return NextResponse.json(
       { error: "Permission insuffisante" },
       { status: 403 }
@@ -76,8 +88,49 @@ export async function POST(
   let updateData: any = {};
   let auditAction = "";
   let auditDetails = "";
+  let liquidationSummary: ReturnType<typeof calculateDeceasedLiquidation> | undefined;
 
   switch (action) {
+    case "ACCEPT": {
+      const existingCount = prisma.associationMembership.count
+        ? (await prisma.associationMembership.count({ where: { associationId } })) ?? 0
+        : 0;
+      const memberNumber =
+        targetMembership.memberNumber ??
+        `M-${String(existingCount + 1).padStart(3, "0")}`;
+      updateData = {
+        status: "ACTIVE",
+        joinedAt: targetMembership.joinedAt ?? now,
+        memberNumber,
+      };
+      auditAction = "MEMBER_ACCEPT";
+      auditDetails = reason
+        ? `Adhésion acceptée : ${reason}`
+        : "Adhésion acceptée par le bureau";
+      break;
+    }
+
+    case "REJECT": {
+      // §7.4 : Motif obligatoire (min. 20 caractères) pour refuser une demande
+      if (!reason || reason.trim().length < 20) {
+        return NextResponse.json(
+          {
+            error:
+              "Un motif d'au moins 20 caractères est obligatoire pour refuser une demande d'adhésion",
+          },
+          { status: 400 }
+        );
+      }
+      updateData = {
+        status: "REJECTED",
+        leftAt: now,
+        excludeReason: reason.trim(),
+      };
+      auditAction = "MEMBER_REJECT";
+      auditDetails = `Refus d'adhésion : ${reason.trim()}`;
+      break;
+    }
+
     case "SUSPEND":
       updateData = { status: "SUSPENDED" };
       auditAction = "MEMBER_SUSPEND";
@@ -126,17 +179,108 @@ export async function POST(
       auditDetails = `Promotion vers ${newRole}`;
       break;
 
-    case "RETROGRADE":
+    case "RETROGRADE": {
+      const targetRole = newRole || "MEMBER";
+      updateData = { role: targetRole };
+      auditAction = "MEMBER_RETROGRADE";
+      auditDetails = `Rétrogradation vers ${targetRole}`;
+      break;
+    }
+
+    case "CHANGE_ROLE": {
+      if (actorMembership?.role !== "FOUNDER" && !isSuperAdmin(session)) {
+        return NextResponse.json(
+          { error: "Changement de rôle du bureau réservé au fondateur" },
+          { status: 403 }
+        );
+      }
       if (!newRole) {
         return NextResponse.json(
-          { error: "newRole requis pour RETROGRADE" },
+          { error: "newRole requis pour CHANGE_ROLE" },
           { status: 400 }
         );
       }
       updateData = { role: newRole };
-      auditAction = "MEMBER_RETROGRADE";
-      auditDetails = `Rétrogradation vers ${newRole}`;
+      auditAction = "MEMBER_CHANGE_ROLE";
+      auditDetails = `Changement de rôle vers ${newRole}`;
       break;
+    }
+
+    case "RESIGN": {
+      // R-020 : Vérifier l'absence de prêts actifs ou d'amendes impayées
+      const leaveCheck = await validateMemberCanLeave(membershipId, prisma);
+      if (!leaveCheck.valid) {
+        return NextResponse.json({ error: leaveCheck.error }, { status: 400 });
+      }
+      updateData = {
+        status: "LEFT",
+        leftAt: now,
+      };
+      auditAction = "MEMBER_RESIGN";
+      auditDetails = reason
+        ? `Démission volontaire : ${reason}`
+        : "Démission volontaire du membre";
+      break;
+    }
+
+    case "DECEASED": {
+      // SPECIFICATION.md §2.2 & §7.3 : Protocole Décès — blocage du compte, calcul balance finale, ventilation 75% enfants / 25% ayants droit
+      const [paidContribs, activeLoans, unpaidSanctions] = await Promise.all([
+        prisma.activityContribution?.findMany
+          ? prisma.activityContribution.findMany({
+              where: { membershipId, status: "PAID" },
+              select: { amount: true },
+            })
+          : Promise.resolve([]),
+        prisma.assocLoan?.findMany
+          ? prisma.assocLoan.findMany({
+              where: {
+                borrowerMembershipId: membershipId,
+                status: { in: ["APPROVED", "ACTIVE", "OVERDUE", "DEFAULTED"] },
+              },
+              include: { repayments: true },
+            })
+          : Promise.resolve([]),
+        prisma.assocSanction?.findMany
+          ? prisma.assocSanction.findMany({
+              where: { membershipId, status: { in: ["PENDING", "APPLIED"] } },
+              select: { penaltyAmount: true },
+            })
+          : Promise.resolve([]),
+      ]);
+
+      const totalAssets = (paidContribs ?? []).reduce(
+        (sum: number, c: any) => sum + (c.amount ?? 0),
+        0
+      );
+      const unpaidLoans = (activeLoans ?? []).reduce((sum: number, l: any) => {
+        const repaid = (l.repayments ?? []).reduce(
+          (rs: number, r: any) => rs + (r.amount ?? 0),
+          0
+        );
+        return sum + Math.max(0, (l.totalDue ?? l.amount ?? 0) - repaid);
+      }, 0);
+      const unpaidFines = (unpaidSanctions ?? []).reduce(
+        (sum: number, s: any) => sum + (s.penaltyAmount ?? s.amount ?? 0),
+        0
+      );
+
+      liquidationSummary = calculateDeceasedLiquidation({
+        totalAssets,
+        unpaidLoans,
+        unpaidFines,
+        solidarityAidAmount: solidarityAidAmount ?? 0,
+      });
+
+      updateData = {
+        status: "LEFT",
+        leftAt: now,
+        excludeReason: `DECEASED: ${reason ?? "Décès déclaré"}`,
+      };
+      auditAction = "MEMBER_DECEASED_LIQUIDATION";
+      auditDetails = `Protocole décès activé — Balance nette: ${liquidationSummary.netBalance}, Enfants (75%): ${liquidationSummary.childrenShare75}, Ayants droit (25%): ${liquidationSummary.rightfulClaimantsShare25}`;
+      break;
+    }
 
     case "TRANSFER_OWNERSHIP":
       if (!newOwnerId) {
@@ -219,12 +363,20 @@ export async function POST(
         action: auditAction,
         entity: "MEMBERSHIP",
         entityId: membershipId,
-        changes: JSON.stringify(updateData),
+        changes: JSON.stringify(
+          liquidationSummary
+            ? { ...updateData, liquidation: liquidationSummary }
+            : updateData
+        ),
         details: auditDetails,
       },
     });
 
-    return NextResponse.json({ success: true, membership: updated });
+    return NextResponse.json({
+      success: true,
+      membership: updated,
+      ...(liquidationSummary ? { liquidation: liquidationSummary } : {}),
+    });
   } catch (error: any) {
     return NextResponse.json(
       { error: "Erreur lors de l'action" },

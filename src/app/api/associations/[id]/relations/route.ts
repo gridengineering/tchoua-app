@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isSuperAdmin } from "@/lib/permissions";
+import {
+  validateSingleParent,
+  validateMaxChildAssociations,
+} from "@/lib/association/rules";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -111,7 +115,11 @@ export async function GET(
     }),
   ]);
 
-  return NextResponse.json({ sourceRelations, targetRelations });
+  return NextResponse.json({
+    sourceRelations,
+    targetRelations,
+    relations: [...sourceRelations, ...targetRelations],
+  });
 }
 
 export async function POST(
@@ -168,6 +176,28 @@ export async function POST(
     );
   }
 
+  // R-004 & R-005 : Validation hiérarchique Mère-Fille (max 1 mère par fille, max 20 filles par mère)
+  if (type === "MOTHER" || type === "CHILD") {
+    const parentId = type === "MOTHER" ? sourceId : targetId;
+    const childId = type === "MOTHER" ? targetId : sourceId;
+
+    const singleParentCheck = await validateSingleParent(childId, prisma);
+    if (!singleParentCheck.valid) {
+      return NextResponse.json(
+        { error: singleParentCheck.error, code: singleParentCheck.code },
+        { status: 409 }
+      );
+    }
+
+    const maxChildrenCheck = await validateMaxChildAssociations(parentId, prisma);
+    if (!maxChildrenCheck.valid) {
+      return NextResponse.json(
+        { error: maxChildrenCheck.error, code: maxChildrenCheck.code },
+        { status: 400 }
+      );
+    }
+  }
+
   try {
     const relation = await prisma.associationRelation.create({
       data: {
@@ -192,4 +222,66 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+// ─── §13.1 & §15 : Rupture de relation / Indépendance sans suppression en cascade ─
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const { searchParams } = new URL(req.url);
+  const body = await req.json().catch(() => ({}));
+  const relationId = searchParams.get("relationId") ?? body.relationId;
+
+  if (!relationId) {
+    return NextResponse.json({ error: "relationId requis" }, { status: 400 });
+  }
+
+  const relation = await prisma.associationRelation.findUnique({
+    where: { id: relationId },
+  });
+
+  if (!relation || (relation.sourceId !== id && relation.targetId !== id)) {
+    return NextResponse.json({ error: "Relation introuvable" }, { status: 404 });
+  }
+
+  const isAdmin = isSuperAdmin(session);
+  const canManage =
+    isAdmin ||
+    (await isPresidentOrFounder(session.user.id, relation.sourceId)) ||
+    (await isPresidentOrFounder(session.user.id, relation.targetId));
+
+  if (!canManage) {
+    return NextResponse.json(
+      { error: "Seuls le président ou le fondateur peuvent dissoudre cette relation" },
+      { status: 403 }
+    );
+  }
+
+  const updated = await prisma.associationRelation.update({
+    where: { id: relationId },
+    data: {
+      status: "DISSOLVED",
+      endDate: new Date(),
+    },
+  });
+
+  // Si un lien parentId direct existait sur l'association fille, le détacher sans supprimer l'association
+  if (relation.type === "MOTHER" || relation.type === "CHILD") {
+    const childId = relation.type === "MOTHER" ? relation.targetId : relation.sourceId;
+    await prisma.association
+      .update({
+        where: { id: childId },
+        data: { parentId: null },
+      })
+      .catch(() => {});
+  }
+
+  return NextResponse.json({ relation: updated });
 }

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  getDefaultMeetingQuorum,
+  calculateProgressiveAbsenceFine,
+} from "@/lib/association/rules";
 
 const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
 
@@ -91,9 +95,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   function resolveQuorum(typeVal?: string, provided?: number) {
     if (provided !== undefined && provided !== null) return provided;
-    if (typeVal === "SPEECH_CIRCLE") return null;
-    if (typeVal === "BUREAU_MEETING" || typeVal === "COMMISSION_MEETING") return 50;
-    return 0;
+    return getDefaultMeetingQuorum(typeVal ?? "REGULAR");
   }
 
   const resolvedType = type ?? "REGULAR";
@@ -147,26 +149,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       update: { status: attendanceStatus },
     });
 
-    // Auto-create fine for absent members if sanctionsConfig exists
+    // Auto-create fine for absent members (SPECIFICATION.md §3.2 & R-050)
     if (attendanceStatus === "ABSENT") {
       const assoc = await prisma.association.findUnique({ where: { id } });
-      let fineAmount = 1000; // Default
-      let reason = "Absence non justifiée";
+      const totalAbsences = await prisma.assocMeetingAttendance.count({
+        where: { membershipId, meeting: { associationId: id }, status: "ABSENT" },
+      });
+
+      const progressive = calculateProgressiveAbsenceFine(totalAbsences);
+      let fineAmount = progressive.fineAmount;
+      let reason = `Absence #${totalAbsences} non justifiée`;
 
       if (assoc?.sanctionsConfig) {
         try {
           const sc = JSON.parse(assoc.sanctionsConfig);
-          // Progressive fine (Module 3.2): 1 absence = sc.absenceFine, 2 = sc.absenceFine2, etc.
-          const previousAbsences = await prisma.assocMeetingAttendance.count({
-            where: { membershipId, meeting: { associationId: id }, status: "ABSENT" }
-          });
-          
           if (sc.absenceFines && Array.isArray(sc.absenceFines)) {
-            fineAmount = sc.absenceFines[Math.min(previousAbsences, sc.absenceFines.length - 1)] ?? 1000;
-          } else {
-            fineAmount = (sc.absenceFine ?? 1000) * (previousAbsences + 1); // Simple progressive fallback
+            fineAmount =
+              sc.absenceFines[Math.min(Math.max(0, totalAbsences - 1), sc.absenceFines.length - 1)] ??
+              progressive.fineAmount;
+          } else if (sc.absenceFine) {
+            fineAmount = sc.absenceFine * totalAbsences;
           }
-          reason = `Absence #${previousAbsences + 1} non justifiée`;
         } catch {}
       }
 
@@ -179,6 +182,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             data: { meetingId, membershipId, reason, amount: fineAmount, paid: false },
           });
         }
+      }
+
+      // R-050 : Signalement automatique au bureau dès 3 absences non justifiées
+      if (progressive.notifyBureau && prisma.associationAuditLog?.create) {
+        await prisma.associationAuditLog
+          .create({
+            data: {
+              associationId: id,
+              userId: session.user.id,
+              action:
+                progressive.action === "PROPOSE_RADIATION"
+                  ? "ABSENCE_PROPOSE_RADIATION"
+                  : progressive.action === "WARNING_AND_FINE"
+                  ? "ABSENCE_FORMAL_WARNING"
+                  : "ABSENCE_BUREAU_ALERT_R050",
+              entity: "MEMBERSHIP",
+              entityId: membershipId,
+              details: `Membre absent ${totalAbsences} fois sans justification (${progressive.action})`,
+            },
+          })
+          .catch(() => {});
       }
     }
 

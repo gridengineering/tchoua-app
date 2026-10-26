@@ -331,7 +331,23 @@ export default function AssociationDetailPage() {
 
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") as TabKey;
-  const [tab, setTab] = useState<TabKey>(initialTab && ["overview", "activities", "members", "meetings", "finances", "documents", "chat"].includes(initialTab) ? initialTab : "overview");
+  const [tab, setTab] = useState<TabKey>(
+    initialTab &&
+      [
+        "overview",
+        "activities",
+        "members",
+        "meetings",
+        "finances",
+        "documents",
+        "chat",
+        "governance",
+        "relations",
+        "reports",
+      ].includes(initialTab)
+      ? initialTab
+      : "overview"
+  );
   const [memberSearch, setMemberSearch] = useState("");
   const [memberRoleFilter, setMemberRoleFilter] = useState("ALL");
   const [memberStatusFilter, setMemberStatusFilter] = useState("ALL");
@@ -1094,12 +1110,61 @@ export default function AssociationDetailPage() {
                               >
                                 Rôle
                               </button>
-                              {member.status === "ACTIVE" ? (
-                                <button className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-error/10 text-red-600">
+                              {member.status === "PENDING" ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      fetch(`/api/associations/${id}/members/${member.id}/actions`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ action: "ACCEPT" }),
+                                      }).then(() => reloadMembers()).catch(() => {});
+                                    }}
+                                    className="text-xs px-2 py-1 rounded border border-green-200 hover:bg-green-50 text-green-600"
+                                  >
+                                    Accepter
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const reason = window.prompt(
+                                        "Motif du refus (minimum 20 caractères obligatoire) :"
+                                      );
+                                      if (!reason || reason.trim().length < 20) return;
+                                      fetch(`/api/associations/${id}/members/${member.id}/actions`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ action: "REJECT", reason }),
+                                      }).then(() => reloadMembers()).catch(() => {});
+                                    }}
+                                    className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-error/10 text-red-600"
+                                  >
+                                    Refuser
+                                  </button>
+                                </>
+                              ) : member.status === "ACTIVE" ? (
+                                <button
+                                  onClick={() => {
+                                    fetch(`/api/associations/${id}/members/${member.id}/actions`, {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ action: "SUSPEND" }),
+                                    }).then(() => reloadMembers()).catch(() => {});
+                                  }}
+                                  className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-error/10 text-red-600"
+                                >
                                   Suspendre
                                 </button>
                               ) : (
-                                <button className="text-xs px-2 py-1 rounded border border-green-200 hover:bg-green-50 text-green-600">
+                                <button
+                                  onClick={() => {
+                                    fetch(`/api/associations/${id}/members/${member.id}/actions`, {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ action: "REACTIVATE" }),
+                                    }).then(() => reloadMembers()).catch(() => {});
+                                  }}
+                                  className="text-xs px-2 py-1 rounded border border-green-200 hover:bg-green-50 text-green-600"
+                                >
                                   Réactiver
                                 </button>
                               )}
@@ -1747,10 +1812,12 @@ export default function AssociationDetailPage() {
                     onChange={e => setMeetingForm(f => ({ ...f, type: e.target.value }))}
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none"
                   >
-                    <option value="GENERAL">AGO</option>
-                    <option value="BUREAU">Bureau</option>
-                    <option value="EXTRAORDINARY">AGE</option>
-                    <option value="THEMATIC">Thématique</option>
+                    <option value="REGULAR">Session Ordinaire (50%)</option>
+                    <option value="EXTRAORDINARY">Session Extraordinaire (66%)</option>
+                    <option value="BUREAU_MEETING">Réunion de Bureau (66%)</option>
+                    <option value="AG_ORDINARY">Assemblée Générale (75%)</option>
+                    <option value="COMMISSION_MEETING">Réunion de Commission (50%)</option>
+                    <option value="SPEECH_CIRCLE">Cercle de Parole (Sans quorum)</option>
                   </select>
                 </div>
                 <div>
