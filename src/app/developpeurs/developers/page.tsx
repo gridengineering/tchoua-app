@@ -58,9 +58,9 @@ export default function DevelopersPage() {
                 </div>
                 <div className="space-y-2">
                    <p className="text-purple-400">const <span className="text-blue-400">tchoua</span> = <span className="text-yellow-400">require</span>(<span className="text-emerald-400">&apos;@tchoua/sdk&apos;</span>);</p>
-                   <p className="text-gray-500">// Initialize with your API Key</p>
+                   <p className="text-gray-500">{`// Initialize with your API Key`}</p>
                    <p className="text-purple-400">const <span className="text-blue-400">client</span> = <span className="text-purple-400">new</span> <span className="text-blue-400">tchoua.Client</span>(&apos;YOUR_API_KEY&apos;);</p>
-                   <p className="text-gray-500 mt-4">// Create a new tontine</p>
+                   <p className="text-gray-500 mt-4">{`// Create a new tontine`}</p>
                    <p className="text-purple-400">await <span className="text-blue-400">client</span>.tontines.<span className="text-yellow-400">create</span>({`{`}</p>
                    <p className="pl-4 text-blue-400">name: <span className="text-emerald-400">&apos;Solidarity Group&apos;</span>,</p>
                    <p className="pl-4 text-blue-400">cycle: <span className="text-emerald-400">&apos;MONTHLY&apos;</span>,</p>

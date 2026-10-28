@@ -158,7 +158,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
       const progressive = calculateProgressiveAbsenceFine(totalAbsences);
       let fineAmount = progressive.fineAmount;
-      let reason = `Absence #${totalAbsences} non justifiée`;
+      const reason = `Absence #${totalAbsences} non justifiée`;
 
       if (assoc?.sanctionsConfig) {
         try {

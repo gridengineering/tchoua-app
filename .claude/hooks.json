@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "profile": "standard",
+  "events": {
+    "PreToolUse": ["pre:security-guard", "pre:prisma-schema-check"],
+    "PostToolUse": ["post:quality-gate", "post:typecheck"],
+    "beforeSubmitPrompt": ["prompt:secret-guard"]
+  }
+}

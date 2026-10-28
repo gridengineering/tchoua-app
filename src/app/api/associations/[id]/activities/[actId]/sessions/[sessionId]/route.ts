@@ -49,7 +49,7 @@ export async function PATCH(
       if (status === "HELD") {
         // 1. Identify Beneficiary
         let beneficiaryId: string | null = null;
-        let amountToGive = distributed || 0;
+        const amountToGive = distributed || 0;
 
         if (drawResult) {
           try {

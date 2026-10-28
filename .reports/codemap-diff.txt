@@ -1,0 +1,10 @@
+Codemap Scan Report — TCHOUA (tchoua-app)
+Generated: 2026-10-28
+Status: Initial ECC codemap baseline generated
+Codemaps created:
+- docs/CODEMAPS/architecture.md
+- docs/CODEMAPS/backend.md
+- docs/CODEMAPS/frontend.md
+- docs/CODEMAPS/data.md
+- docs/CODEMAPS/dependencies.md
+Staleness warnings: 0

@@ -1,0 +1,25 @@
+{
+  "name": "tchoua-core-evals",
+  "version": "1.0.0",
+  "description": "Deterministic regression and specification compliance eval suite for TCHOUA modules",
+  "suites": [
+    {
+      "id": "association-business-rules",
+      "spec": "SPECIFICATION_ASSOCIATION.md",
+      "command": "npx jest tests/unit/lib/association-business-rules.test.ts",
+      "expectedPassRate": 1.0
+    },
+    {
+      "id": "association-api-compliance",
+      "spec": "SPECIFICATION.md",
+      "command": "npx jest tests/unit/api/associations.test.ts",
+      "expectedPassRate": 1.0
+    },
+    {
+      "id": "full-unit-suite",
+      "spec": "SPECIFICATION.md",
+      "command": "npm test",
+      "expectedPassRate": 1.0
+    }
+  ]
+}

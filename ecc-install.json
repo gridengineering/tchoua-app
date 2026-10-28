@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/affaan-m/ecc/main/schemas/ecc-install.schema.json",
+  "version": 1,
+  "target": "antigravity",
+  "profileId": "full",
+  "project": {
+    "name": "tchoua-app",
+    "stack": [
+      "typescript",
+      "nextjs",
+      "react",
+      "prisma",
+      "tailwindcss",
+      "jest",
+      "playwright"
+    ]
+  }
+}

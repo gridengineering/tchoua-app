@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write",
+        "description": "ECC preflight security and destructive command guardrails for TCHOUA"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "description": "ECC quality gate (TypeScript & ESLint verification)"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "matcher": "*",
+        "description": "ECC secret and prompt safety check"
+      }
+    ]
+  },
+  "env": {
+    "ECC_HOOK_PROFILE": "standard",
+    "ECC_QUALITY_GATE_STRICT": "true"
+  }
+}
