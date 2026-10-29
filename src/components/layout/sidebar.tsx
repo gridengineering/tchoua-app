@@ -116,8 +116,9 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
         </Link>
         <button
           onClick={onToggle}
-          className="flex-shrink-0 transition-colors ml-auto p-1.5 rounded-lg text-cream/60 hover:text-white hover:bg-white/5"
-          aria-label="Toggle sidebar"
+          className="flex-shrink-0 transition-colors ml-auto p-1.5 rounded-lg text-cream/60 hover:text-white hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          aria-label={collapsed ? "Déplier la barre latérale" : "Réduire la barre latérale"}
+          title={collapsed ? "Déplier la barre latérale" : "Réduire la barre latérale"}
         >
           <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
         </button>

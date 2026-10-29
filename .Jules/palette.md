@@ -1,0 +1,3 @@
+## 2025-07-01 - Missing ARIA labels and focus states on icon-only interactive elements
+**Learning:** Found a recurring pattern in the codebase where icon-only buttons (like Menu, Chat, Notifications, User Profile) and link elements lacked `aria-label`, `title`, and keyboard focus styling (`focus-visible:ring-2 focus:outline-none`). This makes keyboard navigation and screen reader usage difficult or impossible for these primary navigation tools.
+**Action:** Always verify icon-only buttons have an `aria-label` and `title` in French. Ensure `focus:outline-none focus-visible:ring-2` (and an appropriate ring color like `focus-visible:ring-forest` or `focus-visible:ring-gold`) are added to all interactive elements, particularly in navigation bars and headers.
