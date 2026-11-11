@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Star, Users, TrendingUp, MessageCircle } from "lucide-react";
-import { PublicHeader } from "@/components/layout/public-layout";
+import { ArrowRight, CheckCircle, Star, Users, TrendingUp } from "lucide-react";
+import { PublicFooter, PublicHeader } from "@/components/layout/public-layout";
 import { useI18n } from "@/lib/i18n/context";
 import { HOME_COPY, publicLang } from "@/lib/i18n/public-copy";
 
@@ -21,27 +21,6 @@ const ROW_COLORS = ["#4ade80", "#4ade80", "#f87171", "#4ade80"];
 export default function HomePage() {
   const { lang } = useI18n();
   const c = HOME_COPY[publicLang(lang)];
-
-  const footerColumns = [
-    {
-      title: c.footer.product,
-      links: [
-        { label: c.footer.modules, href: "/#modules" },
-        { label: c.footer.pricing, href: "/#pricing" },
-        { label: c.footer.security, href: "/security" },
-        { label: c.footer.api, href: "/developpeurs" },
-      ],
-    },
-    {
-      title: c.footer.resources,
-      links: [
-        { label: c.footer.how, href: "/how-it-works" },
-        { label: c.footer.help, href: "/aide" },
-        { label: c.footer.aboutLink, href: "/about" },
-        { label: c.footer.contact, href: "mailto:contact@tchoua.com" },
-      ],
-    },
-  ];
 
   return (
     <div className="min-h-screen" style={{ background: "#f7f3eb", color: "#1a1a1a" }}>
@@ -393,52 +372,7 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ background: "#071e14" }} className="text-white/60">
-        <div className="mx-auto max-w-7xl px-6 py-14">
-          <div className="mb-10 grid gap-10 md:grid-cols-4">
-            <div className="md:col-span-2">
-              <div className="mb-4 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: "#1a5c3a" }}>
-                  <img src="/logo.png" alt="Logo" className="h-6 w-6 object-contain" />
-                </div>
-                <span className="text-lg font-bold text-white">Tchoua</span>
-              </div>
-              <p className="mb-5 max-w-sm text-sm leading-relaxed">{c.footer.about}</p>
-              <div className="flex gap-3">
-                <a href="https://github.com/gridengineering/tchoua-app" target="_blank" rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors hover:bg-white/10"
-                  style={{ border: "1px solid rgba(255,255,255,0.1)" }} aria-label="GitHub">GH</a>
-                <a href="https://x.com/stampolla" target="_blank" rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors hover:bg-white/10"
-                  style={{ border: "1px solid rgba(255,255,255,0.1)" }} aria-label="X">𝕏</a>
-                <a href="mailto:contact@tchoua.com"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-xs transition-colors hover:bg-white/10"
-                  style={{ border: "1px solid rgba(255,255,255,0.1)" }} aria-label="Email">
-                  <MessageCircle className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-            {footerColumns.map((col) => (
-              <div key={col.title}>
-                <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide text-white">{col.title}</h4>
-                <div className="space-y-2.5">
-                  {col.links.map((l) => (
-                    <Link key={l.label} href={l.href} className="block text-sm transition-colors hover:text-white">{l.label}</Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs md:flex-row">
-            <span>© 2026 Tchoua. {c.footer.rights}</span>
-            <div className="flex gap-5">
-              <Link href="/security" className="hover:text-white">{c.footer.privacy}</Link>
-              <Link href="/security" className="hover:text-white">{c.footer.terms}</Link>
-              <Link href="/security" className="hover:text-white">{c.footer.cookies}</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
