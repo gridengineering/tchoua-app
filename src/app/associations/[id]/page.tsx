@@ -1110,6 +1110,13 @@ export default function AssociationDetailPage() {
                               >
                                 Rôle
                               </button>
+                              <Link
+                                href={`/associations/${id}/members/${member.id}/solde`}
+                                className="text-xs px-2 py-1 rounded border border-gray-200 hover:bg-cream text-gray-600"
+                                title="Solde de sortie / compensation"
+                              >
+                                Solde
+                              </Link>
                               {member.status === "PENDING" ? (
                                 <>
                                   <button

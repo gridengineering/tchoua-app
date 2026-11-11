@@ -13,7 +13,7 @@
 | Collation (montant/membre + forfait hôte) | OK | Ajouté : `meetingConfig.collationRate`, `collationHostPayout` |
 | Comptes bancaires & signataires | OK | Modèle `AssocBankAccount`, paramètres |
 | Rôles du bureau personnalisés | OK | `bureauConfig`, `AssociationCustomRole` |
-| Wizard de création | Partiel | 4 étapes (`/dashboard/associations/create`) au lieu des 7 de la spécification |
+| Wizard de création | OK | **7 étapes** : identité, contacts, activités, réunions, tontine, sessions & cycle, règlement |
 | Association parente / filles | OK | `parentId`, `/relations`, auto-adhésion au parent dans `/join` |
 | Édition « master form » par onglets | OK | `/associations/[id]/parametres` |
 | Règlement intérieur article par article | OK | `POST /regulations`, `MembershipRegulationApproval`, activation auto |
@@ -56,7 +56,7 @@
 | Barèmes d'aide configurables | OK | `socialAidCaps` (10 catégories) |
 | Demande / approbation / paiement d'aide | OK | `/aides`, `AssocSocialAidRequest` |
 | Prélèvement automatique sur cagnotte | Partiel | Priorité 2 du moteur de répartition |
-| Reconstitution annuelle du fonds | Manquant | Pas de bilan de déficit/répartition annuelle |
+| Reconstitution annuelle du fonds | OK | **Ajouté** : `/solidarite/reconstitution`, bilan entrées/sorties, déficit réparti à parts égales |
 
 ## Module 6 — Épargne, prêts & dividendes
 
@@ -75,8 +75,8 @@
 |---|---|---|
 | Caisse de session & traçabilité | OK | `meetings/[meetingId]/caisse`, `AssocSessionContribution` |
 | Relevé de compte membre | Partiel | Rapports PDF/CSV disponibles, pas de relevé mensuel dédié |
-| Compensation de dettes / recouvrement croisé | Manquant | À spécifier (amendes + arriérés vs avoirs) |
-| Départ / décès | Partiel | Décès : liquidation 75/25 implémentée ; départ : calcul de balance non exposé |
+| Compensation de dettes / recouvrement croisé | OK | **Ajouté** : solde de sortie (`/members/[id]/solde`), amendes + sanctions + prêts + collations vs capital |
+| Départ / décès | OK | Décès : liquidation 75/25 ; départ : solde de sortie appliqué avec statut RESIGNED |
 
 ## Module 8 — Moteur de fréquence
 
@@ -86,7 +86,7 @@
 | Jours fériés (avancer / reporter / annuler) | OK | `holidayBehavior` |
 | Aperçu des 12 prochaines sessions | OK | `FrequencyPicker` + `getNextSessions` |
 | **UI de configuration à la création d'activité** | **OK** | **Ajouté** : `/activities/new` et `/activities/[actId]/edit` |
-| Notifications J-3 / J-1 / Jour J | Manquant | Nécessite un ordonnanceur (cron/queue) |
+| Notifications J-3 / J-1 / Jour J | OK | **Ajouté** : `/api/cron/reminders` + cron quotidien, notifications in-app dédupliquées |
 
 ## Module 9 — Répartition financière
 
@@ -140,12 +140,14 @@ automatique. Voir `scripts/deploy-ovh.sh`.
 - Liste des réunions : `scheduledAt` (au lieu de `date`) — dates et tri corrects.
 - Collation intégrée au parcours de session et à la fiche de réunion.
 - Sélection d'activité : filtres Tontine / Épargne / Solidarité corrigés (types réels).
+- Wizard de création passé de 4 à 7 étapes, avec création des activités et du cycle.
+- Solde de sortie accessible depuis la liste des membres du bureau.
+- Rappels J-3/J-1/J : endpoint cron + notifications in-app. Cf. `CRON_SECRET`.
 
 ## Reste à spécifier / prioriser
 
 1. Connexion sociale (applications OAuth Google/Facebook/LinkedIn/X à créer).
-2. Reconstitution annuelle du fonds de solidarité.
-3. Compensation de dettes et solde de sortie d'un membre.
-4. Notifications programmées des échéances (J-3, J-1, J).
-5. 2FA/OTP wallet et double validation Maker-Checker sur les gros montants.
-6. Wizard de création en 7 étapes (actuellement 4).
+2. 2FA/OTP wallet et double validation Maker-Checker sur les gros montants.
+3. Relevé de compte mensuel membre (PDF dédié).
+4. Avaliste / garanties de tontine aux enchères.
+5. Barèmes d'échec de tontine paramétrables (15 % / 20 %) et majorations rétroactives automatiques.

@@ -162,10 +162,16 @@ export default function AidesPage() {
                 Soumettez vos demandes d'aide ou suivez les actions de solidarité en cours.
               </p>
             </div>
-            <button onClick={() => setShowCreate(true)}
-              className="bg-gold text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Nouvelle demande
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => router.push(`/associations/${assocId}/solidarite/reconstitution`)}
+                className="bg-white/10 border border-white/20 text-white px-5 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2">
+                Reconstitution annuelle
+              </button>
+              <button onClick={() => setShowCreate(true)}
+                className="bg-gold text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Nouvelle demande
+              </button>
+            </div>
           </div>
         </div>
 

@@ -830,6 +830,8 @@ model Association {
   mandates      MandatePeriod[]
   reportSchedules ReportSchedule[]
   dividendRuns  AssociationDividendRun[]
+  solidarityRuns AssociationSolidarityRun[]
+  settlements    MemberSettlement[]
 
   @@map("associations")
 }
@@ -885,6 +887,7 @@ model AssociationMembership {
   notifs          AssociationNotification[]
   approvalVotes   ApprovalVote[]
   dividendShares  AssociationDividendShare[]
+  settlements     MemberSettlement[]
 
   // Rôle personnalisé optionnel (cumulatif avec role de base)
   customRoleId    String?
@@ -1905,4 +1908,54 @@ model AssociationDividendShare {
 
   @@unique([runId, membershipId])
   @@map("association_dividend_shares")
+}
+
+// ─── Reconstitution annuelle du fonds de solidarité (Module 5.1) ────────────
+
+model AssociationSolidarityRun {
+  id            String   @id @default(cuid())
+  associationId String
+  year          Int
+  totalIn       Float    @default(0)
+  totalOut      Float    @default(0)
+  balance       Float    @default(0)
+  deficit       Float    @default(0)
+  membersCount  Int      @default(0)
+  perMember     Float    @default(0)
+  status        String   @default("DRAFT") // DRAFT, APPLIED
+  createdById   String?
+  createdAt     DateTime @default(now())
+  appliedAt     DateTime?
+
+  association Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+
+  @@unique([associationId, year])
+  @@map("association_solidarity_runs")
+}
+
+// ─── Compensation de dettes / solde de sortie (Modules 7.2 & 7.3) ───────────
+
+model MemberSettlement {
+  id             String   @id @default(cuid())
+  associationId  String
+  membershipId   String
+  type           String   @default("DEPARTURE") // YEAR_END, DEPARTURE, DEATH
+  year           Int?
+  assets         Float    @default(0)
+  debtFines      Float    @default(0)
+  debtSanctions  Float    @default(0)
+  debtLoans      Float    @default(0)
+  debtCollation  Float    @default(0)
+  totalDebts     Float    @default(0)
+  net            Float    @default(0)
+  details        String?  // JSON: détail des postes
+  status         String   @default("DRAFT") // DRAFT, APPLIED
+  createdById    String?
+  createdAt      DateTime @default(now())
+  appliedAt      DateTime?
+
+  association Association           @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  membership  AssociationMembership @relation(fields: [membershipId], references: [id])
+
+  @@map("member_settlements")
 }

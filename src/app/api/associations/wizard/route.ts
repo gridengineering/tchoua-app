@@ -31,6 +31,12 @@ export async function POST(req: Request) {
       phone,
       parentId,
       parentSubscriptionFee,
+      website,
+      meetingConfig,
+      membershipConfig,
+      socialAidCaps,
+      sanctionsConfig,
+      activities, // Array d'activités pré-configurées par le wizard
       regulations // Array of { title, content }
     } = body;
 
@@ -88,10 +94,53 @@ export async function POST(req: Request) {
           phone,
           parentId,
           parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null,
+          website,
+          meetingConfig: meetingConfig ? JSON.stringify(meetingConfig) : null,
+          membershipConfig: membershipConfig ? JSON.stringify(membershipConfig) : null,
+          socialAidCaps: socialAidCaps ? JSON.stringify(socialAidCaps) : null,
+          sanctionsConfig: sanctionsConfig ? JSON.stringify(sanctionsConfig) : null,
           creatorId: userId,
-          // status: "DRAFT" — laissé au défaut Prisma
+          status: "ACTIVE",
+          activatedAt: new Date(),
+          lifecycleEvents: {
+            create: {
+              fromStatus: "DRAFT",
+              toStatus: "ACTIVE",
+              triggeredBy: "USER",
+              userId,
+              reason: "Association créée et activée via l'assistant 7 étapes",
+            },
+          },
         }
       });
+
+      // 2b. Créer les activités sélectionnées dans le wizard
+      if (Array.isArray(activities) && activities.length > 0) {
+        await tx.associationActivity.createMany({
+          data: activities.map((act: any, idx: number) => ({
+            associationId: newAssoc.id,
+            name: act.name,
+            description: act.description ?? null,
+            type: act.type ?? "TONTINE_ROTATIVE",
+            status: "ACTIVE",
+            participation: act.participation ?? "OPTIONAL",
+            contributionAmount: act.contributionAmount ?? null,
+            contributionUnit: act.contributionUnit ?? "CASH",
+            contributionFrequency: act.contributionFrequency ?? "MONTHLY",
+            distributionMode: act.distributionMode ?? "ROTATION",
+            auctionMinBidPct: act.auctionMinBidPct ?? null,
+            auctionMinBidders: act.auctionMinBidders ?? null,
+            frequencyConfig: act.frequencyConfig ? JSON.stringify(act.frequencyConfig) : null,
+            partAmount: act.partAmount ?? null,
+            maxPartsPerSession: act.maxPartsPerSession ?? 1,
+            caisseLoanRate: act.caisseLoanRate ?? null,
+            loanRate1: act.loanRate1 ?? null,
+            loanRate2: act.loanRate2 ?? null,
+            loanApprovalMode: act.loanApprovalMode ?? "BUREAU",
+            sortOrder: idx,
+          })),
+        });
+      }
 
       // 2. Créer l'adhésion pour le créateur (Fondateur)
       const membership = await tx.associationMembership.create({
