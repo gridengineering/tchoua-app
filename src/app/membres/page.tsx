@@ -10,6 +10,7 @@ export default function MembresPage() {
   const [tontines, setTontines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
 
   useEffect(() => {
     fetch("/api/tontines?mine=true")
@@ -42,9 +43,10 @@ export default function MembresPage() {
     return members;
   }, [tontines]);
 
-  const filteredMembers = allMembers.filter(m => 
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.tontineName.toLowerCase().includes(search.toLowerCase())
+  const filteredMembers = allMembers.filter(m =>
+    (roleFilter === "ALL" || m.role === roleFilter) &&
+    (m.name.toLowerCase().includes(search.toLowerCase()) ||
+      m.tontineName.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -83,10 +85,20 @@ export default function MembresPage() {
               className="w-full pl-12 pr-4 py-4 bg-warm-white border border-stone rounded-2xl outline-none text-sm font-bold shadow-sm focus:ring-4 focus:ring-blue-600/5 transition-all"
             />
           </div>
-          <button className="px-6 py-4 bg-warm-white border border-stone rounded-2xl flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest text-graphite hover:border-blue-500/20 hover:text-info transition-all">
-            <Filter className="w-4 h-4" />
-            Filtrer
-          </button>
+          <div className="relative">
+            <Filter className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ash" />
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="h-full w-full appearance-none rounded-2xl border border-stone bg-warm-white py-4 pl-11 pr-10 text-xs font-semibold uppercase tracking-wide text-graphite outline-none"
+            >
+              <option value="ALL">Tous les rôles</option>
+              <option value="PRESIDENT">Président</option>
+              <option value="TREASURER">Trésorier</option>
+              <option value="SECRETARY">Secrétaire</option>
+              <option value="MEMBER">Membre</option>
+            </select>
+          </div>
         </div>
 
         {/* Members Grid */}
@@ -138,9 +150,12 @@ export default function MembresPage() {
                   </div>
 
                   <div className="flex gap-2 relative z-10">
-                    <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 text-white text-[10px] text-xs font-medium text-ash uppercase tracking-wider hover:bg-blue-600 transition-all">
+                    <Link
+                      href={`/chat?to=${m.id}`}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 text-white text-[10px] font-semibold uppercase tracking-wider hover:bg-blue-600 transition-all"
+                    >
                       <MessageSquare className="w-3.5 h-3.5" /> Message
-                    </button>
+                    </Link>
                     <Link href={`/chat`} className="w-12 flex items-center justify-center rounded-xl bg-cream text-ash hover:bg-gray-100 transition-all">
                       <ArrowRight className="w-4 h-4" />
                     </Link>

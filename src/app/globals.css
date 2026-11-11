@@ -196,3 +196,16 @@ h1, h2, h3, h4, h5, h6 {
   0%,70%,100% { opacity: 1; }
   20%,50% { opacity: 0; }
 }
+
+/* ─── Espace membre : palette épurée (inspiration navigation simple) ─────── */
+.member-shell {
+  --background: #f8fafc;
+  --cream: #f8fafc;
+  --warm-white: #ffffff;
+  --stone: #e2e8f0;
+  --charcoal: #0f172a;
+  --graphite: #475569;
+  --ash: #64748b;
+  --border: #e2e8f0;
+  color: var(--charcoal);
+}

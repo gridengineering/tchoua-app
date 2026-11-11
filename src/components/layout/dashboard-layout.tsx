@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Sidebar } from "./sidebar";
-import { Header } from "./header";
+import { MemberTopNav } from "./member-top-nav";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,10 +11,8 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,10 +27,10 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
 
   if (status === "loading") {
     return (
-      <div className="h-screen flex items-center justify-center bg-cream">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-forest border-t-transparent rounded-full animate-spin" />
-          <p className="text-forest font-medium animate-pulse text-sm">Initialisation...</p>
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-9 w-9 animate-spin rounded-full border-2 border-forest border-t-transparent" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Chargement de l&apos;espace</p>
         </div>
       </div>
     );
@@ -42,37 +39,9 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-cream">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex flex-shrink-0">
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={() => setCollapsed(!collapsed)}
-          user={session?.user as any}
-        />
-      </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 h-full">
-            <Sidebar
-              collapsed={false}
-              onToggle={() => setMobileOpen(false)}
-              user={session?.user as any}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header onMobileMenuOpen={() => setMobileOpen(true)} title={title} />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {children}
-        </main>
-      </div>
+    <div className="member-shell min-h-screen bg-slate-50">
+      <MemberTopNav title={title} />
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">{children}</main>
     </div>
   );
 }
