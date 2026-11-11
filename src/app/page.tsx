@@ -122,15 +122,6 @@ export default function HomePage() {
                     <div className="text-sm font-bold text-gray-900">98.2%</div>
                   </div>
                 </div>
-                <div className="absolute -bottom-4 -left-6 flex items-center gap-2 rounded-xl bg-white p-3 shadow-lg">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: "#fef9f0" }}>
-                    <Users className="h-4 w-4" style={{ color: "#e68a00" }} />
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-400">{c.hero.members}</div>
-                    <div className="text-sm font-bold text-gray-900">2,547</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
