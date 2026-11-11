@@ -77,6 +77,9 @@ export function MemberTopNav({ title }: { title?: string }) {
     [features]
   );
 
+  const resolveHref = (href: string) =>
+    href === "/chat" && currentAssocId ? `/associations/${currentAssocId}?tab=chat` : href;
+
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === "/dashboard" : pathname === href || pathname.startsWith(`${href}/`);
 
@@ -85,7 +88,7 @@ export function MemberTopNav({ title }: { title?: string }) {
   const navLink = (item: NavItem, compact = false) => (
     <Link
       key={item.href}
-      href={item.href}
+      href={resolveHref(item.href)}
       className={`relative flex items-center gap-2 whitespace-nowrap px-1 text-sm font-medium transition-colors ${
         compact ? "py-2.5" : "py-3"
       } ${isActive(item.href) ? "text-forest" : "text-slate-500 hover:text-slate-900"}`}
@@ -227,7 +230,7 @@ export function MemberTopNav({ title }: { title?: string }) {
                 {visibleMore.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={resolveHref(item.href)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   >
                     <item.icon className="h-4 w-4 text-slate-400" /> {item.label}
@@ -256,7 +259,7 @@ export function MemberTopNav({ title }: { title?: string }) {
               {[...PRIMARY_NAV, ...visibleMore].map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={resolveHref(item.href)}
                   className={`flex items-center gap-3 px-4 py-2.5 text-sm ${
                     isActive(item.href) ? "bg-forest/5 font-semibold text-forest" : "text-slate-600"
                   }`}
