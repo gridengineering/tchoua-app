@@ -96,9 +96,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, []); // Dépendance vide pour éviter de redéfinir la fonction à chaque changement de customLangs
 
   useEffect(() => {
+    const urlLang = new URLSearchParams(window.location.search).get("lang");
     const stored = localStorage.getItem("tchoua_lang");
-    const initialLang = stored || "fr";
+    const initialLang = (urlLang && /^[a-z]{2,12}$/.test(urlLang) ? urlLang : null) || stored || "fr";
     setLangState(initialLang);
+    document.documentElement.lang = initialLang;
     loadTranslation(initialLang);
     refreshLangs();
   }, [refreshLangs, loadTranslation]);
@@ -106,6 +108,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLang = async (l: string) => {
     setLangState(l);
     localStorage.setItem("tchoua_lang", l);
+    document.documentElement.lang = l;
     await loadTranslation(l);
     fetch("/api/users/language", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: l }) }).catch(() => {});
   };

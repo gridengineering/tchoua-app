@@ -1,151 +1,105 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  Users, Target, Rocket, Heart, Shield, Eye,
-  Globe, Zap, Globe2, MessageSquare, 
-  Handshake, Sparkles, Award, TrendingUp
-} from "lucide-react";
+import { Eye, Globe2, Shield, Heart } from "lucide-react";
 import Link from "next/link";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { useI18n } from "@/lib/i18n/context";
+import { ABOUT_COPY, publicLang } from "@/lib/i18n/public-copy";
+
+const VALUE_ICONS = [Eye, Globe2, Shield];
 
 export default function AboutPage() {
+  const { lang } = useI18n();
+  const c = ABOUT_COPY[publicLang(lang)];
+
   return (
     <PublicLayout>
       <div className="space-y-24 pb-20">
-        
-        {/* Hero Section */}
-        <section className="relative pt-12 text-center max-w-4xl mx-auto space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-6 border border-emerald-100">
-              Notre Mission
+        <section className="mx-auto max-w-4xl space-y-8 pt-12 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <span className="mb-6 inline-block rounded-full border border-emerald-100 bg-emerald-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600">
+              {c.badge}
             </span>
-            <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight">
-              Digitaliser la <span className="text-emerald-600">Solidarité.</span>
+            <h1 className="text-5xl font-black leading-tight text-gray-900 md:text-7xl">
+              {c.title1} <span className="text-emerald-600">{c.title2}</span>
             </h1>
-            <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto">
-              Tchoua est né de la volonté de moderniser les tontines traditionnelles 
-              en leur offrant la puissance du numérique tout en préservant leurs valeurs humaines.
-            </p>
+            <p className="mx-auto mt-6 max-w-2xl text-xl font-medium leading-relaxed text-gray-500">{c.intro}</p>
           </motion.div>
         </section>
 
-        {/* Story Section */}
-        <section className="grid lg:grid-cols-2 gap-16 items-center">
-           <div className="space-y-8">
-              <h2 className="text-4xl font-black text-gray-900 leading-tight">D&apos;une tradition ancestrale à un écosystème moderne.</h2>
-              <div className="space-y-6 text-lg text-gray-500 font-medium leading-relaxed">
-                 <p>
-                    Les tontines sont le socle de l&apos;économie sociale en Afrique et dans le monde. 
-                    Elles permettent de financer des projets, d&apos;épargner et de s&apos;entraider. 
-                    Pourtant, leur gestion manuelle limite souvent leur potentiel.
-                 </p>
-                 <p>
-                    Tchoua apporte la transparence, l&apos;automatisation et la sécurité nécessaire 
-                    pour que ces groupes puissent passer à l&apos;échelle supérieure, sans perdre 
-                    l&apos;âme de la solidarité.
-                 </p>
+        <section className="grid items-center gap-16 lg:grid-cols-2">
+          <div className="space-y-8">
+            <h2 className="text-4xl font-black leading-tight text-gray-900">{c.storyTitle}</h2>
+            <div className="space-y-6 text-lg font-medium leading-relaxed text-gray-500">
+              <p>{c.story1}</p>
+              <p>{c.story2}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-8 pt-4">
+              <div>
+                <p className="text-4xl font-black text-emerald-600">100%</p>
+                <p className="text-xs font-black uppercase tracking-widest text-gray-400">{c.openSource}</p>
               </div>
-              <div className="grid grid-cols-2 gap-8 pt-4">
-                 <div>
-                    <p className="text-4xl font-black text-emerald-600">100%</p>
-                    <p className="text-xs font-black uppercase tracking-widest text-gray-400">Open Source</p>
-                 </div>
-                 <div>
-                    <p className="text-4xl font-black text-emerald-600">Gratuit</p>
-                    <p className="text-xs font-black uppercase tracking-widest text-gray-400">Pour les petits groupes</p>
-                 </div>
+              <div>
+                <p className="text-4xl font-black text-emerald-600">{c.free}</p>
+                <p className="text-xs font-black uppercase tracking-widest text-gray-400">{c.forGroups}</p>
               </div>
-           </div>
-           <div className="bg-gray-100 rounded-[3rem] h-[500px] relative overflow-hidden flex items-center justify-center">
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(/pattern-kente.svg)', backgroundSize: '300px' }} />
-              <div className="relative z-10 w-4/5 h-4/5 bg-white rounded-3xl shadow-2xl border border-gray-200 p-8 flex flex-col justify-between">
-                 <div className="space-y-4">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                       <Heart className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <h3 className="text-2xl font-black text-gray-900">La Confiance Digitale</h3>
-                    <p className="text-sm text-gray-400 font-medium">
-                       Nous construisons les outils qui permettent à la confiance de s&apos;épanouir dans le monde numérique.
-                    </p>
-                 </div>
-                 <div className="flex -space-x-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                       <div key={i} className="w-12 h-12 rounded-full bg-gray-100 border-4 border-white flex items-center justify-center text-xs font-black text-gray-400">
-                          M{i}
-                       </div>
-                    ))}
-                    <div className="w-12 h-12 rounded-full bg-emerald-600 border-4 border-white flex items-center justify-center text-xs font-black text-white">
-                       +50
-                    </div>
-                 </div>
+            </div>
+          </div>
+          <div className="relative flex h-[500px] items-center justify-center overflow-hidden rounded-[3rem] bg-gray-100">
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(/pattern-kente.svg)", backgroundSize: "300px" }} />
+            <div className="relative z-10 flex h-4/5 w-4/5 flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-2xl">
+              <div className="space-y-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
+                  <Heart className="h-6 w-6 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">{c.trustTitle}</h3>
+                <p className="text-sm font-medium text-gray-400">{c.trustDesc}</p>
               </div>
-           </div>
+              <div className="flex -space-x-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-gray-100 text-xs font-black text-gray-400">M{i}</div>
+                ))}
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-emerald-600 text-xs font-black text-white">+50</div>
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* Values */}
         <section className="space-y-16">
-           <div className="text-center">
-              <h2 className="text-3xl md:text-5xl font-black text-gray-900">Nos Valeurs Fondamentales</h2>
-           </div>
-           <div className="grid md:grid-cols-3 gap-8">
-              {[
-                 {
-                    title: "Transparence Radicale",
-                    desc: "Chaque transaction, chaque vote et chaque tirage au sort est auditable par tous les membres concernés.",
-                    icon: Eye,
-                    color: "emerald"
-                 },
-                 {
-                    title: "Inclusivité Sans Faille",
-                    desc: "Du smartphone dernier cri au téléphone basique via USSD, nous incluons tout le monde.",
-                    icon: Globe2,
-                    color: "blue"
-                 },
-                 {
-                    title: "Souveraineté Africaine",
-                    desc: "Conçu pour et par les contextes locaux, avec des données hébergées prioritairement sur le continent.",
-                    icon: Shield,
-                    color: "amber"
-                 }
-              ].map((item, idx) => (
-                 <motion.div
-                    key={item.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="p-10 bg-white rounded-[2.5rem] border border-gray-100 text-center space-y-6 hover:shadow-xl transition-all"
-                 >
-                    <div className={`w-16 h-16 rounded-2xl bg-${item.color}-50 text-${item.color}-600 flex items-center justify-center mx-auto`}>
-                       <item.icon className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-black text-gray-900">{item.title}</h3>
-                    <p className="text-gray-500 font-medium text-sm leading-relaxed">{item.desc}</p>
-                 </motion.div>
-              ))}
-           </div>
+          <div className="text-center">
+            <h2 className="text-3xl font-black text-gray-900 md:text-5xl">{c.valuesTitle}</h2>
+          </div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {c.values.map((item, idx) => {
+              const Icon = VALUE_ICONS[idx];
+              return (
+                <motion.div key={item.title}
+                  initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="space-y-6 rounded-[2.5rem] border border-gray-100 bg-white p-10 text-center transition-all hover:shadow-xl">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                    <Icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-black text-gray-900">{item.title}</h3>
+                  <p className="text-sm font-medium leading-relaxed text-gray-500">{item.desc}</p>
+                </motion.div>
+              );
+            })}
+          </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="text-center py-20 bg-emerald-900 rounded-[3rem] text-white">
-           <h2 className="text-3xl md:text-5xl font-black mb-8">Rejoignez le mouvement.</h2>
-           <p className="text-lg text-emerald-100/70 font-medium mb-12 max-w-2xl mx-auto">
-              Soyez parmi les premiers à transformer la gestion de votre tontine et à 
-              participer à la construction d&apos;une finance plus solidaire.
-           </p>
-           <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/register" className="px-10 py-5 bg-white text-emerald-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
-                Démarrer Maintenant
-              </Link>
-              <Link href="/contact" className="px-10 py-5 bg-emerald-800 text-white border border-emerald-700 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-emerald-700 transition-all">
-                Nous Contacter
-              </Link>
-           </div>
+        <section className="rounded-[3rem] bg-emerald-900 py-20 text-center text-white">
+          <h2 className="mb-8 text-3xl font-black md:text-5xl">{c.ctaTitle}</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-lg font-medium text-emerald-100/70">{c.ctaDesc}</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/register" className="rounded-2xl bg-white px-10 py-5 text-sm font-black uppercase tracking-widest text-emerald-900 shadow-xl transition-all hover:scale-105">
+              {c.ctaStart}
+            </Link>
+            <a href="mailto:contact@tchoua.com" className="rounded-2xl border border-emerald-700 bg-emerald-800 px-10 py-5 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-emerald-700">
+              {c.ctaContact}
+            </a>
+          </div>
         </section>
       </div>
     </PublicLayout>
