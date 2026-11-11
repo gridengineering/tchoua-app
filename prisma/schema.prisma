@@ -762,6 +762,7 @@ model CaisseLoan {
 model Association {
   id            String   @id @default(cuid())
   name          String   @unique
+  joinCode      String?  @unique
   nameSlug      String?  @unique
   description   String?
   // TONTINE_CLUB, COOPERATIVE, SOLIDARITY, INVESTMENT, AGRICULTURAL, MUTUAL, OTHER

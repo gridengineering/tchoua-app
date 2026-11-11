@@ -15,6 +15,9 @@ export default function MembersDirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
 
   useEffect(() => {
     fetch(`/api/associations/${id}/members${statusFilter ? `?status=${statusFilter}` : ''}`)
@@ -25,6 +28,13 @@ export default function MembersDirectoryPage() {
       })
       .catch(() => setLoading(false));
   }, [id, statusFilter]);
+
+  useEffect(() => {
+    fetch(`/api/associations/${id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setJoinCode(d?.association?.joinCode ?? ""))
+      .catch(() => {});
+  }, [id]);
 
   const filteredMembers = members.filter(m => 
     m.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,7 +82,10 @@ export default function MembersDirectoryPage() {
               Approbations
             </Link>
 
-            <button className="flex items-center gap-2 bg-forest text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition">
+            <button
+              onClick={() => setInviteOpen(true)}
+              className="flex items-center gap-2 bg-forest text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition"
+            >
               <UserPlus className="w-4 h-4" />
               Inviter
             </button>
@@ -142,6 +155,45 @@ export default function MembersDirectoryPage() {
         </Card>
 
       </div>
+
+      {inviteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setInviteOpen(false)} />
+          <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-lg font-bold text-slate-900">Inviter un membre</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Partagez ce code : la personne ouvre « Associations → Rejoindre », le saisit, et sa demande part en validation du bureau.
+            </p>
+            <div className="mt-4 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+              <span className="flex-1 text-center font-mono text-xl font-bold tracking-[0.3em] text-slate-900">
+                {joinCode || "—"}
+              </span>
+              <button
+                onClick={async () => {
+                  await navigator.clipboard.writeText(joinCode);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                disabled={!joinCode}
+                className="whitespace-nowrap rounded-lg bg-forest px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+              >
+                {copied ? "Copié" : "Copier"}
+              </button>
+            </div>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`Rejoignez notre association sur Tchoua avec le code : ${joinCode}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-semibold text-green-700 hover:bg-green-100"
+            >
+              Partager sur WhatsApp
+            </a>
+            <button onClick={() => setInviteOpen(false)} className="mt-4 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600">
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

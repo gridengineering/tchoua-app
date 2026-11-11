@@ -8,6 +8,7 @@ import {
   validateNotSuspendedInAnyAssociation,
   validateMaxChildAssociations,
 } from "@/lib/association/rules";
+import { generateJoinCode } from "@/lib/invite-code";
 
 export async function POST(req: Request) {
   try {
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
         data: {
           name,
           nameSlug,
+          joinCode: generateJoinCode(),
           description,
           type: type || "TONTINE_CLUB",
           color: color || "#165E39",

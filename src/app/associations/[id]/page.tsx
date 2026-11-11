@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   ArrowLeft, Users, Calendar, DollarSign, FileText, MessageSquare,
@@ -248,6 +249,14 @@ function GavelIcon() { return <span className="text-xs">🔨</span>; }
 function StarIcon() { return <span className="text-xs">⭐</span>; }
 function HeartIcon() { return <span className="text-xs">❤️</span>; }
 
+function getAidCategoryLabel(category: string): string {
+  const labels: Record<string, string> = {
+    SANTE: "Santé", DECES: "Décès", NAISSANCE: "Naissance", MARIAGE: "Mariage",
+    SCOLARITE: "Scolarité", SINISTRE: "Sinistre", AUTRE: "Autre",
+  };
+  return labels[category] ?? category;
+}
+
 function getRoleLabel(role: string): string {
   const roles: Record<string, string> = {
     PRESIDENT: "Président", TREASURER: "Trésorier", SECRETARY: "Secrétaire",
@@ -325,6 +334,8 @@ export default function AssociationDetailPage() {
   const [meetings, setMeetings] = useState<AssocMeetingT[]>([]);
   const [finances, setFinances] = useState<FinanceReport | null>(null);
   const [documents, setDocuments] = useState<AssocDocument[]>([]);
+  const [socialAids, setSocialAids] = useState<any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -362,6 +373,9 @@ export default function AssociationDetailPage() {
   const [modalSubscribe, setModalSubscribe] = useState<AssocActivity | null>(null);
   const [modalMeeting, setModalMeeting] = useState(false);
   const [modalDocument, setModalDocument] = useState(false);
+  const [modalBank, setModalBank] = useState(false);
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [modalCotisation, setModalCotisation] = useState(false);
   const [modalSocialAid, setModalSocialAid] = useState(false);
   const [editingMemberRole, setEditingMemberRole] = useState<AssocMember | null>(null);
@@ -391,9 +405,12 @@ export default function AssociationDetailPage() {
   const [docForm, setDocForm] = useState({ name: "", type: "PV" });
   const [cotisationForm, setCotisationForm] = useState({ memberId: "", amount: "", paymentMode: "MTN_MOMO", reference: "" });
   const [socialAidForm, setSocialAidForm] = useState({ category: "SANTE", amount: "", justification: "" });
+  const [bankForm, setBankForm] = useState({ label: "", type: "BANK", bankName: "", accountNumber: "", mobileNumber: "", mobileOperator: "MTN", isDefault: false });
 
   // Derived
-  const myMembership = members.find(m => m.userId === "me") ?? members[0]; // fallback for demo
+  const { data: session } = useSession();
+  const myUserId = (session?.user as { id?: string } | undefined)?.id;
+  const myMembership = myUserId ? members.find(m => m.userId === myUserId) : undefined;
   const myRole = myMembership?.role ?? "MEMBER";
   const isBureauMember = isBureau(myRole);
 
@@ -407,40 +424,43 @@ export default function AssociationDetailPage() {
         // Fetch association details
         const assocRes = await fetch(`/api/associations/${id}`);
         const assocData = assocRes.ok ? await assocRes.json() : null;
-        setAssoc(assocData?.association ?? mockAssoc(id));
+        setAssoc(assocData?.association ?? null);
 
         // Fetch members
         const membersRes = await fetch(`/api/associations/${id}/members`);
         const membersData = membersRes.ok ? await membersRes.json() : null;
-        setMembers(membersData?.members ?? mockMembers());
+        setMembers(membersData?.members ?? []);
 
         // Fetch activities
         const actRes = await fetch(`/api/associations/${id}/activities`);
         const actData = actRes.ok ? await actRes.json() : null;
-        setActivities(actData?.activities ?? mockActivities());
+        setActivities(actData?.activities ?? []);
 
         // Fetch meetings
         const meetRes = await fetch(`/api/associations/${id}/meetings`);
         const meetData = meetRes.ok ? await meetRes.json() : null;
-        setMeetings(meetData?.meetings ?? mockMeetings());
+        setMeetings(meetData?.meetings ?? []);
 
         // Fetch finances
         const finRes = await fetch(`/api/associations/${id}/reports?type=ACTIVITY`);
         const finData = finRes.ok ? await finRes.json() : null;
-        setFinances(finData?.report ?? mockFinances());
+        setFinances(finData?.report ?? null);
 
         // Fetch documents
         const docRes = await fetch(`/api/associations/${id}/documents`);
         const docData = docRes.ok ? await docRes.json() : null;
-        setDocuments(docData?.documents ?? mockDocuments());
+        setDocuments(docData?.documents ?? []);
+
+        const aidsRes = await fetch(`/api/associations/${id}/social-aids`);
+        const aidsData = aidsRes.ok ? await aidsRes.json() : null;
+        setSocialAids(aidsData?.requests ?? []);
+
+        const bankRes = await fetch(`/api/associations/${id}/bank-accounts`);
+        const bankData = bankRes.ok ? await bankRes.json() : null;
+        setBankAccounts(bankData?.accounts ?? []);
 
       } catch {
-        setAssoc(mockAssoc(id));
-        setMembers(mockMembers());
-        setActivities(mockActivities());
-        setMeetings(mockMeetings());
-        setFinances(mockFinances());
-        setDocuments(mockDocuments());
+        setError("Impossible de charger les données de l'association.");
       } finally {
         setLoading(false);
       }
@@ -470,7 +490,7 @@ export default function AssociationDetailPage() {
     fetch(`/api/associations/${id}/messages?channel=${chatChannel}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        setMessages(data?.messages ?? mockMessages(chatChannel));
+        setMessages(data?.messages ?? []);
       })
       .catch(() => {
         setMessages(mockMessages(chatChannel));
@@ -557,15 +577,72 @@ export default function AssociationDetailPage() {
     );
   }
 
-  // Month bar chart data (simulated)
-  const monthlyData = [
-    { month: "Jan", collected: 220000, expected: 270000 },
-    { month: "Fév", collected: 270000, expected: 270000 },
-    { month: "Mar", collected: 250000, expected: 270000 },
-    { month: "Avr", collected: 265000, expected: 270000 },
-    { month: "Mai", collected: 90000, expected: 270000 },
-  ];
-  const maxBar = Math.max(...monthlyData.map(d => d.expected));
+  if (!assoc) {
+    return (
+      <DashboardLayout title="Association">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+          <AlertCircle className="mx-auto mb-3 h-10 w-10 text-amber-500" />
+          <h2 className="text-lg font-semibold text-slate-900">Association indisponible</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {error ?? "Vous n'êtes pas membre de cette association ou elle n'existe plus."}
+          </p>
+          <Link href="/associations" className="mt-5 inline-flex rounded-lg bg-forest px-4 py-2 text-sm font-semibold text-white">
+            Retour à mes associations
+          </Link>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const decideAid = async (requestId: string, action: "APPROVE" | "REJECT") => {
+    const res = await fetch(`/api/associations/${id}/social-aids`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, action }),
+    });
+    if (res.ok) {
+      const r = await fetch(`/api/associations/${id}/social-aids`);
+      if (r.ok) setSocialAids((await r.json()).requests ?? []);
+    }
+  };
+
+  const addBankAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch(`/api/associations/${id}/bank-accounts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bankForm),
+    });
+    if (res.ok) {
+      const r = await fetch(`/api/associations/${id}/bank-accounts`);
+      if (r.ok) setBankAccounts((await r.json()).accounts ?? []);
+      setModalBank(false);
+      setBankForm({ label: "", type: "BANK", bankName: "", accountNumber: "", mobileNumber: "", mobileOperator: "MTN", isDefault: false });
+    }
+  };
+
+  const removeBankAccount = async (accountId: string) => {
+    const res = await fetch(`/api/associations/${id}/bank-accounts?accountId=${accountId}`, { method: "DELETE" });
+    if (res.ok) setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
+  };
+
+  const uploadDocument = async () => {
+    if (!docFile) return;
+    setUploading(true);
+    const form = new FormData();
+    form.append("file", docFile);
+    form.append("name", docForm.name || docFile.name);
+    form.append("type", docForm.type);
+    const res = await fetch(`/api/associations/${id}/documents`, { method: "POST", body: form });
+    if (res.ok) {
+      const r = await fetch(`/api/associations/${id}/documents`);
+      if (r.ok) setDocuments((await r.json()).documents ?? []);
+      setModalDocument(false);
+      setDocFile(null);
+      setDocForm({ name: "", type: "PV" });
+    }
+    setUploading(false);
+  };
 
   return (
     <DashboardLayout title={assoc.name}>
@@ -977,10 +1054,16 @@ export default function AssociationDetailPage() {
                     ))}
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
+                    <button
+                      onClick={() => router.push(`/associations/${id}/activities/${selectedActivity?.id}`)}
+                      className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream"
+                    >
                       Voir les sessions
                     </button>
-                    <button className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
+                    <button
+                      onClick={() => router.push(`/associations/${id}/activities/${selectedActivity?.id}`)}
+                      className="flex-1 text-sm font-medium py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream"
+                    >
                       Voir les cotisations
                     </button>
                   </div>
@@ -1390,40 +1473,27 @@ export default function AssociationDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Bar chart simulation */}
               <Card>
-                <CardHeader><CardTitle>Cotisations vs Attendu (2026)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Synthèse financière</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {monthlyData.map(({ month, collected, expected }) => (
-                      <div key={month}>
-                        <div className="flex items-center justify-between text-xs text-graphite mb-1">
-                          <span>{month}</span>
-                          <span>{formatCurrency(collected)} / {formatCurrency(expected)}</span>
-                        </div>
-                        <div className="h-5 bg-gray-100 rounded-full overflow-hidden relative">
-                          <div
-                            className="h-full rounded-full transition-all"
-                            style={{
-                              width: `${(expected / maxBar) * 100}%`,
-                              backgroundColor: "#0d3d2820",
-                              position: "absolute",
-                              left: 0,
-                            }}
-                          />
-                          <div
-                            className="h-full rounded-full transition-all"
-                            style={{
-                              width: `${(collected / maxBar) * 100}%`,
-                              backgroundColor: collected >= expected ? "#0d3d28" : "#d4a343",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    <div className="flex items-center gap-4 mt-3 text-xs">
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: "#0d3d28" }} /> Collecté</span>
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full inline-block bg-gray-200" /> Attendu</span>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-xl bg-cream p-3">
+                      <p className="text-xs text-ash">Total collecté</p>
+                      <p className="mt-1 font-semibold text-gray-900">{formatCurrency(finances?.totalCollected ?? 0)}</p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-3">
+                      <p className="text-xs text-ash">Attendu ce mois</p>
+                      <p className="mt-1 font-semibold text-gray-900">{formatCurrency(finances?.expectedMonthly ?? 0)}</p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-3">
+                      <p className="text-xs text-ash">Couverture mensuelle</p>
+                      <p className="mt-1 font-semibold text-gray-900">
+                        {finances?.expectedMonthly ? `${Math.round((finances.totalCollected / finances.expectedMonthly) * 100)} %` : "—"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-3">
+                      <p className="text-xs text-ash">Caisse disponible</p>
+                      <p className="mt-1 font-semibold text-gray-900">{formatCurrency(finances?.caisseBalance ?? 0)}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1436,7 +1506,10 @@ export default function AssociationDetailPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle>Comptes bancaires</CardTitle>
                   {(myRole === "PRESIDENT" || myRole === "TREASURER") && (
-                    <button className="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream">
+                    <button
+                      onClick={() => setModalBank(true)}
+                      className="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-cream"
+                    >
                       + Ajouter un compte
                     </button>
                   )}
@@ -1444,21 +1517,38 @@ export default function AssociationDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[
-                    { label: "Compte Courant Principal", type: "COURANT", number: "****  ****  **42", bank: "Afriland First Bank" },
-                    { label: "Compte Épargne Solidarité", type: "EPARGNE", number: "****  ****  **78", bank: "SCB Cameroun" },
-                  ].map((account, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-cream border border-stone">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#0d3d28" }}>
-                        <Building2 className="w-5 h-5 text-white" />
+                  {bankAccounts.length === 0 ? (
+                    <p className="py-4 text-center text-sm text-ash">
+                      Aucun compte enregistré. Ajoutez le compte bancaire ou mobile money de l&apos;association.
+                    </p>
+                  ) : (
+                    bankAccounts.map((account) => (
+                      <div key={account.id} className="flex items-center gap-3 p-3 rounded-xl bg-cream border border-stone">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#0d3d28" }}>
+                          <Building2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="truncate font-medium text-sm text-gray-900">
+                            {account.label}
+                            {account.isDefault && <span className="ml-2 rounded-full bg-forest/10 px-2 py-0.5 text-[10px] font-semibold text-forest">Par défaut</span>}
+                          </p>
+                          <p className="truncate text-xs text-graphite">
+                            {[account.bankName, account.accountNumber || account.mobileNumber, account.mobileOperator].filter(Boolean).join(" · ") || "—"}
+                          </p>
+                        </div>
+                        <span className="text-xs font-medium px-2 py-0.5 bg-info/10 text-blue-800 rounded-full">{account.type}</span>
+                        {isBureauMember && (
+                          <button
+                            onClick={() => removeBankAccount(account.id)}
+                            className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                            aria-label="Supprimer le compte"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm text-gray-900">{account.label}</p>
-                        <p className="text-xs text-graphite">{account.bank} · {account.number}</p>
-                      </div>
-                      <span className="text-xs font-medium px-2 py-0.5 bg-info/10 text-blue-800 rounded-full">{account.type}</span>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1482,23 +1572,28 @@ export default function AssociationDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {[
-                      { name: "Thomas Biya", category: "SANTE", amount: 150000, date: "2026-05-01" },
-                    ].map((req, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-info/10 rounded-xl">
-                        <div>
-                          <p className="font-medium text-sm text-gray-900">{req.name}</p>
-                          <p className="text-xs text-graphite">{req.category} · {formatDate(req.date)}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-sm text-gray-900">{formatCurrency(req.amount)}</p>
-                          <div className="flex gap-1 mt-1">
-                            <button className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200">Approuver</button>
-                            <button className="text-xs px-2 py-0.5 bg-error/10 text-red-700 rounded hover:bg-red-200">Refuser</button>
+                    {socialAids.filter((req) => req.status === "PENDING").length === 0 ? (
+                      <p className="py-3 text-center text-xs text-ash">Aucune demande en attente.</p>
+                    ) : (
+                      socialAids.filter((req) => req.status === "PENDING").map((req) => (
+                        <div key={req.id} className="flex items-center justify-between gap-3 p-3 bg-info/10 rounded-xl">
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-sm text-gray-900">{req.membership?.user?.name ?? "Membre"}</p>
+                            <p className="text-xs text-graphite">
+                              {getAidCategoryLabel(req.category)} · {formatDate(req.createdAt)}
+                              {req.urgencyLevel === "URGENT" && <span className="ml-2 font-semibold text-red-600">Urgent</span>}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-sm text-gray-900">{formatCurrency(req.requestedAmount)}</p>
+                            <div className="flex gap-1 mt-1">
+                              <button onClick={() => decideAid(req.id, "APPROVE")} className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200">Approuver</button>
+                              <button onClick={() => decideAid(req.id, "REJECT")} className="text-xs px-2 py-0.5 bg-error/10 text-red-700 rounded hover:bg-red-200">Refuser</button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1903,23 +1998,31 @@ export default function AssociationDetailPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Fichier</label>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-[#0d3d28]/40 transition-colors">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-ash/60" />
-                  <p className="text-sm text-graphite">Glisser-déposer ou</p>
-                  <button className="mt-1 text-sm font-medium text-[#0d3d28] hover:underline">parcourir</button>
-                  <p className="text-xs text-ash mt-1">PDF, DOCX, XLSX — max 10 MB</p>
-                </div>
+                <label className="block cursor-pointer rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-[#0d3d28]/40">
+                  <Upload className="mx-auto mb-2 h-8 w-8 text-ash/60" />
+                  <span className="text-sm font-medium text-[#0d3d28]">
+                    {docFile ? docFile.name : "Parcourir un fichier"}
+                  </span>
+                  <p className="mt-1 text-xs text-ash">PDF, JPEG, PNG ou WEBP — max 10 Mo</p>
+                  <input
+                    type="file"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
+                  />
+                </label>
               </div>
               <div className="flex gap-3 pt-2">
                 <button onClick={() => setModalDocument(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-cream">
                   Annuler
                 </button>
                 <button
-                  onClick={() => setModalDocument(false)}
-                  className="flex-1 py-2.5 rounded-xl text-white text-sm font-medium"
+                  onClick={uploadDocument}
+                  disabled={!docFile || uploading}
+                  className="flex-1 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50"
                   style={{ backgroundColor: "#0d3d28" }}
                 >
-                  Uploader
+                  {uploading ? "Envoi..." : "Uploader"}
                 </button>
               </div>
             </div>
@@ -2086,6 +2189,99 @@ export default function AssociationDetailPage() {
         )}
 
       </div>
+
+      {modalBank && (
+        <Modal title="Ajouter un compte" onClose={() => setModalBank(false)}>
+          <form onSubmit={addBankAccount} className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">Libellé</label>
+              <input
+                required
+                value={bankForm.label}
+                onChange={(e) => setBankForm(f => ({ ...f, label: e.target.value }))}
+                placeholder="ex: Compte courant principal"
+                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28]/20"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Type</label>
+                <select
+                  value={bankForm.type}
+                  onChange={(e) => setBankForm(f => ({ ...f, type: e.target.value }))}
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                >
+                  <option value="BANK">Compte bancaire</option>
+                  <option value="MOBILE_MONEY">Mobile Money</option>
+                  <option value="CASH">Caisse</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Banque</label>
+                <input
+                  value={bankForm.bankName}
+                  onChange={(e) => setBankForm(f => ({ ...f, bankName: e.target.value }))}
+                  placeholder="Afriland, SCB…"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                />
+              </div>
+            </div>
+            {bankForm.type === "MOBILE_MONEY" ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Opérateur</label>
+                  <select
+                    value={bankForm.mobileOperator}
+                    onChange={(e) => setBankForm(f => ({ ...f, mobileOperator: e.target.value }))}
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                  >
+                    <option value="MTN">MTN MoMo</option>
+                    <option value="ORANGE">Orange Money</option>
+                    <option value="WAVE">Wave</option>
+                    <option value="EXPRESS_UNION">Express Union</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Numéro</label>
+                  <input
+                    value={bankForm.mobileNumber}
+                    onChange={(e) => setBankForm(f => ({ ...f, mobileNumber: e.target.value }))}
+                    placeholder="6XX XXX XXX"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Numéro de compte / IBAN</label>
+                <input
+                  value={bankForm.accountNumber}
+                  onChange={(e) => setBankForm(f => ({ ...f, accountNumber: e.target.value }))}
+                  placeholder="Numéro de compte"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"
+                />
+              </div>
+            )}
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={bankForm.isDefault}
+                onChange={(e) => setBankForm(f => ({ ...f, isDefault: e.target.checked }))}
+                className="h-4 w-4 accent-forest"
+              />
+              Compte par défaut
+            </label>
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={() => setModalBank(false)} className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-700">
+                Annuler
+              </button>
+              <button type="submit" className="flex-1 rounded-xl py-2.5 text-sm font-medium text-white" style={{ backgroundColor: "#0d3d28" }}>
+                Ajouter
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
       {editingMemberRole && (
         <MemberRoleModal
           associationId={id}

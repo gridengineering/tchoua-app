@@ -8,6 +8,7 @@ import {
   validateMaxAssociationsPerMember,
   validateNotSuspendedInAnyAssociation,
 } from "@/lib/association/rules";
+import { generateJoinCode } from "@/lib/invite-code";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -104,6 +105,7 @@ export async function POST(req: NextRequest) {
     data: {
       name,
       nameSlug: generateNameSlug(name),
+      joinCode: generateJoinCode(),
       description,
       type,
       isPublic: isPublic ?? false,
