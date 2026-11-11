@@ -21,7 +21,7 @@ type SystemRole = {
   createdAt: string;
 };
 
-const RESOURCES = ["USERS", "ASSOCIATIONS", "TRANSACTIONS", "TEMPLATES", "AUDIT", "SETTINGS", "ROLES"];
+const RESOURCES = ["USERS", "ASSOCIATIONS", "TRANSACTIONS", "TEMPLATES", "AUDIT", "SETTINGS", "ROLES", "NOTIFICATIONS", "WALLETS", "FINANCE", "DASHBOARD"];
 const ACTIONS = ["CREATE", "READ", "UPDATE", "DELETE"];
 const RESOURCE_LABELS: Record<string, string> = {
   USERS: "Utilisateurs",
@@ -31,6 +31,10 @@ const RESOURCE_LABELS: Record<string, string> = {
   AUDIT: "Audit & Logs",
   SETTINGS: "Paramètres",
   ROLES: "Rôles & Permissions",
+  NOTIFICATIONS: "Notifications",
+  WALLETS: "Wallets",
+  FINANCE: "Audit financier",
+  DASHBOARD: "Tableau de bord",
 };
 const ACTION_LABELS: Record<string, string> = {
   CREATE: "Créer",
@@ -53,6 +57,8 @@ export default function AdminRolesPage() {
   const [newRole, setNewRole] = useState({ name: "", description: "" });
   const [editingPermissions, setEditingPermissions] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [infoForm, setInfoForm] = useState({ name: "", description: "" });
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   const fetchRoles = useCallback(async () => {
@@ -83,6 +89,31 @@ export default function AdminRolesPage() {
     setSelectedRole(role);
     setEditingPermissions(new Set(role.permissions.map(p => `${p.resource}_${p.action}`)));
     setIsCreating(false);
+    setEditingInfo(false);
+    setInfoForm({ name: role.name, description: role.description ?? "" });
+  };
+
+  const saveRoleInfo = async () => {
+    if (!selectedRole) return;
+    if (!infoForm.name.trim()) return showToast("Le nom du rôle est requis", "error");
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/roles/${selectedRole.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(infoForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Mise à jour impossible");
+      setSelectedRole(data.role);
+      setRoles((prev) => prev.map((r) => (r.id === data.role.id ? data.role : r)));
+      setEditingInfo(false);
+      showToast("Rôle mis à jour", "success");
+    } catch (e: any) {
+      showToast(e.message, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const togglePermission = (resource: string, action: string) => {
@@ -311,14 +342,47 @@ export default function AdminRolesPage() {
           {selectedRole ? (
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-300">
               <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">{selectedRole.name}</h2>
-                    {selectedRole.name === "Admin Principal" && (
-                      <span className="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest border border-amber-100 shadow-sm shadow-amber-500/5">Rôle Système</span>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-gray-400 mt-1 italic">&quot;{selectedRole.description}&quot;</p>
+                <div className="min-w-0 flex-1">
+                  {editingInfo ? (
+                    <div className="space-y-2">
+                      <input
+                        value={infoForm.name}
+                        onChange={(e) => setInfoForm((f) => ({ ...f, name: e.target.value }))}
+                        disabled={selectedRole.name === "Admin Principal"}
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-lg font-bold text-slate-900 outline-none focus:border-indigo-300 disabled:bg-slate-50"
+                      />
+                      <input
+                        value={infoForm.description}
+                        onChange={(e) => setInfoForm((f) => ({ ...f, description: e.target.value }))}
+                        placeholder="Description du rôle"
+                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 outline-none focus:border-indigo-300"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={saveRoleInfo} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">
+                          Enregistrer
+                        </button>
+                        <button onClick={() => setEditingInfo(false)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                          Annuler
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">{selectedRole.name}</h2>
+                        {selectedRole.name === "Admin Principal" && (
+                          <span className="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest border border-amber-100 shadow-sm shadow-amber-500/5">Rôle Système</span>
+                        )}
+                        <button
+                          onClick={() => setEditingInfo(true)}
+                          className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        >
+                          Modifier
+                        </button>
+                      </div>
+                      <p className="text-sm font-medium text-gray-400 mt-1 italic">&quot;{selectedRole.description}&quot;</p>
+                    </>
+                  )}
                 </div>
                 {hasChanged && selectedRole.name !== "Admin Principal" && (
                   <button

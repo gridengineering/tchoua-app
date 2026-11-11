@@ -15,6 +15,15 @@ import {
 } from "lucide-react";
 
 // ─── Structure du menu Membre (15 Modules complets) ─────────────────────────
+const FEATURE_BY_HREF: Record<string, string> = {
+  "/marketplace": "marketplace",
+  "/academie": "academy",
+  "/chat": "chat",
+  "/conseils": "ai",
+  "/dashboard/gamification": "gamification",
+  "/evenements": "events",
+};
+
 const MEMBER_NAV = [
   { href: "/dashboard",              icon: LayoutDashboard, label: "Tableau de Bord" },
   { href: "/tontines",               icon: PiggyBank,       label: "Mes Tontines" },
@@ -48,14 +57,30 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
   const { lang, setLang, availableLangs } = useI18n();
 
   const [myAssocs, setMyAssocs] = useState<MyAssociation[]>([]);
+  const [features, setFeatures] = useState<Record<string, boolean> | null>(null);
   const [selectedAssoc, setSelectedAssoc] = useState<MyAssociation | null>(null);
   const [assocDropOpen, setAssocDropOpen] = useState(false);
 
   const hasSystemRole = !!user?.systemRoleId;
 
+  const visibleMemberNav = MEMBER_NAV.filter((item) => {
+    if (!features) return true;
+    const flag = FEATURE_BY_HREF[item.href];
+    return !flag || features[flag] !== false;
+  });
+
   // Détection de l'association courante dans l'URL
   const assocMatch = pathname.match(/^\/associations\/([^/]+)(?:\/|$)/);
   const currentAssocId = assocMatch?.[1];
+
+  useEffect(() => {
+    fetch("/api/settings/public")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.settings?.features) setFeatures(data.settings.features);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/associations")
@@ -212,7 +237,7 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
         )}
 
         {/* Items de navigation */}
-        {(inAssocContext ? assocNavItems : MEMBER_NAV.map(i => ({
+        {(inAssocContext ? assocNavItems : visibleMemberNav.map(i => ({
           href: i.href,
           label: i.label,
           icon: i.icon,

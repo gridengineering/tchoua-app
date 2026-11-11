@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState, useEffect, useCallback } from "react";
 import { 
   Building2, Search, Filter, MoreHorizontal, 
@@ -75,13 +77,13 @@ export default function AdminAssociationsPage() {
     return () => clearTimeout(timer);
   }, [fetchAssocs]);
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const updateStatus = async (id: string, newStatus: string, reason?: string) => {
     setUpdating(id);
     try {
       const res = await fetch("/api/admin/associations", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({ id, status: newStatus, reason }),
       });
       if (res.ok) {
         fetchAssocs();
@@ -315,10 +317,29 @@ export default function AdminAssociationsPage() {
                       </button>
                     )}
 
-                    <button className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gray-50 text-gray-500 text-sm font-black hover:bg-gray-100 transition-all">
+                    {selectedAssoc.status !== 'DISSOLVED' && (
+                      <button
+                        onClick={() => {
+                          const reason = window.prompt("Motif de dissolution (obligatoire, consigné dans l'audit) :");
+                          if (!reason || reason.trim().length < 5) return;
+                          if (!confirm(`Dissoudre définitivement « ${selectedAssoc.name} » ? Cette action est irréversible.`)) return;
+                          updateStatus(selectedAssoc.id, 'DISSOLVED', reason.trim());
+                        }}
+                        disabled={updating === selectedAssoc.id}
+                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border border-red-200 text-red-600 text-sm font-black hover:bg-red-50 transition-all disabled:opacity-50"
+                      >
+                        <AlertCircle className="w-4 h-4" />
+                        Dissoudre l&apos;association
+                      </button>
+                    )}
+
+                    <Link
+                      href={`/associations/${selectedAssoc.id}`}
+                      className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gray-50 text-gray-600 text-sm font-black hover:bg-gray-100 transition-all"
+                    >
                       <LayoutGrid className="w-4 h-4" />
-                      Voir les Activités
-                    </button>
+                      Ouvrir l&apos;espace association
+                    </Link>
                   </div>
                 </div>
               </div>

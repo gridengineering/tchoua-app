@@ -1,6 +1,6 @@
 // Catalogue de permissions et helpers d'autorisation pour les associations.
 
-export const SUPER_ADMIN_EMAIL = "admin@tchoua.cm";
+export const SUPER_ADMIN_EMAIL = "admin@tchoua.com";
 
 export const PERMISSIONS = {
   EDIT_SETTINGS: "Modifier les paramètres",

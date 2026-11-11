@@ -1,26 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+import { requireSystemAdmin } from "@/lib/admin-auth";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 // GET /api/admin/users — Liste des utilisateurs système
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const guard = await requireSystemAdmin("USERS", "READ");
+    if (!guard.ok) return guard.response;
 
     const { searchParams } = new URL(request.url);
     const roleId = searchParams.get("roleId");
     const status = searchParams.get("status"); // active, inactive
+    const query = (searchParams.get("q") ?? "").trim();
 
     const users = await prisma.user.findMany({
       where: {
-        // Un utilisateur système est un utilisateur qui a un systemRoleId
-        // OU on peut vouloir lister tous les utilisateurs pour leur assigner un rôle
         systemRoleId: roleId ? roleId : { not: null },
         ...(status === "active" ? { isActive: true } : {}),
         ...(status === "inactive" ? { isActive: false } : {}),
+        ...(query
+          ? { OR: [{ name: { contains: query, mode: "insensitive" } }, { email: { contains: query, mode: "insensitive" } }] }
+          : {}),
       },
       select: {
         id: true,
@@ -49,8 +51,8 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/users — Créer un nouvel utilisateur système
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const guard = await requireSystemAdmin("USERS", "CREATE");
+    if (!guard.ok) return guard.response;
 
     const body = await request.json();
     const { name, email, password, systemRoleId, phone } = body;
@@ -59,7 +61,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const settings = await getPlatformSettings();
+    if (String(password).length < settings.security.passwordMinLength) {
+      return NextResponse.json(
+        { error: `Le mot de passe doit contenir au moins ${settings.security.passwordMinLength} caractères` },
+        { status: 400 }
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
@@ -75,7 +85,7 @@ export async function POST(request: NextRequest) {
     // Logger l'action
     await prisma.auditLog.create({
       data: {
-        userId: (session.user as any).id,
+        userId: guard.user.id,
         action: "USER_CREATE",
         entity: "USER",
         entityId: user.id,

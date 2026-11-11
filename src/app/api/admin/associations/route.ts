@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireSystemAdmin } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const guard = await requireSystemAdmin("ASSOCIATIONS", "READ");
+    if (!guard.ok) return guard.response;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -45,29 +44,44 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const guard = await requireSystemAdmin("ASSOCIATIONS", "UPDATE");
+    if (!guard.ok) return guard.response;
 
     const body = await request.json();
-    const { id, status } = body;
+    const { id, status, reason } = body;
 
     if (!id || !status) {
       return NextResponse.json({ error: "ID et statut requis" }, { status: 400 });
     }
 
+    const allowed = ["ACTIVE", "SUSPENDED", "DISSOLVED", "PENDING", "DRAFT"];
+    if (!allowed.includes(String(status))) {
+      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
+    }
+    if (status === "DISSOLVED" && !reason) {
+      return NextResponse.json({ error: "Motif de dissolution requis" }, { status: 400 });
+    }
+
     const association = await prisma.association.update({
       where: { id },
-      data: { status },
+      data: {
+        status,
+        ...(status === "DISSOLVED"
+          ? { dissolvedAt: new Date(), dissolutionReason: reason }
+          : status === "ACTIVE"
+          ? { activatedAt: new Date() }
+          : {}),
+      },
     });
 
     // Audit
     await prisma.auditLog.create({
       data: {
-        userId: (session.user as any).id,
+        userId: guard.user.id,
         action: "ASSOC_STATUS_UPDATE",
         entity: "ASSOCIATIONS",
         entityId: id,
-        details: `Changement de statut de l'association "${association.name}" vers ${status}`,
+        details: `Changement de statut de l'association "${association.name}" vers ${status}${reason ? ` — motif : ${reason}` : ""}`,
       }
     });
 

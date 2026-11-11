@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireSystemAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const user = session?.user as any;
-
-    if (!session || !user?.systemRoleId) {
-      return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
-    }
+    const guard = await requireSystemAdmin("WALLETS", "READ");
+    if (!guard.ok) return guard.response;
 
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "50");
@@ -43,12 +38,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const user = session?.user as any;
-
-    if (!session || !user?.systemRoleId) {
-      return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
-    }
+    const guard = await requireSystemAdmin("WALLETS", "READ");
+    if (!guard.ok) return guard.response;
 
     const body = await req.json();
     const { walletId, action } = body;

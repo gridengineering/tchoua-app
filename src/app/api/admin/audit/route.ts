@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { requireSystemAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/admin/audit — Récupère les logs d'audit
 export async function GET(request: Request) {
+  const guard = await requireSystemAdmin("AUDIT", "READ");
+  if (!guard.ok) return guard.response;
   try {
     const { searchParams } = new URL(request.url);
     const severity = searchParams.get("severity");

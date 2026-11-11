@@ -1,33 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useEffect } from "react";
-import { 
-  LayoutDashboard, 
-  Users, 
-  ShieldCheck, 
-  Building2, 
-  FileText, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X,
-  HelpCircle,
-  Activity,
-  History,
-  Search,
-  Bell,
-  ArrowLeftRight,
-  Wallet,
-  ChevronRight,
-  Landmark
+import {
+  Activity, ArrowLeftRight, Bell, Building2, ChevronLeft, ChevronRight,
+  FileText, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
+  PanelLeftOpen, Settings, ShieldCheck, Users, Wallet, X,
 } from "lucide-react";
 
+type NavItem = { name: string; href: string; icon: any; exact?: boolean };
+type NavGroup = { label: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Pilotage",
+    items: [
+      { name: "Tableau de bord", href: "/admin", icon: LayoutDashboard, exact: true },
+      { name: "Audit financier", href: "/admin/finance", icon: Landmark },
+    ],
+  },
+  {
+    label: "Organisation",
+    items: [
+      { name: "Associations", href: "/admin/associations", icon: Building2 },
+      { name: "Modèles", href: "/admin/templates", icon: FileText },
+    ],
+  },
+  {
+    label: "Accès",
+    items: [
+      { name: "Utilisateurs système", href: "/admin/users", icon: Users },
+      { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck },
+    ],
+  },
+  {
+    label: "Finance",
+    items: [
+      { name: "Wallets", href: "/admin/wallets", icon: Wallet },
+      { name: "Paramètres wallet", href: "/admin/settings/wallet", icon: Settings },
+    ],
+  },
+  {
+    label: "Système",
+    items: [
+      { name: "Notifications", href: "/admin/notifications", icon: Bell },
+      { name: "Journaux", href: "/admin/audit", icon: History },
+      { name: "Paramètres", href: "/admin/settings", icon: Settings },
+    ],
+  },
+];
+
+const CRUMB_LABELS: Record<string, string> = {
+  admin: "Administration",
+  users: "Utilisateurs",
+  roles: "Rôles",
+  associations: "Associations",
+  templates: "Modèles",
+  wallets: "Wallets",
+  finance: "Audit financier",
+  notifications: "Notifications",
+  audit: "Journaux",
+  settings: "Paramètres",
+};
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -36,243 +76,214 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMounted(true);
+    setCollapsed(localStorage.getItem("tchoua-admin-collapsed") === "1");
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      if (status === "unauthenticated") {
-        router.push("/login");
-      } else if (status === "authenticated" && !user?.systemRoleId) {
-        router.push("/403");
-      }
-    }
+    if (!mounted) return;
+    if (status === "unauthenticated") router.push("/login");
+    else if (status === "authenticated" && !user?.systemRoleId) router.push("/403");
   }, [mounted, status, user, router]);
 
-  if (status === "loading") {
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const breadcrumbs = useMemo(() => {
+    const segments = pathname.split("/").filter(Boolean);
+    return segments.map((segment, index) => ({
+      href: `/${segments.slice(0, index + 1).join("/")}`,
+      label: CRUMB_LABELS[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1),
+      last: index === segments.length - 1,
+    }));
+  }, [pathname]);
+
+  const toggleCollapsed = () => {
+    const value = !collapsed;
+    setCollapsed(value);
+    localStorage.setItem("tchoua-admin-collapsed", value ? "1" : "0");
+  };
+
+  if (status === "loading" || !mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-forest border-t-transparent rounded-full animate-spin" />
-          <p className="text-forest font-bold animate-pulse uppercase tracking-widest text-xs">Chargement de la console...</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-9 w-9 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Chargement de la console</p>
         </div>
       </div>
     );
   }
 
-  if (status === "authenticated" && !user?.systemRoleId) {
-    return null; // Redirection en cours vers 403
-  }
+  if (status === "authenticated" && !user?.systemRoleId) return null;
 
-  const menuItems = [
-    { name: "Tableau de Bord", href: "/admin", icon: LayoutDashboard },
-    { name: "Utilisateurs Système", href: "/admin/users", icon: Users },
-    { name: "Rôles & Permissions", href: "/admin/roles", icon: ShieldCheck },
-    { name: "Modèles d'Associations", href: "/admin/templates", icon: FileText },
-    { name: "Supervision des Assos", href: "/admin/associations", icon: Building2 },
-    { name: "Supervision des Wallets", href: "/admin/wallets", icon: Wallet },
-    { name: "Audit Financier Global", href: "/admin/finance", icon: Landmark },
-    { name: "Journaux (Logs)", href: "/admin/audit", icon: History },
-    { name: "Notifications Système", href: "/admin/notifications", icon: Bell },
-    { name: "Paramètres Plateforme", href: "/admin/settings", icon: Settings },
-    { name: "Paramètres Wallet", href: "/admin/settings/wallet", icon: Settings },
-  ];
+  const isActive = (item: NavItem) =>
+    item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-  // Breadcrumb logic
-  const pathSegments = pathname.split('/').filter(Boolean);
-  const breadcrumbs = pathSegments.map((segment, index) => {
-    const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
-    const name = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
-    return { name, href };
-  });
-
-  return (
-    <div className="min-h-screen bg-cream flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 gradient-forest flex-col h-screen sticky top-0 border-r border-white/5">
-        <div className="p-6">
-          <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-cream shadow-lg shadow-black/20">
-              <img src="/logo.png" alt="TCHOUA" className="w-6 h-6 object-contain" />
-            </div>
-            <div>
-              <div className="text-white font-black text-xl tracking-tight">Tchoua</div>
-              <div className="text-[10px] uppercase font-black tracking-widest text-gold">Admin Console</div>
-            </div>
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive 
-                    ? "bg-gold/10 text-gold border border-gold/20 shadow-sm" 
-                    : "text-white/70 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-gold" : "group-hover:text-gold"}`} />
-                <span className="font-bold text-sm">{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Space Toggle Button */}
-        <div className="p-4 border-t border-white/5 bg-slate-900/50">
-          <Link
-            href="/dashboard"
-            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/5 transition-all group border border-transparent hover:border-emerald-400/10"
+  const SidebarContent = (
+    <>
+      <div className={`flex h-16 items-center gap-3 border-b border-white/5 px-4 ${collapsed ? "justify-center" : ""}`}>
+        <Link href="/admin" className="flex items-center gap-3 overflow-hidden">
+          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white">
+            <img src="/logo.png" alt="Tchoua" className="h-6 w-6 object-contain" />
+          </span>
+          {!collapsed && (
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-bold leading-tight text-white">Tchoua</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-widest text-indigo-300">Console</span>
+            </span>
+          )}
+        </Link>
+        {!collapsed && (
+          <button
+            onClick={toggleCollapsed}
+            className="ml-auto hidden rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-white lg:block"
+            aria-label="Réduire le menu"
           >
-            <div className="w-8 h-8 rounded-lg bg-emerald-400/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-              <ArrowLeftRight className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-xs font-black">Espace Membre</div>
-              <div className="text-[10px] text-slate-500 font-bold">Gérer mes tontines</div>
-            </div>
-          </Link>
-        </div>
-
-        <div className="p-4 border-t border-white/5">
-          <button 
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-white hover:bg-red-500/10 transition-colors group"
-          >
-            <LogOut className="w-5 h-5 group-hover:text-red-400" />
-            <span className="font-bold text-sm">Déconnexion</span>
+            <PanelLeftClose className="h-4 w-4" />
           </button>
-        </div>
-      </aside>
+        )}
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors lg:hidden"
-            >
-              <Menu className="w-6 h-6 text-slate-600" />
-            </button>
-            
-            {/* Breadcrumb */}
-            <div className="hidden md:flex items-center gap-2 text-sm">
-              <Link href="/admin" className="text-slate-600 hover:text-slate-900 font-medium">Admin</Link>
-              {breadcrumbs.slice(1).map((crumb, i) => (
-                <div key={crumb.href} className="flex items-center gap-2">
-                  <ChevronRight className="w-4 h-4 text-slate-300" />
-                  <Link 
-                    href={crumb.href} 
-                    className={`font-bold ${i === breadcrumbs.length - 2 ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            {!collapsed && (
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
+            )}
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const active = isActive(item);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={collapsed ? item.name : undefined}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                      active
+                        ? "bg-indigo-500/15 text-white ring-1 ring-inset ring-indigo-400/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    } ${collapsed ? "justify-center" : ""}`}
                   >
-                    {crumb.name}
+                    <item.icon className={`h-4 w-4 flex-shrink-0 ${active ? "text-indigo-300" : "text-slate-400"}`} />
+                    {!collapsed && <span className="truncate">{item.name}</span>}
                   </Link>
-                </div>
-              ))}
-            </div>
-
-            {/* Admin Badge */}
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-forest/5 border border-forest/10">
-              <ShieldCheck className="w-3.5 h-3.5 text-forest" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-forest">Mode Administration</span>
+                );
+              })}
             </div>
           </div>
+        ))}
+      </nav>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center flex-1 max-w-xs bg-slate-50 rounded-xl px-4 py-2 border border-slate-100 focus-within:ring-2 focus-within:ring-blue-600/10 transition-all">
-              <Search className="w-4 h-4 text-slate-600 mr-2" />
-              <input 
-                type="text" 
-                placeholder="Rechercher..." 
-                className="bg-transparent border-none outline-none text-sm w-full font-medium"
-              />
-            </div>
+      <div className="space-y-2 border-t border-white/5 p-3">
+        <Link
+          href="/dashboard"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-emerald-300 transition hover:bg-emerald-400/10 ${collapsed ? "justify-center" : ""}`}
+          title="Espace membre"
+        >
+          <ArrowLeftRight className="h-4 w-4 flex-shrink-0" />
+          {!collapsed && <span>Espace membre</span>}
+        </Link>
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition hover:bg-red-500/10 hover:text-red-300 ${collapsed ? "justify-center" : ""}`}
+          title="Déconnexion"
+        >
+          <LogOut className="h-4 w-4 flex-shrink-0" />
+          {!collapsed && <span>Déconnexion</span>}
+        </button>
+      </div>
+    </>
+  );
 
-            <button className="relative p-2 rounded-xl hover:bg-slate-50 transition-colors">
-              <Bell className="w-5 h-5 text-slate-600" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border-2 border-white" />
-            </button>
-            
-            <div className="h-8 w-px bg-slate-100 mx-2 hidden sm:block" />
-            
-            <div className="flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
-              <div className="text-right hidden sm:block">
-                <div className="text-sm font-black text-forest leading-none">{user?.name}</div>
-                <div className="text-[10px] text-gold font-bold uppercase tracking-widest mt-1">{user?.systemRoleName ?? 'Super Admin'}</div>
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col bg-slate-950 transition-all duration-200 lg:flex ${
+          collapsed ? "w-20" : "w-64"
+        }`}
+      >
+        {SidebarContent}
+        {collapsed && (
+          <button
+            onClick={toggleCollapsed}
+            className="absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm lg:flex"
+            aria-label="Déplier le menu"
+          >
+            <PanelLeftOpen className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </aside>
+
+      <div className={`flex min-h-screen flex-col transition-all duration-200 ${collapsed ? "lg:pl-20" : "lg:pl-64"}`}>
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 sm:px-6">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+            aria-label="Ouvrir le menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <nav className="hidden items-center gap-1.5 text-sm sm:flex" aria-label="Fil d'Ariane">
+            {breadcrumbs.map((crumb, index) => (
+              <span key={crumb.href} className="flex items-center gap-1.5">
+                {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-slate-300" />}
+                {crumb.last ? (
+                  <span className="font-semibold text-slate-900">{crumb.label}</span>
+                ) : (
+                  <Link href={crumb.href} className="text-slate-500 hover:text-slate-900">
+                    {crumb.label}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-2">
+            <span className="hidden items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700 sm:flex">
+              <ShieldCheck className="h-3.5 w-3.5" /> Mode administration
+            </span>
+            <Link
+              href="/admin/notifications"
+              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+              aria-label="Notifications"
+            >
+              <Bell className="h-4 w-4" />
+            </Link>
+            <div className="ml-1 flex items-center gap-2 border-l border-slate-200 pl-2">
+              <div className="hidden text-right sm:block">
+                <div className="text-sm font-semibold leading-none text-slate-900">{user?.name}</div>
+                <div className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                  {user?.systemRoleName ?? "Administrateur"}
+                </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-forest flex items-center justify-center font-black text-white shadow-sm text-sm">
-                {user?.name?.charAt(0).toUpperCase()}
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white">
+                {user?.name?.charAt(0)?.toUpperCase() ?? "A"}
               </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="p-4 sm:p-8 flex-1 overflow-x-hidden">
-          {children}
-        </div>
-      </main>
+        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
+        <footer className="border-t border-slate-200 px-6 py-3 text-xs text-slate-400">
+          Console Tchoua · {new Date().getFullYear()} — Toutes les actions sensibles sont auditées.
+        </footer>
+      </div>
+
+      {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-80 bg-[#0f172a] flex flex-col animate-in slide-in-from-left duration-300">
-            <div className="p-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-xl flex items-center justify-center shadow-lg shadow-[#0d3d28]/20">
-                <img src="/logo.png" alt="TCHOUA" className="w-6 h-6 object-contain" />
-              </div>
-                <div className="text-white font-black text-lg">Tchoua Admin</div>
-              </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 hover:text-white">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-              {menuItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive ? "bg-blue-600 text-white" : "text-slate-300 hover:text-white"
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-bold text-sm">{item.name}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-            
-            <div className="p-4 border-t border-white/5 bg-slate-900/50">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-emerald-400"
-              >
-                <ArrowLeftRight className="w-5 h-5" />
-                <span className="font-bold text-sm">Espace Membre</span>
-              </Link>
-            </div>
-
-            <div className="p-6 border-t border-white/5">
-              <button 
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-slate-300"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-bold text-sm">Déconnexion</span>
-              </button>
-            </div>
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-slate-950">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+              aria-label="Fermer le menu"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            {SidebarContent}
           </aside>
         </div>
       )}

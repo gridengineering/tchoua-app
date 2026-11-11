@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getPlatformSettings } from "@/lib/platform-settings";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -15,6 +16,14 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const platform = await getPlatformSettings();
+    if (platform.maintenanceMode) {
+      return NextResponse.json({ error: platform.maintenanceMessage }, { status: 503 });
+    }
+    if (!platform.allowRegistration) {
+      return NextResponse.json({ error: "Les inscriptions sont temporairement fermées." }, { status: 403 });
+    }
+
     const body = await req.json();
     const data = registerSchema.parse(body);
 

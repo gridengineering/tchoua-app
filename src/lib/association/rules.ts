@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 // ─── Annexe B : Codes d'Erreur API (SPECIFICATION_ASSOCIATION.md) ──────────
 export const API_ERROR_CODES = {
@@ -197,8 +198,10 @@ export async function validateMaxAssociationsPerMember(
   prisma: PrismaClient
 ): Promise<{ valid: boolean; error?: string }> {
   const count = await getMemberActiveAssociationCount(userId, prisma);
-  if (count >= 10) {
-    return { valid: false, error: "Limite de 10 associations actives atteinte" };
+  const settings = await getPlatformSettings();
+  const max = settings.maxAssociationsPerMember > 0 ? settings.maxAssociationsPerMember : 10;
+  if (count >= max) {
+    return { valid: false, error: `Limite de ${max} associations actives atteinte` };
   }
   return { valid: true };
 }

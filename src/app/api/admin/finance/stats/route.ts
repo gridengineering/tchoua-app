@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireSystemAdmin } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const guard = await requireSystemAdmin("FINANCE", "READ");
+    if (!guard.ok) return guard.response;
 
     // En théorie, ici on ferait des agrégations complexes sur les transactions réelles.
     // Pour l'instant, on va simuler des KPIs basés sur les données existantes.

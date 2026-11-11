@@ -261,41 +261,6 @@ function LoginContent() {
             </p>
           </div>
 
-          {/* Demo accounts */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-4 rounded-xl" style={{ background: "rgba(13,61,40,0.05)", border: "1px solid rgba(13,61,40,0.1)" }}>
-              <p className="text-[10px] uppercase font-bold mb-2 tracking-wider" style={{ color: "#0d3d28" }}>👤 Membre Démo</p>
-              <div className="space-y-1 mb-3">
-                <p className="text-[11px] text-gray-500 truncate">demo@tchoua.cm</p>
-                <p className="text-[11px] text-gray-500">demo123</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setForm({ email: "demo@tchoua.cm", password: "demo123" })}
-                className="w-full text-[11px] font-bold py-1.5 rounded-lg transition-all hover:opacity-80"
-                style={{ background: "#0d3d28", color: "white" }}
-              >
-                Remplir
-              </button>
-            </div>
-
-            <div className="p-4 rounded-xl" style={{ background: "rgba(212,163,67,0.08)", border: "1px solid rgba(212,163,67,0.15)" }}>
-              <p className="text-[10px] uppercase font-bold mb-2 tracking-wider" style={{ color: "#b48a3a" }}>👑 Admin Système</p>
-              <div className="space-y-1 mb-3">
-                <p className="text-[11px] text-gray-500 truncate">admin@tchoua.com</p>
-                <p className="text-[11px] text-gray-500">Admin1234</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setForm({ email: "admin@tchoua.com", password: "Admin1234" })}
-                className="w-full text-[11px] font-bold py-1.5 rounded-lg transition-all hover:opacity-80"
-                style={{ background: "#e68a00", color: "white" }}
-              >
-                Remplir
-              </button>
-            </div>
-          </div>
-
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
               ← Retour à l'accueil

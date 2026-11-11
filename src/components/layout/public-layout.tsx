@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { Menu, X, Globe, ChevronDown, ChevronRight } from "lucide-react";
 
@@ -66,18 +66,34 @@ const PUBLIC_NAV: NavItem[] = [
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const { lang, setLang, availableLangs, t } = useI18n();
+  const [brand, setBrand] = useState<{
+    siteName: string; logoUrl: string; primaryColor: string; siteTagline: string;
+    maintenanceMode: boolean; maintenanceMessage: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/settings/public")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data?.settings && setBrand(data.settings))
+      .catch(() => {});
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e2ddd4]/60">
+      {brand?.maintenanceMode && (
+        <div className="bg-amber-500 text-white text-center text-xs font-semibold px-4 py-2">
+          {brand.maintenanceMessage || "Plateforme en maintenance — certaines fonctionnalités sont indisponibles."}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-[#0d3d28]/10 transition-transform group-hover:scale-105" style={{ background: "#0d3d28" }}>
-            <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-[#0d3d28]/10 transition-transform group-hover:scale-105" style={{ background: brand?.primaryColor || "#0d3d28" }}>
+            <img src={brand?.logoUrl || "/logo.png"} alt="Logo" className="w-6 h-6 object-contain" />
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-xl leading-none tracking-tight" style={{ color: "#7c2d12" }}>Tchoua</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#e68a00]">Solidarité Digitale</span>
+            <span className="font-black text-xl leading-none tracking-tight" style={{ color: "#7c2d12" }}>{brand?.siteName || "Tchoua"}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#e68a00]">{brand?.siteTagline || "Solidarité Digitale"}</span>
           </div>
         </Link>
 

@@ -1,248 +1,589 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { 
-  Settings, Save, ShieldCheck, Globe, Mail, 
-  Lock, Zap, Database, RefreshCw, CheckCircle2,
-  AlertCircle, DollarSign, ToggleLeft, ToggleRight,
-  Layout, Eye, Cloud, Trash2, Sliders
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Layout,
+  Lock, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, Sparkles,
+  ToggleLeft, ToggleRight, Wrench,
 } from "lucide-react";
+import { PlatformSettings } from "@/lib/platform-settings-shared";
+
+const TABS = [
+  { id: "general", label: "Identité", icon: Layout },
+  { id: "localization", label: "Localisation", icon: Globe },
+  { id: "access", label: "Accès & sécurité", icon: Lock },
+  { id: "limits", label: "Limites & finances", icon: Coins },
+  { id: "features", label: "Fonctionnalités", icon: Sparkles },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "maintenance", label: "Maintenance", icon: Wrench },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+const LANGUAGES = [
+  { code: "fr", label: "Français" },
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+  { code: "de", label: "Deutsch" },
+  { code: "it", label: "Italiano" },
+  { code: "pt", label: "Português" },
+  { code: "zh", label: "中文" },
+  { code: "ar", label: "العربية" },
+];
+
+const TIMEZONES = [
+  "Africa/Douala",
+  "Africa/Lagos",
+  "Africa/Abidjan",
+  "Africa/Nairobi",
+  "Europe/Paris",
+  "UTC",
+];
+
+const featureLabels: Array<{ key: keyof PlatformSettings["features"]; title: string; desc: string }> = [
+  { key: "marketplace", title: "Marketplace", desc: "Achats groupés et échanges entre membres" },
+  { key: "academy", title: "Académie", desc: "Formations et contenus pédagogiques" },
+  { key: "chat", title: "Chat de groupe", desc: "Messagerie par association" },
+  { key: "ai", title: "Conseils IA", desc: "Assistant et recommandations" },
+  { key: "gamification", title: "Gamification", desc: "Points, badges et niveaux" },
+  { key: "events", title: "Événements", desc: "Sorties et rencontres communautaires" },
+  { key: "templates", title: "Bibliothèque de modèles", desc: "Création d'associations depuis un modèle" },
+];
+
+function setDeep(obj: any, path: string, value: any) {
+  const parts = path.split(".");
+  const clone = { ...obj };
+  let cursor = clone;
+  for (let i = 0; i < parts.length - 1; i++) {
+    cursor[parts[i]] = { ...(cursor[parts[i]] ?? {}) };
+    cursor = cursor[parts[i]];
+  }
+  cursor[parts[parts.length - 1]] = value;
+  return clone;
+}
+
+const inputCls =
+  "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10";
+const labelCls = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500";
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<PlatformSettings | null>(null);
+  const [initial, setInitial] = useState("");
+  const [meta, setMeta] = useState<{ updatedAt: string | null; updatedBy: string | null } | null>(null);
+  const [tab, setTab] = useState<TabId>("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/settings");
-      if (res.ok) {
-        const data = await res.json();
-        setSettings(data.settings);
-      }
-    } catch (error) {
-      console.error(error);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Chargement impossible");
+      setSettings(data.settings);
+      setInitial(JSON.stringify(data.settings));
+      setMeta(data.meta ?? null);
+    } catch (error: any) {
+      setToast({ message: error.message, type: "error" });
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const dirty = useMemo(
+    () => Boolean(settings) && JSON.stringify(settings) !== initial,
+    [settings, initial]
+  );
+
+  const update = (path: string, value: any) =>
+    setSettings((current) => (current ? setDeep(current, path, value) : current));
+
+  const save = async () => {
+    if (!settings) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Enregistrement impossible");
+      setSettings(data.settings);
+      setInitial(JSON.stringify(data.settings));
+      setToast({ message: "Paramètres enregistrés", type: "success" });
+      load();
+    } catch (error: any) {
+      setToast({ message: error.message, type: "error" });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const saveSettings = async () => {
+  const reset = async () => {
+    if (!confirm("Réinitialiser tous les paramètres aux valeurs par défaut ?")) return;
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({ action: "RESET" }),
       });
-      if (res.ok) {
-        setToast({ message: "Paramètres enregistrés", type: "success" });
-      } else {
-        setToast({ message: "Erreur lors de l'enregistrement", type: "error" });
-      }
-    } catch (error) {
-      setToast({ message: "Erreur serveur", type: "error" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Réinitialisation impossible");
+      setSettings(data.settings);
+      setInitial(JSON.stringify(data.settings));
+      setToast({ message: "Paramètres réinitialisés", type: "success" });
+    } catch (error: any) {
+      setToast({ message: error.message, type: "error" });
     } finally {
       setSaving(false);
-      setTimeout(() => setToast(null), 3000);
     }
   };
 
-  const toggle = (key: string) => {
-    setSettings((prev: any) => ({ ...prev, [key]: !prev[key] }));
+  const exportConfig = () => {
+    if (!settings) return;
+    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `tchoua-settings-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (loading && !settings) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="flex min-h-[400px] items-center justify-center">
+        <RefreshCw className="h-7 w-7 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
+  if (!settings) {
+    return (
+      <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+        <AlertCircle className="mx-auto mb-3 h-8 w-8 text-red-500" />
+        <p className="text-sm font-medium text-red-700">Impossible de charger les paramètres.</p>
+        <button onClick={load} className="mt-4 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white">
+          Réessayer
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Toast */}
+    <div className="space-y-6 pb-12">
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-4 px-8 py-4 rounded-[2rem] shadow-2xl text-sm font-black transition-all animate-in slide-in-from-right border border-current/10 ${
-          toast.type === "success" ? "bg-emerald-600 text-white" : "bg-red-600 text-white"
-        }`}>
-          {toast.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+        <div
+          className={`fixed right-6 top-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-xl ${
+            toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
+          }`}
+        >
+          {toast.type === "success" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
           {toast.message}
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Paramètres Plateforme</h1>
-          <p className="text-sm font-medium text-gray-500 mt-1">Configurez le comportement global, la sécurité et l&apos;identité de TCHOUA.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Paramètres de la plateforme</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Configuration globale : identité, accès, limites, fonctionnalités et maintenance.
+            {meta?.updatedAt && (
+              <span className="ml-1 text-slate-400">
+                Dernière mise à jour : {new Date(meta.updatedAt).toLocaleString("fr-FR")}
+              </span>
+            )}
+          </p>
         </div>
-        
-        <button 
-          onClick={saveSettings}
-          disabled={saving}
-          className="flex items-center justify-center gap-3 px-10 py-5 rounded-2xl bg-slate-900 text-white text-sm font-black shadow-xl shadow-black/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
-        >
-          <Save className="w-5 h-5" />
-          {saving ? "Sauvegarde..." : "Enregistrer les Changements"}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={exportConfig}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <Download className="h-4 w-4" /> Exporter
+          </button>
+          <button
+            onClick={reset}
+            disabled={saving}
+            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+          >
+            <RotateCcw className="h-4 w-4" /> Réinitialiser
+          </button>
+          <button
+            onClick={save}
+            disabled={saving || !dirty}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? "Enregistrement…" : "Enregistrer"}
+          </button>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Navigation Tabs (Simulation) */}
-        <div className="lg:col-span-1 space-y-3">
-          {[
-            { id: 'general', label: 'Général', icon: Globe, active: true },
-            { id: 'security', label: 'Sécurité & Accès', icon: Lock, active: false },
-            { id: 'billing', label: 'Finances & Frais', icon: DollarSign, active: false },
-            { id: 'system', label: 'Maintenance & Logs', icon: Database, active: false },
-            { id: 'api', label: 'API & Intégrations', icon: Zap, active: false },
-          ].map((tab, i) => (
-            <button 
-              key={i}
-              className={`w-full flex items-center gap-4 px-6 py-5 rounded-3xl text-sm font-black transition-all ${
-                tab.active 
-                  ? "bg-blue-600 text-white shadow-xl shadow-blue-500/20" 
-                  : "bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 border border-gray-100"
-              }`}
-            >
-              <tab.icon className="w-5 h-5" />
-              {tab.label}
-              {tab.active && <Sliders className="w-4 h-4 ml-auto opacity-50" />}
-            </button>
-          ))}
-          
-          <div className="mt-8 p-6 rounded-[2.5rem] bg-amber-50 border border-amber-100">
-            <div className="flex items-center gap-3 text-amber-600 mb-3">
-              <AlertCircle className="w-5 h-5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Zone de Danger</span>
-            </div>
-            <button className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-white text-red-600 text-xs font-black shadow-sm border border-red-100 hover:bg-red-50 transition-all">
-              <Trash2 className="w-4 h-4" />
-              Vider le Cache Système
-            </button>
-          </div>
+      {dirty && (
+        <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
+          <AlertCircle className="h-4 w-4" />
+          Modifications non enregistrées.
         </div>
+      )}
 
-        {/* Settings Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Identity */}
-          <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8">
-            <h2 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <Layout className="w-6 h-6 text-blue-600" />
-              Identité du Site
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Nom de la Plateforme</label>
-                <input 
-                  type="text" 
-                  value={settings.siteName}
-                  onChange={e => setSettings((s: any) => ({ ...s, siteName: e.target.value }))}
-                  className="w-full bg-gray-50 border border-transparent rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:bg-white focus:border-blue-600/20 transition-all"
-                />
-              </div>
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Email Support</label>
-                <input 
-                  type="email" 
-                  value={settings.supportEmail}
-                  onChange={e => setSettings((s: any) => ({ ...s, supportEmail: e.target.value }))}
-                  className="w-full bg-gray-50 border border-transparent rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:bg-white focus:border-blue-600/20 transition-all"
-                />
-              </div>
-            </div>
-          </div>
+      <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+        <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
+          {TABS.map((item) => {
+            const active = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                className={`flex flex-shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                  active
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+                }`}
+              >
+                <item.icon className={`h-4 w-4 ${active ? "text-indigo-300" : "text-slate-400"}`} />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Business Rules */}
-          <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8">
-            <h2 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <Sliders className="w-6 h-6 text-emerald-600" />
-              Règles Métier &amp; Limites
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Taux de Commission (%)</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    value={settings.commissionRate}
-                    onChange={e => setSettings((s: any) => ({ ...s, commissionRate: parseFloat(e.target.value) }))}
-                    className="w-full bg-gray-50 border border-transparent rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-600/5 focus:bg-white focus:border-emerald-600/20 transition-all"
-                  />
-                  <div className="absolute right-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black">%</div>
+        <div className="space-y-6">
+          {tab === "general" && (
+            <Section title="Identité de la plateforme" icon={Layout} desc="Nom, logo et coordonnées affichés publiquement.">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Nom de la plateforme">
+                  <input className={inputCls} value={settings.siteName} onChange={(e) => update("siteName", e.target.value)} />
+                </Field>
+                <Field label="Slogan">
+                  <input className={inputCls} value={settings.siteTagline} onChange={(e) => update("siteTagline", e.target.value)} />
+                </Field>
+                <Field label="Email de support">
+                  <input type="email" className={inputCls} value={settings.supportEmail} onChange={(e) => update("supportEmail", e.target.value)} />
+                </Field>
+                <Field label="Téléphone de support">
+                  <input className={inputCls} value={settings.supportPhone} onChange={(e) => update("supportPhone", e.target.value)} />
+                </Field>
+                <Field label="URL du logo">
+                  <input className={inputCls} value={settings.logoUrl} onChange={(e) => update("logoUrl", e.target.value)} placeholder="https://…/logo.png" />
+                </Field>
+                <Field label="Couleur principale">
+                  <div className="flex gap-2">
+                    <input type="color" value={settings.primaryColor} onChange={(e) => update("primaryColor", e.target.value)} className="h-10 w-12 cursor-pointer rounded-lg border border-slate-200" />
+                    <input className={inputCls} value={settings.primaryColor} onChange={(e) => update("primaryColor", e.target.value)} />
+                  </div>
+                </Field>
+              </div>
+            </Section>
+          )}
+
+          {tab === "localization" && (
+            <Section title="Localisation" icon={Globe} desc="Devise, fuseau horaire, langues et format des dates.">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Devise par défaut">
+                  <select className={inputCls} value={settings.defaultCurrency} onChange={(e) => update("defaultCurrency", e.target.value)}>
+                    <option value="XAF">FCFA (XAF)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="USD">Dollar (USD)</option>
+                    <option value="GBP">Livre (GBP)</option>
+                  </select>
+                </Field>
+                <Field label="Fuseau horaire">
+                  <select className={inputCls} value={settings.timezone} onChange={(e) => update("timezone", e.target.value)}>
+                    {TIMEZONES.map((tz) => (
+                      <option key={tz} value={tz}>{tz}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Format des dates">
+                  <select className={inputCls} value={settings.dateFormat} onChange={(e) => update("dateFormat", e.target.value)}>
+                    <option value="DD/MM/YYYY">JJ/MM/AAAA</option>
+                    <option value="MM/DD/YYYY">MM/JJ/AAAA</option>
+                    <option value="YYYY-MM-DD">AAAA-MM-JJ</option>
+                  </select>
+                </Field>
+              </div>
+              <div className="mt-4">
+                <label className={labelCls}>Langues disponibles</label>
+                <div className="flex flex-wrap gap-2">
+                  {LANGUAGES.map((lang) => {
+                    const active = settings.languages.includes(lang.code);
+                    return (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() =>
+                          update(
+                            "languages",
+                            active
+                              ? settings.languages.filter((l) => l !== lang.code)
+                              : [...settings.languages, lang.code]
+                          )
+                        }
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                          active
+                            ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                            : "border-slate-200 bg-white text-slate-500 hover:border-indigo-200"
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Devise par défaut</label>
-                <select 
-                  value={settings.defaultCurrency}
-                  onChange={e => setSettings((s: any) => ({ ...s, defaultCurrency: e.target.value }))}
-                  className="w-full bg-gray-50 border border-transparent rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-600/5 focus:bg-white focus:border-emerald-600/20 transition-all appearance-none"
-                >
-                  <option value="FCFA">FCFA (XAF)</option>
-                  <option value="EUR">Euro (EUR)</option>
-                  <option value="USD">Dollar (USD)</option>
-                </select>
-              </div>
-            </div>
+            </Section>
+          )}
 
-            <div className="space-y-6">
-              {[
-                { id: 'kycRequired', label: 'Vérification KYC obligatoire', icon: ShieldCheck, color: 'text-blue-500' },
-                { id: 'allowRegistration', label: 'Autoriser les nouvelles inscriptions', icon: Zap, color: 'text-amber-500' },
-                { id: 'maintenanceMode', label: 'Mode Maintenance (Public)', icon: AlertCircle, color: 'text-red-500' },
-              ].map((opt, i) => (
-                <div key={i} className="flex items-center justify-between p-6 rounded-[2rem] bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-xl bg-white flex items-center justify-center ${opt.color} shadow-sm`}>
-                      <opt.icon className="w-5 h-5" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-700">{opt.label}</span>
-                  </div>
-                  <button onClick={() => toggle(opt.id)} className="transition-transform active:scale-90">
-                    {settings[opt.id] 
-                      ? <ToggleRight className="w-12 h-12 text-blue-600" /> 
-                      : <ToggleLeft className="w-12 h-12 text-gray-300" />
+          {tab === "access" && (
+            <Section title="Accès & sécurité" icon={Lock} desc="Inscriptions, vérification et politique de sécurité.">
+              <div className="space-y-3">
+                <Toggle
+                  title="Autoriser les nouvelles inscriptions"
+                  desc="Si désactivé, l'API d'inscription refuse toute création de compte."
+                  checked={settings.allowRegistration}
+                  onChange={(v) => update("allowRegistration", v)}
+                />
+                <Toggle
+                  title="Vérification email obligatoire"
+                  desc="Demande la confirmation de l'adresse email à l'inscription."
+                  checked={settings.requireEmailVerification}
+                  onChange={(v) => update("requireEmailVerification", v)}
+                />
+                <Toggle
+                  title="2FA obligatoire pour les administrateurs"
+                  desc="Renforce l'accès à la console d'administration."
+                  checked={settings.security.require2FAForAdmins}
+                  onChange={(v) => update("security.require2FAForAdmins", v)}
+                />
+              </div>
+              <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                <Field label="Expiration de session (min)">
+                  <input type="number" min={5} className={inputCls} value={settings.security.sessionTimeoutMinutes}
+                    onChange={(e) => update("security.sessionTimeoutMinutes", Number(e.target.value))} />
+                </Field>
+                <Field label="Tentatives de connexion max">
+                  <input type="number" min={1} className={inputCls} value={settings.security.maxLoginAttempts}
+                    onChange={(e) => update("security.maxLoginAttempts", Number(e.target.value))} />
+                </Field>
+                <Field label="Longueur minimale du mot de passe">
+                  <input type="number" min={6} className={inputCls} value={settings.security.passwordMinLength}
+                    onChange={(e) => update("security.passwordMinLength", Number(e.target.value))} />
+                </Field>
+              </div>
+            </Section>
+          )}
+
+          {tab === "limits" && (
+            <Section title="Limites & finances" icon={Coins} desc="Plafonds appliqués aux membres, associations et prêts.">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field label="Associations max / membre">
+                  <input type="number" min={1} className={inputCls} value={settings.maxAssociationsPerMember}
+                    onChange={(e) => update("maxAssociationsPerMember", Number(e.target.value))} />
+                </Field>
+                <Field label="Membres max / association">
+                  <input type="number" min={1} className={inputCls} value={settings.maxMembersPerAssociation}
+                    onChange={(e) => update("maxMembersPerAssociation", Number(e.target.value))} />
+                </Field>
+                <Field label="Prêts actifs max / membre">
+                  <input type="number" min={1} className={inputCls} value={settings.maxLoansPerMember}
+                    onChange={(e) => update("maxLoansPerMember", Number(e.target.value))} />
+                </Field>
+                <Field label="Commission plateforme (%)">
+                  <input type="number" min={0} step={0.1} className={inputCls} value={settings.defaultCommissionRate}
+                    onChange={(e) => update("defaultCommissionRate", Number(e.target.value))} />
+                </Field>
+                <Field label="Taux de prêt par défaut (%)">
+                  <input type="number" min={0} step={0.1} className={inputCls} value={settings.defaultLoanRate}
+                    onChange={(e) => update("defaultLoanRate", Number(e.target.value))} />
+                </Field>
+                <Field label="Pénalité de retard (%)">
+                  <input type="number" min={0} step={0.5} className={inputCls} value={settings.latePenaltyPercent}
+                    onChange={(e) => update("latePenaltyPercent", Number(e.target.value))} />
+                </Field>
+              </div>
+              <p className="mt-4 text-xs text-slate-500">
+                La limite d&apos;associations s&apos;applique immédiatement à la création et à l&apos;adhésion.
+              </p>
+            </Section>
+          )}
+
+          {tab === "features" && (
+            <Section title="Fonctionnalités" icon={Sparkles} desc="Activez ou masquez les modules de l'espace membre.">
+              <div className="space-y-3">
+                {featureLabels.map((feature) => (
+                  <Toggle
+                    key={feature.key}
+                    title={feature.title}
+                    desc={feature.desc}
+                    checked={settings.features[feature.key]}
+                    onChange={(v) => update(`features.${feature.key}`, v)}
+                  />
+                ))}
+              </div>
+            </Section>
+          )}
+
+          {tab === "notifications" && (
+            <Section title="Notifications" icon={Bell} desc="Canaux et délais de rappel des échéances.">
+              <div className="space-y-3">
+                <Toggle title="Notifications email" desc="Envoi par email (si un fournisseur SMTP est configuré)." checked={settings.notifications.emailEnabled} onChange={(v) => update("notifications.emailEnabled", v)} />
+                <Toggle title="Notifications SMS" desc="Envoi par SMS (fournisseur à connecter)." checked={settings.notifications.smsEnabled} onChange={(v) => update("notifications.smsEnabled", v)} />
+                <Toggle title="Notifications push" desc="Notifications in-app et push." checked={settings.notifications.pushEnabled} onChange={(v) => update("notifications.pushEnabled", v)} />
+              </div>
+              <div className="mt-5">
+                <Field label="Rappels avant échéance (jours, séparés par des virgules)">
+                  <input
+                    className={inputCls}
+                    value={settings.notifications.reminderOffsets.join(", ")}
+                    onChange={(e) =>
+                      update(
+                        "notifications.reminderOffsets",
+                        e.target.value
+                          .split(",")
+                          .map((v) => Number(v.trim()))
+                          .filter((v) => Number.isFinite(v) && v >= 0)
+                      )
                     }
+                  />
+                </Field>
+              </div>
+            </Section>
+          )}
+
+          {tab === "maintenance" && (
+            <div className="space-y-6">
+              <Section title="Maintenance" icon={Wrench} desc="Affiche un bandeau public et bloque les inscriptions.">
+                <Toggle
+                  title="Mode maintenance"
+                  desc="Bandeau visible sur le site public ; les inscriptions sont suspendues."
+                  checked={settings.maintenanceMode}
+                  onChange={(v) => update("maintenanceMode", v)}
+                />
+                <div className="mt-4">
+                  <Field label="Message affiché">
+                    <textarea
+                      className={`${inputCls} min-h-[100px]`}
+                      value={settings.maintenanceMessage}
+                      onChange={(e) => update("maintenanceMessage", e.target.value)}
+                    />
+                  </Field>
+                </div>
+              </Section>
+
+              <Section title="Configuration technique" icon={Cloud} desc="Valeurs chargées par l'application.">
+                <div className="grid gap-3 text-sm sm:grid-cols-2">
+                  <Info label="Fuseau horaire" value={settings.timezone} />
+                  <Info label="Devise" value={settings.defaultCurrency} />
+                  <Info label="Rappels" value={settings.notifications.reminderOffsets.map((o) => (o === 0 ? "Jour J" : `J-${o}`)).join(", ")} />
+                  <Info label="Dernière mise à jour" value={meta?.updatedAt ? new Date(meta.updatedAt).toLocaleString("fr-FR") : "—"} />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button onClick={exportConfig} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    <Download className="h-4 w-4" /> Exporter la configuration
+                  </button>
+                  <button onClick={reset} className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+                    <RotateCcw className="h-4 w-4" /> Réinitialiser
                   </button>
                 </div>
-              ))}
+              </Section>
             </div>
-          </div>
+          )}
 
-          {/* Server Info */}
-          <div className="p-8 rounded-[3rem] bg-slate-900 text-white flex items-center justify-between">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
-                <Cloud className="w-7 h-7 text-blue-400" />
-              </div>
-              <div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Infrastructure</div>
-                <div className="text-lg font-black tracking-tight">Cloud Instance : Tchoua-SRV-01</div>
-                <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-emerald-400 uppercase">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                  Service Actif (Uptime 99.9%)
-                </div>
-              </div>
+          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Settings2 className="h-4 w-4" /> Les paramètres sont enregistrés en base et audités.
             </div>
-            
-            <div className="hidden sm:block text-right">
-              <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Version Logicielle</div>
-              <div className="text-xl font-black opacity-50">v2.4.0-stable</div>
-            </div>
+            <button
+              onClick={save}
+              disabled={saving || !dirty}
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Enregistrer
+            </button>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Section({
+  title, desc, icon: Icon, children,
+}: {
+  title: string; desc?: string; icon: any; children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-5 flex items-start gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <Icon className="h-4 w-4" />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-slate-900">{title}</h2>
+          {desc && <p className="text-xs text-slate-500">{desc}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Toggle({
+  title, desc, checked, onChange,
+}: {
+  title: string; desc: string; checked: boolean; onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3">
+      <div>
+        <div className="text-sm font-semibold text-slate-800">{title}</div>
+        <div className="text-xs text-slate-500">{desc}</div>
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange(!checked)}
+        aria-pressed={checked}
+        className="flex-shrink-0"
+      >
+        {checked ? (
+          <ToggleRight className="h-9 w-9 text-indigo-600" />
+        ) : (
+          <ToggleLeft className="h-9 w-9 text-slate-300" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-slate-50 px-4 py-3">
+      <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+      <div className="font-medium text-slate-800">{value}</div>
     </div>
   );
 }

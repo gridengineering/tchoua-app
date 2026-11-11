@@ -30,6 +30,18 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  // ─── API Admin : session + rôle système obligatoires ─────────────────────
+  if (pathname.startsWith("/api/admin")) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+    if (!token.systemRoleId) {
+      return NextResponse.json({ error: "Accès réservé aux utilisateurs système" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
   // ─── Routes Protégées (Membre) ───────────────────────────────────────────
   const protectedPaths = [
     "/dashboard", "/association", "/tontines", "/membres", "/cotisations",
@@ -54,6 +66,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
+    "/api/admin/:path*",
     "/dashboard/:path*",
     "/association/:path*",
     "/tontines/:path*",

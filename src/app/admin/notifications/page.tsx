@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Bell, Send, Users, Building2, AlertTriangle, 
   CheckCircle2, Clock, History, Search, X,
-  Megaphone, Info, RefreshCw
+  Megaphone, Info, RefreshCw, ShieldCheck
 } from "lucide-react";
 
 export default function AdminNotificationsPage() {
@@ -13,9 +13,22 @@ export default function AdminNotificationsPage() {
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ title: "", message: "", target: "ALL" });
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [mode, setMode] = useState<"ALL" | "ASSOCIATION" | "ROLE">("ALL");
+  const [targetId, setTargetId] = useState("");
+  const [associations, setAssociations] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
+
+  const TEMPLATES = [
+    { id: "maintenance", label: "Maintenance planifiée", title: "Maintenance planifiée", message: "Une maintenance est prévue. La plateforme sera indisponible pendant quelques minutes. Merci de votre compréhension." },
+    { id: "release", label: "Nouvelle version", title: "Nouvelle version disponible", message: "De nouvelles fonctionnalités sont disponibles sur Tchoua. Découvrez-les dès maintenant." },
+    { id: "cotisation", label: "Rappel cotisation", title: "Rappel de cotisation", message: "Pensez à régler votre cotisation avant la prochaine session. Merci pour votre engagement." },
+    { id: "security", label: "Alerte sécurité", title: "Alerte sécurité", message: "Une activité inhabituelle a été détectée. Nous vous invitons à vérifier vos paramètres de sécurité." },
+  ];
 
   useEffect(() => {
     fetchHistory();
+    fetch("/api/admin/associations").then((r) => (r.ok ? r.json() : null)).then((d) => setAssociations(d?.associations ?? [])).catch(() => {});
+    fetch("/api/admin/roles").then((r) => (r.ok ? r.json() : null)).then((d) => setRoles(d?.roles ?? [])).catch(() => {});
   }, []);
 
   const fetchHistory = async () => {
@@ -35,16 +48,23 @@ export default function AdminNotificationsPage() {
 
   const handleSend = async () => {
     if (!form.title || !form.message) return;
+    if (mode !== "ALL" && !targetId) {
+      setToast({ message: "Sélectionnez une cible", type: "error" });
+      return;
+    }
     setSending(true);
     try {
+      const target = mode === "ALL" ? "ALL" : mode === "ROLE" ? `ROLE:${targetId}` : targetId;
       const res = await fetch("/api/admin/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, target }),
       });
       if (res.ok) {
         setToast({ message: "Notification envoyée avec succès", type: "success" });
         setForm({ title: "", message: "", target: "ALL" });
+        setMode("ALL");
+        setTargetId("");
         fetchHistory();
       } else {
         setToast({ message: "Erreur lors de l'envoi", type: "error" });
@@ -91,33 +111,55 @@ export default function AdminNotificationsPage() {
           <div className="space-y-6">
             <div>
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Cible de diffusion</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => setForm(f => ({ ...f, target: "ALL" }))}
-                  className={`flex items-center justify-center gap-3 py-4 rounded-2xl border-2 transition-all ${
-                    form.target === "ALL" 
-                      ? "border-blue-600 bg-blue-50 text-blue-600" 
-                      : "border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200"
-                  }`}
-                >
-                  <Users className="w-5 h-5" />
-                  <span className="text-sm font-black">Tous les Utilisateurs</span>
-                </button>
-                <button 
-                  onClick={() => setForm(f => ({ ...f, target: "SELECT" }))}
-                  className={`flex items-center justify-center gap-3 py-4 rounded-2xl border-2 transition-all ${
-                    form.target === "SELECT" 
-                      ? "border-blue-600 bg-blue-50 text-blue-600" 
-                      : "border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200"
-                  }`}
-                >
-                  <Building2 className="w-5 h-5" />
-                  <span className="text-sm font-black">Associations</span>
-                </button>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { key: "ALL", label: "Tous", icon: Users },
+                  { key: "ASSOCIATION", label: "Association", icon: Building2 },
+                  { key: "ROLE", label: "Rôle système", icon: ShieldCheck },
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => { setMode(item.key as any); setTargetId(""); }}
+                    className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 py-3 transition-all ${
+                      mode === item.key
+                        ? "border-blue-600 bg-blue-50 text-blue-700"
+                        : "border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="text-xs font-semibold">{item.label}</span>
+                  </button>
+                ))}
               </div>
+              {mode !== "ALL" && (
+                <select
+                  value={targetId}
+                  onChange={(e) => setTargetId(e.target.value)}
+                  className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm"
+                >
+                  <option value="">— Sélectionner —</option>
+                  {(mode === "ASSOCIATION" ? associations : roles).map((item) => (
+                    <option key={item.id} value={item.id}>{item.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Modèle de message</label>
+              <select
+                onChange={(e) => {
+                  const tpl = TEMPLATES.find((t) => t.id === e.target.value);
+                  if (tpl) setForm((f) => ({ ...f, title: tpl.title, message: tpl.message }));
+                }}
+                defaultValue=""
+                className="mb-4 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm"
+              >
+                <option value="" disabled>Choisir un modèle…</option>
+                {TEMPLATES.map((t) => (
+                  <option key={t.id} value={t.id}>{t.label}</option>
+                ))}
+              </select>
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Titre de l&apos;alerte</label>
               <input 
                 type="text"
@@ -148,7 +190,7 @@ export default function AdminNotificationsPage() {
 
             <button 
               onClick={handleSend}
-              disabled={sending || !form.title || !form.message}
+              disabled={sending || !form.title || !form.message || (mode !== "ALL" && !targetId)}
               className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl bg-slate-900 text-white text-sm font-black shadow-xl shadow-black/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Send className="w-5 h-5" />

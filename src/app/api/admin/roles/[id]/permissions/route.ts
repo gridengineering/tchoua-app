@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireSystemAdmin } from "@/lib/admin-auth";
 
 // PUT /api/admin/roles/[id]/permissions — mettre à jour les permissions d'un rôle
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const guard = await requireSystemAdmin("ROLES", "UPDATE");
+  if (!guard.ok) return guard.response;
+
   try {
     const { id } = await params;
     const body = await request.json();

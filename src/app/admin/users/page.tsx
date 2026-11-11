@@ -60,6 +60,7 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", systemRoleId: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -116,13 +117,14 @@ export default function AdminUsersPage() {
       
       if (res.ok) {
         setShowModal(false);
+        setToast({ message: editingUser ? "Utilisateur mis à jour" : "Utilisateur créé", type: "success" });
         fetchData();
       } else {
         const data = await res.json();
-        alert(data.error || "Une erreur est survenue");
+        setToast({ message: data.error || "Une erreur est survenue", type: "error" });
       }
     } catch (err) {
-      alert("Erreur réseau");
+      setToast({ message: "Erreur réseau", type: "error" });
     } finally {
       setSubmitting(false);
     }
@@ -135,9 +137,15 @@ export default function AdminUsersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !user.isActive })
       });
-      if (res.ok) fetchData();
+      if (res.ok) {
+        setToast({ message: user.isActive ? "Compte désactivé" : "Compte réactivé", type: "success" });
+        fetchData();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setToast({ message: data.error || "Action impossible", type: "error" });
+      }
     } catch (err) {
-      alert("Erreur réseau");
+      setToast({ message: "Erreur réseau", type: "error" });
     }
   };
 
@@ -149,6 +157,14 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {toast && (
+        <div className={`fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-xl ${
+          toast.type === "success" ? "bg-emerald-600" : "bg-red-600"
+        }`}>
+          {toast.type === "success" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+          {toast.message}
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -357,16 +373,14 @@ export default function AdminUsersPage() {
                 placeholder="jean.dupont@tchoua.com"
               />
 
-              {!editingUser && (
-                  <Input 
-                    label="Mot de passe temporaire"
-                    required
-                    type="password" 
-                    value={form.password}
-                    onChange={e => setForm({...form, password: e.target.value})}
-                    placeholder="••••••••"
-                  />
-              )}
+              <Input
+                label={editingUser ? "Nouveau mot de passe (optionnel)" : "Mot de passe temporaire"}
+                required={!editingUser}
+                type="password"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                placeholder={editingUser ? "Laisser vide pour conserver l'actuel" : "••••••••"}
+              />
 
               <Select 
                 label="Rôle Système"
