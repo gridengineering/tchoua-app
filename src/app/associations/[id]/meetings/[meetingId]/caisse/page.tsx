@@ -95,16 +95,19 @@ export default function MeetingCaissePage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <Link
-            href={`/associations/${id}/meetings`}
+            href={`/associations/${id}/reunions/${meetingId}`}
             className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#0d3d28]"
           >
             <ArrowLeft className="w-4 h-4" /> Retour aux réunions
           </Link>
           
-          <button className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-black">
+          <Link
+            href={`/associations/${id}/rapports`}
+            className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-black"
+          >
             <FileText className="w-4 h-4" />
-            Rapport PDF de fin de session
-          </button>
+            Rapports de session
+          </Link>
         </div>
 
         {/* KPIs Dashboard */}

@@ -829,6 +829,7 @@ model Association {
   webhooks      AssociationWebhook[]
   mandates      MandatePeriod[]
   reportSchedules ReportSchedule[]
+  dividendRuns  AssociationDividendRun[]
 
   @@map("associations")
 }
@@ -868,6 +869,7 @@ model AssociationMembership {
   activitySubs    ActivitySubscription[]
   meetingAttendances AssocMeetingAttendance[]
   meetingFines    AssocMeetingFine[]
+  collations      AssocMeetingCollation[]
   loans           AssocLoan[]
   contributions   ActivityContribution[]
   beneficiaries   ActivityBeneficiary[]
@@ -882,6 +884,7 @@ model AssociationMembership {
   mandates        MandatePeriod[]
   notifs          AssociationNotification[]
   approvalVotes   ApprovalVote[]
+  dividendShares  AssociationDividendShare[]
 
   // Rôle personnalisé optionnel (cumulatif avec role de base)
   customRoleId    String?
@@ -1121,6 +1124,10 @@ model AssocMeeting {
   quorumRequired  Int?     // pourcentage minimum
   quorumReached   Boolean  @default(false)
   attendeeCount   Int?
+  // Collation (Module 3.1) — collecte automatique + reversement à l'hôte
+  collationRate              Float?
+  collationHostMembershipId  String?
+  collationStatus            String   @default("NONE") // NONE, OPEN, CLOSED
   minutesUrl      String?
   notes           String?
   agenda          String?  // JSON: [{ title, duration, presenter }]
@@ -1130,6 +1137,7 @@ model AssocMeeting {
   association   Association @relation(fields: [associationId], references: [id])
   attendances   AssocMeetingAttendance[]
   fines         AssocMeetingFine[]
+  collations    AssocMeetingCollation[]
   sessionContributions AssocSessionContribution[]
   sanctions     AssocSanction[]
   waiverRequests AssocWaiverRequest[]
@@ -1170,6 +1178,26 @@ model AssocMeetingFine {
   membership AssociationMembership @relation(fields: [membershipId], references: [id])
 
   @@map("assoc_meeting_fines")
+}
+
+/// Collation (Module 3.1) : cotisation de collation par membre, avec reversement
+/// forfaitaire à l'hôte de la réunion, déduction faite de ses propres arriérés.
+model AssocMeetingCollation {
+  id           String   @id @default(cuid())
+  meetingId    String
+  membershipId String
+  amount       Float
+  paid         Boolean  @default(false)
+  paidAt       DateTime?
+  method       String?  // CASH, MOBILE_MONEY, BANK
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  meeting      AssocMeeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  membership   AssociationMembership @relation(fields: [membershipId], references: [id])
+
+  @@unique([meetingId, membershipId])
+  @@map("assoc_meeting_collations")
 }
 
 // ─── Aides Sociales (avec plafonds par catégorie) ─────────────────────────
@@ -1839,4 +1867,42 @@ model WalletTransaction {
   wallet        Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@map("wallet_transactions")
+}
+
+// ─── Répartition des bénéfices / Dividendes (Module 6.5) ────────────────────
+
+/// Exercice annuel de répartition des intérêts encaissés au prorata du capital.
+model AssociationDividendRun {
+  id            String   @id @default(cuid())
+  associationId String
+  year          Int
+  totalInterest Float    @default(0)
+  totalCapital  Float    @default(0)
+  status        String   @default("DRAFT") // DRAFT, POSTED
+  createdById   String?
+  createdAt     DateTime @default(now())
+  postedAt      DateTime?
+
+  association Association                @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  shares      AssociationDividendShare[]
+
+  @@unique([associationId, year])
+  @@map("association_dividend_runs")
+}
+
+model AssociationDividendShare {
+  id            String    @id @default(cuid())
+  runId         String
+  membershipId  String
+  capital       Float     @default(0)
+  interestShare Float     @default(0)
+  eligible      Boolean   @default(true)
+  credited      Boolean   @default(false)
+  creditedAt    DateTime?
+
+  run        AssociationDividendRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  membership AssociationMembership  @relation(fields: [membershipId], references: [id])
+
+  @@unique([runId, membershipId])
+  @@map("association_dividend_shares")
 }

@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, Plus, Download, CheckCircle, Clock, XCircle, BarChart2, Users, Vault, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { AuctionManager } from "@/components/associations/activities/AuctionManager";
 import { DrawManager } from "@/components/associations/activities/DrawManager";
 
@@ -38,9 +39,9 @@ export default function ActivityPage() {
       fetch(`/api/associations/${id}/activities/${actId}/contributions`).then(r => r.json()),
       fetch(`/api/associations/${id}`).then(r => r.json()),
     ]).then(([act, sess, contribs, assocData]) => {
-      setActivity(act);
-      setSessions(Array.isArray(sess) ? sess : []);
-      setContributions(Array.isArray(contribs) ? contribs : []);
+      setActivity(act?.activity ?? act);
+      setSessions(sess?.sessions ?? (Array.isArray(sess) ? sess : []));
+      setContributions(contribs?.contributions ?? (Array.isArray(contribs) ? contribs : []));
       if (assocData?.association?.memberships) {
         setMembers(assocData.association.memberships.map((m: any) => ({ id: m.id, name: m.user.name })));
       }
@@ -53,7 +54,7 @@ export default function ActivityPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ scheduledAt: sessionForm.scheduledAt, notes: sessionForm.notes, potAmount: parseFloat(sessionForm.potAmount) || null }),
     });
-    if (res.ok) { const s = await res.json(); setSessions(p => [s, ...p]); setShowSessionModal(false); }
+    if (res.ok) { const json = await res.json(); const s = json.session ?? json; setSessions(p => [s, ...p]); setShowSessionModal(false); }
   };
 
   const handlePayment = async () => {
@@ -61,7 +62,7 @@ export default function ActivityPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...paymentForm, amount: parseFloat(paymentForm.amount) || 0 }),
     });
-    if (res.ok) { const c = await res.json(); setContributions(p => [c, ...p]); setShowPaymentModal(false); }
+    if (res.ok) { const json = await res.json(); const c = json.contribution ?? json; setContributions(p => [c, ...p]); setShowPaymentModal(false); }
   };
 
   const handleAuctionComplete = async (sessionId: string, result: any) => {
@@ -135,6 +136,9 @@ export default function ActivityPage() {
               )}
             </div>
             <div className="flex gap-2 flex-shrink-0">
+              <Link href={`/associations/${id}/activities/${actId}/edit`} className="px-3 py-1.5 rounded-lg text-sm font-medium border flex items-center" style={{ borderColor: "#d6d3d1", color: "#57534e" }}>
+                Modifier
+              </Link>
               <button onClick={() => setShowPaymentModal(true)} className="px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
                 Enregistrer paiement
               </button>

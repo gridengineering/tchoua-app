@@ -92,6 +92,7 @@ export function Sidebar({ collapsed, onToggle, user }: SidebarProps) {
     { href: `/associations/${currentAssocId}/aides`,        label: "Solidarité",     icon: Heart },
     { href: `/associations/${currentAssocId}/reunions`,     label: "Sessions",       icon: RotateCcw },
     { href: `/associations/${currentAssocId}/rapports`,     label: "Rapports",       icon: BarChart3 },
+    { href: `/associations/${currentAssocId}/dividendes`,   label: "Dividendes",     icon: Coins },
     { href: `/associations/${currentAssocId}?tab=members`,  label: "Membres",        icon: Users },
   ] : [];
 

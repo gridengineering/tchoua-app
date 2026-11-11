@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Activity, Plus, ChevronLeft, Search, Filter, ArrowRight, Users, PiggyBank, Landmark, Heart, Coins } from "lucide-react";
+import Link from "next/link";
+import { Activity, Plus, Search, ArrowRight, PiggyBank, Landmark, Heart, Coins } from "lucide-react";
 import { formatCurrency, getFrequencyLabel } from "@/lib/utils";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
@@ -52,7 +53,11 @@ export default function ActivitiesPage() {
 
   const filtered = useMemo(() => {
     return activities.filter(a => {
-      const matchesType = !typeFilter || a.type.includes(typeFilter);
+      const matchesType = !typeFilter ||
+        (typeFilter === "TONTINE" && a.type.startsWith("TONTINE")) ||
+        (typeFilter === "SAVINGS" && (a.type === "EPARGNE" || a.type === "INVESTISSEMENT")) ||
+        (typeFilter === "AIDE_SOLIDAIRE" && (a.type === "AIDE_SOLIDAIRE" || a.type === "SOLIDARITY")) ||
+        a.type === typeFilter;
       const matchesSearch = a.name.toLowerCase().includes(search.toLowerCase());
       return matchesType && matchesSearch;
     });
@@ -79,9 +84,9 @@ export default function ActivitiesPage() {
                 pour toutes les activités de cette association.
               </p>
             </div>
-            <button className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 whitespace-nowrap self-start md:self-center">
+            <Link href={`/associations/${id}/activities/new`} className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 whitespace-nowrap self-start md:self-center">
               <Plus className="w-4 h-4" /> Nouvelle activité
-            </button>
+            </Link>
           </div>
         </div>
 

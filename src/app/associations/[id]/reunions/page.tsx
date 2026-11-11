@@ -1,18 +1,21 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { RotateCcw, Plus, ChevronLeft, MapPin, Calendar, Clock, Users, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
-type MeetingStatus = "SCHEDULED" | "HELD" | "CANCELLED";
+type MeetingStatus = "PLANNED" | "HELD" | "CANCELLED";
 
 interface AssocMeetingT {
   id: string;
-  title: string;
-  date: string;
+  title: string | null;
+  scheduledAt: string;
+  type?: string;
   location?: string | null;
   status: MeetingStatus;
+  collationStatus?: string;
   _count?: { attendances: number };
 }
 
@@ -36,7 +39,7 @@ export default function ReunionsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const sortedMeetings = [...meetings].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedMeetings = [...meetings].sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
 
   return (
     <DashboardLayout title="Sessions & Réunions">
@@ -56,9 +59,9 @@ export default function ReunionsPage() {
                 accédez aux rapports des sessions passées de votre association.
               </p>
             </div>
-            <button className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 whitespace-nowrap self-start md:self-center">
+            <Link href={`/associations/${assocId}/reunions/new`} className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 whitespace-nowrap self-start md:self-center">
               <Plus className="w-4 h-4" /> Planifier une session
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -77,7 +80,7 @@ export default function ReunionsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sortedMeetings.map(m => {
-              const date = new Date(m.date);
+              const date = new Date(m.scheduledAt);
               const isPast = date < new Date();
               
               return (

@@ -21,7 +21,7 @@ type MembershipConfig = {
   ageMin: string; sponsorshipRequired: boolean; sponsorshipCount: number;
   admissionFee: string; approvalProcess: "UNANIMOUS" | "MAJORITY" | "AUTO"; waitingPeriod: string;
 };
-type MeetingConfig = { frequency: "MONTHLY" | "QUARTERLY"; dayOfWeek: number; hour: number; quorumPercent: number };
+type MeetingConfig = { frequency: "MONTHLY" | "QUARTERLY"; dayOfWeek: number; hour: number; quorumPercent: number; collationRate: number; collationHostPayout: number };
 type SocialAidCaps = {
   illness_member: string; illness_spouse: string; death_member: string; death_spouse: string;
   death_child_under5: string; death_child_over5: string; death_parent: string;
@@ -55,7 +55,7 @@ const emptyMembership = (): MembershipConfig => ({
   ageMin: "", sponsorshipRequired: false, sponsorshipCount: 1,
   admissionFee: "", approvalProcess: "MAJORITY", waitingPeriod: "",
 });
-const emptyMeeting = (): MeetingConfig => ({ frequency: "MONTHLY", dayOfWeek: 6, hour: 15, quorumPercent: 60 });
+const emptyMeeting = (): MeetingConfig => ({ frequency: "MONTHLY", dayOfWeek: 6, hour: 15, quorumPercent: 60, collationRate: 0, collationHostPayout: 0 });
 const emptyAids = (): SocialAidCaps => ({
   illness_member: "", illness_spouse: "", death_member: "", death_spouse: "",
   death_child_under5: "", death_child_over5: "", death_parent: "",
@@ -534,7 +534,7 @@ function MembershipSection({ assoc, onSave }: { assoc: Association; onSave: (d: 
 }
 
 function MeetingSection({ assoc, onSave }: { assoc: Association; onSave: (d: Record<string, unknown>) => Promise<void> }) {
-  const init = parseJson<MeetingConfig>(assoc.meetingConfig, emptyMeeting());
+  const init = { ...emptyMeeting(), ...parseJson<MeetingConfig>(assoc.meetingConfig, emptyMeeting()) };
   const s = useSection(init);
   const save = async () => {
     s.setSaving(true);
@@ -567,6 +567,16 @@ function MeetingSection({ assoc, onSave }: { assoc: Association; onSave: (d: Rec
           <label className={labelCls}>Quorum (%)</label>
           <input type="number" min={1} max={100} className={inputCls} style={inputStyle} value={s.value.quorumPercent}
             onChange={(e) => s.setValue({ ...s.value, quorumPercent: parseInt(e.target.value) || 60 })} />
+        </div>
+        <div>
+          <label className={labelCls}>Collation / membre (FCFA)</label>
+          <input type="number" min={0} step={100} className={inputCls} style={inputStyle} value={s.value.collationRate ?? 0}
+            onChange={(e) => s.setValue({ ...s.value, collationRate: parseInt(e.target.value) || 0 })} />
+        </div>
+        <div>
+          <label className={labelCls}>Forfait hôte (FCFA)</label>
+          <input type="number" min={0} step={1000} className={inputCls} style={inputStyle} value={s.value.collationHostPayout ?? 0}
+            onChange={(e) => s.setValue({ ...s.value, collationHostPayout: parseInt(e.target.value) || 0 })} />
         </div>
       </div>
     </SectionCard>
