@@ -18,7 +18,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: {
         userId: session.user.id,
         associationId,
-        role: { in: ["PRESIDENT", "SECRETARY", "FOUNDER"] } // Simplification pour les droits
+        status: "ACTIVE",
+        role: { in: ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "FOUNDER"] }
       }
     });
 
@@ -26,9 +27,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Vous n'avez pas les droits pour cette action" }, { status: 403 });
     }
 
-    const dataToUpdate: any = {};
+    const target = await prisma.associationMembership.findFirst({
+      where: { id: membershipId, associationId },
+      select: { id: true, status: true, joinedAt: true },
+    });
+    if (!target) return NextResponse.json({ error: "Membre introuvable dans cette association" }, { status: 404 });
+
+    const dataToUpdate: Record<string, unknown> = {};
     if (status) dataToUpdate.status = status;
     if (role) dataToUpdate.role = role;
+    if (status === "ACTIVE" && !target.joinedAt) dataToUpdate.joinedAt = new Date();
+    if (status === "REJECTED") dataToUpdate.leftAt = new Date();
 
     const membership = await prisma.associationMembership.update({
       where: { id: membershipId },

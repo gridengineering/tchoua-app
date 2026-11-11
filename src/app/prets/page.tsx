@@ -106,7 +106,7 @@ export default function PretsAggregatePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.map((a) => (
-              <Link key={a.id} href={`/associations/${a.association?.id}?tab=activities`} className="group">
+              <Link key={a.id} href={`/associations/${a.association?.id}/prets`} className="group">
                 <div className="bg-warm-white rounded-2xl p-8 border border-stone shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all relative overflow-hidden h-full">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-gold/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
                   
