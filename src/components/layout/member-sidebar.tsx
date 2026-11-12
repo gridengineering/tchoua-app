@@ -39,10 +39,10 @@ const GLOBAL_GROUPS: Group[] = [
     title: "Finances",
     items: [
       { href: "/tontines", label: "Tontines", icon: PiggyBank },
-      { href: "/epargne", label: "Épargne & investissement", icon: Landmark },
-      { href: "/prets", label: "Prêts & crédit", icon: Coins },
+      { href: "/epargne", label: "Épargne", icon: Landmark },
+      { href: "/prets", label: "Prêts", icon: Coins },
       { href: "/solidarite", label: "Solidarité", icon: Heart },
-      { href: "/sessions", label: "Sessions & tirages", icon: RotateCcw },
+      { href: "/sessions", label: "Sessions", icon: RotateCcw },
       { href: "/dashboard/wallet", label: "Portefeuille", icon: Wallet },
     ],
   },
@@ -100,7 +100,7 @@ function SidebarLink({ item, active, collapsed }: { item: NavItem; active: boole
       href={item.href}
       title={collapsed ? item.label : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors",
         collapsed && "justify-center px-2",
         active ? "m-active font-semibold" : "m-muted m-hover m-hover-text"
       )}
@@ -186,14 +186,14 @@ export function MemberSidebar({
           <button onClick={() => setAssocOpen((v) => !v)}
             className="flex w-full items-center gap-2 rounded-lg border m-border m-soft px-3 py-2 text-left text-sm m-hover">
             <Building2 className="h-4 w-4 flex-shrink-0 m-accent-text" />
-            <span className="flex-1 truncate m-text">{currentAssoc?.name ?? "Toutes mes associations"}</span>
+            <span className="flex-1 truncate m-text">{currentAssoc?.name ?? "Mes associations"}</span>
             <ChevronDown className={cn("h-3.5 w-3.5 flex-shrink-0 m-muted transition-transform", assocOpen && "rotate-180")} />
           </button>
           {assocOpen && (
             <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border m-border m-surface shadow-xl">
               <button onClick={() => { setAssocOpen(false); router.push("/dashboard"); }}
                 className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm m-text m-hover">
-                <LayoutDashboard className="h-4 w-4" /> Toutes mes associations
+                <LayoutDashboard className="h-4 w-4" /> Mes associations
                 {!currentAssocId && <Check className="ml-auto h-3.5 w-3.5 m-accent-text" />}
               </button>
               <div className="max-h-56 overflow-y-auto border-t border-slate-100">

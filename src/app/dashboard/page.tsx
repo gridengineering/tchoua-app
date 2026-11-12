@@ -71,7 +71,7 @@ export default function DashboardPage() {
         <MemberLaunchpad />
 
         {/* ── HERO BANNER ── */}
-        <div className="relative overflow-hidden m-accent-bg rounded-2xl p-8 md:p-12 text-white shadow-2xl">
+        <div className="relative overflow-hidden m-hero rounded-2xl p-8 md:p-12 text-white shadow-2xl">
           {/* Abstract patterns */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-forest/10 rounded-full blur-[60px] -ml-24 -mb-24"></div>

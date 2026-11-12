@@ -372,3 +372,16 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary { background-color: var(--m-accent, #0d3d28); color: #fff; }
 .btn-primary:hover { filter: brightness(1.08); }
 .field-focus:focus { border-color: var(--m-accent, #0d3d28); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-accent, #0d3d28) 18%, transparent); }
+
+/* Contraste des accents & hero */
+.member-shell { --m-accent-contrast: #ffffff; }
+[data-member-theme="midnight"] .member-shell { --m-accent-contrast: #04121f; }
+[data-member-theme="neon"] .member-shell { --m-accent-contrast: #0a0a0f; }
+.m-accent-bg { background-color: var(--m-accent); color: var(--m-accent-contrast, #ffffff); }
+.m-accent-bg.text-white { color: var(--m-accent-contrast, #ffffff); }
+.m-hero {
+  background-image: linear-gradient(135deg,
+    color-mix(in srgb, var(--m-accent) 72%, #000) 0%,
+    color-mix(in srgb, var(--m-accent) 40%, #000) 100%);
+  color: #ffffff;
+}
