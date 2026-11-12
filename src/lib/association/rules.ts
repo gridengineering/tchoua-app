@@ -275,13 +275,28 @@ export async function validateLoanToFundRatio(
 ): Promise<{ valid: boolean; error?: string }> {
   const activities = await prisma.associationActivity.findMany({
     where: { associationId },
-    select: { caisseBalance: true },
+    select: { caisseBalance: true, loanMaxPerMember: true },
   });
 
-  const totalFunds = activities.reduce(
-    (sum, a) => sum + (a.caisseBalance ?? 0),
-    0
-  );
+  const capital = await prisma.activityContribution.aggregate({
+    where: { activity: { associationId }, status: "PAID" },
+    _sum: { amount: true },
+  });
+
+  const totalFunds =
+    activities.reduce((sum, a) => sum + (a.caisseBalance ?? 0), 0) +
+    (capital._sum.amount ?? 0);
+
+  let maxRatio = 0.8;
+  for (const activity of activities) {
+    if (!activity.loanMaxPerMember) continue;
+    try {
+      const config = JSON.parse(activity.loanMaxPerMember);
+      if (typeof config?.ratioMax === "number" && config.ratioMax > 0) {
+        maxRatio = Math.max(maxRatio, config.ratioMax);
+      }
+    } catch {}
+  }
 
   const loans = await prisma.assocLoan.findMany({
     where: {
@@ -306,10 +321,10 @@ export async function validateLoanToFundRatio(
   }
 
   const ratio = totalLoans / totalFunds;
-  if (ratio > 0.8) {
+  if (ratio > maxRatio) {
     return {
       valid: false,
-      error: `Ratio prêts/fonds de ${(ratio * 100).toFixed(1)}% dépasse la limite de 80%`,
+      error: `Ratio prêts/fonds de ${(ratio * 100).toFixed(1)}% dépasse la limite de ${(maxRatio * 100).toFixed(0)}%`,
     };
   }
 
