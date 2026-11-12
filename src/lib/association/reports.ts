@@ -1260,8 +1260,45 @@ export function exportToCSV(data: any): string {
 }
 
 export function exportToExcel(data: any): Buffer {
-  // No xlsx library installed; return a JSON buffer as fallback
-  return Buffer.from(JSON.stringify(data, null, 2), "utf-8");
+  const rows: any[] = Array.isArray(data)
+    ? data
+    : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
+  const headers = rows.length ? Object.keys(rows[0]) : [];
+
+  const esc = (s: string) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
+
+  const cell = (v: unknown): string => {
+    if (v == null) return '<Cell><Data ss:Type="String"></Data></Cell>';
+    if (typeof v === "number" && isFinite(v)) return `<Cell><Data ss:Type="Number">${v}</Data></Cell>`;
+    if (typeof v === "boolean") return `<Cell><Data ss:Type="String">${v ? "true" : "false"}</Data></Cell>`;
+    const s = typeof v === "object" ? JSON.stringify(v) : String(v);
+    return `<Cell><Data ss:Type="String">${esc(s)}</Data></Cell>`;
+  };
+
+  const headerRow = `<Row>${headers.map((h) => `<Cell><Data ss:Type="String">${esc(h)}</Data></Cell>`).join("")}</Row>`;
+  const bodyRows = rows.map((r) => `<Row>${headers.map((h) => cell(r[h])).join("")}</Row>`).join("");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="Rapport">
+  <Table>
+   ${headerRow}
+   ${bodyRows}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+  return Buffer.from("\uFEFF" + xml, "utf-8");
 }
 
 function toWinAnsi(text: string): string {

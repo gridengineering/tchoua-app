@@ -64,8 +64,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const buffer = exportToExcel(data);
       return new NextResponse(new Uint8Array(buffer), {
         headers: {
-          "Content-Type": "application/octet-stream",
-          "Content-Disposition": `attachment; filename="${report.title}.xlsx"`,
+          "Content-Type": "application/vnd.ms-excel",
+          "Content-Disposition": `attachment; filename="${report.title}.xls"`,
         },
       });
     }
