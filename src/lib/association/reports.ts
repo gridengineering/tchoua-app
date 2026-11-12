@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import PDFDocument from "pdfkit";
+import { createRequire } from "module";
 import { PrismaClient } from "@prisma/client";
 import {
   addDays,
@@ -1268,6 +1268,7 @@ export function exportToExcel(data: any): Buffer {
 export function exportToPDF(data: any, title = "Rapport"): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
+      const PDFDocument: any = createRequire(import.meta.url)("pdfkit");
       const rows: any[] = Array.isArray(data)
         ? data
         : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
