@@ -102,12 +102,12 @@ function SidebarLink({ item, active, collapsed }: { item: NavItem; active: boole
       className={cn(
         "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         collapsed && "justify-center px-2",
-        active ? "bg-forest/10 font-semibold text-forest" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        active ? "m-active font-semibold" : "m-muted m-hover m-hover-text"
       )}
     >
-      <Icon className={cn("h-[18px] w-[18px] flex-shrink-0", active ? "text-forest" : "text-slate-400 group-hover:text-slate-600")} />
+      <Icon className={cn("h-[18px] w-[18px] flex-shrink-0", active ? "m-accent-text" : "m-muted ")} />
       {!collapsed && <span className="truncate">{item.label}</span>}
-      {!collapsed && active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-forest" />}
+      {!collapsed && active && <span className="ml-auto h-1.5 w-1.5 rounded-full m-accent-bg" />}
     </Link>
   );
 }
@@ -157,57 +157,57 @@ export function MemberSidebar({
     items.some((item) => (item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href)));
 
   const content = (
-    <div className="flex h-full flex-col bg-white">
-      <div className={cn("flex h-16 flex-shrink-0 items-center border-b border-slate-200", collapsed ? "justify-center px-2" : "px-4")}>
+    <div className="m-glass flex h-full flex-col border-r m-border">
+      <div className={cn("flex h-16 flex-shrink-0 items-center border-b m-border", collapsed ? "justify-center px-2" : "px-4")}>
         <Link href="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-forest">
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg m-accent-bg">
             <img src="/logo.png" alt="" className="h-5 w-5 object-contain" />
           </span>
-          {!collapsed && <span className="text-lg font-bold tracking-tight text-forest">Tchoua</span>}
+          {!collapsed && <span className="text-lg font-bold tracking-tight m-accent-text">Tchoua</span>}
         </Link>
         {!collapsed && (
-          <button onClick={onToggle} className="ml-auto hidden rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 lg:block" aria-label="Réduire le menu">
+          <button onClick={onToggle} className="ml-auto hidden rounded-lg p-1.5 m-muted m-hover m-hover-text lg:block" aria-label="Réduire le menu">
             <ChevronLeft className="h-4 w-4" />
           </button>
         )}
-        <button onClick={onClose} className="ml-auto rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Fermer">
+        <button onClick={onClose} className="ml-auto rounded-lg p-1.5 m-muted m-hover lg:hidden" aria-label="Fermer">
           <X className="h-5 w-5" />
         </button>
       </div>
 
       {collapsed && (
-        <button onClick={onToggle} className="hidden justify-center border-b border-slate-200 py-2 text-slate-400 hover:bg-slate-50 lg:flex" aria-label="Déployer le menu">
+        <button onClick={onToggle} className="hidden justify-center border-b m-border py-2 m-muted m-hover lg:flex" aria-label="Déployer le menu">
           <ChevronRight className="h-4 w-4" />
         </button>
       )}
 
       {!collapsed && (
-        <div className="relative border-b border-slate-200 px-3 py-3">
+        <div className="relative border-b m-border px-3 py-3">
           <button onClick={() => setAssocOpen((v) => !v)}
-            className="flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm hover:bg-white">
-            <Building2 className="h-4 w-4 flex-shrink-0 text-forest" />
-            <span className="flex-1 truncate text-slate-700">{currentAssoc?.name ?? "Toutes mes associations"}</span>
-            <ChevronDown className={cn("h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition-transform", assocOpen && "rotate-180")} />
+            className="flex w-full items-center gap-2 rounded-lg border m-border m-soft px-3 py-2 text-left text-sm m-hover">
+            <Building2 className="h-4 w-4 flex-shrink-0 m-accent-text" />
+            <span className="flex-1 truncate m-text">{currentAssoc?.name ?? "Toutes mes associations"}</span>
+            <ChevronDown className={cn("h-3.5 w-3.5 flex-shrink-0 m-muted transition-transform", assocOpen && "rotate-180")} />
           </button>
           {assocOpen && (
-            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border m-border m-surface shadow-xl">
               <button onClick={() => { setAssocOpen(false); router.push("/dashboard"); }}
-                className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50">
+                className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm m-text m-hover">
                 <LayoutDashboard className="h-4 w-4" /> Toutes mes associations
-                {!currentAssocId && <Check className="ml-auto h-3.5 w-3.5 text-forest" />}
+                {!currentAssocId && <Check className="ml-auto h-3.5 w-3.5 m-accent-text" />}
               </button>
               <div className="max-h-56 overflow-y-auto border-t border-slate-100">
                 {associations.map((a) => (
                   <button key={a.id} onClick={() => { setAssocOpen(false); router.push(`/associations/${a.id}`); }}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50">
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm m-text m-hover">
                     <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: a.color || "#0d3d28" }} />
                     <span className="flex-1 truncate">{a.name}</span>
-                    {currentAssocId === a.id && <Check className="h-3.5 w-3.5 text-forest" />}
+                    {currentAssocId === a.id && <Check className="h-3.5 w-3.5 m-accent-text" />}
                   </button>
                 ))}
               </div>
               <Link href="/dashboard/associations/create" onClick={() => setAssocOpen(false)}
-                className="flex items-center gap-2 border-t border-slate-100 px-3 py-2.5 text-sm font-semibold text-forest hover:bg-forest/5">
+                className="flex items-center gap-2 border-t border-slate-100 px-3 py-2.5 text-sm font-semibold m-accent-text m-hover-accent">
                 <Plus className="h-4 w-4" /> Créer une association
               </Link>
             </div>
@@ -219,8 +219,8 @@ export function MemberSidebar({
         {currentAssocId && !collapsed && (
           <div className="mb-3">
             <div className="mb-1 flex items-center justify-between px-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Association</span>
-              <Link href="/dashboard" className="text-[10px] font-medium text-forest hover:underline">Quitter</Link>
+              <span className="text-[10px] font-bold uppercase tracking-widest m-muted">Association</span>
+              <Link href="/dashboard" className="text-[10px] font-medium m-accent-text hover:underline">Quitter</Link>
             </div>
             <AssociationNav id={currentAssocId} />
           </div>
@@ -229,7 +229,7 @@ export function MemberSidebar({
         {visibleGroups.map((group) => (
           <div key={group.title} className="mb-3">
             {!collapsed && (
-              <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">{group.title}</div>
+              <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
             )}
             <div className="space-y-0.5">
               {group.items.map((item) => {
@@ -243,24 +243,24 @@ export function MemberSidebar({
         ))}
       </nav>
 
-      <div className="flex-shrink-0 border-t border-slate-200 p-2">
+      <div className="flex-shrink-0 border-t m-border p-2">
         {user?.systemRoleId && (
           <SidebarLink item={{ href: "/admin", label: "Console admin", icon: ShieldCheck }} active={pathname.startsWith("/admin")} collapsed={collapsed} />
         )}
         {!collapsed && (
-          <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-forest text-[11px] font-bold text-white">
+          <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm m-muted">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full m-accent-bg text-[11px] font-bold text-white">
               {user?.name?.charAt(0)?.toUpperCase() ?? "M"}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-semibold text-slate-800">{user?.name}</div>
-              <div className="truncate text-[10px] text-slate-400">{user?.email}</div>
+              <div className="truncate text-xs font-semibold m-text">{user?.name}</div>
+              <div className="truncate text-[10px] m-muted">{user?.email}</div>
             </div>
           </div>
         )}
         {!collapsed && (
           <select value={lang} onChange={(e) => setLang(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-600">
+            className="mt-1 w-full rounded-lg border m-border m-surface px-2 py-1.5 text-xs m-muted">
             {availableLangs.map((l) => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
           </select>
         )}
@@ -277,7 +277,7 @@ export function MemberSidebar({
   return (
     <>
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 hidden border-r border-slate-200 transition-[width] duration-300 lg:block",
+        "fixed inset-y-0 left-0 z-40 hidden border-r m-border transition-[width] duration-300 lg:block",
         collapsed ? "w-20" : "w-64"
       )}>
         {content}

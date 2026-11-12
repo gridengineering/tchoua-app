@@ -44,25 +44,25 @@ export function MemberTopbar({
   });
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b m-border m-glass backdrop-blur">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
-        <button onClick={onMenuClick} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Ouvrir le menu">
+        <button onClick={onMenuClick} className="rounded-lg p-2 m-muted m-hover lg:hidden" aria-label="Ouvrir le menu">
           <Menu className="h-5 w-5" />
         </button>
 
         <div className="min-w-0 flex-1">
           {title ? (
-            <h1 className="truncate text-base font-semibold text-slate-900">{title}</h1>
+            <h1 className="truncate text-base font-semibold m-text">{title}</h1>
           ) : (
             <nav className="flex items-center gap-1.5 truncate text-sm">
-              <Link href="/dashboard" className="font-medium text-slate-400 hover:text-slate-700">Accueil</Link>
+              <Link href="/dashboard" className="font-medium m-muted m-hover-text">Accueil</Link>
               {crumbs.slice(0, 4).map((c, i) => (
                 <span key={c.href} className="flex min-w-0 items-center gap-1.5">
-                  <span className="text-slate-300">/</span>
+                  <span className="m-muted">/</span>
                   {i === crumbs.length - 1 ? (
-                    <span className="truncate font-semibold text-slate-800">{c.label}</span>
+                    <span className="truncate font-semibold m-text">{c.label}</span>
                   ) : (
-                    <Link href={c.href} className="truncate text-slate-500 hover:text-slate-800">{c.label}</Link>
+                    <Link href={c.href} className="truncate m-muted m-hover-text">{c.label}</Link>
                   )}
                 </span>
               ))}
@@ -72,33 +72,33 @@ export function MemberTopbar({
 
         <div className="flex items-center gap-1.5">
           <Link href="/dashboard/associations/create"
-            className="hidden items-center gap-1.5 rounded-lg bg-forest px-3 py-2 text-sm font-semibold text-white hover:bg-forest-dark sm:flex">
+            className="hidden items-center gap-1.5 rounded-lg m-accent-bg px-3 py-2 text-sm font-semibold text-white hover:brightness-110 sm:flex">
             <Plus className="h-4 w-4" /> Nouvelle association
           </Link>
-          <Link href="/profil" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Notifications">
+          <Link href="/profil" className="rounded-lg p-2 m-muted m-hover" aria-label="Notifications">
             <Bell className="h-5 w-5" />
           </Link>
           <div className="relative" ref={menuRef}>
-            <button onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 hover:bg-slate-100">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-xs font-bold text-white">
+            <button onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 m-hover">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full m-accent-bg text-xs font-bold text-white">
                 {user?.name?.charAt(0)?.toUpperCase() ?? "M"}
               </span>
-              <span className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 md:block">{user?.name}</span>
-              <ChevronDown className="hidden h-3.5 w-3.5 text-slate-400 md:block" />
+              <span className="hidden max-w-[120px] truncate text-sm font-medium m-text md:block">{user?.name}</span>
+              <ChevronDown className="hidden h-3.5 w-3.5 m-muted md:block" />
             </button>
             {open && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-                <div className="border-b border-slate-100 px-4 py-3">
-                  <div className="truncate text-sm font-semibold text-slate-900">{user?.name}</div>
-                  <div className="truncate text-xs text-slate-500">{user?.email}</div>
+              <div className="absolute right-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-xl border m-border bg-white shadow-xl">
+                <div className="border-b m-border px-4 py-3">
+                  <div className="truncate text-sm font-semibold m-text">{user?.name}</div>
+                  <div className="truncate text-xs m-muted">{user?.email}</div>
                 </div>
-                <Link href="/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-slate-50"><User className="h-4 w-4" /> Mon profil</Link>
-                <Link href="/parametres" className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-slate-50"><Settings className="h-4 w-4" /> Paramètres</Link>
+                <Link href="/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm m-hover"><User className="h-4 w-4" /> Mon profil</Link>
+                <Link href="/parametres" className="flex items-center gap-2 px-4 py-2.5 text-sm m-hover"><Settings className="h-4 w-4" /> Paramètres</Link>
                 {user?.systemRoleId && (
                   <Link href="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50"><ShieldCheck className="h-4 w-4" /> Console admin</Link>
                 )}
                 <button onClick={() => signOut({ callbackUrl: "/login" })}
-                  className="flex w-full items-center gap-2 border-t border-slate-100 px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
+                  className="flex w-full items-center gap-2 border-t m-border px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
                   <LogOut className="h-4 w-4" /> Déconnexion
                 </button>
               </div>

@@ -15,6 +15,7 @@ import {
   ShieldCheck, Award, MessageSquare, GraduationCap, ShoppingBag, Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MemberLaunchpad } from "@/components/member/member-launchpad";
 
 interface DashboardData {
   user: { name: string; score: number; level: string; walletBalance: number };
@@ -67,9 +68,10 @@ export default function DashboardPage() {
   return (
     <DashboardLayout title={currentAssocId ? "Tableau de Bord Association" : "Tableau de Bord Global"}>
       <div className="space-y-8 animate-in fade-in duration-700">
-        
+        <MemberLaunchpad />
+
         {/* ── HERO BANNER ── */}
-        <div className="relative overflow-hidden bg-forest rounded-2xl p-8 md:p-12 text-white shadow-2xl">
+        <div className="relative overflow-hidden m-accent-bg rounded-2xl p-8 md:p-12 text-white shadow-2xl">
           {/* Abstract patterns */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-forest/10 rounded-full blur-[60px] -ml-24 -mb-24"></div>

@@ -20,6 +20,7 @@ model User {
   familyInfo      String?   // JSON: { firstSpouseName, fatherName, motherName, childrenCount }
   emergencyContact String?  // JSON: { name, phone, relationship }
   language        String    @default("fr")
+  theme           String    @default("forest")
   isVerified      Boolean   @default(false)
   isActive        Boolean   @default(true)
   role            String    @default("MEMBER") // Legacy, to be phased out by systemRole

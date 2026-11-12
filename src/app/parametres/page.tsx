@@ -6,8 +6,10 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
-import { Settings, Globe, Plus, Trash2, Save } from "lucide-react";
+import { Settings, Globe, Plus, Trash2, Save, Palette, Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
+import { useMemberTheme } from "@/components/layout/member-theme";
+import { MEMBER_THEMES } from "@/lib/member-themes";
 
 interface CustomLang { code: string; name: string; flag: string; translations: any; }
 
@@ -15,7 +17,8 @@ export default function ParametresPage() {
   const { data: session } = useSession();
   const user = session?.user as any;
   const [saved, setSaved] = useState(false);
-  const { availableLangs, refreshLangs, lang } = useI18n();
+  const { availableLangs, refreshLangs, lang, setLang } = useI18n();
+  const { theme, setTheme } = useMemberTheme();
 
   const [customs, setCustoms] = useState<CustomLang[]>([]);
   const [draft, setDraft] = useState({ code: "", name: "", flag: "🌍", translations: '{\n  "nav": {},\n  "common": {}\n}' });
@@ -78,7 +81,7 @@ export default function ParametresPage() {
           <CardContent className="space-y-4">
             <Input label="Nom complet" defaultValue={user?.name || ""} />
             <Input label="Email" type="email" defaultValue={user?.email || ""} disabled />
-            <Select label="Langue d'interface" defaultValue={lang}
+            <Select label="Langue d'interface" value={lang} onChange={(e) => setLang(e.target.value)}
               options={availableLangs.map((l) => ({ value: l.code, label: `${l.flag} ${l.name}` }))} />
             <Button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }}>
               {saved ? "✓ Sauvegardé !" : "Sauvegarder les modifications"}
@@ -86,6 +89,49 @@ export default function ParametresPage() {
           </CardContent>
         </Card>
 
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Palette className="w-5 h-5 text-forest" /> Apparence & langue</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Thème de l'espace membre</p>
+              <p className="mb-3 text-xs text-graphite">Six ambiances, appliquées instantanément et conservées sur votre compte.</p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {MEMBER_THEMES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTheme(t.id)}
+                    className={`relative rounded-xl border-2 p-3 text-left transition-all hover:-translate-y-0.5 ${
+                      theme === t.id ? "border-forest ring-2 ring-forest/20" : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="mb-2 flex gap-1.5">
+                      {t.swatches.map((c) => (
+                        <span key={c} className="h-6 flex-1 rounded-md" style={{ background: c }} />
+                      ))}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">{t.name}</div>
+                    <div className="text-[11px] text-graphite">{t.tagline}</div>
+                    {theme === t.id && (
+                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-white">
+                        <Check className="h-3 w-3" />
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-4">
+              <Select label="Langue de l'interface" value={lang} onChange={(e) => setLang(e.target.value)}
+                options={availableLangs.map((l) => ({ value: l.code, label: `${l.flag} ${l.name}` }))} />
+              <p className="mt-2 text-xs text-graphite">Le changement de langue est immédiat sur tout l'espace membre.</p>
+            </div>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader><CardTitle>Sécurité</CardTitle></CardHeader>
           <CardContent className="space-y-4">

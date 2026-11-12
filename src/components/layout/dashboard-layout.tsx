@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { MemberSidebar } from "./member-sidebar";
 import { MemberTopbar } from "./member-topbar";
+import { MemberThemeProvider } from "./member-theme";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -53,7 +54,8 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const user = session?.user as { name?: string | null; email?: string | null; systemRoleId?: string | null } | undefined;
 
   return (
-    <div className="member-shell min-h-screen bg-slate-50">
+    <MemberThemeProvider>
+    <div className="member-shell min-h-screen">
       <MemberSidebar
         collapsed={collapsed}
         onToggle={toggle}
@@ -66,5 +68,6 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
         <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:py-8">{children}</main>
       </div>
     </div>
+    </MemberThemeProvider>
   );
 }

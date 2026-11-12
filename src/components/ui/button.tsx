@@ -15,7 +15,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const base = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/50 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
 
     const variants = {
-      default: "bg-forest text-white hover:bg-forest-dark shadow-sm",
+      default: "btn-primary shadow-sm",
       secondary: "bg-gold text-charcoal hover:bg-gold-light shadow-sm",
       outline: "border border-stone bg-warm-white text-charcoal hover:bg-cream hover:text-forest hover:border-forest/30",
       ghost: "text-graphite hover:bg-stone/50 hover:text-charcoal",

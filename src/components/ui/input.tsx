@@ -22,7 +22,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal placeholder:text-ash/70",
-              "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
+              "field-focus focus:outline-none transition-all",
               "disabled:bg-stone/20 disabled:text-ash disabled:cursor-not-allowed",
               error && "border-error focus:border-error focus:ring-error bg-error/5",
               leftIcon && "pl-11",
@@ -60,7 +60,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             className={cn(
               "w-full h-10 bg-warm-white border border-stone rounded-xl px-4 text-sm font-body text-charcoal appearance-none",
-              "focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-all",
+              "field-focus focus:outline-none transition-all",
               "disabled:bg-stone/20 disabled:text-ash disabled:cursor-not-allowed",
               error && "border-error focus:border-error focus:ring-error bg-error/5",
               leftIcon && "pl-11",
