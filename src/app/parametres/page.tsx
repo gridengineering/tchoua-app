@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { Settings, Globe, Plus, Trash2, Save, Palette, Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
-import { useMemberTheme } from "@/components/layout/member-theme";
+import { applyMemberTheme, useMemberTheme } from "@/components/layout/member-theme";
 import { MEMBER_THEMES } from "@/lib/member-themes";
 
 interface CustomLang { code: string; name: string; flag: string; translations: any; }
@@ -18,7 +18,11 @@ export default function ParametresPage() {
   const user = session?.user as any;
   const [saved, setSaved] = useState(false);
   const { availableLangs, refreshLangs, lang, setLang } = useI18n();
-  const { theme, setTheme } = useMemberTheme();
+  const { theme } = useMemberTheme();
+  const [selectedTheme, setSelectedTheme] = useState("");
+  useEffect(() => {
+    setSelectedTheme(document.documentElement.getAttribute("data-member-theme") || theme);
+  }, [theme]);
 
   const [customs, setCustoms] = useState<CustomLang[]>([]);
   const [draft, setDraft] = useState({ code: "", name: "", flag: "🌍", translations: '{\n  "nav": {},\n  "common": {}\n}' });
@@ -103,9 +107,9 @@ export default function ParametresPage() {
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => setTheme(t.id)}
+                    onClick={() => { applyMemberTheme(t.id); setSelectedTheme(t.id); }}
                     className={`relative rounded-xl border-2 p-3 text-left transition-all hover:-translate-y-0.5 ${
-                      theme === t.id ? "border-forest ring-2 ring-forest/20" : "border-gray-200 hover:border-gray-300"
+                      selectedTheme === t.id ? "border-forest ring-2 ring-forest/20" : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <div className="mb-2 flex gap-1.5">
@@ -115,7 +119,7 @@ export default function ParametresPage() {
                     </div>
                     <div className="text-sm font-semibold text-gray-900">{t.name}</div>
                     <div className="text-[11px] text-graphite">{t.tagline}</div>
-                    {theme === t.id && (
+                    {selectedTheme === t.id && (
                       <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-white">
                         <Check className="h-3 w-3" />
                       </span>

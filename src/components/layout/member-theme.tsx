@@ -11,10 +11,26 @@ type ThemeCtx = {
 
 const Ctx = createContext<ThemeCtx>({ theme: DEFAULT_MEMBER_THEME, setTheme: () => {}, ready: false });
 
+const THEME_EVENT = "tchoua-member-theme-change";
+
 function applyTheme(id: MemberThemeId) {
   if (typeof document !== "undefined") {
     document.documentElement.setAttribute("data-member-theme", id);
   }
+}
+
+export function applyMemberTheme(id: MemberThemeId) {
+  if (!isMemberTheme(id)) return;
+  applyTheme(id);
+  try {
+    localStorage.setItem("tchoua_member_theme", id);
+    window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: id }));
+  } catch {}
+  fetch("/api/users/theme", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ theme: id }),
+  }).catch(() => {});
 }
 
 export function MemberThemeProvider({ children }: { children: React.ReactNode }) {
@@ -22,6 +38,11 @@ export function MemberThemeProvider({ children }: { children: React.ReactNode })
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const onTheme = (event: Event) => {
+      const id = (event as CustomEvent).detail;
+      if (isMemberTheme(id)) setThemeState(id);
+    };
+    window.addEventListener(THEME_EVENT, onTheme);
     const stored = localStorage.getItem("tchoua_member_theme");
     const initial = isMemberTheme(stored) ? stored : DEFAULT_MEMBER_THEME;
     setThemeState(initial);
@@ -38,18 +59,11 @@ export function MemberThemeProvider({ children }: { children: React.ReactNode })
         }
       })
       .catch(() => {});
+    return () => window.removeEventListener(THEME_EVENT, onTheme);
   }, []);
 
   const setTheme = useCallback((id: MemberThemeId) => {
-    if (!isMemberTheme(id)) return;
-    setThemeState(id);
-    applyTheme(id);
-    localStorage.setItem("tchoua_member_theme", id);
-    fetch("/api/users/theme", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ theme: id }),
-    }).catch(() => {});
+    applyMemberTheme(id);
   }, []);
 
   return <Ctx.Provider value={{ theme, setTheme, ready }}>{children}</Ctx.Provider>;
