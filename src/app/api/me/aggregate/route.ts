@@ -21,10 +21,12 @@ export async function GET(req: NextRequest) {
   const typeFilter = searchParams.get("type"); // ex: TONTINE → match TONTINE_ROTATIVE, TONTINE_ASCA…
   const assocFilter = searchParams.get("associationId");
 
+  const BUREAU_ROLES = ["FOUNDER", "PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "TREASURER_ADJ"];
   const memberships = await prisma.associationMembership.findMany({
     where: { userId: session.user.id, status: { not: "LEFT" } },
     select: { id: true, associationId: true, role: true },
   });
+  const bureauAssocIds = memberships.filter((m) => BUREAU_ROLES.includes(m.role)).map((m) => m.associationId);
   const membershipIds = memberships.map((m) => m.id);
   const assocIds = assocFilter
     ? memberships.filter((m) => m.associationId === assocFilter).map((m) => m.associationId)
@@ -63,9 +65,19 @@ export async function GET(req: NextRequest) {
 
   if (resource === "loans") {
     const loans = await prisma.assocLoan.findMany({
-      where: assocFilter
-        ? { activity: { associationId: assocFilter } }
-        : { activity: { associationId: { in: assocIds } } },
+      where: {
+        AND: [
+          assocFilter
+            ? { activity: { associationId: assocFilter } }
+            : { activity: { associationId: { in: assocIds } } },
+          {
+            OR: [
+              { activity: { associationId: { in: bureauAssocIds } } },
+              { borrowerMembership: { userId: session.user.id } },
+            ],
+          },
+        ],
+      },
       include: {
         activity: { select: { id: true, name: true, type: true, associationId: true } },
         repayments: true,
@@ -106,9 +118,19 @@ export async function GET(req: NextRequest) {
 
   if (resource === "aids") {
     const aids = await prisma.assocSocialAidRequest.findMany({
-      where: assocFilter
-        ? { associationId: assocFilter }
-        : { associationId: { in: assocIds } },
+      where: {
+        AND: [
+          assocFilter
+            ? { associationId: assocFilter }
+            : { associationId: { in: assocIds } },
+          {
+            OR: [
+              { associationId: { in: bureauAssocIds } },
+              { membership: { userId: session.user.id } },
+            ],
+          },
+        ],
+      },
       include: {
         membership: {
           select: { id: true, userId: true, user: { select: { name: true, avatar: true } } },

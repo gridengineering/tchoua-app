@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import PDFDocument from "pdfkit";
 import { PrismaClient } from "@prisma/client";
 import {
   addDays,
@@ -1262,4 +1263,45 @@ export function exportToCSV(data: any): string {
 export function exportToExcel(data: any): Buffer {
   // No xlsx library installed; return a JSON buffer as fallback
   return Buffer.from(JSON.stringify(data, null, 2), "utf-8");
+}
+
+export function exportToPDF(data: any, title = "Rapport"): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const rows: any[] = Array.isArray(data)
+        ? data
+        : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
+      const doc = new PDFDocument({ size: "A4", margins: { top: 48, bottom: 48, left: 48, right: 48 } });
+      const chunks: Buffer[] = [];
+      doc.on("data", (c: Buffer) => chunks.push(c));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+
+      doc.font("Helvetica-Bold").fontSize(16).fillColor("#0d3d28").text(title, { align: "center" });
+      doc.moveDown(0.3);
+      doc.font("Helvetica").fontSize(9).fillColor("#666").text(`Généré le ${new Date().toLocaleString("fr-FR")}`, { align: "center" });
+      doc.moveDown(1);
+
+      if (!rows.length) {
+        doc.font("Helvetica").fontSize(11).fillColor("#333").text("Aucune donnée.");
+        doc.end();
+        return;
+      }
+
+      const headers = Object.keys(rows[0]);
+      rows.forEach((row, idx) => {
+        if (doc.y > doc.page.height - 90) doc.addPage();
+        doc.font("Helvetica-Bold").fontSize(9).fillColor("#0d3d28").text(`Enregistrement ${idx + 1}`);
+        doc.moveDown(0.2);
+        headers.forEach((h) => {
+          const v = row[h] == null ? "—" : typeof row[h] === "object" ? JSON.stringify(row[h]) : String(row[h]);
+          doc.font("Helvetica").fontSize(8).fillColor("#333").text(`${h} : ${v}`, { indent: 10, lineBreak: true });
+        });
+        doc.moveDown(0.4);
+      });
+
+      doc.end();
+    } catch (e) {
+      reject(e);
+    }
+  });
 }

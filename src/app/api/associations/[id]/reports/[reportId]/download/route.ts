@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateReportData, exportToCSV, exportToExcel } from "@/lib/association/reports";
+import { generateReportData, exportToCSV, exportToExcel, exportToPDF } from "@/lib/association/reports";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -28,10 +28,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const format = (searchParams.get("format") ?? report.format ?? "JSON").toUpperCase();
 
   if (format === "PDF") {
-    return NextResponse.json(
-      { message: "La génération PDF nécessite l'installation d'une librairie externe (ex: puppeteer ou pdfkit)." },
-      { status: 501 }
-    );
+    try {
+      const parameters = report.parameters ? JSON.parse(report.parameters) : {};
+      const data = await generateReportData(report.type, id, parameters, prisma);
+      const pdf = await exportToPDF(data, report.title);
+      return new NextResponse(new Uint8Array(pdf), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${report.title}.pdf"`,
+        },
+      });
+    } catch (err: any) {
+      return NextResponse.json(
+        { error: "Erreur lors de la génération PDF", detail: err?.message },
+        { status: 500 }
+      );
+    }
   }
 
   try {
