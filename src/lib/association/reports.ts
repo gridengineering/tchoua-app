@@ -1,5 +1,4 @@
 import { createHash } from "crypto";
-import { createRequire } from "module";
 import { PrismaClient } from "@prisma/client";
 import {
   addDays,
@@ -1265,46 +1264,76 @@ export function exportToExcel(data: any): Buffer {
   return Buffer.from(JSON.stringify(data, null, 2), "utf-8");
 }
 
-export function exportToPDF(data: any, title = "Rapport"): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    try {
-      // Chargé à l'exécution (nom obfusqué pour ne pas être résolu par Turbopack)
-      const nodeRequire = createRequire(import.meta.url);
-      const PDFDocument: any = nodeRequire(["pdf", "kit"].join(""));
-      const rows: any[] = Array.isArray(data)
-        ? data
-        : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
-      const doc = new PDFDocument({ size: "A4", margins: { top: 48, bottom: 48, left: 48, right: 48 } });
-      const chunks: Buffer[] = [];
-      doc.on("data", (c: Buffer) => chunks.push(c));
-      doc.on("end", () => resolve(Buffer.concat(chunks)));
+function toWinAnsi(text: string): string {
+  let out = "";
+  for (const ch of text) {
+    const c = ch.codePointAt(0) ?? 63;
+    out += c < 128 || (c >= 160 && c <= 255) ? ch : "?";
+  }
+  return out;
+}
 
-      doc.font("Helvetica-Bold").fontSize(16).fillColor("#0d3d28").text(title, { align: "center" });
-      doc.moveDown(0.3);
-      doc.font("Helvetica").fontSize(9).fillColor("#666").text(`Généré le ${new Date().toLocaleString("fr-FR")}`, { align: "center" });
-      doc.moveDown(1);
+function pdfEscape(s: string): string {
+  return s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+}
 
-      if (!rows.length) {
-        doc.font("Helvetica").fontSize(11).fillColor("#333").text("Aucune donnée.");
-        doc.end();
-        return;
-      }
+// Générateur PDF minimal sans dépendance externe (Helvetica / WinAnsi).
+export function exportToPDF(data: any, title = "Rapport"): Buffer {
+  const rows: any[] = Array.isArray(data)
+    ? data
+    : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
+  const headers = rows.length ? Object.keys(rows[0]) : [];
 
-      const headers = Object.keys(rows[0]);
-      rows.forEach((row, idx) => {
-        if (doc.y > doc.page.height - 90) doc.addPage();
-        doc.font("Helvetica-Bold").fontSize(9).fillColor("#0d3d28").text(`Enregistrement ${idx + 1}`);
-        doc.moveDown(0.2);
-        headers.forEach((h) => {
-          const v = row[h] == null ? "—" : typeof row[h] === "object" ? JSON.stringify(row[h]) : String(row[h]);
-          doc.font("Helvetica").fontSize(8).fillColor("#333").text(`${h} : ${v}`, { indent: 10, lineBreak: true });
-        });
-        doc.moveDown(0.4);
-      });
-
-      doc.end();
-    } catch (e) {
-      reject(e);
-    }
+  const lineList: string[] = [title, `Généré le ${new Date().toLocaleString("fr-FR")}`, ""];
+  if (!rows.length) lineList.push("Aucune donnée.");
+  rows.forEach((row, idx) => {
+    lineList.push(`Enregistrement ${idx + 1}`);
+    headers.forEach((h) => {
+      const v = row[h] == null ? "-" : typeof row[h] === "object" ? JSON.stringify(row[h]) : String(row[h]);
+      lineList.push(`${h} : ${v}`);
+    });
+    lineList.push("");
   });
+
+  const toWinAnsi = (text: string): string => {
+    let out = "";
+    for (const ch of text) {
+      const c = ch.codePointAt(0) ?? 63;
+      out += c < 128 || (c >= 160 && c <= 255) ? ch : "?";
+    }
+    return out;
+  };
+  const pdfEscape = (txt: string): string => txt.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+
+  const wrapped: string[] = [];
+  for (const line of lineList) {
+    const s = toWinAnsi(line);
+    if (s.length <= 92) { wrapped.push(s); continue; }
+    for (let k = 0; k < s.length; k += 92) wrapped.push(s.slice(k, k + 92));
+  }
+  const lines = wrapped.slice(0, 74);
+  if (wrapped.length > 74) lines.push("... (contenu tronqué)");
+
+  const content = lines.map((l) => `(${pdfEscape(l)}) Tj T*`).join("\n");
+  const stream = `BT\n/F1 8 Tf\n40 800 Td\n10 TL\n${content}\nET`;
+
+  const objs: Record<number, string> = {};
+  objs[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+  objs[2] = "<< /Type /Pages /Kids [3 0 R] /Count 1 >>";
+  objs[3] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>";
+  objs[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+  objs[5] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
+
+  let out = "%PDF-1.4\n";
+  const offsets: number[] = [];
+  for (let i = 1; i <= 5; i += 1) {
+    offsets[i] = out.length;
+    out += `${i} 0 obj\n${objs[i]}\nendobj\n`;
+  }
+  const xrefPos = out.length;
+  out += "xref\n0 6\n0000000000 65535 f \n";
+  for (let i = 1; i <= 5; i += 1) out += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
+  out += `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+
+  return Buffer.from(out, "latin1");
 }
