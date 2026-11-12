@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { createRequire } from "module";
 import { PrismaClient } from "@prisma/client";
 import {
   addDays,
@@ -1267,8 +1268,9 @@ export function exportToExcel(data: any): Buffer {
 export function exportToPDF(data: any, title = "Rapport"): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
-      // Chargé à l'exécution via require dynamique pour éviter le bundling Turbopack de fontkit
-      const PDFDocument: any = (0, eval)("require")("pdfkit");
+      // Chargé à l'exécution (nom obfusqué pour ne pas être résolu par Turbopack)
+      const nodeRequire = createRequire(import.meta.url);
+      const PDFDocument: any = nodeRequire(["pdf", "kit"].join(""));
       const rows: any[] = Array.isArray(data)
         ? data
         : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
