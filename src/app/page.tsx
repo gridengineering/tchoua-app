@@ -311,14 +311,14 @@ export default function HomePage() {
               <p className="max-w-2xl text-gray-500">{docs.home.desc}</p>
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Link href="/docs/manuel/" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white" style={{ background: "#0d3d28" }}>
+                <BookOpen className="h-4 w-4" /> {docs.readOnline}
+              </Link>
               <a href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white" style={{ background: "#0d3d28" }}>
+                className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-bold"
+                style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
                 <Download className="h-4 w-4" /> {docs.download}
               </a>
-              <Link href="/documentation" className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-bold"
-                style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
-                {docs.read} <ArrowRight className="h-4 w-4" />
-              </Link>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -8,6 +8,7 @@ import { publicLang } from "@/lib/i18n/public-copy";
 import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 const PDF = "/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf";
+const HTML_MANUAL = "/docs/manuel/";
 
 export default function DocumentationPage() {
   const { lang, setLang, availableLangs } = useI18n();
@@ -40,14 +41,14 @@ export default function DocumentationPage() {
                 ))}
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <a href={PDF} target="_blank" rel="noopener noreferrer"
+                <a href={HTML_MANUAL}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#e68a00] px-6 py-4 text-xs font-black uppercase tracking-widest text-[#0d3d28] shadow-xl shadow-[#e68a00]/20 transition-all hover:bg-[#ff9d0a]">
-                  <Download className="h-4 w-4" /> {d.download}
+                  <BookOpen className="h-4 w-4" /> {d.readOnline}
                 </a>
-                <a href="#contents"
+                <a href={PDF} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-medium text-white transition-all"
                   style={{ border: "1px solid rgba(255,255,255,0.25)" }}>
-                  {d.read} <ArrowRight className="h-4 w-4" />
+                  <Download className="h-4 w-4" /> {d.download}
                 </a>
               </div>
             </div>
@@ -122,7 +123,7 @@ export default function DocumentationPage() {
                 </div>
                 <div className="divide-y divide-[#f1ebdf]">
                   {part.chapters.map((ch) => (
-                    <a key={ch.n} href={`${PDF}#page=${ch.page}`} target="_blank" rel="noopener noreferrer"
+                    <a key={ch.n} href={`${HTML_MANUAL}#${ch.n === "A" ? "annexes" : "ch" + ch.n.padStart(2, "0")}`}
                       className="flex items-start gap-4 px-5 py-3 transition-colors hover:bg-[#fdfaf2]">
                       <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-black"
                         style={{ background: "#0d3d28", color: "#f4d58d" }}>{ch.n}</span>
@@ -173,8 +174,8 @@ export default function DocumentationPage() {
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mb-3 text-3xl font-bold" style={{ color: "#0d3d28" }}>{d.ctaDesc}</h2>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-semibold text-white"
-              style={{ background: "#0d3d28" }}>{d.cta} <ArrowRight className="h-4 w-4" /></Link>
+            <a href={HTML_MANUAL} className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-semibold text-white"
+              style={{ background: "#0d3d28" }}>{d.readOnline} <ArrowRight className="h-4 w-4" /></a>
             <a href={PDF} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl border px-7 py-3.5 font-semibold"
               style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>

@@ -10,6 +10,7 @@ export type DocsCopy = {
   title2: string;
   desc: string;
   download: string;
+  readOnline: string;
   read: string;
   notice: string;
   pages: string;
@@ -38,6 +39,7 @@ const fr: DocsCopy = {
   title2: "de Tchoua.",
   desc: "88 pages pour comprendre, paramétrer et exploiter la plateforme : associations, tontines, cotisations, prêts, solidarité, gouvernance, rapports et administration.",
   download: "Télécharger le PDF",
+  readOnline: "Lire en ligne",
   read: "Parcourir le sommaire",
   notice: "Édition anonymisée : les noms des associations et des personnes ont été remplacés par des identifiants fictifs. Les montants, règles et captures restent concrets.",
   pages: "88 pages",
@@ -124,6 +126,7 @@ const en: DocsCopy = {
   title2: "for Tchoua.",
   desc: "88 pages to understand, configure and operate the platform: associations, tontines, contributions, loans, solidarity, governance, reports and administration.",
   download: "Download the PDF",
+  readOnline: "Read online",
   read: "Browse the contents",
   notice: "Anonymized edition: association and people names have been replaced with fictional identifiers. Amounts, rules and screenshots remain concrete.",
   pages: "88 pages",
@@ -198,6 +201,7 @@ const es: DocsCopy = {
   title2: "de Tchoua.",
   desc: "88 páginas para comprender, configurar y explotar la plataforma: asociaciones, tontinas, cotizaciones, préstamos, solidaridad, gobernanza, informes y administración.",
   download: "Descargar el PDF",
+  readOnline: "Leer en línea",
   read: "Ver el índice",
   notice: "Edición anonimizada: los nombres de las asociaciones y de las personas fueron sustituidos por identificadores ficticios. Los montos, reglas y capturas siguen siendo concretos.",
   pages: "88 páginas", captures: "24 capturas reales", diagrams: "10 esquemas",
@@ -264,6 +268,7 @@ const de: DocsCopy = {
   title2: "für Tchoua.",
   desc: "88 Seiten zum Verstehen, Konfigurieren und Betreiben der Plattform: Vereine, Tontinen, Beiträge, Kredite, Solidarität, Governance, Berichte und Administration.",
   download: "PDF herunterladen",
+  readOnline: "Online lesen",
   read: "Inhaltsverzeichnis ansehen",
   notice: "Anonymisierte Ausgabe: Namen von Vereinen und Personen wurden durch fiktive Kennungen ersetzt. Beträge, Regeln und Screenshots bleiben konkret.",
   pages: "88 Seiten", captures: "24 echte Screenshots", diagrams: "10 Diagramme",
