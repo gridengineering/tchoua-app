@@ -121,10 +121,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const interest = Number(r.interest ?? Math.max(Number(r.amount) - Number(r.principal ?? 0), 0));
     events.push({
       id: `r-${r.id}`, date: r.paidAt.toISOString(), type: "REPAYMENT",
-      label: `Remboursement — ${r.loan.borrowerMembership.user.name}`, amount: Number(r.amount), direction: "IN",
+      label: `Remboursement principal — ${r.loan.borrowerMembership.user.name}`, amount: Number(r.principal ?? (Number(r.amount) - interest)), direction: "IN",
       membershipId: r.loan.borrowerMembershipId, memberName: r.loan.borrowerMembership.user.name,
       activityId: r.loan.activity.id, activityName: r.loan.activity.name,
-      meta: { principal: r.principal, intérêt: interest, mode: r.paymentMethod, référence: r.reference },
+      meta: { principal: r.principal, intérêt: interest, versement: Number(r.amount), mode: r.paymentMethod, référence: r.reference },
     });
 
     if (interest > 0) {
