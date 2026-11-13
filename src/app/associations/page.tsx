@@ -524,7 +524,7 @@ export default function AssociationsPage() {
                       )}
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users className="w-3.5 h-3.5 text-ash" />
-                        <span>{a._count?.members ?? 0} membre(s)</span>
+                        <span>{(a._count?.memberships ?? a._count?.members ?? 0)} membre(s)</span>
                       </div>
                       {a._count?.activities > 0 && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
