@@ -1831,17 +1831,17 @@ footer.manual a{color:#e6c98f}
     <thead><tr><th>Objeto</th><th>Fórmula de referencia</th><th>Condiciones</th></tr></thead>
     <tbody>
       <tr><td>Cotización</td><td class="mono">C = q × u</td><td>q = participaciones suscritas; u = tarifa por período.</td></tr>
-      <tr><td>Deuda neta</td><td class="mono">D = appel + ajustements − remises − affectations</td><td>Presentar el crédito excedente por separado.</td></tr>
-      <tr><td>Bote distribuible</td><td class="mono">P = encaissements confirmés + report + financement − charges − réservations</td><td>Incluir únicamente los flujos del fondo autorizado.</td></tr>
-      <tr><td>Participaciones enteras</td><td class="mono">n = min(plafond, droits restants, plancher(P / b))</td><td>b = importe por derecho entero; verificar después la elegibilidad.</td></tr>
-      <tr><td>Participaciones fraccionarias</td><td class="mono">q = min(plafond, droits, f × plancher(P / (b × f)))</td><td>Todos los límites están alineados con la rejilla f.</td></tr>
-      <tr><td>Préstamo con principal constante</td><td class="mono">a = capital / n ; I(t) = CRD(t−1) × i</td><td>i = tasa por período; ajuste final del principal.</td></tr>
+      <tr><td>Deuda neta</td><td class="mono">D = llamada + ajustes − descuentos − asignaciones</td><td>Presentar el crédito excedente por separado.</td></tr>
+      <tr><td>Bote distribuible</td><td class="mono">P = cobros confirmados + traslado + financiación − cargos − reservas</td><td>Incluir únicamente los flujos del fondo autorizado.</td></tr>
+      <tr><td>Participaciones enteras</td><td class="mono">n = min(tope, derechos restantes, suelo(P / b))</td><td>b = importe por derecho entero; verificar después la elegibilidad.</td></tr>
+      <tr><td>Participaciones fraccionarias</td><td class="mono">q = min(tope, derechos, f × suelo(P / (b × f)))</td><td>Todos los límites están alineados con la rejilla f.</td></tr>
+      <tr><td>Préstamo con principal constante</td><td class="mono">a = capital / n ; I(t) = saldo vivo(t−1) × i</td><td>i = tasa por período; ajuste final del principal.</td></tr>
       <tr><td>Anualidad constante</td><td class="mono">A = capital × i / (1 − (1 + i)^(−n))</td><td>Para i = 0, A = capital / n.</td></tr>
-      <tr><td>Interés simple fechado</td><td class="mono">I = capital × taux annuel × jours / base</td><td>Base elegida explícitamente, por ejemplo 365.</td></tr>
-      <tr><td>Ahorro disponible</td><td class="mono">S libre = S acquis − blocages − retraits réservés</td><td>Eliminar los solapamientos entre reservas.</td></tr>
-      <tr><td>Ayuda con tope</td><td class="mono">A = min(formule, reliquat événement, reliquat annuel, reliquat ménage)</td><td>Las ayudas aprobadas no pagadas consumen el tope.</td></tr>
-      <tr><td>Dividendo</td><td class="mono">d(i) = base distribuable × poids(i) / somme des poids</td><td>Base y liquidez controladas por separado.</td></tr>
-      <tr><td>Quórum</td><td class="mono">Q = plafond supérieur(taux × base admissible)</td><td>Presentes reconocidos ≥ Q; base y poderes explícitos.</td></tr>
+      <tr><td>Interés simple fechado</td><td class="mono">I = capital × tasa anual × días / base</td><td>Base elegida explícitamente, por ejemplo 365.</td></tr>
+      <tr><td>Ahorro disponible</td><td class="mono">S libre = S acumulado − bloqueos − retiros reservados</td><td>Eliminar los solapamientos entre reservas.</td></tr>
+      <tr><td>Ayuda con tope</td><td class="mono">A = min(fórmula, remanente evento, remanente anual, remanente hogar)</td><td>Las ayudas aprobadas no pagadas consumen el tope.</td></tr>
+      <tr><td>Dividendo</td><td class="mono">d(i) = base distribuible × peso(i) / suma de pesos</td><td>Base y liquidez controladas por separado.</td></tr>
+      <tr><td>Quórum</td><td class="mono">Q = techo(tasa × base admisible)</td><td>Presentes reconocidos ≥ Q; base y poderes explícitos.</td></tr>
     </tbody>
   </table></div>
   <p class="note">Método de los mayores restos: calcular las cuotas exactas, atribuir las unidades enteras inferiores y luego distribuir las unidades restantes a los mayores restos. En caso de igualdad, aplicar un orden estable publicado u otra regla aprobada. La suma final debe igualar exactamente la base.</p>

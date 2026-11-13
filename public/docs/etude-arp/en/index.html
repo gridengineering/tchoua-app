@@ -1828,17 +1828,17 @@ footer.manual a{color:#e6c98f}
     <thead><tr><th>Item</th><th>Reference formula</th><th>Conditions</th></tr></thead>
     <tbody>
       <tr><td>Contribution</td><td class="mono">C = q × u</td><td>q = shares subscribed; u = price per period.</td></tr>
-      <tr><td>Net debt</td><td class="mono">D = appel + ajustements − remises − affectations</td><td>Present excess credit separately.</td></tr>
-      <tr><td>Distributable pot</td><td class="mono">P = encaissements confirmés + report + financement − charges − réservations</td><td>Include only the flows of the authorized fund.</td></tr>
-      <tr><td>Whole shares</td><td class="mono">n = min(plafond, droits restants, plancher(P / b))</td><td>b = amount per whole entitlement; then check eligibility.</td></tr>
-      <tr><td>Fractional shares</td><td class="mono">q = min(plafond, droits, f × plancher(P / (b × f)))</td><td>All limits are aligned on the f grid.</td></tr>
-      <tr><td>Constant-principal loan</td><td class="mono">a = capital / n ; I(t) = CRD(t−1) × i</td><td>i = rate per period; final principal adjustment.</td></tr>
-      <tr><td>Constant annuity</td><td class="mono">A = capital × i / (1 − (1 + i)^(−n))</td><td>For i = 0, A = capital / n.</td></tr>
-      <tr><td>Dated simple interest</td><td class="mono">I = capital × taux annuel × jours / base</td><td>Base explicitly chosen, for example 365.</td></tr>
-      <tr><td>Available savings</td><td class="mono">S libre = S acquis − blocages − retraits réservés</td><td>Eliminate overlaps between reservations.</td></tr>
-      <tr><td>Capped aid</td><td class="mono">A = min(formule, reliquat événement, reliquat annuel, reliquat ménage)</td><td>Approved but unpaid aid consumes the cap.</td></tr>
-      <tr><td>Dividend</td><td class="mono">d(i) = base distribuable × poids(i) / somme des poids</td><td>Base and liquidity checked separately.</td></tr>
-      <tr><td>Quorum</td><td class="mono">Q = plafond supérieur(taux × base admissible)</td><td>Recognized attendees ≥ Q; explicit base and proxies.</td></tr>
+      <tr><td>Net debt</td><td class="mono">D = call + adjustments − discounts − allocations</td><td>Present excess credit separately.</td></tr>
+      <tr><td>Distributable pot</td><td class="mono">P = confirmed receipts + carry-over + funding − charges − reservations</td><td>Include only the flows of the authorized fund.</td></tr>
+      <tr><td>Whole shares</td><td class="mono">n = min(cap, remaining entitlements, floor(P / b))</td><td>b = amount per whole entitlement; then check eligibility.</td></tr>
+      <tr><td>Fractional shares</td><td class="mono">q = min(cap, entitlements, f × floor(P / (b × f)))</td><td>All limits are aligned on the f grid.</td></tr>
+      <tr><td>Constant-principal loan</td><td class="mono">a = principal / n ; I(t) = outstanding(t−1) × i</td><td>i = rate per period; final principal adjustment.</td></tr>
+      <tr><td>Constant annuity</td><td class="mono">A = principal × i / (1 − (1 + i)^(−n))</td><td>For i = 0, A = capital / n.</td></tr>
+      <tr><td>Dated simple interest</td><td class="mono">I = principal × annual rate × days / basis</td><td>Base explicitly chosen, for example 365.</td></tr>
+      <tr><td>Available savings</td><td class="mono">S available = S accrued − locks − reserved withdrawals</td><td>Eliminate overlaps between reservations.</td></tr>
+      <tr><td>Capped aid</td><td class="mono">A = min(formula, event remainder, annual remainder, household remainder)</td><td>Approved but unpaid aid consumes the cap.</td></tr>
+      <tr><td>Dividend</td><td class="mono">d(i) = distributable base × weight(i) / sum of weights</td><td>Base and liquidity checked separately.</td></tr>
+      <tr><td>Quorum</td><td class="mono">Q = ceiling(rate × eligible base)</td><td>Recognized attendees ≥ Q; explicit base and proxies.</td></tr>
     </tbody>
   </table></div>
   <p class="note">Largest remainder method: calculate the exact shares, allocate the whole units below, then distribute the remaining units to the largest remainders. In the event of a tie, apply a published stable order or another approved rule. The final sum must equal the base exactly.</p>

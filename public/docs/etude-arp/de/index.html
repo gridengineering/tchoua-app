@@ -1828,17 +1828,17 @@ footer.manual a{color:#e6c98f}
     <thead><tr><th>Gegenstand</th><th>Referenzformel</th><th>Bedingungen</th></tr></thead>
     <tbody>
       <tr><td>Beitrag</td><td class="mono">C = q × u</td><td>q = gezeichnete Anteile; u = Tarif pro Periode.</td></tr>
-      <tr><td>Nettoschuld</td><td class="mono">D = appel + ajustements − remises − affectations</td><td>Den überschüssigen Kredit getrennt ausweisen.</td></tr>
-      <tr><td>Verteilbarer Topf</td><td class="mono">P = encaissements confirmés + report + financement − charges − réservations</td><td>Nur die Ströme des genehmigten Fonds einbeziehen.</td></tr>
-      <tr><td>Ganze Anteile</td><td class="mono">n = min(plafond, droits restants, plancher(P / b))</td><td>b = Betrag pro ganzem Anspruch; anschließend die Berechtigung prüfen.</td></tr>
-      <tr><td>Bruchteile von Anteilen</td><td class="mono">q = min(plafond, droits, f × plancher(P / (b × f)))</td><td>Alle Grenzen sind am Raster f ausgerichtet.</td></tr>
-      <tr><td>Kredit mit konstanter Tilgung</td><td class="mono">a = capital / n ; I(t) = CRD(t−1) × i</td><td>i = Satz pro Periode; abschließende Anpassung des Kapitalbetrags.</td></tr>
-      <tr><td>Konstante Annuität</td><td class="mono">A = capital × i / (1 − (1 + i)^(−n))</td><td>Für i = 0 gilt A = Kapital / n.</td></tr>
-      <tr><td>Einfache, datierte Zinsen</td><td class="mono">I = capital × taux annuel × jours / base</td><td>Ausdrücklich gewählte Basis, zum Beispiel 365.</td></tr>
-      <tr><td>Verfügbares Sparen</td><td class="mono">S libre = S acquis − blocages − retraits réservés</td><td>Überschneidungen zwischen Reservierungen beseitigen.</td></tr>
-      <tr><td>Hilfe mit Obergrenze</td><td class="mono">A = min(formule, reliquat événement, reliquat annuel, reliquat ménage)</td><td>Genehmigte, aber nicht ausgezahlte Hilfen verbrauchen die Obergrenze.</td></tr>
-      <tr><td>Dividende</td><td class="mono">d(i) = base distribuable × poids(i) / somme des poids</td><td>Basis und Liquidität getrennt prüfen.</td></tr>
-      <tr><td>Quorum</td><td class="mono">Q = plafond supérieur(taux × base admissible)</td><td>Anerkannte Anwesende ≥ Q; Basis und ausdrückliche Vollmachten.</td></tr>
+      <tr><td>Nettoschuld</td><td class="mono">D = Aufruf + Anpassungen − Rabatte − Zuordnungen</td><td>Den überschüssigen Kredit getrennt ausweisen.</td></tr>
+      <tr><td>Verteilbarer Topf</td><td class="mono">P = bestätigte Eingänge + Übertrag + Finanzierung − Kosten − Reservierungen</td><td>Nur die Ströme des genehmigten Fonds einbeziehen.</td></tr>
+      <tr><td>Ganze Anteile</td><td class="mono">n = min(Obergrenze, Restansprüche, floor(P / b))</td><td>b = Betrag pro ganzem Anspruch; anschließend die Berechtigung prüfen.</td></tr>
+      <tr><td>Bruchteile von Anteilen</td><td class="mono">q = min(Obergrenze, Ansprüche, f × floor(P / (b × f)))</td><td>Alle Grenzen sind am Raster f ausgerichtet.</td></tr>
+      <tr><td>Kredit mit konstanter Tilgung</td><td class="mono">a = Kapital / n ; I(t) = Restschuld(t−1) × i</td><td>i = Satz pro Periode; abschließende Anpassung des Kapitalbetrags.</td></tr>
+      <tr><td>Konstante Annuität</td><td class="mono">A = Kapital × i / (1 − (1 + i)^(−n))</td><td>Für i = 0 gilt A = Kapital / n.</td></tr>
+      <tr><td>Einfache, datierte Zinsen</td><td class="mono">I = Kapital × Jahreszins × Tage / Basis</td><td>Ausdrücklich gewählte Basis, zum Beispiel 365.</td></tr>
+      <tr><td>Verfügbares Sparen</td><td class="mono">S frei = S erworben − Sperren − reservierte Abhebungen</td><td>Überschneidungen zwischen Reservierungen beseitigen.</td></tr>
+      <tr><td>Hilfe mit Obergrenze</td><td class="mono">A = min(Formel, Ereignisrest, Jahresrest, Haushaltsrest)</td><td>Genehmigte, aber nicht ausgezahlte Hilfen verbrauchen die Obergrenze.</td></tr>
+      <tr><td>Dividende</td><td class="mono">d(i) = verteilbare Basis × Gewicht(i) / Summe der Gewichte</td><td>Basis und Liquidität getrennt prüfen.</td></tr>
+      <tr><td>Quorum</td><td class="mono">Q = Decke(Satz × zulässige Basis)</td><td>Anerkannte Anwesende ≥ Q; Basis und ausdrückliche Vollmachten.</td></tr>
     </tbody>
   </table></div>
   <p class="note">Methode der größten Reste: die exakten Quoten berechnen, die niedrigeren ganzen Einheiten zuweisen und die verbleibenden Einheiten dann den größten Resten zuweisen. Bei Gleichstand eine veröffentlichte stabile Reihenfolge oder eine andere genehmigte Regel anwenden. Die Endsumme muss exakt der Basis entsprechen.</p>
