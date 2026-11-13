@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Bell, ChevronDown, LogOut, Menu, Plus, Settings, ShieldCheck, User } from "lucide-react";
+import { Bell, ChevronDown, HelpCircle, LogOut, Menu, Plus, Settings, ShieldCheck, User } from "lucide-react";
 
 const LABELS: Record<string, string> = {
   dashboard: "Tableau de bord", associations: "Associations", tontines: "Tontines",
@@ -17,11 +17,13 @@ const LABELS: Record<string, string> = {
 };
 
 export function MemberTopbar({
-  title, onMenuClick, user,
+  title, onMenuClick, user, onHelpClick, helpOpen,
 }: {
   title?: string;
   onMenuClick: () => void;
   user?: { name?: string | null; email?: string | null; systemRoleId?: string | null };
+  onHelpClick?: () => void;
+  helpOpen?: boolean;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -75,6 +77,16 @@ export function MemberTopbar({
             className="hidden items-center gap-1.5 rounded-lg m-accent-bg px-3 py-2 text-sm font-semibold text-white hover:brightness-110 sm:flex">
             <Plus className="h-4 w-4" /> Nouvelle association
           </Link>
+          <button
+            onClick={onHelpClick}
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors ${helpOpen ? "m-accent-bg text-white" : "m-muted m-hover"}`}
+            aria-label="Afficher l’aide contextuelle"
+            aria-pressed={helpOpen}
+            title="Aide sur ce formulaire"
+          >
+            <HelpCircle className="h-5 w-5" />
+            <span className="hidden sm:inline">Aide</span>
+          </button>
           <Link href="/profil" className="rounded-lg p-2 m-muted m-hover" aria-label="Notifications">
             <Bell className="h-5 w-5" />
           </Link>
