@@ -12,6 +12,7 @@ const PDF = "/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf";
 export default function DocumentationPage() {
   const { lang, setLang, availableLangs } = useI18n();
   const d = DOCS_COPY[publicLang(lang)];
+  const docLangs = availableLangs.filter((l) => ["fr", "en", "es", "de"].includes(l.code));
 
   return (
     <div className="min-h-screen" style={{ background: "#f7f3eb", color: "#1a1a1a" }}>
@@ -154,7 +155,7 @@ export default function DocumentationPage() {
               <p className="max-w-xl text-sm leading-relaxed text-white/60">{d.langDesc}</p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {availableLangs.map((l) => (
+              {docLangs.map((l) => (
                 <button key={l.code} onClick={() => setLang(l.code)}
                   className={`rounded-xl border px-3 py-3 text-left text-sm transition-colors ${
                     lang === l.code ? "border-[#e68a00] bg-[#e68a00] text-[#0d3d28]" : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10"
