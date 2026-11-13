@@ -63,6 +63,16 @@ export type ActivityInitial = {
   auctionMinBidders?: number | null;
   partAmount?: number | null;
   maxPartsPerSession?: number;
+  beneficiaryAmountPerShare?: number | null;
+  minShareFraction?: number;
+  maxSharesPerMember?: number | null;
+  maxBeneficiarySharesPerSession?: number | null;
+  allowPartialShares?: boolean;
+  allowSameBeneficiaryMultipleShares?: boolean;
+  cycleMode?: string;
+  cycleSessions?: number | null;
+  cycleStart?: string | null;
+  cycleEnd?: string | null;
   caisseLoanRate?: number | null;
   caisseLoanDuration?: number | null;
   loanRate1?: number | null;
@@ -131,6 +141,16 @@ export function ActivityForm({
     auctionMinBidders: initial?.auctionMinBidders != null ? String(initial.auctionMinBidders) : "2",
     partAmount: initial?.partAmount != null ? String(initial.partAmount) : "",
     maxPartsPerSession: initial?.maxPartsPerSession != null ? String(initial.maxPartsPerSession) : "1",
+    beneficiaryAmountPerShare: initial?.beneficiaryAmountPerShare != null ? String(initial.beneficiaryAmountPerShare) : "",
+    minShareFraction: initial?.minShareFraction != null ? String(initial.minShareFraction) : "1",
+    maxSharesPerMember: initial?.maxSharesPerMember != null ? String(initial.maxSharesPerMember) : "",
+    maxBeneficiarySharesPerSession: initial?.maxBeneficiarySharesPerSession != null ? String(initial.maxBeneficiarySharesPerSession) : "",
+    allowPartialShares: initial?.allowPartialShares ?? false,
+    allowSameBeneficiaryMultipleShares: initial?.allowSameBeneficiaryMultipleShares ?? true,
+    cycleMode: initial?.cycleMode ?? "FIXED_SESSIONS",
+    cycleSessions: initial?.cycleSessions != null ? String(initial.cycleSessions) : "",
+    cycleStart: initial?.cycleStart ? initial.cycleStart.slice(0, 10) : "",
+    cycleEnd: initial?.cycleEnd ? initial.cycleEnd.slice(0, 10) : "",
     caisseLoanRate: initial?.caisseLoanRate != null ? String(initial.caisseLoanRate) : "",
     caisseLoanDuration: initial?.caisseLoanDuration != null ? String(initial.caisseLoanDuration) : "",
     loanRate1: initial?.loanRate1 != null ? String(initial.loanRate1) : "2",
@@ -194,6 +214,20 @@ export function ActivityForm({
         auctionMinBidders: isTontine && form.distributionMode === "AUCTION" ? Number(form.auctionMinBidders) : undefined,
         partAmount: form.partAmount === "" ? null : Number(form.partAmount),
         maxPartsPerSession: Number(form.maxPartsPerSession) || 1,
+        ...(isTontine
+          ? {
+              beneficiaryAmountPerShare: form.beneficiaryAmountPerShare === "" ? null : Number(form.beneficiaryAmountPerShare),
+              minShareFraction: Number(form.minShareFraction) || 1,
+              maxSharesPerMember: form.maxSharesPerMember === "" ? null : Number(form.maxSharesPerMember),
+              maxBeneficiarySharesPerSession: form.maxBeneficiarySharesPerSession === "" ? null : Number(form.maxBeneficiarySharesPerSession),
+              allowPartialShares: form.allowPartialShares,
+              allowSameBeneficiaryMultipleShares: form.allowSameBeneficiaryMultipleShares,
+              cycleMode: form.cycleMode,
+              cycleSessions: form.cycleMode === "FIXED_SESSIONS" ? (form.cycleSessions === "" ? null : Number(form.cycleSessions)) : null,
+              cycleStart: form.cycleStart ? new Date(form.cycleStart).toISOString() : null,
+              cycleEnd: form.cycleMode === "FIXED_PERIOD" && form.cycleEnd ? new Date(form.cycleEnd).toISOString() : null,
+            }
+          : {}),
         caisseLoanRate: form.caisseLoanRate === "" ? null : Number(form.caisseLoanRate),
         caisseLoanDuration: form.caisseLoanDuration === "" ? null : Number(form.caisseLoanDuration),
         loanRate1: isLoan ? Number(form.loanRate1) : undefined,
@@ -357,6 +391,70 @@ export function ActivityForm({
               <p className="mt-1 text-xs text-ash">Montant d&apos;une part et nombre max de parts par membre.</p>
             </div>
           </div>
+
+          {isTontine && (
+            <div className="rounded-xl border border-stone bg-white p-4">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-charcoal">
+                <Coins className="h-4 w-4 text-forest" /> Cycle & parts bénéficiaires
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label className={labelCls}>Montant par part bénéficiaire</label>
+                  <input type="number" min={0} step={500} value={form.beneficiaryAmountPerShare}
+                    onChange={(e) => set({ beneficiaryAmountPerShare: e.target.value })} placeholder="Ex : 550 000" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Fraction minimale</label>
+                  <select value={form.minShareFraction} onChange={(e) => set({ minShareFraction: e.target.value, allowPartialShares: e.target.value !== "1" })} className={inputCls}>
+                    <option value="1">Part entière</option>
+                    <option value="0.5">Demi-part</option>
+                    <option value="0.25">Quart de part</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Parts max par membre</label>
+                  <input type="number" min={0} step={0.25} value={form.maxSharesPerMember}
+                    onChange={(e) => set({ maxSharesPerMember: e.target.value })} placeholder="Illimité" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Parts bénéficiaires max / session</label>
+                  <input type="number" min={1} value={form.maxBeneficiarySharesPerSession}
+                    onChange={(e) => set({ maxBeneficiarySharesPerSession: e.target.value })} placeholder="Selon le pot" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Mode de cycle</label>
+                  <select value={form.cycleMode} onChange={(e) => set({ cycleMode: e.target.value })} className={inputCls}>
+                    <option value="FIXED_SESSIONS">Nombre de sessions fixe</option>
+                    <option value="FIXED_PERIOD">Période fixe</option>
+                    <option value="UNTIL_ALL_BENEFITED">Jusqu&apos;à épuisement des parts</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>
+                    {form.cycleMode === "FIXED_SESSIONS" ? "Nombre de sessions" : form.cycleMode === "FIXED_PERIOD" ? "Fin du cycle" : "Fin automatique"}
+                  </label>
+                  {form.cycleMode === "FIXED_SESSIONS" ? (
+                    <input type="number" min={1} value={form.cycleSessions} onChange={(e) => set({ cycleSessions: e.target.value })} placeholder="Ex : 12" className={inputCls} />
+                  ) : form.cycleMode === "FIXED_PERIOD" ? (
+                    <input type="date" value={form.cycleEnd} onChange={(e) => set({ cycleEnd: e.target.value })} className={inputCls} />
+                  ) : (
+                    <div className="rounded-xl border border-stone bg-cream/40 px-3 py-2.5 text-xs text-graphite">Clôture dès que toutes les parts ont un bénéficiaire.</div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 text-xs font-medium text-graphite">
+                  <input type="checkbox" checked={form.allowPartialShares} onChange={(e) => set({ allowPartialShares: e.target.checked })} />
+                  Autoriser les fractions de part
+                </label>
+                <label className="flex items-center gap-2 text-xs font-medium text-graphite">
+                  <input type="checkbox" checked={form.allowSameBeneficiaryMultipleShares} onChange={(e) => set({ allowSameBeneficiaryMultipleShares: e.target.checked })} />
+                  Un bénéficiaire peut recevoir plusieurs parts
+                </label>
+              </div>
+              <p className="mt-2 text-xs text-ash">Le pot de chaque session détermine le nombre de parts distribuables, dans la limite des plafonds.</p>
+            </div>
+          )}
 
           <div className="rounded-xl border border-stone bg-cream/40 p-4">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-charcoal">
