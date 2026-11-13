@@ -7,9 +7,10 @@
 <link rel="canonical" href="https://www.tchoua.com/docs/manuel/index.html">
 <style>
 :root{--ink:#0d3d28;--ink2:#145c43;--gold:#c08a2e;--cream:#f7f3eb;--paper:#fffdf8;--muted:#66756c;--line:#e2dccd}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
+*{box-sizing:border-box}html{scroll-behavior:auto}
 body{margin:0;background:var(--cream);color:#26362e;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.72}
 a{color:#0d5c44;text-decoration:none}a:hover{text-decoration:underline}
+[id]{scroll-margin-top:84px}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(13,61,40,.97);color:#fff;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12)}
 .topbar-in{max-width:1320px;margin:auto;display:flex;align-items:center;gap:18px;padding:10px 22px}
 .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:900;letter-spacing:-.02em}
@@ -50,7 +51,7 @@ a{color:#0d5c44;text-decoration:none}a:hover{text-decoration:underline}
 .chapter{margin:0 0 64px;padding-bottom:48px;border-bottom:1px solid var(--line)}
 .chapter:last-of-type{border-bottom:none}
 .chapter-kicker{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#a97b18;font-weight:900;margin-bottom:8px}
-h1.chapter{font-size:clamp(28px,3.4vw,40px);line-height:1.1;letter-spacing:-.02em;color:#0d3d28;margin:0 0 14px;border:0;padding:0}
+h1.chapter{font-size:clamp(28px,3.4vw,40px);line-height:1.1;letter-spacing:-.02em;color:#0d3d28;margin:0 0 14px;border:0;padding:0;scroll-margin-top:112px}
 .lead{font-size:18px;line-height:1.6;color:#405248;margin:0 0 26px}
 h2{font-size:24px;line-height:1.25;color:#0d3d28;margin:38px 0 12px;padding-top:8px;border-top:1px solid #eee7d7}
 h3{font-size:18px;color:#145c43;margin:26px 0 8px}
@@ -1710,9 +1711,9 @@ footer.manual a{color:#f4d58d}
 const bar=document.getElementById('progress');
 addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;bar.style.width=p+'%';},{passive:true});
 const links=[...document.querySelectorAll('.sidebar a[href^="#"]')];
-const targets=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id));}})},{rootMargin:'-25% 0px -65% 0px'});
-targets.forEach(t=>obs.observe(t));
+const heads=[...document.querySelectorAll('.content h1[id], .content h2[id]')];
+function syncToc(){let cur=heads[0];for(const h of heads){if(h.getBoundingClientRect().top<=150)cur=h;else break;}if(cur){const id='#'+cur.id;links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===id));}}
+addEventListener('scroll',syncToc,{passive:true});syncToc();
 document.getElementById('print')?.addEventListener('click',()=>window.print());
 </script>
 </body></html>
