@@ -2,8 +2,57 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+function applyCorsHeaders(res: NextResponse, origin: string | null) {
+  res.headers.set("Access-Control-Allow-Origin", origin || "*");
+  res.headers.set("Access-Control-Allow-Credentials", "true");
+  res.headers.set("Access-Control-Allow-Methods", "GET,POST,PATCH,PUT,DELETE,OPTIONS");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  res.headers.set("Vary", "Origin");
+  return res;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const origin = request.headers.get("origin");
+
+  // ─── API CORS + Mobile Bearer Token forwarding ───────────────────────────
+  if (pathname.startsWith("/api")) {
+    if (request.method === "OPTIONS") {
+      return applyCorsHeaders(new NextResponse(null, { status: 204 }), origin);
+    }
+
+    const authHeader = request.headers.get("authorization");
+    const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+    const requestHeaders = new Headers(request.headers);
+
+    if (bearerToken) {
+      const existingCookie = requestHeaders.get("cookie") ?? "";
+      if (!existingCookie.includes("next-auth.session-token=")) {
+        const injected = `next-auth.session-token=${bearerToken}; __Secure-next-auth.session-token=${bearerToken}`;
+        requestHeaders.set("cookie", existingCookie ? `${existingCookie}; ${injected}` : injected);
+      }
+    }
+
+    if (pathname.startsWith("/api/admin")) {
+      const forwardedReq = new Request(request.url, { headers: requestHeaders });
+      const token = await getToken({
+        req: forwardedReq as unknown as NextRequest,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      if (!token) {
+        return applyCorsHeaders(NextResponse.json({ error: "Non autorisé" }, { status: 401 }), origin);
+      }
+      if (!token.systemRoleId) {
+        return applyCorsHeaders(
+          NextResponse.json({ error: "Accès réservé aux utilisateurs système" }, { status: 403 }),
+          origin
+        );
+      }
+    }
+
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    return applyCorsHeaders(response, origin);
+  }
 
   // ─── Routes Admin : Nécessite un systemRoleId valide ─────────────────────
   if (pathname.startsWith("/admin")) {
@@ -65,6 +114,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/api/:path*",
     "/admin/:path*",
     "/api/admin/:path*",
     "/dashboard/:path*",
