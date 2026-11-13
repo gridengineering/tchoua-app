@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const membership = await getMembership(session.user.id, id);
 
-  if (!association.isPublic && !membership) {
+  if (!association.isPublic && !membership && !isSuperAdmin(session)) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 

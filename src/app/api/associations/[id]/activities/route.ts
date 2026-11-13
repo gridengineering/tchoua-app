@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isSuperAdmin } from "@/lib/permissions";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import { capabilityForActivityType } from "@/lib/arp/profile";
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const membership = await getMembership(session.user.id, id);
   if (!membership) {
     const assoc = await prisma.association.findUnique({ where: { id }, select: { isPublic: true } });
-    if (!assoc?.isPublic) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+    if (!assoc?.isPublic && !isSuperAdmin(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
   const activities = await prisma.associationActivity.findMany({

@@ -12,6 +12,7 @@ import type {
   ArpCapabilities,
   ArpCapability,
   ArpConfig,
+  ArpOrigin,
   ArpProfilePayload,
   ArpValidation,
   ArpValidationContext,
@@ -96,17 +97,30 @@ async function findAssociationForArp(associationId: string) {
  * Garantit l'existence d'un profil ARP. Les associations déjà actives reçoivent
  * un profil ACTIVE d'origine BACKFILL, signalé comme à valider dans l'interface.
  */
-export async function ensureArpProfile(associationId: string) {
+export type EnsureArpOptions = {
+  config?: unknown;
+  origin?: ArpOrigin;
+  activate?: boolean;
+};
+
+export async function ensureArpProfile(
+  associationId: string,
+  options: EnsureArpOptions = {}
+) {
   const existing = await prisma.arpProfile.findUnique({
     where: { associationId },
   });
   if (existing) return existing;
 
   const association = await findAssociationForArp(associationId);
-  const config = defaultArpConfig(seedFromAssociation(association));
+  const seed = seedFromAssociation(association);
+  const config = options.config
+    ? normalizeArpConfig(options.config, seed)
+    : defaultArpConfig(seed);
   const context = arpContextFromAssociation(association);
   const checks = validateArpConfig(config, context);
-  const active = association.status === "ACTIVE";
+  const active = options.activate ?? association.status === "ACTIVE";
+  const origin: ArpOrigin = options.origin ?? (active ? "BACKFILL" : "MANUAL");
 
   try {
     return await prisma.$transaction(async (tx) => {
@@ -115,7 +129,7 @@ export async function ensureArpProfile(associationId: string) {
           associationId,
           structure: config.dimensions.organisation.toUpperCase(),
           status: active ? "ACTIVE" : "DRAFT",
-          origin: active ? "BACKFILL" : "MANUAL",
+          origin,
           version: 1,
           config: config as unknown as Prisma.InputJsonValue,
           checks: checks as unknown as Prisma.InputJsonValue,

@@ -52,6 +52,9 @@ const labelCls = "mb-1.5 block text-xs font-semibold uppercase tracking-wide tex
 export type ActivityInitial = {
   id?: string;
   name?: string;
+  status?: string;
+  conditionMonths?: number | null;
+  collectionAmount?: number | null;
   description?: string | null;
   type?: string;
   participation?: string;
@@ -110,10 +113,16 @@ export function ActivityForm({
   associationId,
   mode = "create",
   initial,
+  embedded = false,
+  onSaved,
+  onCancel,
 }: {
   associationId: string;
   mode?: "create" | "edit";
   initial?: ActivityInitial | null;
+  embedded?: boolean;
+  onSaved?: (id?: string) => void;
+  onCancel?: () => void;
 }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -129,8 +138,20 @@ export function ActivityForm({
     }
   }, [initial?.loanMaxPerMember]);
 
+  const initialRatioMax = useMemo(() => {
+    if (!initial?.loanMaxPerMember) return "";
+    try {
+      const parsed = JSON.parse(initial.loanMaxPerMember);
+      return parsed?.ratioMax != null ? String(parsed.ratioMax) : "";
+    } catch {
+      return "";
+    }
+  }, [initial?.loanMaxPerMember]);
+
   const [form, setForm] = useState({
     name: initial?.name ?? "",
+    status: initial?.status ?? "ACTIVE",
+    conditionMonths: initial?.conditionMonths != null ? String(initial.conditionMonths) : "",
     description: initial?.description ?? "",
     type: initial?.type ?? "TONTINE_ROTATIVE",
     participation: initial?.participation ?? "MANDATORY",
@@ -156,12 +177,14 @@ export function ActivityForm({
     loanRate1: initial?.loanRate1 != null ? String(initial.loanRate1) : "2",
     loanRate2: initial?.loanRate2 != null ? String(initial.loanRate2) : "4",
     loanMaxPerMember: initialLimit,
+    loanRatioMax: initialRatioMax,
     loanApprovalMode: initial?.loanApprovalMode ?? "BUREAU",
     loanMaxActive: initial?.loanMaxActive != null ? String(initial.loanMaxActive) : "1",
     penaltyLateAmount: initial?.penaltyLateAmount != null ? String(initial.penaltyLateAmount) : "",
     penaltyLatePercent: initial?.penaltyLatePercent != null ? String(initial.penaltyLatePercent) : "",
     penaltyGraceDays: initial?.penaltyGraceDays != null ? String(initial.penaltyGraceDays) : "",
     maxRetards: initial?.maxRetards != null ? String(initial.maxRetards) : "",
+    collectionAmount: initial?.collectionAmount != null ? String(initial.collectionAmount) : "",
     paymentMethods: boolFromJson(initial?.paymentMethods),
   });
 
@@ -204,7 +227,12 @@ export function ActivityForm({
         name: form.name.trim(),
         description: form.description || null,
         type: form.type,
+        status: form.status,
         participation: form.participation,
+        conditionMonths:
+          form.participation === "CONDITIONAL" && form.conditionMonths !== ""
+            ? Number(form.conditionMonths)
+            : null,
         contributionAmount: form.contributionAmount === "" ? null : Number(form.contributionAmount),
         contributionUnit: form.contributionUnit,
         contributionFrequency: legacyFrequency(frequency.mode),
@@ -234,7 +262,11 @@ export function ActivityForm({
         loanRate2: isLoan ? Number(form.loanRate2) : undefined,
         loanMaxPerMember:
           isLoan && form.loanMaxPerMember !== ""
-            ? JSON.stringify({ type: "AMOUNT", value: Number(form.loanMaxPerMember) })
+            ? JSON.stringify({
+                type: "AMOUNT",
+                value: Number(form.loanMaxPerMember),
+                ratioMax: form.loanRatioMax === "" ? undefined : Number(form.loanRatioMax),
+              })
             : undefined,
         loanApprovalMode: isLoan ? form.loanApprovalMode : undefined,
         loanMaxActive: isLoan ? Number(form.loanMaxActive) : undefined,
@@ -242,6 +274,10 @@ export function ActivityForm({
         penaltyLatePercent: form.penaltyLatePercent === "" ? null : Number(form.penaltyLatePercent),
         penaltyGraceDays: form.penaltyGraceDays === "" ? null : Number(form.penaltyGraceDays),
         maxRetards: form.maxRetards === "" ? null : Number(form.maxRetards),
+        collectionAmount:
+          form.type === "COLLECTION" && form.collectionAmount !== ""
+            ? Number(form.collectionAmount)
+            : null,
         paymentMethods: form.paymentMethods,
       };
 
@@ -257,6 +293,11 @@ export function ActivityForm({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || "Enregistrement impossible");
       const id = mode === "edit" ? initial?.id : data?.activity?.id;
+      if (onSaved) {
+        onSaved(id);
+        setSaving(false);
+        return;
+      }
       router.push(id ? `/associations/${associationId}/activities/${id}` : `/associations/${associationId}/activities`);
     } catch (err: any) {
       setError(err?.message || "Erreur lors de l'enregistrement");
@@ -266,17 +307,19 @@ export function ActivityForm({
 
   return (
     <form onSubmit={submit} className="space-y-6 pb-12">
-      <div className="flex items-center justify-between gap-4">
-        <Link
-          href={`/associations/${associationId}/activities`}
-          className="inline-flex items-center gap-2 text-sm font-medium text-graphite hover:text-forest"
-        >
-          <ArrowLeft className="w-4 h-4" /> Retour aux activités
-        </Link>
-        <span className="text-xs font-semibold uppercase tracking-widest text-ash">
-          Module 8 · Moteur de fréquence
-        </span>
-      </div>
+      {!embedded ? (
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href={`/associations/${associationId}/activities`}
+            className="inline-flex items-center gap-2 text-sm font-medium text-graphite hover:text-forest"
+          >
+            <ArrowLeft className="w-4 h-4" /> Retour aux activités
+          </Link>
+          <span className="text-xs font-semibold uppercase tracking-widest text-ash">
+            Module 8 · Moteur de fréquence
+          </span>
+        </div>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -317,7 +360,15 @@ export function ActivityForm({
               className={inputCls}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className={labelCls}>Statut</label>
+              <select value={form.status} onChange={(e) => set({ status: e.target.value })} className={inputCls}>
+                <option value="ACTIVE">Active</option>
+                <option value="PAUSED">En pause</option>
+                <option value="CLOSED">Clôturée</option>
+              </select>
+            </div>
             <div>
               <label className={labelCls}>Participation</label>
               <select
@@ -329,6 +380,18 @@ export function ActivityForm({
                 <option value="OPTIONAL">Optionnelle</option>
                 <option value="CONDITIONAL">Conditionnelle (ancienneté)</option>
               </select>
+            </div>
+            <div>
+              <label className={labelCls}>Ancienneté requise (mois)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.conditionMonths}
+                onChange={(e) => set({ conditionMonths: e.target.value })}
+                disabled={form.participation !== "CONDITIONAL"}
+                placeholder="Ex : 3"
+                className={inputCls}
+              />
             </div>
             <div>
               <label className={labelCls}>Unité de cotisation</label>
@@ -353,6 +416,20 @@ export function ActivityForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
+          {form.type === "COLLECTION" ? (
+            <div>
+              <label className={labelCls}>Montant de la collecte (FCFA)</label>
+              <input
+                type="number"
+                min={0}
+                step={500}
+                value={form.collectionAmount}
+                onChange={(e) => set({ collectionAmount: e.target.value })}
+                placeholder="Ex : 10 000"
+                className={inputCls}
+              />
+            </div>
+          ) : null}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className={labelCls}>Montant par session (FCFA)</label>
@@ -623,6 +700,19 @@ export function ActivityForm({
               />
             </div>
             <div>
+              <label className={labelCls}>Ratio max prêts / fonds (%)</label>
+              <input
+                type="number"
+                min={0}
+                max={300}
+                step={5}
+                value={form.loanRatioMax}
+                onChange={(e) => set({ loanRatioMax: e.target.value })}
+                placeholder="80"
+                className={inputCls}
+              />
+            </div>
+            <div>
               <label className={labelCls}>Validation des demandes</label>
               <select
                 value={form.loanApprovalMode}
@@ -720,11 +810,16 @@ export function ActivityForm({
       )}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" onClick={() => router.back()} disabled={saving}>
-          Annuler
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => (embedded ? onCancel?.() : router.back())}
+          disabled={saving}
+        >
+          {embedded ? "Fermer" : "Annuler"}
         </Button>
         <Button type="submit" loading={saving} className="sm:min-w-56">
-          {mode === "edit" ? "Enregistrer les modifications" : "Créer l'activité"}
+          {embedded ? "Enregistrer" : mode === "edit" ? "Enregistrer les modifications" : "Créer l'activité"}
         </Button>
       </div>
     </form>

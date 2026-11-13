@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isSuperAdmin } from "@/lib/permissions";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -29,7 +29,7 @@ export async function GET(
   const membership = await getMembership(session.user.id, id);
   if (!membership) {
     const assoc = await prisma.association.findUnique({ where: { id }, select: { isPublic: true } });
-    if (!assoc?.isPublic) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+    if (!assoc?.isPublic && !isSuperAdmin(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
   const activity = await prisma.associationActivity.findFirst({
@@ -92,14 +92,14 @@ export async function PATCH(
 
   const body = await req.json();
   const {
-    name, description, status, contributionAmount, contributionUnit,
+    name, description, status, conditionMonths, contributionAmount, contributionUnit,
     contributionFrequency, distributionMode, partAmount, maxPartsPerSession,
     beneficiaryAmountPerShare, minShareFraction, maxSharesPerMember,
     maxBeneficiarySharesPerSession, allowPartialShares, allowSameBeneficiaryMultipleShares,
     cycleMode, cycleSessions, cycleStart, cycleEnd, cycleConfig,
     penaltyLateAmount, penaltyLatePercent, penaltyGraceDays, maxRetards,
     loanRate1, loanRate2, loanMaxPerMember, loanApprovalMode, loanMaxActive,
-    paymentMethods, frequencyConfig, sortOrder,
+    paymentMethods, natureCatalog, collectionAmount, frequencyConfig, sortOrder,
   } = body;
 
   const updated = await prisma.associationActivity.update({
@@ -108,6 +108,7 @@ export async function PATCH(
       ...(name !== undefined && { name }),
       ...(description !== undefined && { description }),
       ...(status !== undefined && { status }),
+      ...(conditionMonths !== undefined && { conditionMonths }),
       ...(contributionAmount !== undefined && { contributionAmount }),
       ...(contributionUnit !== undefined && { contributionUnit }),
       ...(contributionFrequency !== undefined && { contributionFrequency }),
@@ -135,6 +136,8 @@ export async function PATCH(
       ...(loanApprovalMode !== undefined && { loanApprovalMode }),
       ...(loanMaxActive !== undefined && { loanMaxActive }),
       ...(paymentMethods !== undefined && { paymentMethods: JSON.stringify(paymentMethods) }),
+      ...(natureCatalog !== undefined && { natureCatalog: natureCatalog ? JSON.stringify(natureCatalog) : null }),
+      ...(collectionAmount !== undefined && { collectionAmount }),
       ...(frequencyConfig !== undefined && { frequencyConfig: JSON.stringify(frequencyConfig) }),
       ...(sortOrder !== undefined && { sortOrder }),
     },

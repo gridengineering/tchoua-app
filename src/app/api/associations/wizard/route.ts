@@ -34,6 +34,9 @@ export async function POST(req: Request) {
       parentId,
       parentSubscriptionFee,
       website,
+      isPublic,
+      bankConfig,
+      arpConfig,
       meetingConfig,
       membershipConfig,
       socialAidCaps,
@@ -98,6 +101,8 @@ export async function POST(req: Request) {
           parentId,
           parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null,
           website,
+          isPublic: Boolean(isPublic),
+          bankConfig: bankConfig ? JSON.stringify(bankConfig) : null,
           meetingConfig: meetingConfig ? JSON.stringify(meetingConfig) : null,
           membershipConfig: membershipConfig ? JSON.stringify(membershipConfig) : null,
           socialAidCaps: socialAidCaps ? JSON.stringify(socialAidCaps) : null,
@@ -125,8 +130,9 @@ export async function POST(req: Request) {
             name: act.name,
             description: act.description ?? null,
             type: act.type ?? "TONTINE_ROTATIVE",
-            status: "ACTIVE",
+            status: act.status ?? "ACTIVE",
             participation: act.participation ?? "OPTIONAL",
+            conditionMonths: act.conditionMonths ?? null,
             contributionAmount: act.contributionAmount ?? null,
             contributionUnit: act.contributionUnit ?? "CASH",
             contributionFrequency: act.contributionFrequency ?? "MONTHLY",
@@ -136,6 +142,18 @@ export async function POST(req: Request) {
             frequencyConfig: act.frequencyConfig ? JSON.stringify(act.frequencyConfig) : null,
             partAmount: act.partAmount ?? null,
             maxPartsPerSession: act.maxPartsPerSession ?? 1,
+            beneficiaryAmountPerShare: act.beneficiaryAmountPerShare ?? null,
+            minShareFraction: act.minShareFraction ?? 1,
+            maxSharesPerMember: act.maxSharesPerMember ?? null,
+            maxBeneficiarySharesPerSession: act.maxBeneficiarySharesPerSession ?? null,
+            allowPartialShares: act.allowPartialShares ?? false,
+            allowSameBeneficiaryMultipleShares: act.allowSameBeneficiaryMultipleShares ?? true,
+            cycleMode: act.cycleMode ?? "FIXED_SESSIONS",
+            cycleSessions: act.cycleSessions ?? null,
+            cycleStart: act.cycleStart ? new Date(act.cycleStart) : null,
+            cycleEnd: act.cycleEnd ? new Date(act.cycleEnd) : null,
+            collectionAmount: act.collectionAmount ?? null,
+            paymentMethods: Array.isArray(act.paymentMethods) ? JSON.stringify(act.paymentMethods) : (act.paymentMethods ?? "CASH"),
             caisseLoanRate: act.caisseLoanRate ?? 0,
             caisseLoanDuration: act.caisseLoanDuration ?? 1,
             loanRate1: act.loanRate1 ?? null,
@@ -218,7 +236,11 @@ export async function POST(req: Request) {
     // Le profil reste BACKFILL/ACTIVE : il n'interrompt pas l'existant et sera
     // revu puis publié par le bureau depuis /associations/[id]/arp.
     try {
-      await ensureArpProfile(result.id);
+      await ensureArpProfile(result.id, {
+        config: arpConfig,
+        origin: "MANUAL",
+        activate: true,
+      });
     } catch (arpError) {
       console.error("Initialisation ARP après wizard:", arpError);
     }

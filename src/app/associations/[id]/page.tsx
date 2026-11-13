@@ -719,12 +719,28 @@ export default function AssociationDetailPage() {
                 >
                   <Plus className="w-4 h-4" /> Rejoindre une activité
                 </button>
+                {isBureauMember && (
+                  <button
+                    className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-[#f6fbf7] text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#ecf7ef] transition-colors"
+                    onClick={() => router.push(`/associations/${id}/configuration`)}
+                  >
+                    <Settings className="w-4 h-4" /> Configurer
+                  </button>
+                )}
                 <button
-                  className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-[#f6fbf7] text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#ecf7ef] transition-colors"
+                  className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-white text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f6fbf7] transition-colors"
                   onClick={() => router.push(`/associations/${id}/arp`)}
                 >
                   <Boxes className="w-4 h-4" /> Cadre ARP
                 </button>
+                {isBureauMember && (
+                  <button
+                    className="inline-flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-cream transition-colors"
+                    onClick={() => router.push(`/associations/${id}/modifier`)}
+                  >
+                    <FileText className="w-4 h-4" /> Modifier
+                  </button>
+                )}
                 {isBureauMember && (
                   <>
                     <button

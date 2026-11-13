@@ -441,12 +441,26 @@ function CoverageTable({ rows }: { rows: AdminRow[] }) {
                   </td>
                   <td className="px-3 py-2.5 text-[#57534e]">{row.funds}</td>
                   <td className="px-3 py-2.5 text-right">
-                    <Link
-                      href={`/associations/${row.id}/arp`}
-                      className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#0d3d28] hover:underline"
-                    >
-                      Ouvrir <ArrowUpRight className="h-3 w-3" />
-                    </Link>
+                    <div className="flex flex-col items-end gap-1">
+                      <Link
+                        href={`/associations/${row.id}/arp`}
+                        className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#0d3d28] hover:underline"
+                      >
+                        Cadre ARP <ArrowUpRight className="h-3 w-3" />
+                      </Link>
+                      <Link
+                        href={`/associations/${row.id}/configuration`}
+                        className="text-[10px] font-semibold text-[#1e40af] hover:underline"
+                      >
+                        Configurer
+                      </Link>
+                      <Link
+                        href={`/associations/${row.id}/modifier`}
+                        className="text-[10px] font-semibold text-[#57534e] hover:underline"
+                      >
+                        Modifier
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               );
