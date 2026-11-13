@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 
 const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
 const AID_APPROVER_ROLES = ["PRESIDENT", "FOUNDER", "TREASURER", "SOLIDARITY_OFFICER"];
@@ -47,6 +48,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const membership = await getMembership(session.user.id, id);
   if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+
+  try {
+    await requireArpCapability(id, "SOCIAL_AID");
+  } catch (error) {
+    const mapped = arpErrorResponse(error);
+    if (mapped) return NextResponse.json(mapped.body, { status: mapped.status });
+    throw error;
+  }
 
   const body = await req.json();
   const { category, requestedAmount, justification, urgencyLevel, documentUrl } = body;

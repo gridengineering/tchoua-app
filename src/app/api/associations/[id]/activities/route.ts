@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
+import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
+import { capabilityForActivityType } from "@/lib/arp/profile";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -72,6 +74,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   } = body;
 
   if (!name || !type) return NextResponse.json({ error: "name et type sont requis" }, { status: 400 });
+
+  const arpCapability = capabilityForActivityType(type);
+  if (arpCapability) {
+    try {
+      await requireArpCapability(id, arpCapability);
+    } catch (error) {
+      const mapped = arpErrorResponse(error);
+      if (mapped) return NextResponse.json(mapped.body, { status: mapped.status });
+      throw error;
+    }
+  }
 
   const activity = await prisma.associationActivity.create({
     data: {

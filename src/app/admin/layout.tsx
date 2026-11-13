@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
-  Activity, ArrowLeftRight, Bell, Building2, ChevronLeft, ChevronRight,
+  Activity, ArrowLeftRight, Bell, Boxes, Building2, ChevronLeft, ChevronRight,
   FileText, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
   PanelLeftOpen, Settings, ShieldCheck, Users, Wallet, X,
 } from "lucide-react";
@@ -25,6 +25,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Organisation",
     items: [
       { name: "Associations", href: "/admin/associations", icon: Building2 },
+      { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes },
       { name: "Modèles", href: "/admin/templates", icon: FileText },
     ],
   },
@@ -57,6 +58,7 @@ const CRUMB_LABELS: Record<string, string> = {
   users: "Utilisateurs",
   roles: "Rôles",
   associations: "Associations",
+  arp: "Référentiel ARP",
   templates: "Modèles",
   wallets: "Wallets",
   finance: "Audit financier",

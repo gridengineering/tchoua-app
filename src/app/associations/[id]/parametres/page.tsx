@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, ReactNode } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, AlertTriangle, Trash2, Check, Shield, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, AlertTriangle, Trash2, Check, Shield, Plus, X, Boxes } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { PERMISSIONS, ALL_PERMISSIONS, type Permission } from "@/lib/permissions";
 
@@ -159,6 +159,24 @@ export default function ParametresPage() {
             <ArrowLeft className="w-4 h-4" /> Retour
           </Link>
         </div>
+
+        <Link
+          href={`/associations/${id}/arp`}
+          className="flex items-center justify-between gap-3 rounded-xl border border-[#cfe0d5] bg-gradient-to-r from-[#f6fbf7] to-[#fffdf9] px-5 py-4 transition hover:border-[#0d3d28]/40"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#0d3d28] text-white">
+              <Boxes className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-[#1a1a1a]">Cadre ARP de l&apos;association</p>
+              <p className="mt-0.5 text-[11px] leading-4 text-[#6b7280]">
+                36 domaines, conditions de compatibilité, fonds, réservations et versions publiées.
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-[#0d3d28]">Ouvrir →</span>
+        </Link>
 
         <IdentitySection assoc={assoc} onSave={patch} />
         <HierarchieSection assoc={assoc} onSave={patch} />

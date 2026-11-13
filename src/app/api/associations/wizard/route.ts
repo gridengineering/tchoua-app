@@ -9,6 +9,7 @@ import {
   validateMaxChildAssociations,
 } from "@/lib/association/rules";
 import { generateJoinCode } from "@/lib/invite-code";
+import { ensureArpProfile } from "@/lib/arp/server";
 
 export async function POST(req: Request) {
   try {
@@ -212,6 +213,15 @@ export async function POST(req: Request) {
 
       return newAssoc;
     });
+
+    // Initialise le cadre ARP à partir des activités réellement créées.
+    // Le profil reste BACKFILL/ACTIVE : il n'interrompt pas l'existant et sera
+    // revu puis publié par le bureau depuis /associations/[id]/arp.
+    try {
+      await ensureArpProfile(result.id);
+    } catch (arpError) {
+      console.error("Initialisation ARP après wizard:", arpError);
+    }
 
     return NextResponse.json({ success: true, association: result });
 

@@ -285,7 +285,7 @@ export async function validateLoanToFundRatio(
 
   const totalFunds =
     activities.reduce((sum, a) => sum + (a.caisseBalance ?? 0), 0) +
-    (capital._sum.amount ?? 0);
+    (capital?._sum?.amount ?? 0);
 
   let maxRatio = 0.8;
   for (const activity of activities) {

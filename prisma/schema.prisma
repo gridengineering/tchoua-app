@@ -834,6 +834,9 @@ model Association {
   dividendRuns  AssociationDividendRun[]
   solidarityRuns AssociationSolidarityRun[]
   settlements    MemberSettlement[]
+  arpProfile     ArpProfile?
+  arpVersions    ArpProfileVersion[]
+  arpFunds       ArpFund[]
 
   @@map("associations")
 }
@@ -1029,6 +1032,7 @@ model AssociationActivity {
   loans             AssocLoan[]
   sanctions         AssocSanction[]
   waiverRequests    AssocWaiverRequest[]
+  arpFunds          ArpFund[]
 
   @@map("association_activities")
 }
@@ -1972,4 +1976,118 @@ model MemberSettlement {
   membership  AssociationMembership @relation(fields: [membershipId], references: [id])
 
   @@map("member_settlements")
+}
+
+
+// ─── ARP : cadre de gestion, versions et noyau des fonds ─────────────────────
+
+model ArpProfile {
+  id              String    @id @default(cuid())
+  associationId   String    @unique
+  structure       String    @default("AUTONOME")
+  status          String    @default("DRAFT") // DRAFT, ACTIVE, SUSPENDED, ARCHIVED
+  origin          String    @default("MANUAL") // MANUAL, BACKFILL, TEMPLATE
+  version         Int       @default(1)
+  config          Json
+  checks          Json?
+  draftConfig     Json?
+  draftChecks     Json?
+  effectiveAt     DateTime?
+  approvedById    String?
+  approvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  association     Association         @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  versions        ArpProfileVersion[]
+
+  @@index([status])
+  @@map("arp_profiles")
+}
+
+model ArpProfileVersion {
+  id              String    @id @default(cuid())
+  profileId       String
+  associationId   String
+  version         Int
+  status          String
+  origin          String    @default("MANUAL")
+  config          Json
+  checks          Json?
+  hash            String
+  createdById     String?
+  approvedById    String?
+  effectiveAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  profile         ArpProfile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  association     Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, version])
+  @@index([associationId, createdAt])
+  @@map("arp_profile_versions")
+}
+
+model ArpFund {
+  id              String    @id @default(cuid())
+  associationId   String
+  code            String
+  name            String
+  type            String    @default("LIBRE") // LIBRE, AFFECTE, RESERVE, DEPOT
+  currency        String    @default("XAF")
+  activityId      String?
+  status          String    @default("ACTIVE") // ACTIVE, CLOSED
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  association     Association          @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  activity        AssociationActivity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  movements       ArpFundMovement[]
+  reservations    ArpFundReservation[]
+
+  @@unique([associationId, code])
+  @@index([associationId, status])
+  @@map("arp_funds")
+}
+
+model ArpFundMovement {
+  id              String    @id @default(cuid())
+  fundId          String
+  direction       String // IN, OUT
+  amountMinor     BigInt
+  currency        String
+  valueDate       DateTime
+  occurredAt      DateTime  @default(now())
+  sourceType      String    @default("MANUAL")
+  sourceId        String?
+  description     String
+  reversesId      String?
+  createdById     String?
+  createdAt       DateTime  @default(now())
+
+  fund            ArpFund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+
+  @@index([fundId, occurredAt])
+  @@index([sourceType, sourceId])
+  @@map("arp_fund_movements")
+}
+
+model ArpFundReservation {
+  id              String    @id @default(cuid())
+  fundId          String
+  amountMinor     BigInt
+  currency        String
+  purpose         String
+  status          String    @default("ACTIVE") // ACTIVE, RELEASED, CONSUMED
+  expiresAt       DateTime?
+  consumedAt      DateTime?
+  releasedAt      DateTime?
+  createdById     String?
+  createdAt       DateTime  @default(now())
+
+  fund            ArpFund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+
+  @@index([fundId, status])
+  @@map("arp_fund_reservations")
 }

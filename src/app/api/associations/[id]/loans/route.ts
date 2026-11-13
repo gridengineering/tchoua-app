@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
@@ -82,6 +83,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const membership = await getMembership(session.user.id, id);
   if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+
+  try {
+    await requireArpCapability(id, "CREDIT");
+  } catch (error) {
+    const mapped = arpErrorResponse(error);
+    if (mapped) return NextResponse.json(mapped.body, { status: mapped.status });
+    throw error;
+  }
 
   const body = await req.json();
   const { activityId, amount, duration, purpose, customRate } = body;

@@ -8,7 +8,7 @@ import {
   ArrowLeft, Users, Calendar, DollarSign, FileText, MessageSquare,
   Activity, Settings, UserPlus, Plus, Search, Upload, Send,
   AlertCircle, CheckCircle, Clock, ChevronRight, X, Building2,
-  BarChart3, Shield, Gavel, Shuffle, Star, Heart
+  BarChart3, Shield, Gavel, Shuffle, Star, Heart, Boxes
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -718,6 +718,12 @@ export default function AssociationDetailPage() {
                   onClick={() => { setTab("activities"); }}
                 >
                   <Plus className="w-4 h-4" /> Rejoindre une activité
+                </button>
+                <button
+                  className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-[#f6fbf7] text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#ecf7ef] transition-colors"
+                  onClick={() => router.push(`/associations/${id}/arp`)}
+                >
+                  <Boxes className="w-4 h-4" /> Cadre ARP
                 </button>
                 {isBureauMember && (
                   <>
