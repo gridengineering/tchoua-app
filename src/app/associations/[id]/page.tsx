@@ -213,6 +213,14 @@ function getAssocTypeLabel(type: string): string {
     SPORTS: "Sportive",
     SAVINGS: "Épargne",
     MIXED: "Mixte",
+    AMICALE: "Amicale",
+    SECTION: "Section",
+    FEDERATION: "Fédération",
+    TONTINE_CLUB: "Club de tontine",
+    COOPERATIVE: "Coopérative",
+    INVESTMENT: "Investissement",
+    AGRICULTURAL: "Agricole",
+    MUTUAL: "Mutuelle",
   };
   return types[type] || type;
 }

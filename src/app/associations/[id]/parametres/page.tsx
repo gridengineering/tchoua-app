@@ -276,6 +276,11 @@ function IdentitySection({ assoc, onSave }: { assoc: Association; onSave: (d: Re
             <option value="INVESTMENT">Investissement</option>
             <option value="AGRICULTURAL">Agricole</option>
             <option value="MUTUAL">Mutuelle</option>
+            <option value="AMICALE">Amicale d&apos;élites</option>
+            <option value="SECTION">Section / démembrement</option>
+            <option value="FEDERATION">Fédération</option>
+            <option value="CULTURAL">Culturelle</option>
+            <option value="PROFESSIONAL">Professionnelle</option>
             <option value="OTHER">Autre</option>
           </select>
         </div>
