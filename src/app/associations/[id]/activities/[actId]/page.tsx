@@ -136,6 +136,9 @@ export default function ActivityPage() {
               )}
             </div>
             <div className="flex gap-2 flex-shrink-0">
+              <Link href={`/associations/${id}/activities/${actId}/cycle`} className="px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ borderColor: "#d6d3d1", color: "#57534e" }}>
+                Cycle
+              </Link>
               <Link href={`/associations/${id}/activities/${actId}/edit`} className="px-3 py-1.5 rounded-lg text-sm font-medium border flex items-center" style={{ borderColor: "#d6d3d1", color: "#57534e" }}>
                 Modifier
               </Link>

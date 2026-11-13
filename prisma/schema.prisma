@@ -978,6 +978,18 @@ model AssociationActivity {
   // Système de parts
   partAmount        Float?
   maxPartsPerSession Int   @default(1)
+  // Tontine flexible : montant reçu par part, fractions, cycle
+  beneficiaryAmountPerShare Float?
+  minShareFraction  Float   @default(1)
+  maxSharesPerMember Float?
+  maxBeneficiarySharesPerSession Float?
+  allowPartialShares Boolean @default(false)
+  allowSameBeneficiaryMultipleShares Boolean @default(true)
+  cycleMode         String  @default("FIXED_SESSIONS") // FIXED_SESSIONS, FIXED_PERIOD, UNTIL_ALL_BENEFITED
+  cycleSessions     Int?
+  cycleStart        DateTime?
+  cycleEnd          DateTime?
+  cycleConfig       String?
 
   // Caisse
   caisseBalance     Float  @default(0)

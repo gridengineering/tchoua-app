@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, PiggyBank, RotateCcw, Landmark, Heart, BarChart3,
   Settings, LogOut, ChevronLeft, ChevronDown, MessageCircle, Calendar, Bot,
   FileText, Building2, UserCircle, Check, ShieldCheck, Plus, ShoppingBag,
-  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight,
+  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight, History, TrendingUp,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: any; feature?: string };
@@ -76,6 +76,8 @@ function AssociationNav({ id }: { id: string }) {
     { href: `/associations/${id}/dividendes`, label: "Dividendes", icon: Coins },
     { href: `/associations/${id}/members`, label: "Membres", icon: Users },
     { href: `/associations/${id}/rapports`, label: "Rapports", icon: FileText },
+    { href: `/associations/${id}/historique`, label: "Historique", icon: History },
+    { href: `/associations/${id}/interets`, label: "Intérêts", icon: TrendingUp },
     { href: `/associations/${id}/parametres`, label: "Paramètres", icon: Settings },
   ];
   const pathname = usePathname();
