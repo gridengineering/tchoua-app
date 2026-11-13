@@ -109,6 +109,14 @@ footer.manual a{color:#f4d58d}
 @media(max-width:720px){.langs{display:none}}
 .langs-mobile{display:none}
 @media(max-width:720px){.langs-mobile{display:flex;justify-content:center;background:#0d3d28;padding:0 12px 8px}.langs-mobile .langs{display:flex!important;margin:0}.langs-mobile .langs a{color:#e8f0ea}}
+
+.langs{display:flex;gap:4px;align-items:center;margin-left:4px}
+.langs a{font-size:11px;font-weight:800;color:#cfe0d6;padding:5px 7px;border-radius:6px}
+.langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
+.langs a.active{background:#e68a00;color:#0d3d28}
+@media(max-width:720px){.langs{display:none}}
+.langs-mobile{display:none}
+@media(max-width:720px){.langs-mobile{display:flex;justify-content:center;background:#0d3d28;padding:0 12px 8px}.langs-mobile .langs{display:flex!important;margin:0}.langs-mobile .langs a{color:#e8f0ea}}
 </style>
 </head>
 <body>
@@ -214,7 +222,7 @@ footer.manual a{color:#f4d58d}
   </ul>
 
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/01_home.jpg" alt="Page d'accueil publique de Tchoua">
+    <img loading="lazy" src="/docs/manuel/assets/shots/01_home.jpg" alt="Öffentliche Startseite von Tchoua">
     <figcaption><b>Abbildung 1.1</b> — Öffentliche Startseite: Versprechen, Vertrauensbelege und Zugang zur Kontoerstellung. Die Navigation bleibt bewusst kurz: Funktionen, Methode, Preise, Über uns, Kontakt.</figcaption>
   </figure>
 
@@ -276,14 +284,14 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/architecture.png" alt="Architecture de la plateforme">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/architecture.png" alt="Architektur der Plattform">
     <div class="cap"><b>Abbildung 2.1</b> — Architektur in drei Schichten: Nutzererfahrung, Next.js-Anwendung, Daten und Integrationen.</div>
   </section>
 
   <h2>2.3 Datenmodell</h2>
   <p>Das Modell ist bewusst auf den Verein ausgerichtet. Ein Benutzer kann mehreren Vereinen mit unterschiedlichen Rollen angehören. Ein Verein besitzt Aktivitäten; jede Aktivität besitzt Sitzungen, Beiträge, Begünstigte, Kredite und Rückzahlungen. Dokumente und Ordnungsartikel sind dem Verein zugeordnet.</p>
   <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/data_model.png" alt="Modèle de données">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/data_model.png" alt="Datenmodell">
     <div class="cap"><b>Abbildung 2.2</b> — Zentrale Entitäten und Beziehungen. Die vollständigen Kardinalitäten sind im Prisma-Schema des Repositories beschrieben.</div>
   </section>
 
@@ -342,7 +350,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tabelle 3.1 — In einem Verein verfügbare Rollen. Bezeichnungen und Befugnisse sind konfigurierbar; benutzerdefinierte Rollen können erstellt und mit einer Basisrolle kombiniert werden.</p>
 <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roles.png" alt="Rôles et permissions">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roles.png" alt="Rollen und Berechtigungen">
     <div class="cap"><b>Abbildung 3.1</b> — Drei Berechtigungsstufen und vier übergreifende Sicherheitsregeln.</div>
   </section>
 
@@ -375,7 +383,7 @@ footer.manual a{color:#f4d58d}
   <h2>3.5 Einrichtung des Profils</h2>
   <p>Jeder Benutzer verwaltet sein Profil, sein Passwort, seine Sprache, sein Design für den Mitgliederbereich und seine Benachrichtigungen. Die Darstellungseinstellungen werden serverseitig gespeichert und bereits beim Laden angewendet, ohne Flackern.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Paramètres du compte et choix du thème">
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Kontoeinstellungen und Themenauswahl">
     <figcaption><b>Abbildung 3.2</b> — Kontoeinstellungen: persönliche Angaben, Sprache und Designauswahl (Wald, Mitternacht, Aurora, Ozean, Sand, Neon).</figcaption>
   </figure>
 
@@ -422,14 +430,14 @@ footer.manual a{color:#f4d58d}
   <p class="table-cap">Tabelle 4.1 — Jeder Übergang wird mit Urheber, Datum und Begründung protokolliert (Lebenszyklus-Ereignis).</p>
 
 <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/lifecycle.png" alt="Cycle de vie d'une association">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/lifecycle.png" alt="Lebenszyklus eines Vereins">
     <div class="cap"><b>Abbildung 4.1</b> — Von der Gründung bis zur Archivierung: sechs Etappen und Kontrollen bei jedem Übergang.</div>
   </section>
 
   <h2>4.3 Governance auf zwei Ebenen</h2>
   <p>Das Modell FEV / SLD zeigt die Leistungsfähigkeit der Hierarchie: Die FEV ist ein nationaler Verband mit Mitgliederversammlung, Leitungsausschuss, geschäftsführendem Vorstand, Ausschüssen und Sektionen. Die SLD ist die Sektion Douala mit eigenem Ausschuss, eigener Ordnung und eigenen Mitteln.</p>
   <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/org.png" alt="Gouvernance FEV / SLD">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/org.png" alt="Governance FEV / SLD">
     <div class="cap"><b>Abbildung 4.2</b> — Reale Organisation FEV / SLD: nationale Mitgliederversammlung, Leitungsausschuss, Vorstand, Ausschüsse, Sektion Douala.</div>
   </section>
   <p>Jede Ebene hat ihre eigenen Regeln: Die nationale Mitgliederversammlung tagt einmal jährlich mit einem Quorum von der Hälfte der Mitglieder; der Leitungsausschuss entscheidet mit 2/3; die Sektion Douala tagt am ersten Samstag nach dem 5. mit einem Quorum von 3/5. Tchoua speichert diese Parameter und gibt sie in den Governance-Ansichten wieder.</p>
@@ -437,7 +445,7 @@ footer.manual a{color:#f4d58d}
   <h2>4.4 Statuten, Ordnung und Dokumente</h2>
   <p>Die Statuten und die Innenordnung sind in nummerierte Artikel gegliedert, die eingesehen und von den Mitgliedern genehmigt werden können. Die Originaldokumente (PDF, DOCX) sind über die Vereinsakte herunterladbar. Die Versionen bleiben erhalten, und Änderungen werden nachvollziehbar protokolliert.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="Fiche FEV">
+    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="FEV-Akte">
     <figcaption><b>Abbildung 4.3</b> — Akte FEV: 1 Mitglied, 5 Aktivitäten, 14 Ordnungsartikel, 3 Dokumente, nationale Zugehörigkeit.</figcaption>
   </figure>
 
@@ -471,21 +479,21 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/modules.png" alt="Carte des modules">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/modules.png" alt="Modulkarte">
     <div class="cap"><b>Abbildung 5.1</b> — Die acht Module und der gemeinsame Kern: Verein → Mitglied → Aktivität → Sitzung → Bewegung.</div>
   </section>
 
   <h2>5.2 Navigation im Mitgliederbereich</h2>
   <p>Die Seitenleiste ist nach Absicht gruppiert: <strong>Steuerung</strong> (Dashboard, Vereine, Kalender), <strong>Finanzen</strong> (Tontinen, Sparen, Kredite, Solidarität, Sitzungen, Wallet), <strong>Gemeinschaft</strong> (Mitglieder, Marktplatz, Veranstaltungen, Chat), <strong>Analyse & Lernen</strong> (Berichte, KI-Beratung, Gamification, Akademie). Der kontextbezogene Bereich des Vereins ergänzt Übersicht, Aktivitäten, Kredite, Hilfen, Zusammenkünfte, Dividenden, Mitglieder, Berichte, Verlauf, Zinsen und Einstellungen.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Tableau de bord membre">
+    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Mitglieder-Dashboard">
     <figcaption><b>Abbildung 5.2</b> — Mitglieder-Dashboard: personalisierter Hero-Bereich, Kennzahlen, Launchpad und Schnellzugriffe. Design und Sprache entsprechen dem Profil.</figcaption>
   </figure>
 
   <h2>5.3 Launchpad</h2>
   <p>Das Launchpad ist ein direkter Zugang zu den zwölf meistgenutzten Modulen: Tontinen, Sparen, Kredite, Solidarität, Sitzungen, Mitglieder, Berichte, Wallet, Marktplatz, Chat, Akademie, Veranstaltungen. Es reduziert die Zahl der Klicks und macht den Mitgliederbereich auf dem Mobilgerät nutzbar.</p>
   <figure class="mobile">
-    <img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Launchpad mobile">
+    <img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Mobiles Launchpad">
     <figcaption><b>Abbildung 5.3</b> — Mobiles Launchpad: Modulraster, Schnellaktionen (Beitrag zahlen, Kredit beantragen, neuen Verein gründen) und eine für den Daumen geeignete Navigation.</figcaption>
   </figure>
 
@@ -549,7 +557,7 @@ footer.manual a{color:#f4d58d}
   </table>
 
   <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/tontine.png" alt="Moteur de tontine">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/tontine.png" alt="Tontinen-Engine">
     <div class="cap"><b>Abbildung 6.1</b> — Die acht Etappen der Engine, von der Wahl der Anteile bis zum Abschluss des Zyklus, mit den drei Berechnungsformeln.</div>
   </section>
 
@@ -601,7 +609,7 @@ footer.manual a{color:#f4d58d}
   <h2>6.7 Auktionen bei der SLD</h2>
   <p>Die SLD wendet eine jährliche Tontine von 25 000 FCFA und deren Vielfache an, die über öffentliche Auktionen mit einem Mindestgebot von 5 % des Beitragssatzes vergeben wird. Das Mitglied, das die Auktion gewinnt, erhält den Topf abzüglich des Abschlags; die erzeugten Zinsen werden in Losen verteilt oder übertragen. Säumige Mitglieder zahlen einen Zuschlag von 15 %, wenn sie noch nicht begünstigt wurden, und von 20 %, wenn sie bereits begünstigt wurden.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/20_amsed_tontine.jpg" alt="Activité de tontine SLD">
+    <img loading="lazy" src="/docs/manuel/assets/shots/20_amsed_tontine.jpg" alt="Tontinenaktivität SLD">
     <figcaption><b>Abbildung 6.2</b> — Aktivität „Jährliche Auktionstontine“ der SLD: 25 000 FCFA pro Anteil, 12 Sitzungen, Modus Auktion. Die Parameter für Zyklus und Anteile sind bearbeitbar.</figcaption>
   </figure>
 
@@ -618,7 +626,7 @@ footer.manual a{color:#f4d58d}
   <h2>6.9 Realer Zyklus und Saldo</h2>
   <p>Die Zyklusansicht gibt die Beiträge, die Ausschüttungen, den Saldo, die gezeichneten und verteilten Anteile, den Fortschritt und die Situation je Mitglied wieder. Die folgende Abbildung zeigt einen Demonstrationszyklus mit vier Mitgliedern und zwei Sitzungen: 800 000 FCFA eingezahlt, 800 000 FCFA ausgeschüttet, Saldo null, zwei von vier Anteilen verteilt.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/21_cycle_demo.jpg" alt="Cycle de tontine">
+    <img loading="lazy" src="/docs/manuel/assets/shots/21_cycle_demo.jpg" alt="Tontinenzyklus">
     <figcaption><b>Abbildung 6.3</b> — Tontine-Zyklus: Beiträge, Ausschüttungen, Saldo, Fortschritt, Situation je Mitglied, Sitzungen und Begünstigte. Demonstrationsdaten.</figcaption>
   </figure>
 
@@ -723,13 +731,13 @@ footer.manual a{color:#f4d58d}
   <h2>7.5 Bewirtungsbeitrag</h2>
   <p>Der Bewirtungsbeitrag ist eine Empfangskasse: Jedes Mitglied zahlt einen festen Betrag pro Sitzung, und das Mitglied, das die Zusammenkunft ausrichtet, erhält eine Pauschale, nach Abzug seiner Rückstände. Bei der SLD beträgt der Beitrag 3 000 FCFA und die Pauschale 150 000 FCFA.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/43_sessions.jpg" alt="Calendrier des sessions">
+    <img loading="lazy" src="/docs/manuel/assets/shots/43_sessions.jpg" alt="Sitzungskalender">
     <figcaption><b>Abbildung 7.1</b> — Beispiel eines Sitzungskalenders (Demonstrationsdaten): Daten, Aktivitäten, Status und direkter Zugang zur Sitzung. Die Sitzungen ergeben sich aus der konfigurierten Frequenz.</figcaption>
   </figure>
 
   <h2>7.6 Aktivitäten und Beitragsaufrufe</h2>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/06_ndi_activities.jpg" alt="Activités de l'association">
+    <img loading="lazy" src="/docs/manuel/assets/shots/06_ndi_activities.jpg" alt="Aktivitäten des Vereins">
     <figcaption><b>Abbildung 7.2</b> — Aktivitäten des Vereins: Karten je Aktivität, Betrag, Beteiligung, Kasse, Abonnements und Zugang zu den Details.</figcaption>
   </figure>
   <p>Jede Aktivitätskarte zeigt den Betrag des Beitrags, die Frequenz, die verfügbare Kasse, die Zahl der Abonnenten und die Aktionen (einsehen, Beitrag zahlen, verwalten). Pflichtaktivitäten erscheinen im Mitgliederbereich mit dem erwarteten Betrag und der Fälligkeit.</p>
@@ -789,7 +797,7 @@ footer.manual a{color:#f4d58d}
   <div class="formula"><b>Zins</b> = Restschuld × Monatszins × Anzahl Monate<br><b>Rate</b> = Kapital ÷ Laufzeit + Zinsen der Periode<br><b>Obergrenze</b> = min(verfügbare Kasse, Obergrenze Mitglied, Vielfaches der Einlage)</div>
 
 <section class="diagram-page">
-    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/loan.png" alt="Cycle d'un prêt">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/loan.png" alt="Kreditzyklus">
     <div class="cap"><b>Abbildung 8.1</b> — Die sechs Etappen eines Kredits, vom Antrag bis zur Verteilung der Zinsen, mit Sicherheiten und Strafgebühren.</div>
   </section>
 
@@ -808,7 +816,7 @@ footer.manual a{color:#f4d58d}
   <div class="formula"><b>Anteilsquote</b> = Kapital des Mitglieds zum Zeitpunkt des Kredits ÷ Gesamtkapital zum Zeitpunkt des Kredits<br><b>Zinsanteil</b> = zurückgezahlte Zinsen × Anteilsquote</div>
   <p>Die Ansicht „Zinsen“ zeigt für jede Rückzahlung im Detail: Datum, Kreditnehmer, Aktivität, Gesamtzinsen, Kapital des Mitglieds, Gesamtkapital, Anteilsquote und den ihm zustehenden Betrag. Der Vorstand kann die Verteilung unter allen Mitgliedern aufklappen.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Intérêts et dividendes">
+    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Zinsen und Dividenden">
     <figcaption><b>Abbildung 8.2</b> — Zinsen und Dividenden: 5 219 831 FCFA erzeugte Zinsen, Anteil des Mitglieds, Dividenden 2026 und Detail je Rückzahlung.</figcaption>
   </figure>
 
@@ -832,7 +840,7 @@ footer.manual a{color:#f4d58d}
 
   <h2>8.6 Kreditansicht</h2>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/07_ndi_loans.jpg" alt="Prêts internes HORIZON">
+    <img loading="lazy" src="/docs/manuel/assets/shots/07_ndi_loans.jpg" alt="Interne Kredite HORIZON">
     <figcaption><b>Abbildung 8.3</b> — Interne Kredite: verfügbare Kasse, laufende Kredite, Verlauf, Status und Zugang zu den Tilgungsplänen.</figcaption>
   </figure>
 
@@ -887,7 +895,7 @@ footer.manual a{color:#f4d58d}
 
   <h2>9.3 Ansicht Solidarität</h2>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/42_solidarite.jpg" alt="Espace solidarité">
+    <img loading="lazy" src="/docs/manuel/assets/shots/42_solidarite.jpg" alt="Solidaritätsbereich">
     <figcaption><b>Abbildung 9.1</b> — Bereich Solidarität & Nachbarschaftshilfe: Suche eines Antrags, Filter nach Kategorie und Verein, Stand der Warteschlange.</figcaption>
   </figure>
 
@@ -955,7 +963,7 @@ footer.manual a{color:#f4d58d}
 
   <h2>10.3 Ansicht Zusammenkünfte</h2>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/09_ndi_meetings.jpg" alt="Sessions et réunions">
+    <img loading="lazy" src="/docs/manuel/assets/shots/09_ndi_meetings.jpg" alt="Sitzungen und Versammlungen">
     <figcaption><b>Abbildung 10.1</b> — Sitzungen & Zusammenkünfte: Suche, Filter nach Aktivität und Verein, Stand der Warteschlange der Zusammenkünfte.</figcaption>
   </figure>
 
@@ -1016,7 +1024,7 @@ footer.manual a{color:#f4d58d}
 
   <h2>11.2 Der Tätigkeitsbericht</h2>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Rapports de l'association">
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Vereinsberichte">
     <figcaption><b>Abbildung 11.1</b> — Berichte: Zusammenfassung je Aktivität, Kassen, aktuelle Beiträge, Exporte und Steuerungskennzahlen.</figcaption>
   </figure>
   <p>Der Bericht zeigt die erwarteten und die vereinnahmten Beiträge, die offenen Posten, die ausgezahlten und zurückgezahlten Kredite, die ausgezahlten Hilfen, die Kassensalden, die Ausgaben und die Ergebnisse. Er kann nach Zeitraum, Aktivität und Mitglied gefiltert und anschließend als PDF oder CSV exportiert werden.</p>
@@ -1024,7 +1032,7 @@ footer.manual a{color:#f4d58d}
   <h2>11.3 Die Dividenden</h2>
   <p>Das Dividendenmodul berechnet die Verteilung der Zinsen und Gewinne unter den Mitgliedern nach einem in der Mitgliederversammlung festgelegten Schlüssel: Anzahl der Anteile, gehaltenes Kapital, Mitgliedsdauer oder eine Kombination. Die Berechnung wird in einem jährlichen „Lauf“ fixiert, mit Status, Berechnungsgrundlage und Anteilsquote je Mitglied.</p>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/12_ndi_dividends.jpg" alt="Dividendes 2026">
+    <img loading="lazy" src="/docs/manuel/assets/shots/12_ndi_dividends.jpg" alt="Dividenden 2026">
     <figcaption><b>Abbildung 11.2</b> — Dividenden 2026 von HORIZON: Grundlage von 5 433 499 FCFA, sieben Anteile, Betrag je Anteil und namentliche Verteilung.</figcaption>
   </figure>
   <div class="formula"><b>Dividende je Anteil</b> = insgesamt zu verteilender Betrag ÷ Anzahl der Anteile<br><b>Dividende des Mitglieds</b> = Anteile des Mitglieds × Dividende je Anteil</div>
@@ -1174,7 +1182,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
   <figure>
-    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Auswahl des Themes">
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Themenauswahl">
     <figcaption><b>Abbildung 13.1</b> — Einstellungen: persönliche Informationen, Sprache und Theme-Auswahl mit sofortiger Vorschau.</figcaption>
   </figure>
 
@@ -1188,7 +1196,7 @@ footer.manual a{color:#f4d58d}
   <h2>13.4 Mobilgeräte</h2>
   <p>Die Anwendung ist auf dem Telefon nutzbar: kompakte Navigation, gestapelte Karten, mit dem Daumen erreichbare Aktionen, scrollbare Tabellen. Die wichtigsten Bildschirme (Dashboard, Tontinen, Kredite, Verlauf) werden in 390 × 844 getestet.</p>
   <div class="duo">
-    <figure><img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Dashboard mobil"><figcaption><b>Abbildung 13.3</b> — Launchpad mobil.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Mobiles Dashboard"><figcaption><b>Abbildung 13.3</b> — Launchpad mobil.</figcaption></figure>
     <figure><img loading="lazy" src="/docs/manuel/assets/shots/41_mobile_tontines.jpg" alt="Tontinen mobil"><figcaption><b>Abbildung 13.4</b> — Liste der Tontinen mobil.</figcaption></figure>
   </div>
 
