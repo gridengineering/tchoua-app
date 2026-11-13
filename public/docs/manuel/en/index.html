@@ -1,0 +1,2055 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tchoua · Complete documentation 2026</title>
+<meta name="description" content="How Tchoua actually works: associations, the ARP framework, tontines, contributions, loans, solidarity, meetings, reports, administration and configuration.">
+<link rel="canonical" href="https://www.tchoua.com/docs/manuel/en/index.html">
+<link rel="alternate" hreflang="fr" href="https://www.tchoua.com/docs/manuel/index.html">
+<link rel="alternate" hreflang="en" href="https://www.tchoua.com/docs/manuel/en/index.html">
+<link rel="alternate" hreflang="es" href="https://www.tchoua.com/docs/manuel/es/index.html">
+<link rel="alternate" hreflang="de" href="https://www.tchoua.com/docs/manuel/de/index.html">
+<style>
+:root{--ink:#0d3d28;--ink2:#145c43;--gold:#c08a2e;--cream:#f7f3eb;--paper:#fffdf8;--muted:#66756c;--line:#e2dccd}
+*{box-sizing:border-box}html{scroll-behavior:auto}
+body{margin:0;background:var(--cream);color:#26362e;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.72}
+a{color:#0d5c44;text-decoration:none}a:hover{text-decoration:underline}
+[id]{scroll-margin-top:84px}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,61,40,.97);color:#fff;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12)}
+.topbar-in{max-width:1320px;margin:auto;display:flex;align-items:center;gap:18px;padding:10px 22px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:900;letter-spacing:-.02em}
+.brand img{width:34px;height:34px;border-radius:9px;background:#fff;padding:3px;object-fit:contain}
+.brand small{display:block;font-size:9px;letter-spacing:.18em;color:#e6c98f;font-weight:800}
+.topbar .spacer{flex:1}
+.topbar a.top{color:#d8e6df;font-size:13px;font-weight:600;padding:7px 9px;border-radius:8px}
+.topbar a.top:hover{background:rgba(255,255,255,.08);text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:10px 15px;font-weight:800;font-size:13px;border:1px solid transparent;cursor:pointer}
+.btn.gold{background:#e68a00;color:#0d3d28}.btn.gold:hover{background:#ff9d0a;text-decoration:none}
+.btn.ghost{border-color:rgba(255,255,255,.25);color:#fff;background:rgba(255,255,255,.12)}.btn.ghost:hover{background:rgba(255,255,255,.2);text-decoration:none}
+.btn.line{border-color:#0d3d28;color:#0d3d28;background:transparent}
+.progress{position:fixed;top:0;left:0;height:3px;background:#e68a00;z-index:99;width:0}
+.hero{background:#0d3d28;color:#fff;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 12%,rgba(192,138,46,.28),transparent 45%),radial-gradient(circle at 12% 88%,rgba(28,110,82,.5),transparent 48%)}
+.hero-in{position:relative;max-width:1320px;margin:auto;padding:54px 22px 46px;display:grid;grid-template-columns:1.35fr .65fr;gap:40px;align-items:end}
+.kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#e6c98f;font-weight:800}
+.hero h1{font-size:clamp(34px,5vw,62px);line-height:1.02;letter-spacing:-.03em;margin:12px 0 14px;font-weight:900}
+.hero h1 span{color:#e68a00}
+.hero p{color:#d8e6df;font-size:17px;max-width:720px;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}
+.chip{border:1px solid rgba(230,201,143,.4);color:#f1dfb8;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700}
+.hero-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:20px}
+.hero-card .label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#e6c98f;font-weight:800}
+.hero-card .big{font-size:38px;font-weight:900;line-height:1;margin:8px 0}
+.hero-card .small{font-size:12px;color:#cfe0d6}
+.notice{background:#fbf6e8;border-left:5px solid #c08a2e;border-radius:0 12px 12px 0;padding:14px 18px;color:#6b5418;font-size:13px;margin:16px 0 0}
+.layout{max-width:1320px;margin:auto;display:grid;grid-template-columns:290px minmax(0,1fr);gap:48px;padding:34px 22px 60px;align-items:start}
+.sidebar{position:sticky;top:76px;max-height:calc(100vh - 94px);overflow:auto;padding:4px 14px 20px 0;border-right:1px solid var(--line)}
+.sidebar h2{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#a97b18;margin:14px 0 8px}
+.toc-part{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#a97b18;font-weight:800;margin:16px 0 5px}
+.sidebar a{display:flex;gap:9px;padding:7px 7px;border-radius:8px;color:#3c4c43;font-size:13px;line-height:1.35;font-weight:600}
+.sidebar a span{color:#a97b18;font-weight:900;min-width:18px}
+.sidebar a:hover{background:#fffdf8;text-decoration:none}
+.sidebar a.active{background:#0d3d28;color:#fff}.sidebar a.active span{color:#f4d58d}
+.sidebar .back{display:block;margin:12px 0 0;font-size:12px;color:#66756c}
+.content{max-width:880px;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:clamp(24px,4vw,52px);box-shadow:0 16px 50px rgba(13,61,40,.06)}
+.chapter{margin:0 0 64px;padding-bottom:48px;border-bottom:1px solid var(--line)}
+.chapter:last-of-type{border-bottom:none}
+.chapter-kicker{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#a97b18;font-weight:900;margin-bottom:8px}
+h1.chapter{font-size:clamp(28px,3.4vw,40px);line-height:1.1;letter-spacing:-.02em;color:#0d3d28;margin:0 0 14px;border:0;padding:0;scroll-margin-top:112px}
+.lead{font-size:18px;line-height:1.6;color:#405248;margin:0 0 26px}
+h2{font-size:24px;line-height:1.25;color:#0d3d28;margin:38px 0 12px;padding-top:8px;border-top:1px solid #eee7d7}
+h3{font-size:18px;color:#145c43;margin:26px 0 8px}
+p{margin:0 0 15px;text-align:left}
+ul,ol{margin:0 0 18px 22px;padding:0}li{margin:0 0 7px}
+strong{color:#0d3d28}
+table{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:13.5px;line-height:1.45;display:block;overflow-x:auto}
+thead{background:#0d3d28;color:#fff}th{text-align:left;padding:10px 11px;font-size:12px;white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid #e8e2d4;vertical-align:top}
+tr:nth-child(even) td{background:#faf7ef}
+.table-cap{font-size:12px;color:#6c7b71;margin:-14px 0 22px}
+figure{margin:22px 0 28px}figure img{width:100%;height:auto;border:1px solid #ddd5c4;border-radius:12px;background:#fff;display:block}
+figcaption{font-size:12.5px;color:#6c7b71;margin-top:8px;line-height:1.45}figcaption b{color:#0d3d28}
+.diagram-page{margin:24px 0 30px;padding:12px;background:#f7f3ec;border:1px solid #e2dccd;border-radius:16px}
+.diagram-page img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #ddd5c4}
+.diagram-page .cap{font-size:12.5px;color:#6c7b71;margin-top:8px}.diagram-page .cap b{color:#0d3d28}
+.callout{border-left:5px solid #c08a2e;background:#fbf6e8;padding:14px 18px;border-radius:0 12px 12px 0;margin:20px 0}
+.callout .tag{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#a97b18;font-weight:900;margin-bottom:4px}
+.callout.info{border-left-color:#2b6f8f;background:#eef5f7}.callout.info .tag{color:#2b6f8f}
+.callout.warn{border-left-color:#b23b32;background:#fbefed}.callout.warn .tag{color:#b23b32}
+.callout.dark{border-left-color:#0d3d28;background:#edf3ef}.callout.dark .tag{color:#0d3d28}
+.formula{background:#0d3d28;color:#f8f4e8;padding:16px 18px;border-radius:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6;margin:18px 0 24px;white-space:pre-wrap}
+.formula b{color:#f4d58d}
+.kpi{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 24px}.kpi>div{flex:1 1 150px;border:1px solid #e0d8c7;border-radius:12px;padding:14px;background:#fffdf8}
+.kpi .v{font-size:24px;font-weight:900;color:#0d3d28;line-height:1}.kpi .l{font-size:11px;color:#6c7b71;margin-top:6px}
+.duo{display:flex;gap:16px;flex-wrap:wrap}.duo figure{flex:1 1 260px;margin:10px 0}
+.mobile img{width:min(100%,320px);margin:auto}
+.checklist{list-style:none;margin-left:0}.checklist li{padding-left:22px;text-indent:-22px}.checklist li:before{content:"✓";color:#0d6b4f;font-weight:900;margin-right:8px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.page-break{display:none}.small{font-size:13px;color:#66756c}
+.mobile-toc{display:none;margin:18px 0;border:1px solid var(--line);border-radius:14px;background:#fffdf8;padding:12px 16px}
+.mobile-toc summary{cursor:pointer;font-weight:800;color:#0d3d28}
+.mobile-toc a{display:block;padding:6px 0;font-size:13px;border-top:1px solid #f0eadc}
+.content-end{text-align:center;color:#8a978f;font-size:12px;padding:20px 0 8px}
+footer.manual{background:#0d3d28;color:#cfe0d6;font-size:12px;padding:28px 22px;text-align:center}
+footer.manual a{color:#f4d58d}
+@media(max-width:980px){.hero-in{grid-template-columns:1fr}.layout{display:block;padding-top:22px}.sidebar{display:none}.mobile-toc{display:block}.content{border-radius:16px;padding:22px 18px}.topbar a.top{display:none}.hero p{font-size:15px}h2{font-size:21px}}
+@media print{.topbar,.sidebar,.mobile-toc,.hero .actions,.progress,footer.manual{display:none!important}.layout{display:block;max-width:none;padding:0}.content{border:0;box-shadow:none;max-width:none;padding:0}.chapter{page-break-after:always}.chapter:last-of-type{page-break-after:auto}body{background:#fff}}
+
+.langs{display:flex;gap:4px;align-items:center;margin-left:4px}
+.langs a{font-size:11px;font-weight:800;color:#cfe0d6;padding:5px 7px;border-radius:6px}
+.langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
+.langs a.active{background:#e68a00;color:#0d3d28}
+@media(max-width:720px){.langs{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<header class="topbar"><div class="topbar-in">
+  <a class="brand" href="/"><img src="/docs/manuel/assets/logo.png" alt="Tchoua"><div>Tchoua<small>MANUEL COMPLET</small></div></a>
+  <div class="spacer"></div>
+  <a class="top" href="/documentation">Documentation</a>
+  <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_EN.pdf">Download the PDF</a>
+  <div class="langs"><a class="" href="/docs/manuel/index.html" hreflang="fr">FR</a><a class="active" href="/docs/manuel/en/index.html" hreflang="en">EN</a><a class="" href="/docs/manuel/es/index.html" hreflang="es">ES</a><a class="" href="/docs/manuel/de/index.html" hreflang="de">DE</a></div>
+</div></header>
+<section class="hero"><div class="hero-in">
+  <div>
+    <div class="kicker">Official documentation · 2026 edition</div>
+    <h1>The existing system<br><span>Complete documentation 2026</span></h1>
+    <p>How Tchoua actually works: associations, the ARP framework, tontines, contributions, loans, solidarity, meetings, reports, administration and configuration.</p>
+    <div class="chips"><span class="chip">21 chapters</span><span class="chip">39 real screenshots</span><span class="chip">10 diagrams</span><span class="chip">Version 2.0 · November 2026</span></div>
+    <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_EN.pdf">Download the PDF</a>
+    <a class="btn ghost" href="#ch01">Contents</a>
+  </div>
+  <div class="hero-card">
+    <div class="label">Documentation</div>
+    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Appendices</span></div>
+    <div class="small">21 chapters · 10 diagrams</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.0 · November 2026</div>
+  </div>
+</div></section>
+<main class="layout">
+  <aside class="sidebar"><h2>Contents</h2>
+    <div class="toc-part">Understanding</div>
+<a href="#ch01"><span>1</span>Vision, positioning and promise</a>
+<a href="#ch02"><span>2</span>Architecture, data and security</a>
+<a href="#ch03"><span>3</span>Accounts, roles and permissions</a>
+<a href="#ch04"><span>4</span>Association lifecycle</a>
+<a href="#ch05"><span>5</span>Module overview</a>
+<div class="toc-part">Business modules</div>
+<a href="#ch06"><span>6</span>Activities and the tontine engine</a>
+<a href="#ch07"><span>7</span>Contributions, sessions and attendance</a>
+<a href="#ch08"><span>8</span>Loans, repayments and interest</a>
+<a href="#ch09"><span>9</span>Solidarity and social aid</a>
+<a href="#ch10"><span>10</span>Meetings, discipline and catering</a>
+<a href="#ch11"><span>11</span>Accounting, reports and dividends</a>
+<a href="#ch12"><span>12</span>History and analytics</a>
+<div class="toc-part">Operations</div>
+<a href="#ch13"><span>13</span>Member area, themes and mobile</a>
+<a href="#ch14"><span>14</span>Administration and templates</a>
+<a href="#ch15"><span>15</span>Multilingual and international</a>
+<a href="#ch16"><span>16</span>Real cases: HORIZON, FEV, SLD</a>
+<a href="#ch17"><span>17</span>End-to-end workflows</a>
+<a href="#ch18"><span>18</span>Roadmap, limitations and support</a>
+<div class="toc-part">ARP framework and configuration</div>
+<a href="#ch19"><span>19</span>ARP framework: rules, combinations and versions</a>
+<a href="#ch20"><span>20</span>Creating or editing an association with tabs</a>
+<a href="#ch21"><span>21</span>Configuring each activity and managing funds</a>
+<div class="toc-part">Appendices</div>
+<a href="#annexes"><span>A</span>Glossary, API and checklist</a>
+    <a class="back" href="/documentation">← Back to documentation</a>
+  </aside>
+  <div>
+    <details class="mobile-toc"><summary>Manual contents</summary><div class="toc-part">Understanding</div>
+<a href="#ch01"><span>1</span>Vision, positioning and promise</a>
+<a href="#ch02"><span>2</span>Architecture, data and security</a>
+<a href="#ch03"><span>3</span>Accounts, roles and permissions</a>
+<a href="#ch04"><span>4</span>Association lifecycle</a>
+<a href="#ch05"><span>5</span>Module overview</a>
+<div class="toc-part">Business modules</div>
+<a href="#ch06"><span>6</span>Activities and the tontine engine</a>
+<a href="#ch07"><span>7</span>Contributions, sessions and attendance</a>
+<a href="#ch08"><span>8</span>Loans, repayments and interest</a>
+<a href="#ch09"><span>9</span>Solidarity and social aid</a>
+<a href="#ch10"><span>10</span>Meetings, discipline and catering</a>
+<a href="#ch11"><span>11</span>Accounting, reports and dividends</a>
+<a href="#ch12"><span>12</span>History and analytics</a>
+<div class="toc-part">Operations</div>
+<a href="#ch13"><span>13</span>Member area, themes and mobile</a>
+<a href="#ch14"><span>14</span>Administration and templates</a>
+<a href="#ch15"><span>15</span>Multilingual and international</a>
+<a href="#ch16"><span>16</span>Real cases: HORIZON, FEV, SLD</a>
+<a href="#ch17"><span>17</span>End-to-end workflows</a>
+<a href="#ch18"><span>18</span>Roadmap, limitations and support</a>
+<div class="toc-part">ARP framework and configuration</div>
+<a href="#ch19"><span>19</span>ARP framework: rules, combinations and versions</a>
+<a href="#ch20"><span>20</span>Creating or editing an association with tabs</a>
+<a href="#ch21"><span>21</span>Configuring each activity and managing funds</a>
+<div class="toc-part">Appendices</div>
+<a href="#annexes"><span>A</span>Glossary, API and checklist</a></details>
+    <article class="content"><section class="chapter">
+  <div class="chapter-kicker">Chapter 1</div>
+  <h1 class="chapter" id="ch01" data-short="1 · Vision">Vision, positioning and promise</h1>
+  <p class="lead">Tchoua is not just a tontine calculator. It is a trust infrastructure for every form of tontine-type association: friendly societies, sections, federations, cooperatives, mutuals, women's groups, hometown associations.</p>
+
+  <h2>1.1 The problem</h2>
+  <p>In Cameroon and across much of Africa, the tontine is a savings and credit mechanism built on a spoken word, a notebook, a treasurer and collective memory. This model works as long as the group is small and members know one another. It weakens as soon as the association grows: records get lost, contributions are not reconciled, loans are not tracked, aid is granted without an objective basis, and distant sections do not know what is being decided at national level.</p>
+  <p>Existing tools are either spreadsheets or tontine apps limited to the rotating turn. None covers the reality of a friendly society such as the FEV: bylaws, a steering committee, sections, a national fund, illness and bereavement aid, distinctions, sanctions, quorums, terms of office and documents to be preserved.</p>
+
+  <h2>1.2 The promise</h2>
+  <p>Tchoua brings three inseparable things:</p>
+  <ul>
+    <li><strong>Transparency</strong> — every member sees their contributions, loans, aid, interest shares and balance; the board sees the whole picture; every movement is time-stamped and attributed.</li>
+    <li><strong>Configurability</strong> — no rule is hard-coded: amounts, frequencies, quorums, caps, sanctions, cycles and allocation methods are configured per association and per activity.</li>
+    <li><strong>Complete coverage</strong> — from creating the association to closing the cycle, including membership, meetings, tontines, loans, solidarity, reports and administration.</li>
+  </ul>
+
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/01_home.jpg" alt="Tchoua public home page">
+    <figcaption><b>Figure 1.1</b> — Public home page: promise, social proof and access to account creation. The navigation is deliberately short: features, method, pricing, about, contact.</figcaption>
+  </figure>
+
+  <h2>1.3 The three product pillars</h2>
+  <table>
+    <thead><tr><th>Pillar</th><th>What it provides</th><th>Where to see it</th></tr></thead>
+    <tbody>
+      <tr><td>Association</td><td>Identity, bylaws, internal rules, board, sections, documents, lifecycle, governance</td><td>Association console, FEV and SLD pages</td></tr>
+      <tr><td>Financial activities</td><td>Tontines, savings, investment, loans, catering, group purchases, in-kind contributions</td><td>Activities, sessions, loans, history</td></tr>
+      <tr><td>Social protection</td><td>Solidarity fund, illness, bereavement, marriage, birth, education and emergency aid</td><td>Solidarity, social aid, reports</td></tr>
+    </tbody>
+  </table>
+
+  <h2>1.4 The personas</h2>
+  <table>
+    <thead><tr><th>Persona</th><th>Needs</th><th>Tchoua answer</th></tr></thead>
+    <tbody>
+      <tr><td>Member</td><td>Know what they owe, what they have received, what remains; take part in decisions</td><td>Member area, launchpad, personal history, notifications, voting</td></tr>
+      <tr><td>Treasurer</td><td>Collect, reconcile, track cash boxes, produce reports</td><td>Sessions, contributions, loans, cash boxes, PDF/CSV exports</td></tr>
+      <tr><td>President / board</td><td>Steer, arbitrate, convene, control, represent</td><td>Association console, meetings, governance, reports, audit</td></tr>
+      <tr><td>Auditor</td><td>Verify movements, supporting documents, balances</td><td>Audit log, reports, history, exports</td></tr>
+      <tr><td>System administrator</td><td>Create templates, manage roles, configure the platform</td><td>System console, templates, users, settings</td></tr>
+      <tr><td>Local section</td><td>Apply national bylaws while managing its own funds</td><td>Parent/child hierarchy, inherited and overridden configurations</td></tr>
+    </tbody>
+  </table>
+
+  <h2>1.5 What sets Tchoua apart</h2>
+  <p><strong>Business depth.</strong> A tontine is not just a rotating turn: it is a contract with shares, fractions, sessions, a pot, auctions, beneficiaries, a balance and a closing. Tchoua implements these objects and their rules, including edge cases (insufficient pot, exhausted shares, defaulting member, multiple beneficiaries).</p>
+  <p><strong>Governance.</strong> Bylaws and internal rules are not decorative: they become parameters (quorums, majorities, terms of office, sanctions) and enforceable documents, with version history and approvals.</p>
+  <p><strong>Federation.</strong> A parent association can group sections together; each section keeps its own funds and local rules. This is the FEV / SLD model, transferable to all hometown associations.</p>
+  <div class="callout dark"><span class="tag">Positioning</span><p>The reference platform for managing every form of tontine-type association in Cameroon and Africa: web, mobile, multilingual, multi-currency, configurable without code.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 2</div>
+  <h1 class="chapter" id="ch02" data-short="2 · Architecture">Architecture, data and security</h1>
+  <p class="lead">Tchoua is a modern web application, deployed in production and available at tchoua.com and www.tchoua.com. It is designed to serve several associations, several hierarchical levels and several currencies without duplicating code.</p>
+
+  <h2>2.1 Overview</h2>
+  <p>The application is built on Next.js (App Router), React, TypeScript, Prisma and PostgreSQL. Public pages and the member area share the same foundation; the APIs systematically verify association membership and role before any read or write. Files (bylaws, minutes, supporting documents) are stored on the server and referenced in the database.</p>
+  <div class="kpi">
+    <div><div class="v">Next.js</div><div class="l">server rendering and API routes</div></div>
+    <div><div class="v">Prisma</div><div class="l">typed access to PostgreSQL</div></div>
+    <div><div class="v">JWT</div><div class="l">signed sessions, secure cookie</div></div>
+    <div><div class="v">PM2</div><div class="l">supervised process, automatic restart</div></div>
+  </div>
+  <h2>2.2 Technical components</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Component</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>Interface</td><td>React + Tailwind</td><td>Public pages, member area, association console, system console, reusable components</td></tr>
+      <tr><td>Application</td><td>Next.js App Router</td><td>Server rendering, REST API routes, authentication middleware, exports</td></tr>
+      <tr><td>Authentication</td><td>NextAuth (JWT)</td><td>Credential login, signed session, role checks</td></tr>
+      <tr><td>Domain</td><td>TypeScript modules</td><td>Frequency engine, tontine engine, loan rules, interest allocation, solidarity, internal rules</td></tr>
+      <tr><td>Data</td><td>PostgreSQL + Prisma</td><td>Relational model, constraints, transactions, migrations</td></tr>
+      <tr><td>Files</td><td>Local storage /uploads</td><td>Bylaws, internal rules, minutes, supporting documents, exports</td></tr>
+      <tr><td>Operations</td><td>PM2 + HAProxy + Certbot</td><td>Processes, reverse proxy, TLS, certificate renewal</td></tr>
+    </tbody>
+  </table>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/architecture.png" alt="Platform architecture">
+    <div class="cap"><b>Figure 2.1</b> — Three-layer architecture: user experience, Next.js application, data and integrations.</div>
+  </section>
+
+  <h2>2.3 Data model</h2>
+  <p>The model is deliberately centred on the association. A user can belong to several associations with different roles. An association owns activities; each activity owns sessions, contributions, beneficiaries, loans and repayments. Documents and rule articles are attached to the association.</p>
+  <section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/data_model.png" alt="Data model">
+    <div class="cap"><b>Figure 2.2</b> — Core entities and relationships. Full cardinalities are described in the repository's Prisma schema.</div>
+  </section>
+
+  <h2>2.4 Security</h2>
+  <ul>
+    <li><strong>Authentication</strong> — hashed passwords (bcrypt), signed JWT sessions, <span class="mono">__Secure-next-auth.session-token</span> cookie, expiry and renewal.</li>
+    <li><strong>Authorization</strong> — two-level control: association membership and role (member, board, system administrator). Sensitive routes use a shared guard.</li>
+    <li><strong>Least privilege</strong> — a regular member sees only their own operations; the board sees the whole picture; the system administrator does not stand in for the board on business decisions.</li>
+    <li><strong>Audit</strong> — administrative actions and status changes are logged with author, date and reason. Financial movements are never deleted: corrections create reversing entries.</li>
+    <li><strong>Transport</strong> — HTTPS mandatory, HTTP → HTTPS redirect, Let's Encrypt certificates renewed automatically.</li>
+    <li><strong>Files</strong> — controlled types and sizes (PDF, JPEG, PNG, WebP; 10 MB), access by role.</li>
+  </ul>
+  <div class="callout warn"><span class="tag">Warning</span><p>Credentials, session secrets, API keys and passwords must never appear in the interface, screenshots or documents. Demo accounts are disabled in production.</p></div>
+
+  <h2>2.5 Multi-association and hierarchy</h2>
+  <p>Each association is a sealed space: its members, activities, cash boxes, documents and reports. An association can have a parent (federation, national friendly society) and children (sections). Roles are evaluated at the level of the association concerned; a member can be a regular member in one section and a national board member.</p>
+  <p>This architecture can serve both a neighbourhood tontine of ten members and a national federation of several thousand members, without changing code or database.</p>
+
+  <h2>2.6 Operations and continuity</h2>
+  <p>Production is supervised: PM2 processes, HAProxy reverse proxy, TLS certificates, database backups and logging. Deployments are automated by a script that aligns the repository, regenerates the Prisma client, builds the application and restarts the process. SQL migrations are idempotent and applied before the restart.</p>
+  <table>
+    <thead><tr><th>Risk</th><th>Measure</th></tr></thead>
+    <tbody>
+      <tr><td>Process unavailability</td><td>PM2 restarts automatically; health check on key pages</td></tr>
+      <tr><td>Data loss</td><td>PostgreSQL backups, regular exports, audit log</td></tr>
+      <tr><td>Access leak</td><td>Session control, roles, secure cookies, HTTPS</td></tr>
+      <tr><td>Deployment error</td><td>Verified build, controlled restart, rollback by commit</td></tr>
+      <tr><td>Malicious file</td><td>Allowed types, size limit, storage outside the codebase</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 3</div>
+  <h1 class="chapter" id="ch03" data-short="3 · Roles">Accounts, roles and permissions</h1>
+  <p class="lead">Trust rests on a simple rule: everyone sees what concerns them, the board sees what it administers, the system administrator sees the platform — but never makes business decisions in place of the board.</p>
+
+  <h2>3.1 Two families of roles</h2>
+  <p>Tchoua distinguishes <strong>association roles</strong> (president, treasurer, secretary, member, etc.) from <strong>system roles</strong> (chief administrator, operator, auditor). A user can hold both an association role and a system role, but the two scopes remain separate.</p>
+  <h2>3.2 Association roles</h2>
+  <table>
+    <thead><tr><th>Role</th><th>Scope</th><th>Typical actions</th></tr></thead>
+    <tbody>
+      <tr><td>Founder</td><td>Association creation</td><td>Initial setup, appointment of the board, publication</td></tr>
+      <tr><td>President</td><td>Whole association</td><td>Convene, arbitrate, approve, represent, close</td></tr>
+      <tr><td>Vice-president</td><td>Whole association</td><td>Stand-in duties, delegations, oversight</td></tr>
+      <tr><td>General secretary</td><td>Memberships, meetings, documents</td><td>Minutes, convening notices, files, archives</td></tr>
+      <tr><td>Assistant secretary</td><td>Memberships, contributions, fines</td><td>Data entry, follow-up, payment receipts</td></tr>
+      <tr><td>Treasurer</td><td>Cash boxes, banks, reports</td><td>Receipts, disbursements, reconciliations</td></tr>
+      <tr><td>Assistant treasurer</td><td>Treasury stand-in</td><td>Oversight, data entry, replacement</td></tr>
+      <tr><td>Auditor</td><td>Oversight</td><td>Audit of movements, quarterly and annual reports</td></tr>
+      <tr><td>Censor</td><td>Discipline</td><td>Applying sanctions, keeping the register</td></tr>
+      <tr><td>Adviser</td><td>Advisory</td><td>Opinions, committees, mediation</td></tr>
+      <tr><td>Member</td><td>Own data</td><td>Consult, contribute, request, vote</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table 3.1 — Roles available within an association. Labels and powers are configurable; custom roles can be created and combined with a base role.</p>
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roles.png" alt="Roles and permissions">
+    <div class="cap"><b>Figure 3.1</b> — Three levels of privilege and four cross-cutting security rules.</div>
+  </section>
+
+  <h2>3.3 Visibility matrix</h2>
+  <table>
+    <thead><tr><th>Data</th><th>Member</th><th>Board</th><th>System admin</th></tr></thead>
+    <tbody>
+      <tr><td>Profile and contact details</td><td>Their own</td><td>All</td><td>System account</td></tr>
+      <tr><td>Contributions</td><td>Their own</td><td>All</td><td>Depending on role</td></tr>
+      <tr><td>Loans and repayments</td><td>Their own</td><td>All</td><td>Depending on role</td></tr>
+      <tr><td>Interest shares</td><td>Their own</td><td>All</td><td>Depending on role</td></tr>
+      <tr><td>Social aid</td><td>Their own</td><td>All</td><td>Depending on role</td></tr>
+      <tr><td>Overall history</td><td>View</td><td>Full</td><td>Full</td></tr>
+      <tr><td>Association settings</td><td>Read</td><td>Edit</td><td>Supervision</td></tr>
+      <tr><td>System roles and templates</td><td>No</td><td>No</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.4 Account lifecycle</h2>
+  <ol>
+    <li><strong>Registration</strong> — name, e-mail, password, acceptance of terms; or invitation by the board.</li>
+    <li><strong>Verification</strong> — the account is active after e-mail validation or activation by an administrator.</li>
+    <li><strong>Membership</strong> — the member joins an association via a code, an invitation or a request approved by the board.</li>
+    <li><strong>Activation</strong> — the board assigns the role and member number; the join date is recorded.</li>
+    <li><strong>Account life</strong> — contributions, loans, aid, votes, documents, notifications.</li>
+    <li><strong>Exit</strong> — resignation, removal or death; the status changes to <span class="mono">LEFT</span>, entitlements are calculated and the history is retained.</li>
+  </ol>
+  <div class="callout info"><span class="tag">Information</span><p>A member can belong to several associations with different roles. Their dashboard aggregates their commitments, but each association keeps its own accounting and rules.</p></div>
+
+  <h2>3.5 Profile settings</h2>
+  <p>Each user manages their profile, password, language, member-area theme and notifications. Appearance preferences are stored server-side and applied as soon as the page loads, without flicker.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Account settings and theme selection">
+    <figcaption><b>Figure 3.2</b> — Account settings: personal information, language and theme selector (Forest, Midnight, Dawn, Ocean, Sand, Neon).</figcaption>
+  </figure>
+
+  <h2>3.6 Good practice</h2>
+  <ul class="checklist">
+    <li>One account per person, never a shared account.</li>
+    <li>The board never shares its password; rights are granted by role.</li>
+    <li>Sensitive functions (membership approval, disbursement, closing) are traced with the author.</li>
+    <li>Inactive or departing accounts are disabled, not deleted, to preserve the history.</li>
+    <li>System administrators are few, and their actions are audited.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 4</div>
+  <h1 class="chapter" id="ch04" data-short="4 · Lifecycle">Association lifecycle</h1>
+  <p class="lead">Creating an association is not just entering a name. You have to define its identity, its affiliation, its board, its membership conditions, its meetings, its aid, its sanctions and its internal rules — then bring it to life.</p>
+
+  <h2>4.1 The six steps</h2>
+  <h3>1. Creation</h3>
+  <p>The creator enters the name, the type (friendly society, section, federation, tontine, cooperative, mutual…), the region, the colour, the logo, the description, the possible parent association and the starting template. A unique invitation code is generated.</p>
+  <h3>2. Configuration</h3>
+  <p>The board configures how the association operates: bodies, quorums, majorities, terms of office, membership conditions, joining fee, annual contribution, meeting frequency, aid catalogue, sanctions, bank accounts. These settings are stored as JSON and remain editable.</p>
+  <h3>3. Membership</h3>
+  <p>Candidates complete an application, provide their information and are sponsored where the rule requires it. The board approves or rejects; activation records the join date, the member number and the role.</p>
+  <h3>4. Activities</h3>
+  <p>The association creates its activities: rotating tontine, ASCA tontine, auction tontine, savings, investment, loan fund, solidarity fund, catering, group purchases, in-kind contributions.</p>
+  <h3>5. Sessions</h3>
+  <p>Each activity schedules its sessions according to its frequency. Members contribute, attendance is recorded, fines are applied, beneficiaries are designated, loans are disbursed and repaid.</p>
+  <h3>6. Closing</h3>
+  <p>At the end of the cycle, the association produces its statement, calculates dividends, archives the documents and switches to read-only. A new cycle can be created without erasing the history.</p>
+
+  <h2>4.2 Statuses and transitions</h2>
+  <table>
+    <thead><tr><th>Status</th><th>Meaning</th><th>Allowed transitions</th></tr></thead>
+    <tbody>
+      <tr><td>DRAFT</td><td>Configuration in progress, not visible</td><td>ACTIVE, DISSOLVED</td></tr>
+      <tr><td>PENDING</td><td>Awaiting approval</td><td>ACTIVE, DRAFT</td></tr>
+      <tr><td>ACTIVE</td><td>Normal operation</td><td>SUSPENDED, DISSOLVED</td></tr>
+      <tr><td>SUSPENDED</td><td>Activities frozen, consultation possible</td><td>ACTIVE, DISSOLVED</td></tr>
+      <tr><td>DISSOLVED</td><td>End of life, read-only</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table 4.1 — Each transition is logged with author, date and reason (lifecycle event).</p>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/lifecycle.png" alt="Association lifecycle">
+    <div class="cap"><b>Figure 4.1</b> — From creation to archiving: six steps, with checks at every transition.</div>
+  </section>
+
+  <h2>4.3 Two-level governance</h2>
+  <p>The FEV / SLD model shows the power of hierarchy: the FEV is a national friendly society with a general assembly, a steering committee, an executive board, committees and sections. The SLD is the Douala section, with its own committee, its own rules and its own funds.</p>
+  <section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/org.png" alt="FEV / SLD governance">
+    <div class="cap"><b>Figure 4.2</b> — Actual FEV / SLD organisation: national GA, steering committee, board, committees, Douala section.</div>
+  </section>
+  <p>Each level has its own rules: the national GA meets once a year with a quorum of half the members; the steering committee decides by a 2/3 majority; the Douala section meets on the first Saturday after the 5th, with a quorum of 3/5. Tchoua stores these parameters and surfaces them in the governance screens.</p>
+
+  <h2>4.4 Bylaws, internal rules and documents</h2>
+  <p>The bylaws and the internal rules are structured into numbered articles that members can consult and approve. The original documents (PDF, DOCX) can be downloaded from the association record. Versions are retained and changes are traced.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="FEV record">
+    <figcaption><b>Figure 4.3</b> — FEV record: 1 member, 5 activities, 14 rule articles, 3 documents, national affiliation.</figcaption>
+  </figure>
+
+  <h2>4.5 Special cases</h2>
+  <ul>
+    <li><strong>Section without legal personality</strong> — it inherits the parent's bylaws and manages its own funds. Tchoua models it as a child association.</li>
+    <li><strong>Federation</strong> — it groups autonomous associations; consolidation of headcounts and funds is described as a future development.</li>
+    <li><strong>Dormant association</strong> — SUSPENDED status, consultation possible, entries frozen.</li>
+    <li><strong>Dissolution</strong> — remaining assets are allocated according to the bylaws; the history remains consultable.</li>
+  </ul>
+  <div class="callout dark"><span class="tag">Golden rule</span><p>An association with movements is never deleted: it is closed. The history is the association's memory and the proof of its transparency.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 5</div>
+  <h1 class="chapter" id="ch05" data-short="5 · Modules">Module overview</h1>
+  <p class="lead">Eight domains cover the entire lifecycle of an association. They share the same data model and the same logging, which avoids duplicate data entry and inconsistencies. Since November 2026, a versioned <strong>ARP framework</strong> governs these modules and conditions new subscriptions; it is described in chapters 19 to 21.</p>
+  <h2>5.1 Module descriptions</h2>
+  <table>
+    <thead><tr><th>Module</th><th>Functions</th><th>Main screens</th></tr></thead>
+    <tbody>
+      <tr><td>Associations &amp; sections</td><td>Creation, identity, hierarchy, bylaws, internal rules, documents, lifecycle</td><td>My associations, association record, settings, governance</td></tr>
+      <tr><td>Membership &amp; members</td><td>Applications, sponsorship, approval, roles, member numbers, removals, directory</td><td>Members, applications, member record</td></tr>
+      <tr><td>Tontines &amp; activities</td><td>Activity types, shares, fractions, cycles, auctions, beneficiaries, balances</td><td>Activities, cycle, sessions, tontines</td></tr>
+      <tr><td>Contributions &amp; sessions</td><td>Calls, collections, statuses, arrears, attendance, fines, catering</td><td>Sessions, contributions, meetings</td></tr>
+      <tr><td>Loans &amp; interest</td><td>Applications, guarantees, approval, disbursement, repayments, allocation</td><td>Loans, loan record, interest</td></tr>
+      <tr><td>Solidarity &amp; aid</td><td>Catalogue, caps, applications, approval, disbursement, follow-up</td><td>Solidarity, social aid</td></tr>
+      <tr><td>Accounting &amp; reports</td><td>Cash boxes, journals, statements, PDF/CSV exports, dividends, audit</td><td>Reports, dividends, history</td></tr>
+      <tr><td>Administration &amp; templates</td><td>Templates, system users, roles, settings, maintenance</td><td>System console</td></tr>
+    </tbody>
+  </table>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/modules.png" alt="Module map">
+    <div class="cap"><b>Figure 5.1</b> — The eight modules and the shared core: association → member → activity → session → movement.</div>
+  </section>
+
+  <h2>5.2 Member area navigation</h2>
+  <p>The side navigation is grouped by intent: <strong>Steering</strong> (dashboard, associations, calendar), <strong>Finances</strong> (tontines, savings, loans, solidarity, sessions, wallet), <strong>Community</strong> (members, marketplace, events, chat), <strong>Analysis &amp; learning</strong> (reports, AI advice, gamification, academy). The association's contextual section adds overview, activities, loans, aid, meetings, dividends, members, reports, history, interest and settings.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Member dashboard">
+    <figcaption><b>Figure 5.2</b> — Member dashboard: personalised hero, indicators, launchpad and shortcuts. The theme and language are those of the profile.</figcaption>
+  </figure>
+
+  <h2>5.3 Launchpad</h2>
+  <p>The launchpad gives direct access to the twelve most-used modules: tontines, savings, loans, solidarity, sessions, members, reports, wallet, marketplace, chat, academy, events. It reduces the number of clicks and makes the member area usable on mobile.</p>
+  <figure class="mobile">
+    <img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Mobile launchpad">
+    <figcaption><b>Figure 5.3</b> — Mobile launchpad: module grid, quick actions (contribute, request a loan, new association) and thumb-friendly navigation.</figcaption>
+  </figure>
+
+  <h2>5.4 Interactions between modules</h2>
+  <ul>
+    <li>An <strong>approved membership</strong> creates the member, their role and their member number; it feeds the contribution calls.</li>
+    <li>A <strong>session</strong> generates the expected contributions, attendance, fines and catering.</li>
+    <li>A <strong>tontine</strong> consumes contributions, calculates the pot, designates beneficiaries and produces a cycle balance.</li>
+    <li>A <strong>loan</strong> debits the cash box, generates a repayment schedule and interest; repayments feed the history and the dividends.</li>
+    <li>An <strong>aid payment</strong> debits the solidarity fund and creates a traceable application.</li>
+    <li><strong>Reports</strong> aggregate all movements; the <strong>history</strong> surfaces them at member, activity or association level.</li>
+  </ul>
+  <div class="callout info"><span class="tag">Information</span><p>Each module can be enabled or disabled per association according to its configuration. A pure tontine does not need the loans module; a national friendly society will mainly use membership, solidarity, meetings and reports.</p></div>
+  <h2>5.5 Shared principles</h2>
+  <p>All modules share four guarantees: the same member identity, the same clock, the same currency and the same journal. An operation entered in one module is immediately visible in the others, with no manual synchronisation.</p>
+  <table>
+    <thead><tr><th>Guarantee</th><th>Concrete effect</th></tr></thead>
+    <tbody>
+      <tr><td>Single identity</td><td>One member, one account, one member number per association</td></tr>
+      <tr><td>Time-stamping</td><td>Every movement carries a date, an author and a reference</td></tr>
+      <tr><td>Single currency</td><td>Amounts are stored as values and displayed in the association's currency</td></tr>
+      <tr><td>Shared journal</td><td>Reports and history aggregate all modules</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 6</div>
+  <h1 class="chapter" id="ch06" data-short="6 · Tontines">Activities and the tontine engine</h1>
+  <p class="lead">The tontine is the historic heart of Tchoua. The engine goes far beyond the rotating turn: shares, fractions, sessions, pot, auctions, multiple beneficiaries, fixed cycles or share exhaustion, balance and closing.</p>
+
+  <h2>6.1 Definitions</h2>
+  <table>
+    <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+    <tbody>
+      <tr><td>Share</td><td>Unit of participation; a full share is worth the amount defined by the activity.</td></tr>
+      <tr><td>Fraction</td><td>1, 1/2 or 1/4 of a share depending on the configuration and whether fractions are allowed.</td></tr>
+      <tr><td>Subscription</td><td>A member's commitment to pay a number of shares at each session.</td></tr>
+      <tr><td>Contribution</td><td>The actual payment for a session, equal to subscribed shares × share amount.</td></tr>
+      <tr><td>Pot</td><td>Sum of the contributions collected for the session, plus any carry-over and adjustments.</td></tr>
+      <tr><td>Beneficiary share</td><td>Share allocated to a beneficiary; it entitles the holder to the amount per beneficiary share.</td></tr>
+      <tr><td>Session</td><td>A dated meeting during which members contribute and distributions are made.</td></tr>
+      <tr><td>Cycle</td><td>The complete period between the opening and the closing of the activity.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 Activity types</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Principle</th><th>Typical use</th></tr></thead>
+    <tbody>
+      <tr><td>Rotating tontine</td><td>Each member receives the pot in turn</td><td>Neighbourhood group, family, friends</td></tr>
+      <tr><td>ASCA tontine</td><td>Internal savings and credit, loans with interest</td><td>Cooperative, women's group</td></tr>
+      <tr><td>Auction tontine</td><td>The pot goes to the highest bidder; the discount feeds the interest</td><td>SLD, elite tontines</td></tr>
+      <tr><td>Savings / investment</td><td>Capitalised contributions, interest or dividends</td><td>Investment fund, projects</td></tr>
+      <tr><td>Loan</td><td>Loan fund for members</td><td>HORIZON, section fund</td></tr>
+      <tr><td>Solidarity</td><td>Non-repayable contributions and aid</td><td>Friendly societies, mutuals</td></tr>
+      <tr><td>Catering</td><td>Contribution to reception costs</td><td>Statutory meetings</td></tr>
+      <tr><td>In-kind</td><td>Contributions in goods, converted into value</td><td>Agricultural cooperatives</td></tr>
+      <tr><td>Group purchases</td><td>Collective orders</td><td>Groupings, consumer tontines</td></tr>
+    </tbody>
+  </table>
+
+  <section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/tontine.png" alt="Tontine engine">
+    <div class="cap"><b>Figure 6.1</b> — The engine's eight steps, from choosing shares to closing the cycle, with the three calculation formulas.</div>
+  </section>
+
+  <h2>6.3 Subscription and shares</h2>
+  <p>An active member subscribes between the minimum fraction and any applicable cap. Their expected contribution at each session is their shares multiplied by the share amount. If they subscribe several shares, their contribution is multiplied accordingly; their beneficiary entitlement follows the same proportion.</p>
+  <div class="formula"><b>expected contribution</b> = subscribed shares × share amount<br><b>beneficiary entitlement</b> = beneficiary shares × amount per beneficiary share</div>
+  <table>
+    <thead><tr><th>Parameter</th><th>Effect</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Share amount</td><td>Basis of the contribution</td><td>25 000 FCFA</td></tr>
+      <tr><td>Minimum fraction</td><td>1, 1/2 or 1/4</td><td>Half share = 12 500 FCFA</td></tr>
+      <tr><td>Max shares per member</td><td>Caps the commitment</td><td>4 shares maximum</td></tr>
+      <tr><td>Amount per beneficiary share</td><td>What a beneficiary receives</td><td>300 000 FCFA</td></tr>
+      <tr><td>Max beneficiary shares / session</td><td>Caps the distribution</td><td>2 shares per session</td></tr>
+      <tr><td>Same beneficiary several times</td><td>Allows accumulation</td><td>Yes / no</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.4 The pot and distributable shares</h2>
+  <p>A session's pot is the sum of the contributions collected, any carry-over and approved adjustments. The number of distributable shares is the smaller of two numbers: the cap on shares per session, and the number of shares the pot can finance.</p>
+  <div class="formula"><b>pot</b> = Σ contributions collected + carry-over + adjustments<br><b>distributable shares</b> = min(session cap, floor(pot ÷ amount per share))<br><b>cycle balance</b> = Σ contributions − Σ distributions</div>
+  <div class="callout warn"><span class="tag">Warning</span><p>If the pot is insufficient, the distribution may be blocked, partial or deferred according to the activity's rule. No distribution may make the balance negative without explicit authorisation of a cash advance.</p></div>
+
+  <h2>6.5 The three cycle modes</h2>
+  <table>
+    <thead><tr><th>Mode</th><th>End of cycle</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Fixed sessions</td><td>After N sessions (e.g. 12 monthly)</td><td>If shares remain, they are carried over or refunded according to the rule</td></tr>
+      <tr><td>Fixed period</td><td>On the end date</td><td>The number of sessions depends on the frequency</td></tr>
+      <tr><td>Share exhaustion</td><td>When all subscribed shares have a beneficiary</td><td>The number of sessions varies; shares per session may increase with the pot</td></tr>
+    </tbody>
+  </table>
+  <p>Progress is calculated differently depending on the mode: sessions held / sessions planned for a fixed-number cycle, shares distributed / shares subscribed for an exhaustion cycle.</p>
+
+  <h2>6.6 Allocating beneficiaries</h2>
+  <table>
+    <thead><tr><th>Mode</th><th>Rule</th><th>Control</th></tr></thead>
+    <tbody>
+      <tr><td>Rotation</td><td>Fixed order of members</td><td>A member only comes round once per round</td></tr>
+      <tr><td>Monthly draw</td><td>Random draw among eligible members</td><td>Exclusion of previous beneficiaries if the rule requires it</td></tr>
+      <tr><td>Single draw</td><td>Full schedule set in advance</td><td>Check of remaining shares</td></tr>
+      <tr><td>Auctions</td><td>The pot goes to the highest bidder; the discount feeds the interest</td><td>Minimum starting bid, number of bidders</td></tr>
+      <tr><td>Merit / needs</td><td>The board designates with justification</td><td>Traceability of the decision</td></tr>
+      <tr><td>Hybrid</td><td>Combination of rules</td><td>Explicit configuration</td></tr>
+    </tbody>
+  </table>
+  <p>A beneficiary's eligibility takes into account their active status, contributions up to date, remaining shares and any previous receipts. A member can receive several shares in the same session if the activity allows it and within the cap.</p>
+
+  <h2>6.7 Auctions at the SLD</h2>
+  <p>The SLD runs an annual tontine of 25 000 FCFA and its multiples, allocated by public auction with a starting bid of 5% of the contribution rate. The member who wins the auction receives the pot minus the discount; the interest generated is distributed in lots or carried over. Defaulting members incur a 15% surcharge if they have not yet benefited and 20% if they have already benefited.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/20_amsed_tontine.jpg" alt="SLD tontine activity">
+    <figcaption><b>Figure 6.2</b> — The SLD's "Annual auction tontine" activity: 25 000 FCFA per share, 12 sessions, auction mode. The cycle and share parameters are editable.</figcaption>
+  </figure>
+
+  <h2>6.8 Worked examples</h2>
+  <h3>Example A — 12 sessions, 1 share, 12 members</h3>
+  <p>Share at 50 000 FCFA, amount per beneficiary share 550 000 FCFA, one beneficiary per session. Each session collects 12 × 50 000 = 600 000 FCFA, distributes 550 000 FCFA and leaves a balance of 50 000 FCFA. After 12 sessions, all 12 members have benefited and the cumulative balance is 600 000 FCFA.</p>
+  <h3>Example B — multiple shares</h3>
+  <p>Four members with 2 shares and four members with 1 share represent 12 shares. With two beneficiary shares per session, the cycle ends in six sessions.</p>
+  <h3>Example C — share exhaustion</h3>
+  <p>20 shares, one distributable share per session, variable pot. Session 1 distributes one share, session 2 may distribute two if the pot allows; the cycle stops when all 20 shares have a beneficiary.</p>
+  <h3>Example D — half share</h3>
+  <p>Share at 100 000 FCFA, member with 0.5 share: contribution of 50 000 FCFA and beneficiary entitlement of 0.5 × the amount per share.</p>
+
+  <h2>6.9 Actual cycle and balance</h2>
+  <p>The cycle screen shows contributions, distributions, balance, subscribed and distributed shares, progress and each member's position. The following figure shows a demo cycle with four members and two sessions: 800 000 FCFA contributed, 800 000 FCFA distributed, zero balance, two shares distributed out of four.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/21_cycle_demo.jpg" alt="Tontine cycle">
+    <figcaption><b>Figure 6.3</b> — Tontine cycle: contributions, distributions, balance, progress, each member's position, sessions and beneficiaries. Demo data.</figcaption>
+  </figure>
+
+  <h2>6.10 Edge cases and management rules</h2>
+  <table>
+    <thead><tr><th>Case</th><th>Expected behaviour</th></tr></thead>
+    <tbody>
+      <tr><td>Absent member</td><td>Contribution due; fine according to the internal rules; eligibility suspended if the rule requires it</td></tr>
+      <tr><td>Partial contribution</td><td>PARTIAL status; remainder due; beneficiary share reduced pro rata if configured</td></tr>
+      <tr><td>Late contribution</td><td>LATE status; penalty; defaulters ranked last</td></tr>
+      <tr><td>Insufficient pot</td><td>Blocking, partial distribution or carry-over according to the rule</td></tr>
+      <tr><td>Excess pot</td><td>Carry-over, an extra share within the cap, or cash box</td></tr>
+      <tr><td>Departing member</td><td>Contributions vested; shares not received recalculated or refunded</td></tr>
+      <tr><td>Double distribution</td><td>Forbidden: uniqueness (session, member, share rank)</td></tr>
+      <tr><td>Change of share during the cycle</td><td>Forbidden unless by amendment with an effective date</td></tr>
+      <tr><td>Early closing</td><td>Allowed if the rule permits; remaining shares handled according to the rule</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.11 Configuration in the interface</h2>
+  <p>The activity form lets you define the type, the share amount, the frequency, the allocation mode, the amount per beneficiary share, the minimum fraction, the caps, whether fractions are allowed and the cycle mode. Advanced parameters (surplus rule, late-payment tolerance, early closing) are stored in the cycle configuration and documented in the tontine specification.</p>
+  <h2>6.12 Other activities</h2>
+  <p>The engine is not limited to financial tontines. Complementary activities use the same sessions, contributions and reports, with adapted rules.</p>
+  <table>
+    <thead><tr><th>Activity</th><th>Principle</th><th>Control points</th></tr></thead>
+    <tbody>
+      <tr><td>Savings</td><td>Regular capitalised contributions, withdrawal under conditions</td><td>Balance, cap, notice period, interest</td></tr>
+      <tr><td>Investment</td><td>Pooled fund for projects or productive loans</td><td>Shares, project, profitability, dividend</td></tr>
+      <tr><td>In-kind</td><td>Agricultural produce or materials valued</td><td>Unit, quality, conversion, storage</td></tr>
+      <tr><td>Group purchases</td><td>Collective order, pro rata allocation</td><td>Quote, delivery, quality, payment</td></tr>
+      <tr><td>Catering</td><td>Session contribution and flat fee to the recipient</td><td>Rate, arrears, handover, journal</td></tr>
+      <tr><td>Services / time</td><td>Time bank, skills exchange</td><td>Hours, valuation, assessment</td></tr>
+    </tbody>
+  </table>
+  <p>Each activity keeps its own cash box, frequency and rules. An association can therefore combine a tontine, an investment fund, a loan fund and a catering fund without mixing the flows.</p>
+
+  <div class="callout dark"><span class="tag">Key takeaway</span><p>The engine calculates and exposes balances, shares and distributions. Automatic designation of beneficiaries based on eligibility and auctions remains a workflow to be completed; configuration and calculation are operational.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 7</div>
+  <h1 class="chapter" id="ch07" data-short="7 · Contributions">Contributions, sessions and attendance</h1>
+  <p class="lead">The session is the unit of time in association life: members meet, contribute, check attendance, apply fines, serve the catering and make decisions.</p>
+
+  <h2>7.1 Anatomy of a session</h2>
+  <table>
+    <thead><tr><th>Element</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Number</td><td>Sequence within the activity cycle</td></tr>
+      <tr><td>Date and time</td><td>Planned date, actual start and end</td></tr>
+      <tr><td>Venue</td><td>Head office, a member's home, community hall, rented room</td></tr>
+      <tr><td>Type</td><td>Ordinary, extraordinary, GA, board meeting</td></tr>
+      <tr><td>Quorum</td><td>Number or percentage required to deliberate</td></tr>
+      <tr><td>Agenda</td><td>Items to be addressed, attached documents</td></tr>
+      <tr><td>Attendance</td><td>Present, late, absent, excused</td></tr>
+      <tr><td>Contributions</td><td>Amounts expected and collected per member</td></tr>
+      <tr><td>Fines</td><td>Sanctions applied according to the internal rules</td></tr>
+      <tr><td>Decisions</td><td>Resolutions, votes, owners, deadlines</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7.2 Lifecycle of a contribution</h2>
+  <ol>
+    <li><strong>Call</strong> — the open session generates the expected contributions from the subscribed shares.</li>
+    <li><strong>Collection</strong> — the treasurer enters the amount, the method (cash, Mobile Money, transfer, in-kind) and the reference.</li>
+    <li><strong>Status</strong> — PAID, PARTIAL, LATE, EXEMPT. The status determines eligibility and reminders.</li>
+    <li><strong>Reconciliation</strong> — the amount is assigned to the activity's cash box and to the session pot.</li>
+    <li><strong>Reminder</strong> — unpaid amounts trigger a notification and, if configured, a fine.</li>
+    <li><strong>Closing</strong> — the session is frozen; later corrections create an adjustment.</li>
+  </ol>
+  <div class="formula"><b>expected</b> = shares × share amount<br><b>collected</b> = Σ validated payments<br><b>outstanding</b> = expected − collected</div>
+
+  <h2>7.3 Statuses and consequences</h2>
+  <table>
+    <thead><tr><th>Status</th><th>Definition</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>PAID</td><td>Full amount collected</td><td>Eligibility maintained; full beneficiary share</td></tr>
+      <tr><td>PARTIAL</td><td>Incomplete collection</td><td>Outstanding balance; reduced eligibility if configured</td></tr>
+      <tr><td>LATE</td><td>Deadline passed</td><td>Penalty; reminder; defaulters ranking</td></tr>
+      <tr><td>EXEMPT</td><td>Waiver (special member, GA decision)</td><td>No penalty; rights maintained</td></tr>
+      <tr><td>CANCELLED</td><td>Session cancelled or error</td><td>Reversing entry, no deletion</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7.4 Attendance and fines</h2>
+  <p>Attendance is recorded for each session. The SLD's internal rules provide a complete scale: late 500 FCFA, absence 1 000 FCFA, two consecutive absences 3 000 FCFA, three absences 5 000 FCFA, leaving before 19:00 500 FCFA, chattering 500 FCFA, indiscipline 3 000 FCFA, unauthorised commitment 10 000 FCFA, missed committee meeting 5 000 FCFA, absence from the national GA 20 000 FCFA, absence from a funeral 25 000 FCFA.</p>
+  <table>
+    <thead><tr><th>Breach</th><th>SLD sanction</th><th>Tchoua effect</th></tr></thead>
+    <tbody>
+      <tr><td>Lateness</td><td>500 FCFA</td><td>Fine attached to the session</td></tr>
+      <tr><td>Single absence</td><td>1 000 FCFA</td><td>Fine + ABSENT status</td></tr>
+      <tr><td>Two consecutive absences</td><td>3 000 FCFA</td><td>Cumulative fine</td></tr>
+      <tr><td>Three consecutive absences</td><td>5 000 FCFA</td><td>Automatic warning</td></tr>
+      <tr><td>Early departure</td><td>500 FCFA</td><td>PARTI_TOT status</td></tr>
+      <tr><td>Indiscipline</td><td>3 000 FCFA</td><td>Fine + report to the censor</td></tr>
+      <tr><td>Missed committee meeting</td><td>5 000 FCFA</td><td>Fine + mission follow-up</td></tr>
+      <tr><td>Absence from national GA</td><td>20 000 FCFA</td><td>Exceptional fine</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table 7.1 — SLD scale. All amounts are configurable; no value is hard-coded.</p>
+
+  <h2>7.5 Catering</h2>
+  <p>Catering is a reception fund: each member contributes a fixed amount per session, and the member hosting the meeting receives a flat fee, after deduction of their arrears. At the SLD, the contribution is 3 000 FCFA and the flat fee 150 000 FCFA.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/43_sessions.jpg" alt="Session calendar">
+    <figcaption><b>Figure 7.1</b> — Example of a session calendar (demo data): dates, activities, statuses and direct access to the session. Sessions come from the configured frequency.</figcaption>
+  </figure>
+
+  <h2>7.6 Activities and contribution calls</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/06_ndi_activities.jpg" alt="Association activities">
+    <figcaption><b>Figure 7.2</b> — Association activities: cards per activity, amount, participation, cash box, subscriptions and access to details.</figcaption>
+  </figure>
+  <p>Each activity card shows the contribution amount, the frequency, the available cash box, the number of subscribers and the actions (view, contribute, manage). Mandatory activities appear in the member area with the expected amount and the due date.</p>
+
+  <h2>7.7 Reminders and automation</h2>
+  <p>A scheduled job identifies late contributions, loan deadlines and upcoming sessions, then sends notifications. The job can be run in simulation mode to check the recipients before the actual send. Reminders are logged to avoid duplicates.</p>
+  <div class="callout info"><span class="tag">Information</span><p>Notification channels (e-mail, WhatsApp, SMS) are configured at platform level. The content and language follow the member's preferences.</p></div>
+
+  <h2>7.8 Treasury good practice</h2>
+  <ul class="checklist">
+    <li>Enter contributions the same day, never at the end of the month.</li>
+    <li>Attach the Mobile Money reference or the receipt to each payment.</li>
+    <li>Have corrections approved by a second person.</li>
+    <li>Close the session before opening the next one.</li>
+    <li>Export the cash journal at the end of every month.</li>
+    <li>Reconcile the Tchoua balance and the bank balance before the GA.</li>
+  </ul>
+  <h2>7.9 Session closing checks</h2>
+  <p>Closing a session is a control point, not a formality. It verifies that collections, attendance, fines and catering are consistent before freezing the pot and producing the minutes.</p>
+  <table>
+    <thead><tr><th>Check</th><th>Question to ask</th><th>Trace</th></tr></thead>
+    <tbody>
+      <tr><td>Cash box</td><td>Does the balance match the cash, Mobile Money and bank?</td><td>Cash journal</td></tr>
+      <tr><td>Unpaid amounts</td><td>Are all expected contributions paid, partial or documented?</td><td>Status list</td></tr>
+      <tr><td>Fines</td><td>Are lateness, absences and breaches qualified and quantified?</td><td>Censor's register</td></tr>
+      <tr><td>Catering</td><td>Is the recipient's flat fee calculated after deducting arrears?</td><td>Receipt and journal</td></tr>
+      <tr><td>Minutes</td><td>Are decisions, votes and owners recorded?</td><td>Signed minutes</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Information</span><p>A closed session can no longer be modified directly: any later correction creates an adjustment visible in the history and the report.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 8</div>
+  <h1 class="chapter" id="ch08" data-short="8 · Loans">Loans, repayments and interest</h1>
+  <p class="lead">The loans module turns collective savings into controlled credit: application, review, guarantees, disbursement, repayment schedule, repayments and transparent allocation of interest.</p>
+  <h2>8.1 Loan types</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Source</th><th>Typical rules</th></tr></thead>
+    <tbody>
+      <tr><td>Member loan</td><td>Activity cash box</td><td>Monthly rate, term, cap per member, guarantees</td></tr>
+      <tr><td>Exceptional loan</td><td>Investment fund</td><td>Committee, specific conditions, information to the GA</td></tr>
+      <tr><td>Illness loan</td><td>Solidarity fund</td><td>Interest-free, capped, repayment after hospitalisation</td></tr>
+      <tr><td>Cash advance</td><td>Treasury</td><td>Short term, board approval</td></tr>
+    </tbody>
+  </table>
+  <h2>8.2 Loan rules</h2>
+  <ul>
+    <li><strong>Cap</strong> — fixed amount, percentage of the cash box or multiple of the member's stake.</li>
+    <li><strong>Rate</strong> — monthly rate, possibly decreasing after a few months.</li>
+    <li><strong>Term</strong> — number of months and repayment schedule.</li>
+    <li><strong>Guarantees</strong> — savings, surety, guarantor, cheque, acknowledgement of debt.</li>
+    <li><strong>Approval</strong> — board, secretariat or automatic depending on the amount and the configuration.</li>
+    <li><strong>Simultaneous active loans</strong> — maximum number per member.</li>
+    <li><strong>Arrears</strong> — penalty, surcharge, suspension, recovery.</li>
+  </ul>
+  <div class="formula"><b>interest</b> = outstanding principal × monthly rate × number of months<br><b>instalment</b> = principal ÷ term + interest for the period<br><b>cap</b> = min(available cash box, member cap, multiple of the stake)</div>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/loan.png" alt="Loan cycle">
+    <div class="cap"><b>Figure 8.1</b> — The six steps of a loan, from application to interest allocation, with guarantees and penalties.</div>
+  </section>
+
+  <h2>8.3 Loan cycle</h2>
+  <ol>
+    <li>The member creates an application: amount, purpose, term, proposed guarantees.</li>
+    <li>The board reviews it: check of the cash box, the cap, active loans and repayment capacity.</li>
+    <li>The application is approved or rejected with reasons; the decision is notified.</li>
+    <li>The disbursement is recorded (cash, Mobile Money, transfer) and the cash box is debited.</li>
+    <li>Repayments are entered with principal and interest separated.</li>
+    <li>The loan is settled; the interest feeds the allocation and the dividends.</li>
+  </ol>
+
+  <h2>8.4 Interest allocation</h2>
+  <p>Each repayment includes a principal portion and an interest portion. Interest is allocated among members in proportion to the capital they held on the loan's disbursement date. This key prevents a member who joined after the loan from receiving interest they did not help to generate.</p>
+  <div class="formula"><b>share</b> = member's capital on the loan date ÷ total capital on the loan date<br><b>interest share</b> = interest repaid × share</div>
+  <p>The "Interest" screen details, for each repayment: the date, the borrower, the activity, the total interest, the member's capital, the overall capital, the share and the amount due to them. The board can expand the allocation across all members.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Interest and dividends">
+    <figcaption><b>Figure 8.2</b> — Interest and dividends: 5 219 831 FCFA of interest generated, the member's share, 2026 dividends and the detail by repayment.</figcaption>
+  </figure>
+
+  <h2>8.5 The ETS HORIZON case</h2>
+  <p>HORIZON is an investment and lending association with seven members. The imported data make it possible to verify the module on a real volume: 49 loans, 100 360 001 FCFA disbursed, 44 loans repaid, 5 active loans for 12 000 000 FCFA, 88 360 001 FCFA of principal repaid and 5 219 831 FCFA of interest.</p>
+  <table>
+    <thead><tr><th>Indicator</th><th>Value</th><th>Reading</th></tr></thead>
+    <tbody>
+      <tr><td>Members</td><td>7</td><td>One member per named account</td></tr>
+      <tr><td>Capital / contributions</td><td>8 000 000 FCFA</td><td>Basis for allocating interest</td></tr>
+      <tr><td>Loans disbursed</td><td>49</td><td>100 360 001 FCFA in total</td></tr>
+      <tr><td>Loans settled</td><td>44</td><td>93 579 832 FCFA repaid (principal + interest)</td></tr>
+      <tr><td>Loans outstanding</td><td>5</td><td>12 000 000 FCFA of principal</td></tr>
+      <tr><td>Principal repaid</td><td>88 360 001 FCFA</td><td>Excluding interest</td></tr>
+      <tr><td>Interest generated</td><td>5 219 831 FCFA</td><td>Allocated pro rata to capital</td></tr>
+      <tr><td>2026 dividends</td><td>5 433 499 FCFA</td><td>7 shares, validated calculation basis</td></tr>
+      <tr><td>Loans / funds ratio</td><td>150 %</td><td>Parameter specific to HORIZON</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table 8.1 — HORIZON key figures from the actual import, verified in the application.</p>
+
+  <h2>8.6 Loans screen</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/07_ndi_loans.jpg" alt="HORIZON internal loans">
+    <figcaption><b>Figure 8.3</b> — Internal loans: available cash box, loans outstanding, history, statuses and access to repayment schedules.</figcaption>
+  </figure>
+
+  <h2>8.7 Risks and controls</h2>
+  <table>
+    <thead><tr><th>Risk</th><th>Control</th></tr></thead>
+    <tbody>
+      <tr><td>Over-financing</td><td>Cap per member, cash ratio, max active loans</td></tr>
+      <tr><td>Repayment default</td><td>Guarantees, repayment schedule, reminders, penalties</td></tr>
+      <tr><td>Double loan</td><td>Check of active loans</td></tr>
+      <tr><td>Misappropriation</td><td>Dual approval, audit, bank reconciliation</td></tr>
+      <tr><td>Misallocated interest</td><td>Capital key on the loan date, detailed journal</td></tr>
+      <tr><td>Politically motivated loan</td><td>Justification, vote, traceability of the decision</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Warning</span><p>An unrepaid loan must never be deleted or hidden: it must be written off with a board decision and an adjusting entry. Traceability takes precedence over the appearance of the balance.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 9</div>
+  <h1 class="chapter" id="ch09" data-short="9 · Solidarity">Solidarity and social aid</h1>
+  <p class="lead">Solidarity is the very purpose of many associations. Tchoua turns informal mutual support into a legible entitlement: a catalogue, caps, an application, an approval and a traceable disbursement.</p>
+
+  <h2>9.1 The aid catalogue</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Event</th><th>Example cap</th></tr></thead>
+    <tbody>
+      <tr><td>Health</td><td>Member hospitalisation</td><td>SLD 70 000; FEV 10 000/day (3–15 days)</td></tr>
+      <tr><td>Health</td><td>Spouse hospitalisation</td><td>SLD 50 000</td></tr>
+      <tr><td>Health</td><td>Serious illness</td><td>Interest-free loan up to 100 000</td></tr>
+      <tr><td>Family</td><td>Marriage (first)</td><td>50 000</td></tr>
+      <tr><td>Family</td><td>Birth</td><td>20 000 + 10 000 twins</td></tr>
+      <tr><td>Bereavement</td><td>Death of the member</td><td>SLD 900 000; FEV 300 000</td></tr>
+      <tr><td>Bereavement</td><td>Death of the spouse</td><td>405 000</td></tr>
+      <tr><td>Bereavement</td><td>Death of a child</td><td>50 000 (&lt;10 years) / 100 000 (&gt;10 years)</td></tr>
+      <tr><td>Bereavement</td><td>Death of the father or mother</td><td>100 000</td></tr>
+      <tr><td>Emergency</td><td>Disaster, fire, accident</td><td>According to budget and board decision</td></tr>
+      <tr><td>Education</td><td>School fees, supplies</td><td>According to cash box and internal rules</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table 9.1 — Indicative catalogue. Each association defines its own categories, caps and conditions.</p>
+
+  <h2>9.2 Application workflow</h2>
+  <ol>
+    <li><strong>Opening</strong> — the member selects the category, describes the event and attaches the documents (certificate, invoice, deed).</li>
+    <li><strong>Review</strong> — the board checks eligibility, completeness and the available cap.</li>
+    <li><strong>Decision</strong> — approval, reasoned rejection or request for further documents.</li>
+    <li><strong>Disbursement</strong> — payment to the member or to a third party (hospital, funeral home), with a reference.</li>
+    <li><strong>Follow-up</strong> — the aid appears in the member's history and in the association's reports.</li>
+  </ol>
+  <div class="formula"><b>fund balance</b> = allocated contributions − aid paid − costs<br><b>available cap</b> = annual cap − aid already paid in the period</div>
+
+  <h2>9.3 Solidarity screen</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/42_solidarite.jpg" alt="Solidarity area">
+    <figcaption><b>Figure 9.1</b> — Solidarity &amp; Mutual Aid area: application search, filters by category and by association, queue status.</figcaption>
+  </figure>
+
+  <h2>9.4 SLD rules</h2>
+  <p>The SLD internal rules specify the amounts and conditions: hospitalisation of at least five days, observed by a designated member and verified with the health facility; illness aid limited to a one-year period; marriage limited to a first marriage; birth within a marriage; death of a member with a breakdown for burial, transport, catering, drinks and miscellaneous costs; a wake attendance requirement of three days in Douala.</p>
+  <table>
+    <thead><tr><th>SLD aid</th><th>Amount</th><th>Condition</th></tr></thead>
+    <tbody>
+      <tr><td>Member hospitalisation</td><td>70 000</td><td>5 days minimum, verification</td></tr>
+      <tr><td>Spouse hospitalisation</td><td>50 000</td><td>First declared spouse</td></tr>
+      <tr><td>Serious illness</td><td>Loan 100 000 max</td><td>Interest-free, 3-month repayment</td></tr>
+      <tr><td>Marriage</td><td>50 000</td><td>First marriage only</td></tr>
+      <tr><td>Birth</td><td>20 000 (+10 000 twins)</td><td>Birth within a marriage</td></tr>
+      <tr><td>Death of member</td><td>900 000</td><td>Statutory breakdown</td></tr>
+      <tr><td>Death of spouse</td><td>405 000</td><td>Statutory breakdown</td></tr>
+      <tr><td>Death of child</td><td>50 000 / 100 000</td><td>Depending on age</td></tr>
+      <tr><td>Death of parent</td><td>100 000</td><td>Father or mother</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9.5 FEV rules</h2>
+  <p>At national level, the FEV has a provisional deposit fund of 10 000 FCFA per member. In the event of a death, 300 000 FCFA is drawn: 200 000 for the family, 50 000 for the wreath and 50 000 for the deceased's section. Illness aid is 10 000 FCFA per day of hospitalisation, with a minimum of 3 days and a maximum of 15 days per year, subject to verification by a section team and a medical certificate.</p>
+
+  <h2>9.6 Controls and anti-abuse</h2>
+  <ul>
+    <li>Supporting documents mandatory and archived.</li>
+    <li>Verification by a designated member for hospitalisations.</li>
+    <li>Annual cap per member and per category.</li>
+    <li>One aid per event, unless by exceptional decision.</li>
+    <li>Aid history available to the board and the auditor.</li>
+    <li>Disbursement approved by at least two people for large amounts.</li>
+  </ul>
+  <div class="callout dark"><span class="tag">Philosophy</span><p>Aid is not a favour: it is a contributory entitlement. The member has contributed to the fund; they must be able to understand the amount they are entitled to, the documents to provide and the processing time.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 10</div>
+  <h1 class="chapter" id="ch10" data-short="10 · Meetings">Meetings, discipline and catering</h1>
+  <p class="lead">The meeting is where association life is decided. Tchoua turns it into a structured object: convening notice, agenda, attendance, quorum, votes, sanctions, minutes and catering.</p>
+
+  <h2>10.1 Meeting types</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Purpose</th><th>Typical quorum</th></tr></thead>
+    <tbody>
+      <tr><td>Ordinary meeting</td><td>Routine activities, contributions, decisions</td><td>Majority of members</td></tr>
+      <tr><td>Extraordinary meeting</td><td>Urgent matter, special convening</td><td>According to the bylaws</td></tr>
+      <tr><td>Ordinary general assembly</td><td>Accounts, budget, elections, guidelines</td><td>1/2 of members (FEV)</td></tr>
+      <tr><td>Extraordinary general assembly</td><td>Amendment of bylaws, dissolution</td><td>2/3 depending on the case</td></tr>
+      <tr><td>Board meeting</td><td>Review, arbitration, preparation</td><td>Majority of the board</td></tr>
+      <tr><td>Committee</td><td>Study of a technical matter</td><td>Committee members</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.2 Running a meeting</h2>
+  <ol>
+    <li><strong>Convening</strong> — date, venue, agenda, attached documents, statutory notice period.</li>
+    <li><strong>Opening</strong> — quorum check, appointment of the chair and the secretary.</li>
+    <li><strong>Roll call</strong> — attendance, lateness, absences, excuses; any fines.</li>
+    <li><strong>Reading of the previous minutes</strong> — adoption or corrections.</li>
+    <li><strong>Agenda items</strong> — presentation, debate, vote, resolution.</li>
+    <li><strong>Contributions and catering</strong> — collection, service, receipt.</li>
+    <li><strong>Closing</strong> — next date, action owners, signed minutes.</li>
+  </ol>
+  <div class="formula"><b>quorum met</b> = present ≥ required quorum<br><b>majority</b> = votes for &gt; votes against (or 2/3 according to the rule)<br><b>fine</b> = scale according to the breach observed</div>
+
+  <h2>10.3 Meetings screen</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/09_ndi_meetings.jpg" alt="Sessions and meetings">
+    <figcaption><b>Figure 10.1</b> — Sessions &amp; Meetings: search, filters by activity and by association, status of the meeting queue.</figcaption>
+  </figure>
+
+  <h2>10.4 Discipline</h2>
+  <p>Discipline is handled as a register, not as a mood. Each breach is linked to a session, a member, an article of the internal rules and an amount. The censor applies; the treasurer collects; the auditor verifies. In the event of a dispute, the member may ask the board for a discretionary waiver, which the board decides and justifies.</p>
+  <table>
+    <thead><tr><th>Step</th><th>Actor</th><th>Trace</th></tr></thead>
+    <tbody>
+      <tr><td>Observation</td><td>Chair / censor</td><td>Attendance line, time-stamp</td></tr>
+      <tr><td>Qualification</td><td>Censor</td><td>Reason, article of the internal rules</td></tr>
+      <tr><td>Sanction</td><td>Board</td><td>Amount, due date, notification</td></tr>
+      <tr><td>Collection</td><td>Treasurer</td><td>Receipt, cash box, journal</td></tr>
+      <tr><td>Appeal</td><td>Board / GA</td><td>Reasoned decision</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10.5 Catering and receptions</h2>
+  <p>Catering is a contribution from each member at each statutory session. The member hosting the meeting receives a flat fee, after deduction of their arrears. At the SLD, the contribution is 3 000 FCFA and the flat fee 150 000 FCFA; the payment is handed to the recipient during the session.</p>
+  <ul>
+    <li>The catering rate is an association parameter.</li>
+    <li>The recipient's flat fee is also configurable.</li>
+    <li>Catering arrears are deducted from the flat fee.</li>
+    <li>The catering balance is tracked in the reports.</li>
+  </ul>
+
+  <h2>10.6 Minutes and archives</h2>
+  <p>Each meeting produces minutes: agenda, those present, those absent, resolutions, votes, actions and owners. The minutes are uploaded to the association's documents, with a dedicated type, and remain available to members. Decisions can be linked to tasks and deadlines.</p>
+  <div class="callout info"><span class="tag">Information</span><p>Convening notices and minutes can be exported to PDF. Documents are time-stamped and attached to the association; they are never overwritten silently.</p></div>
+
+  <h2>10.7 Good practice</h2>
+  <ul class="checklist">
+    <li>Publish the agenda at least 15 days in advance (30 days for a GA).</li>
+    <li>Check the quorum before opening the votes.</li>
+    <li>Have the minutes signed by the president and the secretary.</li>
+    <li>Collect fines and catering contributions on the spot.</li>
+    <li>Circulate the minutes to members within 30 days.</li>
+    <li>Keep the supporting documents with the minutes.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 11</div>
+  <h1 class="chapter" id="ch11" data-short="11 · Reports">Accounting, reports and dividends</h1>
+  <p class="lead">An association without reports is an association without proof. Tchoua produces statements that the board, the auditors and the members can read: cash boxes, movements, balance sheet, dividends and exports.</p>
+
+  <h2>11.1 The cash boxes</h2>
+  <p>Each activity has its own cash box: tontine, solidarity, investment, loan, catering. The balance is calculated from validated movements. Transfers between cash boxes are explicit operations, never silent corrections.</p>
+  <table>
+    <thead><tr><th>Cash box</th><th>Funded by</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td>Tontine</td><td>Member contributions</td><td>Distribution to beneficiaries</td></tr>
+      <tr><td>Solidarity</td><td>Contributions, fines, donations</td><td>Illness, bereavement and family aid</td></tr>
+      <tr><td>Investment</td><td>Contributions, interest, dividends</td><td>Loans, projects, reserve</td></tr>
+      <tr><td>Loan</td><td>Repayments, allocations</td><td>Loan disbursements</td></tr>
+      <tr><td>Catering</td><td>Session contributions</td><td>Recipient's flat fee</td></tr>
+    </tbody>
+  </table>
+
+  <h2>11.2 The activity report</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Association reports">
+    <figcaption><b>Figure 11.1</b> — Reports: summary by activity, cash boxes, recent contributions, exports and steering indicators.</figcaption>
+  </figure>
+  <p>The report presents expected and collected contributions, unpaid amounts, loans disbursed and repaid, aid paid, cash box balances, expenses and results. It can be filtered by period, activity and member, then exported to PDF or CSV.</p>
+
+  <h2>11.3 Dividends</h2>
+  <p>The dividends module calculates the allocation of interest and profits among members, using a key defined at the general assembly: number of shares, capital held, seniority or a combination. The calculation is frozen in an annual "run", with status, calculation basis and each member's share.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/12_ndi_dividends.jpg" alt="2026 dividends">
+    <figcaption><b>Figure 11.2</b> — HORIZON's 2026 dividends: base of 5 433 499 FCFA, seven shares, amount per share and allocation by name.</figcaption>
+  </figure>
+  <div class="formula"><b>dividend per share</b> = total amount to allocate ÷ number of shares<br><b>member dividend</b> = member's shares × dividend per share</div>
+
+  <h2>11.4 The HORIZON case</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Financial year</td><td>2026</td></tr>
+      <tr><td>Allocation base</td><td>5 433 499 FCFA</td></tr>
+      <tr><td>Shares</td><td>7</td></tr>
+      <tr><td>Amount per share</td><td>776 214.14 FCFA</td></tr>
+      <tr><td>Status</td><td>Validated / published</td></tr>
+      <tr><td>Traceability</td><td>Annual run, share per member, export</td></tr>
+    </tbody>
+  </table>
+
+  <h2>11.5 Exports and documents</h2>
+  <ul>
+    <li><strong>PDF</strong> — management report, balance sheet, list of movements, balance certificate.</li>
+    <li><strong>CSV</strong> — detailed journal for a spreadsheet or an accountant.</li>
+    <li><strong>Documents</strong> — bylaws, internal rules, minutes, auditors' reports, supporting documents.</li>
+    <li><strong>Archiving</strong> — each export is time-stamped and attached to the association.</li>
+  </ul>
+
+  <h2>11.6 Audit and internal control</h2>
+  <table>
+    <thead><tr><th>Control</th><th>Objective</th><th>Frequency</th></tr></thead>
+    <tbody>
+      <tr><td>Cash box / bank reconciliation</td><td>Detect discrepancies</td><td>Monthly</td></tr>
+      <tr><td>Review of unpaid amounts</td><td>Send reminders and set provisions</td><td>Monthly</td></tr>
+      <tr><td>Loan control</td><td>Verify guarantees and due dates</td><td>Quarterly</td></tr>
+      <tr><td>Auditors' report</td><td>Certify the accounts</td><td>Quarterly and annual</td></tr>
+      <tr><td>Document inventory</td><td>Completeness of archives</td><td>Annual</td></tr>
+      <tr><td>System audit</td><td>Traceability of sensitive actions</td><td>Continuous</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Warning</span><p>An exported report does not replace statutory accounting. For associations subject to accounting obligations, exports must be handed to an accountant and reconciled with the official ledgers.</p></div>
+
+  <h2>11.7 Steering indicators</h2>
+  <div class="kpi">
+    <div><div class="v">Rate</div><div class="l">of contribution collection</div></div>
+    <div><div class="v">Outstanding</div><div class="l">loans and repayment rate</div></div>
+    <div><div class="v">Balance</div><div class="l">per cash box and per activity</div></div>
+    <div><div class="v">Coverage</div><div class="l">of aid by the solidarity fund</div></div>
+  </div>
+  <p>These indicators are calculated from actual movements, never entered manually. They are available in the reports and on the board's dashboard.</p>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 12</div>
+  <h1 class="chapter" id="ch12" data-short="12 · History">History and analytics</h1>
+  <p class="lead">Every member must be able to answer three questions: what have I paid in, what have I received, and what is left for me? The history module answers them at member, activity and association level.</p>
+
+  <h2>12.1 Three scopes</h2>
+  <table>
+    <thead><tr><th>Scope</th><th>Content</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>Association-wide</td><td>All movements across all activities</td><td>Steering, transparency, auditors</td></tr>
+      <tr><td>Per member</td><td>Contributions, loans, repayments, aid, interest shares</td><td>Member record, statement, claim</td></tr>
+      <tr><td>Per activity</td><td>Movements of the tontine, the fund or the cash box</td><td>Cycle monitoring, reports</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12.2 The four views</h2>
+  <p>The history screen adopts the display modes of modern ERPs: list, kanban, chart and grid. The user filters by type, member, activity, period and text, then groups by member, activity, type or month.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/13_history.jpg" alt="Movement history">
+    <figcaption><b>Figure 12.1</b> — History: inflows, outflows, net balance, paginated list, filters, groupings and four display modes.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>View</th><th>What it shows</th><th>When to use it</th></tr></thead>
+    <tbody>
+      <tr><td>List</td><td>Movements line by line, signed amount</td><td>Control, search, export</td></tr>
+      <tr><td>Kanban</td><td>Cards grouped by member, activity, type or month</td><td>Quick reading, distribution</td></tr>
+      <tr><td>Chart</td><td>Inflow / outflow bars by group</td><td>Comparison, trend</td></tr>
+      <tr><td>Grid</td><td>Cross-tab of groups × types, net</td><td>Analysis, report</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12.3 Movement types</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Direction</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Contribution</td><td>Inflow</td><td>Session / activity</td></tr>
+      <tr><td>Loan disbursed</td><td>Outflow</td><td>Approved request</td></tr>
+      <tr><td>Principal repayment</td><td>Inflow</td><td>Loan instalment</td></tr>
+      <tr><td>Interest</td><td>Inflow</td><td>Repayment, shared pro rata</td></tr>
+      <tr><td>Beneficiary</td><td>Outflow</td><td>Tontine session</td></tr>
+      <tr><td>Social aid</td><td>Outflow</td><td>Request approved and paid</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12.4 Reference figures</h2>
+  <p>On HORIZON, the global history returns 144 movements: 101 579 832 FCFA of inflows (8 000 000 in capital, 88 360 001 in principal repaid, 5 219 831 in interest) and 100 360 001 FCFA of outflows (loans disbursed), i.e. a net balance of 1 219 831 FCFA. These figures are computed from the movements, not keyed in.</p>
+  <div class="formula"><b>net balance</b> = Σ inflows − Σ outflows<br><b>interest</b> = Σ interest on repayments<br><b>member share</b> = Σ (interest × capital share)</div>
+
+  <h2>12.5 Interest detail</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Interest detail">
+    <figcaption><b>Figure 12.2</b> — Interest: total generated, member share, dividends, distribution by period and detail by repayment.</figcaption>
+  </figure>
+  <p>The board can open each line to see how it is made up: total interest on the repayment, the member's capital at the loan date, total capital, share and amount allocated. This is the proof of the distribution, not only its result.</p>
+
+  <h2>12.6 Pagination, filters and export</h2>
+  <ul>
+    <li>Server-side pagination (25 rows by default, up to 100).</li>
+    <li>Combinable filters: type, member, activity, start date, end date, text search.</li>
+    <li>Dynamic grouping: member, activity, type, month.</li>
+    <li>Totals recalculated over the entire filtered set, not only over the page.</li>
+    <li>CSV/PDF export for reports and auditors.</li>
+  </ul>
+
+  <h2>12.7 Transparency and privacy</h2>
+  <p>The association's global history is visible to members, in line with the transparency promise. Personal data, medical documents and contact details, however, are not exposed. An ordinary member sees their own transactions in detail; the board sees everything within its remit.</p>
+  <div class="callout info"><span class="tag">Information</span><p>Visibility is computed on every request: it depends on the effective role in the association, not on a display setting. A member whose role changes immediately sees their scope change.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 13</div>
+  <h1 class="chapter" id="ch13" data-short="13 · Member area">Member area, themes and mobile</h1>
+  <p class="lead">The member area is designed as a personal cockpit: it shows what matters, lets you act in two clicks and adapts to the chosen language and theme.</p>
+
+  <h2>13.1 Structure of the area</h2>
+  <table>
+    <thead><tr><th>Zone</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Top bar</td><td>Breadcrumb, notifications, user menu, association selector</td></tr>
+      <tr><td>Side navigation</td><td>Steering, finances, community, analysis, account; association context menu</td></tr>
+      <tr><td>Launchpad</td><td>12 modules with direct access + quick actions</td></tr>
+      <tr><td>Content</td><td>Dashboard, activities, history, reports, settings</td></tr>
+      <tr><td>Footer</td><td>Version, help, contact, status</td></tr>
+    </tbody>
+  </table>
+
+  <h2>13.2 The six themes</h2>
+  <p>Each member chooses their theme in Settings → Appearance &amp; language. The theme is applied immediately and saved on the account. The six themes cover different tastes and contexts of use, from the most sober to the most contrasted.</p>
+  <table>
+    <thead><tr><th>Theme</th><th>Mood</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>Forest</td><td>Deep green, cream, gold</td><td>Historic, institutional theme</td></tr>
+      <tr><td>Midnight</td><td>Night blue, cyan</td><td>Night work, contrast</td></tr>
+      <tr><td>Aurora</td><td>Lavender, purple, white</td><td>Soft, modern</td></tr>
+      <tr><td>Ocean</td><td>Blue-green, sand</td><td>Balance, legibility</td></tr>
+      <tr><td>Sand</td><td>Beige, brown, terracotta</td><td>Warm, traditional</td></tr>
+      <tr><td>Neon</td><td>Black, magenta, acid green</td><td>Maximum contrast, demonstration</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Theme selection">
+    <figcaption><b>Figure 13.1</b> — Settings: personal information, language and theme selector with immediate preview.</figcaption>
+  </figure>
+
+  <h2>13.3 Navigation and launchpad</h2>
+  <p>The launchpad groups modules by use and offers three quick actions: contribute, apply for a loan, create an association. On mobile it becomes a grid of touch cards; on desktop, a grid of cards with icons and subtitles.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Dashboard">
+    <figcaption><b>Figure 13.2</b> — Dashboard: personalised hero, indicators, launchpad and shortcuts. Tone and colours follow the active theme.</figcaption>
+  </figure>
+
+  <h2>13.4 Mobile</h2>
+  <p>The application can be used on a phone: compact navigation, stacked cards, actions within thumb reach, scrolling tables. The key screens (dashboard, tontines, loans, history) are tested at 390 × 844.</p>
+  <div class="duo">
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Mobile dashboard"><figcaption><b>Figure 13.3</b> — Mobile launchpad.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/41_mobile_tontines.jpg" alt="Mobile tontines"><figcaption><b>Figure 13.4</b> — Mobile tontine list.</figcaption></figure>
+  </div>
+
+  <h2>13.5 Language and accessibility</h2>
+  <p>The language selector is available in the user menu and in settings. Public pages accept <span class="mono">?lang=fr|en|es|de</span>. Labels, dates and amounts follow the locale; currencies are formatted with separators and symbol.</p>
+  <ul>
+    <li>Contrast checked on all six themes, including primary buttons.</li>
+    <li>Font sizes legible on mobile and in print.</li>
+    <li>Keyboard navigation on forms and buttons.</li>
+    <li>Explicit error messages, never a technical code on its own.</li>
+  </ul>
+
+  <h2>13.6 Notifications</h2>
+  <p>The member receives notifications for contribution due dates, upcoming sessions, decisions on their requests, repayments and board announcements. Channels (in-app, e-mail, WhatsApp, SMS) are configured by the platform and by the association.</p>
+  <div class="callout dark"><span class="tag">Principle</span><p>The member area must never force anyone to guess: every amount displayed points to a movement, every movement points to a session, every session points to an activity.</p></div>
+  <h2>13.7 Support and digital inclusion</h2>
+  <p>Not all members have the same digital confidence. The member area offers explicit labels, educational empty states and guided actions. Boards can organise onboarding sessions and use the screenshots in this manual as training material.</p>
+  <ul>
+    <li>Onboarding in under ten minutes for a member who knows how to use WhatsApp.</li>
+    <li>Critical actions ask for confirmation and display a summary.</li>
+    <li>Errors are explained in plain language, with the expected correction.</li>
+    <li>Data remains viewable even when the association is suspended.</li>
+    <li>A member can ask their board for help without leaving the application.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 14</div>
+  <h1 class="chapter" id="ch14" data-short="14 · Administration">Administration and templates</h1>
+  <p class="lead">The system console drives the platform, not the associations. It manages reusable templates, system users, roles, global settings and maintenance.</p>
+
+  <h2>14.1 System dashboard</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/30_admin.jpg" alt="Administration console">
+    <figcaption><b>Figure 14.1</b> — Administration console: associations, users, templates, wallets, settings and recent audit log.</figcaption>
+  </figure>
+  <p>The dashboard shows the number of associations, users, templates and wallets, the latest audit actions and pending requests. It gives a quick diagnosis of the platform's state.</p>
+
+  <h2>14.2 Association templates</h2>
+  <p>A template contains a name, a category, a description, model internal rules and a list of preconfigured activities. It serves as a starting point when creating an association; the creator can then adjust each parameter.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/32_admin_templates.jpg" alt="Association templates">
+    <figcaption><b>Figure 14.2</b> — Templates: FEV (national friendly society), SLD (local branch), categories tontine, family, business, village, project, religious, savings, friendly society, branch, federation.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Template</th><th>Category</th><th>Typical activities</th></tr></thead>
+    <tbody>
+      <tr><td>FEV — National federation</td><td>AMICALE</td><td>Membership, annual contribution, national fund, illness aid, bereavement aid</td></tr>
+      <tr><td>SLD — Local branch</td><td>SECTION</td><td>Auction tontine, solidarity, investment, catering, three aid funds</td></tr>
+      <tr><td>Neighbourhood tontine</td><td>TONTINE</td><td>Rotating tontine, catering</td></tr>
+      <tr><td>Loan fund</td><td>ÉPARGNE</td><td>Investment fund, loans, solidarity</td></tr>
+      <tr><td>Village association</td><td>VILLAGE</td><td>Contribution, projects, solidarity, meetings</td></tr>
+    </tbody>
+  </table>
+
+  <h2>14.3 Users and system roles</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/31_admin_users.jpg" alt="System users">
+    <figcaption><b>Figure 14.3</b> — System users: accounts, roles, status, last access and security actions.</figcaption>
+  </figure>
+  <p>The administrator creates accounts, assigns a system role, resets a password or disables an account. System roles combine permissions per resource and per action (CREATE, READ, UPDATE, DELETE). The "Principal Admin" role bypasses restrictions; the other roles are limited to their permissions.</p>
+
+  <h2>14.4 Supervised associations</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/33_admin_associations.jpg" alt="Association supervision">
+    <figcaption><b>Figure 14.4</b> — Supervision: list of associations, type, status, members, activities and access to the record.</figcaption>
+  </figure>
+  <p>The console allows an association to be suspended, reactivated, its status changed or its data viewed. These actions are logged and do not alter business entries.</p>
+
+  <h2>14.5 Platform settings</h2>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/34_admin_settings.jpg" alt="Platform settings">
+    <figcaption><b>Figure 14.5</b> — Settings: name, currency, country, contact, limits, features, maintenance, registration.</figcaption>
+  </figure>
+  <p>Global settings define the platform's identity, the default currency, the limits (number of associations, members, activities), the enabled features, maintenance mode and whether registrations are open. They are stored in the database and applied immediately.</p>
+
+  <h2>14.6 Audit log</h2>
+  <table>
+    <thead><tr><th>Action</th><th>Actor</th><th>Data</th></tr></thead>
+    <tbody>
+      <tr><td>Association created / modified</td><td>Administrator or creator</td><td>Before / after, date, IP</td></tr>
+      <tr><td>Role change</td><td>Administrator</td><td>Previous role, new role</td></tr>
+      <tr><td>Password reset</td><td>Administrator</td><td>Target account, date</td></tr>
+      <tr><td>Settings modified</td><td>Administrator</td><td>Key, old value, new value</td></tr>
+      <tr><td>Suspension / reactivation</td><td>Administrator</td><td>Reason, date</td></tr>
+    </tbody>
+  </table>
+
+  <h2>14.7 ARP reference framework and coverage</h2>
+  <p>The <strong>Organisation → ARP reference framework</strong> entry gives access to the 36 domains of the ARP study, the 144 invariants, the C01–C06 conditions and the catalogue of 23 328 combinations. The same console shows each association's coverage: framework status, origin (manual, imported, template), version, completeness, errors, alerts, active modules and number of funds.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/63_admin_arp.jpg" alt="ARP coverage of associations">
+    <figcaption><b>Figure 14.6</b> — ARP coverage: the four associations, their version, their completeness and their modules. Imported profiles remain flagged as needing validation.</figcaption>
+  </figure>
+  <p>The "Initialise missing profiles" button creates an <span class="mono">ACTIVE / BACKFILL</span> profile for associations that do not yet have one. This profile does not block existing operations; it must be reviewed and then published by the association's board.</p>
+
+  <h2>14.8 Maintenance and backups</h2>
+  <ul>
+    <li>Daily backup of the PostgreSQL database.</li>
+    <li>Export of critical documents and reports.</li>
+    <li>Process and TLS certificate monitoring.</li>
+    <li>Idempotent migrations before each deployment.</li>
+    <li>Deployment and build log.</li>
+    <li>Rollback procedure per commit.</li>
+  </ul>
+  <div class="callout warn"><span class="tag">Warning</span><p>The system console must not be used to correct business transactions. A correction to a contribution, a loan or an aid is made inside the association, with a traceable movement and the board's agreement.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 15</div>
+  <h1 class="chapter" id="ch15" data-short="15 · International">Multilingual and international</h1>
+  <p class="lead">Tchoua targets French-speaking, English-speaking and other African markets. The interface, content, currencies and rules must be able to change country without rewriting the application.</p>
+
+  <h2>15.1 Languages</h2>
+  <table>
+    <thead><tr><th>Language</th><th>Code</th><th>Coverage</th></tr></thead>
+    <tbody>
+      <tr><td>French</td><td>fr</td><td>Full interface, public site, documents</td></tr>
+      <tr><td>English</td><td>en</td><td>Public site, member interface (progressive rollout)</td></tr>
+      <tr><td>Spanish</td><td>es</td><td>Public site</td></tr>
+      <tr><td>German</td><td>de</td><td>Public site</td></tr>
+      <tr><td>Local languages</td><td>—</td><td>Planned extensions (Douala, Bassa, Ewondo, etc.)</td></tr>
+    </tbody>
+  </table>
+  <p>The language selector is available in the user menu, in settings and on the public site. Translations are centralised in locale files; no text should be hard-coded in components.</p>
+
+  <h2>15.2 Currencies and formats</h2>
+  <p>Amounts are stored as numeric values and displayed in the association's currency. Formatting respects separators, symbol and number of decimals. Conversion rates and multiple currencies are planned for international federations.</p>
+  <table>
+    <thead><tr><th>Currency</th><th>Code</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>CFA franc (CEMAC)</td><td>XAF</td><td>Cameroon, Gabon, Congo, Chad, CAR, Equatorial Guinea</td></tr>
+      <tr><td>CFA franc (UEMOA)</td><td>XOF</td><td>Senegal, Côte d'Ivoire, Benin, Togo, Mali, Burkina, Niger</td></tr>
+      <tr><td>Naira</td><td>NGN</td><td>Nigeria</td></tr>
+      <tr><td>Cedi</td><td>GHS</td><td>Ghana</td></tr>
+      <tr><td>Euro / Dollar</td><td>EUR / USD</td><td>Diaspora, partners</td></tr>
+    </tbody>
+  </table>
+
+  <h2>15.3 Legal adaptation</h2>
+  <p>Each country has its own law on associations: in Cameroon, Law No. 90/053 of 19 December 1990; in the OHADA area, common accounting rules; elsewhere, specific regimes. Tchoua does not claim to replace a lawyer: the platform provides templates and parameters, and the association validates its articles with its advisers.</p>
+  <ul>
+    <li>Template articles and internal rules per country (to be expanded).</li>
+    <li>Declaratory obligations and statutory registers.</li>
+    <li>Holding of assemblies, quorums and archives.</li>
+    <li>Protection of personal data.</li>
+  </ul>
+
+  <h2>15.4 Payments and mobile money</h2>
+  <p>Payment methods are configurable per association: cash, MTN MoMo, Orange Money, Wave, bank transfer, in-kind, time. Payment integrations must comply with local operators and regulators; the platform prepares the entry points and the reconciliation.</p>
+  <table>
+    <thead><tr><th>Method</th><th>Use</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Cash</td><td>Meetings, rural areas</td><td>Operational</td></tr>
+      <tr><td>MTN MoMo</td><td>Cameroon, Ghana, Uganda…</td><td>Configurable, integration to be completed</td></tr>
+      <tr><td>Orange Money</td><td>French-speaking Africa</td><td>Configurable, integration to be completed</td></tr>
+      <tr><td>Wave</td><td>Senegal, Côte d'Ivoire</td><td>Planned</td></tr>
+      <tr><td>Bank transfer</td><td>Formalised associations</td><td>Operational (entry + reconciliation)</td></tr>
+      <tr><td>In-kind / time</td><td>Cooperatives, time banks</td><td>Operational (valuation)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>15.5 International roadmap</h2>
+  <ol>
+    <li>Stabilise French and English across the full interface.</li>
+    <li>Add local currencies and formats.</li>
+    <li>Integrate mobile money operators country by country.</li>
+    <li>Build the legal library country by country.</li>
+    <li>Offline mode and synchronisation for areas with poor connectivity.</li>
+    <li>USSD and SMS for members without a smartphone.</li>
+  </ol>
+  <div class="callout info"><span class="tag">Information</span><p>The public site is already available in French, English, Spanish and German. The member interface uses the same translation foundation; business screens are translated progressively.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 16</div>
+  <h1 class="chapter" id="ch16" data-short="16 · Real cases">Real cases: HORIZON, FEV, SLD</h1>
+  <p class="lead">Three associations, three different models, one platform. HORIZON illustrates investment and lending; FEV the federating national friendly society; SLD the local branch with an auction tontine.</p>
+
+  <h2>16.1 ETS HORIZON — investment and loans</h2>
+  <p>HORIZON is a seven-member association that manages capital, loans and dividends. The historical data has been imported and verified: 49 loans, 5 active, 44 repaid, 5 433 499 FCFA of 2026 dividends.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/05_ndi_overview.jpg" alt="ETS HORIZON record">
+    <figcaption><b>Figure 16.1</b> — ETS HORIZON record: 7 members, 2 activities, capital, cash box, loans, dividends and management shortcuts.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Item</th><th>Amount / number</th></tr></thead>
+    <tbody>
+      <tr><td>Members</td><td>7</td></tr>
+      <tr><td>Capital / contributions</td><td>8 000 000 FCFA</td></tr>
+      <tr><td>Loans disbursed</td><td>49 — 100 360 001 FCFA</td></tr>
+      <tr><td>Loans outstanding</td><td>5 — 12 000 000 FCFA</td></tr>
+      <tr><td>Principal repaid</td><td>88 360 001 FCFA</td></tr>
+      <tr><td>Interest</td><td>5 219 831 FCFA</td></tr>
+      <tr><td>2026 dividends</td><td>5 433 499 FCFA</td></tr>
+      <tr><td>Loans / funds ratio</td><td>150 % (configurable)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>16.2 FEV — national friendly society</h2>
+  <p><strong>FEV</strong> (Fédération des Élites de la Vallée) is an elite friendly society governed by the 1990 law. It federates branches, holds an annual GA, a half-yearly steering committee, an executive board and committees. Its resources come from membership fees (10 000 FCFA), annual contributions (15 000 FCFA), investments and fines.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="FEV record">
+    <figcaption><b>Figure 16.2</b> — FEV: national friendly society, 1 attached member, 5 activities, 14 articles, 3 founding documents.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Parameter</th><th>Configured value</th></tr></thead>
+    <tbody>
+      <tr><td>Type</td><td>AMICALE</td></tr>
+      <tr><td>GA</td><td>Annual, January–February, 45 days' notice, quorum 1/2</td></tr>
+      <tr><td>Steering committee</td><td>Half-yearly, decisions 2/3, quorum 2/3</td></tr>
+      <tr><td>Board</td><td>3 years, renewable once, unpaid duties</td></tr>
+      <tr><td>Membership fee</td><td>10 000 FCFA</td></tr>
+      <tr><td>Annual contribution</td><td>15 000 FCFA</td></tr>
+      <tr><td>National fund</td><td>10 000 FCFA per member; 300 000 on death</td></tr>
+      <tr><td>Illness aid</td><td>10 000 FCFA/day, 3 to 15 days</td></tr>
+      <tr><td>Branches</td><td>Minimum 10 members; delegates 10 % (cap 11)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>16.3 SLD — Douala branch</h2>
+  <p><strong>SLD</strong> (Section Locale de Douala) is the Douala branch of FEV. It applies the national articles and its own 2024 internal rules: meetings on the first Saturday after the 5th, quorum 3/5, auction tontine of 25 000 FCFA, solidarity fund of 72 000 FCFA/year, investment fund of 5 000 FCFA/month, catering contribution of 3 000 FCFA and family aid.</p>
+  <div class="duo">
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/18_amsed.jpg" alt="SLD record"><figcaption><b>Figure 16.3</b> — SLD, Douala branch attached to FEV.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/19_amsed_activities.jpg" alt="SLD activities"><figcaption><b>Figure 16.4</b> — Seven SLD activities.</figcaption></figure>
+  </div>
+  <table>
+    <thead><tr><th>Activity</th><th>Amount</th><th>Frequency / rule</th></tr></thead>
+    <tbody>
+      <tr><td>Annual auction tontine</td><td>25 000 FCFA / share</td><td>Monthly, 12 sessions, reserve price 5 %</td></tr>
+      <tr><td>Solidarity fund</td><td>6 000 FCFA/month</td><td>72 000 FCFA/year</td></tr>
+      <tr><td>Investment fund</td><td>5 000 FCFA/month</td><td>Loan 3 %/month, 2 months, cap 2×</td></tr>
+      <tr><td>Catering</td><td>3 000 FCFA/session</td><td>Flat rate 150 000 FCFA</td></tr>
+      <tr><td>Illness aid</td><td>70 000 / 50 000</td><td>Member / spouse</td></tr>
+      <tr><td>Family aid</td><td>50 000 / 20 000</td><td>Marriage / birth</td></tr>
+      <tr><td>Bereavement aid</td><td>900 000 / 405 000</td><td>Member / spouse</td></tr>
+    </tbody>
+  </table>
+
+  <h2>16.4 Comparison</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>HORIZON</th><th>FEV</th><th>SLD</th></tr></thead>
+    <tbody>
+      <tr><td>Nature</td><td>Investment / loans</td><td>National friendly society</td><td>Local branch</td></tr>
+      <tr><td>Level</td><td>Primary association</td><td>Federation</td><td>Branch</td></tr>
+      <tr><td>Members</td><td>7</td><td>National</td><td>Douala branch</td></tr>
+      <tr><td>Main contribution</td><td>Capital contributions</td><td>15 000/year</td><td>25 000 tontine + 6 000 solidarity + 5 000 FI</td></tr>
+      <tr><td>Flagship activity</td><td>Loans with interest</td><td>National fund and aid</td><td>Auction tontine</td></tr>
+      <tr><td>Reports</td><td>2026 dividends</td><td>GA, committee, committees</td><td>CDS, catering, penalties</td></tr>
+    </tbody>
+  </table>
+  <div class="callout dark"><span class="tag">Lesson</span><p>The same engine serves three radically different models. That is the proof of generalisation: the objects (association, member, activity, session, movement) are common; the rules are parameters.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 17</div>
+  <h1 class="chapter" id="ch17" data-short="17 · Workflows">End-to-end workflows</h1>
+  <p class="lead">This chapter chains screens and rules together for the most frequent journeys. Each step states the actor, the action, the control and the trace produced.</p>
+  <h2>17.1 Creating an association and its board</h2>
+  <table>
+    <thead><tr><th>#</th><th>Actor</th><th>Action</th><th>Control / trace</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Creator</td><td>Chooses the template, type, name, region, colour</td><td>Unique name, valid type</td></tr>
+      <tr><td>2</td><td>Creator</td><td>Optionally attaches it to a parent association</td><td>No hierarchical cycle</td></tr>
+      <tr><td>3</td><td>Creator</td><td>Configures membership, meetings, aid, penalties</td><td>Consistent values</td></tr>
+      <tr><td>4</td><td>Creator</td><td>Appoints the board and roles</td><td>One president, one treasurer</td></tr>
+      <tr><td>5</td><td>System</td><td>Generates the invitation code and activates the association</td><td>Lifecycle event</td></tr>
+    </tbody>
+  </table>
+
+  <h2>17.2 Enrolling a member</h2>
+  <ol>
+    <li>The candidate creates an account or receives an invitation.</li>
+    <li>They join the association by code, link or request.</li>
+    <li>The board checks the conditions, the sponsorship and the documents.</li>
+    <li>The membership is validated: role, member number, join date.</li>
+    <li>The member appears in the directory, the contribution calls and the reports.</li>
+  </ol>
+  <div class="callout info"><span class="tag">Information</span><p>A refused membership is kept with its reason. Removal does not delete the history: it changes the status and closes the entitlements.</p></div>
+
+  <h2>17.3 Opening a session and collecting contributions</h2>
+  <table>
+    <thead><tr><th>#</th><th>Action</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Create the session (date, type, venue, agenda)</td><td>Session scheduled</td></tr>
+      <tr><td>2</td><td>Open the session</td><td>Expected contributions generated</td></tr>
+      <tr><td>3</td><td>Record attendance</td><td>Statuses and fines</td></tr>
+      <tr><td>4</td><td>Collect contributions</td><td>PAID / PARTIAL / LATE statuses</td></tr>
+      <tr><td>5</td><td>Collect the catering contribution</td><td>Catering cash box funded</td></tr>
+      <tr><td>6</td><td>Close the session</td><td>Frozen pot, minutes, report</td></tr>
+    </tbody>
+  </table>
+
+  <h2>17.4 Distributing a tontine</h2>
+  <ol>
+    <li>Check the pot and the distributable shares.</li>
+    <li>Apply the allocation rule (rotation, draw, auction).</li>
+    <li>Designate the beneficiary or beneficiaries and the number of shares.</li>
+    <li>Compute the amount: shares × amount per share.</li>
+    <li>Validate the distribution; the session balance is updated.</li>
+    <li>The beneficiary receives the amount; the history records it.</li>
+  </ol>
+  <div class="formula"><b>amount</b> = beneficiary shares × amount per share<br><b>session balance</b> = contributions − distributions<br><b>cycle balance</b> = Σ session balances</div>
+
+  <h2>17.5 Granting and tracking a loan</h2>
+  <table>
+    <thead><tr><th>#</th><th>Actor</th><th>Action</th><th>Control</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Member</td><td>Requests amount, purpose, term, guarantees</td><td>Cap, active loans</td></tr>
+      <tr><td>2</td><td>Board</td><td>Reviews, checks the cash position</td><td>Ratio, capacity, guarantees</td></tr>
+      <tr><td>3</td><td>Board / GA</td><td>Approval or reasoned refusal</td><td>Quorum, majority</td></tr>
+      <tr><td>4</td><td>Treasurer</td><td>Disbursement</td><td>Double validation</td></tr>
+      <tr><td>5</td><td>Member</td><td>Repayments of principal + interest</td><td>Schedule, receipt</td></tr>
+      <tr><td>6</td><td>System</td><td>Allocation of interest</td><td>Capital at the loan date</td></tr>
+    </tbody>
+  </table>
+
+  <h2>17.6 Awarding social aid</h2>
+  <ol>
+    <li>The member creates the request with category and supporting documents.</li>
+    <li>The board checks eligibility and the cap.</li>
+    <li>The decision is notified (approved, refused, further information required).</li>
+    <li>The disbursement is recorded with a reference.</li>
+    <li>The aid appears in the history, the report and the fund balance.</li>
+  </ol>
+
+  <h2>17.7 Closing a financial year</h2>
+  <table>
+    <thead><tr><th>Step</th><th>Content</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr><td>Inventory</td><td>Cash boxes, banks, loans, aid, contributions</td><td>Treasurer</td></tr>
+      <tr><td>Reconciliation</td><td>Discrepancies and reasoned corrections</td><td>Treasurer + auditors</td></tr>
+      <tr><td>Financial statements</td><td>Income statement, position</td><td>Board</td></tr>
+      <tr><td>Dividends</td><td>Allocation key, annual run</td><td>GA</td></tr>
+      <tr><td>Report</td><td>Activity report and financial report</td><td>President / treasurer</td></tr>
+      <tr><td>Archiving</td><td>Minutes, reports, exports</td><td>Secretary</td></tr>
+    </tbody>
+  </table>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/payments.png" alt="Financial flows">
+    <div class="cap"><b>Figure 17.1</b> — Financial flows: collections, disbursements, controls and the member → cash box → beneficiary → journal path.</div>
+  </section>
+
+  <h2>17.8 RACI matrix</h2>
+  <table>
+    <thead><tr><th>Activity</th><th>Member</th><th>Board</th><th>Treasurer</th><th>Auditors</th><th>Admin</th></tr></thead>
+    <tbody>
+      <tr><td>Contribute</td><td>R</td><td>A</td><td>R</td><td>I</td><td>—</td></tr>
+      <tr><td>Validate a membership</td><td>I</td><td>A/R</td><td>I</td><td>—</td><td>—</td></tr>
+      <tr><td>Disburse a loan</td><td>I</td><td>A</td><td>R</td><td>I</td><td>—</td></tr>
+      <tr><td>Award an aid</td><td>R</td><td>A</td><td>R</td><td>I</td><td>—</td></tr>
+      <tr><td>Close a cycle</td><td>I</td><td>A/R</td><td>R</td><td>C</td><td>—</td></tr>
+      <tr><td>Configure the platform</td><td>—</td><td>I</td><td>—</td><td>—</td><td>A/R</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">R = responsible for execution, A = approval authority, C = consulted, I = informed.</p>
+
+  <h2>17.9 Handling exceptions</h2>
+  <ul>
+    <li><strong>Session cancelled</strong> — contributions remain, the distribution is cancelled by a reverse movement.</li>
+    <li><strong>Data entry error</strong> — corrected by an adjustment, never by deletion.</li>
+    <li><strong>Departing member</strong> — balance calculated, repayment or offset, LEFT status.</li>
+    <li><strong>Dispute</strong> — referred to the board, reasoned decision, appeal possible before the GA.</li>
+    <li><strong>Connection loss</strong> — validated entries remain; data entry resumes after reconnection.</li>
+    <li><strong>Outage</strong> — members can view, the board is informed; service resumes after restart.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 18</div>
+  <h1 class="chapter" id="ch18" data-short="18 · Roadmap">Roadmap, limitations and support</h1>
+  <p class="lead">An honest document also states what is not yet done. This chapter presents the product trajectory, the current limitations and the support arrangements.</p>
+  <h2>18.1 What is operational</h2>
+  <ul class="checklist">
+    <li>Multilingual public site and member access.</li>
+    <li>Creation and management of associations, branches and federations.</li>
+    <li>Membership, roles, directory, documents, internal rules.</li>
+    <li>Tontines: shares, fractions, cycles, pot, beneficiaries, balances.</li>
+    <li>Contributions, sessions, attendance, fines, catering.</li>
+    <li>Loans, repayments, interest, dividends.</li>
+    <li>Solidarity and the aid catalogue.</li>
+    <li>History, reports, PDF/CSV exports, audit.</li>
+    <li>Themes, language, mobile, launchpad.</li>
+    <li>System console, templates, roles, settings.</li>
+  </ul>
+
+  <h2>18.2 Current limitations</h2>
+  <table>
+    <thead><tr><th>Area</th><th>Limitation</th><th>Workaround / next step</th></tr></thead>
+    <tbody>
+      <tr><td>Automatic designation of beneficiaries</td><td>The computation and the parameters are ready; automatic allocation based on eligibility and auctions remains a workflow to be finalised</td><td>Manual, traceable designation in the meantime</td></tr>
+      <tr><td>Federation consolidation</td><td>Hierarchy and branches operational; aggregated national dashboard still to come</td><td>Per-branch reports</td></tr>
+      <tr><td>OHADA accounting</td><td>Management exports and reports; full chart of accounts not integrated</td><td>CSV export to the accountant</td></tr>
+      <tr><td>Mobile Money</td><td>Payment methods configurable; operator integration to be finalised</td><td>Manual entry with reference</td></tr>
+      <tr><td>Offline / USSD / SMS</td><td>Not available</td><td>Responsive web application</td></tr>
+      <tr><td>Honorary distinctions</td><td>EPI — honorary distinction described in the texts, not modelled</td><td>Module to be added</td></tr>
+      <tr><td>Multi-country</td><td>Currency and language configurable; legal library by country to be expanded</td><td>Templates by country</td></tr>
+      <tr><td>Electronic signature</td><td>Not integrated</td><td>Minutes signed and uploaded</td></tr>
+    </tbody>
+  </table>
+
+<section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roadmap.png" alt="Africa roadmap">
+    <div class="cap"><b>Figure 18.1</b> — Trajectory: Cameroon foundations, federation, West Africa, continental.</div>
+  </section>
+
+  <h2>18.3 Security and compliance</h2>
+  <p>The platform applies the principles of least privilege, traceability and separation of powers. Personal data is limited to what is necessary; medical documents and contact details are not exposed to other members. Backups and logs make it possible to reconstruct operations.</p>
+  <div class="callout warn"><span class="tag">Warning</span><p>No system replaces human vigilance: the board must check the reports, the auditors must examine the accounts, and members must verify their own movements.</p></div>
+
+  <h2>18.4 Support and maintenance</h2>
+  <table>
+    <thead><tr><th>Level</th><th>Channel</th><th>Target response time</th></tr></thead>
+    <tbody>
+      <tr><td>Blocking incident</td><td>Priority support</td><td>4 business hours</td></tr>
+      <tr><td>Functional defect</td><td>Standard support</td><td>2 business days</td></tr>
+      <tr><td>Change request</td><td>Product committee</td><td>Monthly review</td></tr>
+      <tr><td>Training</td><td>Dedicated session</td><td>On schedule</td></tr>
+      <tr><td>Documentation</td><td>This manual + guides</td><td>Quarterly update</td></tr>
+    </tbody>
+  </table>
+
+  <h2>18.5 Document governance</h2>
+  <p>This manual is the functional reference. Any product change must be reflected in the relevant chapter, with the version and date updated. Screenshots must be redone when the interface changes; diagrams can be regenerated by script.</p>
+  <ul>
+    <li>Version 1.0 — November 2026 — state of production.</li>
+    <li>Quarterly review: features, figures, screenshots.</li>
+    <li>Annual review: architecture, security, roadmap.</li>
+    <li>Validation: product, operations, management.</li>
+  </ul>
+  <div class="callout dark"><span class="tag">Conclusion</span><p>Tchoua is not just tontine software: it is a way of making solidarity verifiable, governance readable and trust transferable. The platform is ready to serve; the documentation is there so that everyone can use it.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 19</div>
+  <h1 class="chapter" id="ch19" data-short="19 · ARP framework">ARP framework: rules, combinations and versions</h1>
+  <p class="lead">Since November 2026, Tchoua no longer merely records activities: each association has an <strong>ARP framework</strong> (Association Resource Planning) that describes its form, its rules, its authorised modules and its compatibility conditions. This framework is versioned, checked and enforceable against new operations.</p>
+
+  <h2>19.1 Why an ARP framework</h2>
+  <p>A neighbourhood tontine, a family friendly society, a local branch and a national federation do not have the same bodies, the same funds or the same obligations. The ARP framework separates what must be separated:</p>
+  <ul>
+    <li>the <strong>user account</strong> and the <strong>membership</strong>;</li>
+    <li>the <strong>expected contribution</strong> (receivable), the <strong>payment</strong> (treasury) and the <strong>allocation</strong> (imputation);</li>
+    <li>the <strong>fund</strong> (authorised use) and the <strong>account</strong> (place of safekeeping);</li>
+    <li>the <strong>decision</strong> to allocate and the <strong>disbursement</strong>;</li>
+    <li>the <strong>published rule</strong> and the <strong>historical operations</strong>, which keep their version.</li>
+  </ul>
+  <div class="callout dark"><span class="tag">Principle</span><p>The ARP framework does not replace the articles or the internal rules. It makes them <strong>executable</strong>: a declared rule becomes a control, a mandatory field or an explicit refusal. The software model is worth neither filed articles nor authorisation to carry on a regulated activity.</p></div>
+
+  <h2>19.2 Thirty-six domains, one hundred and forty-four invariants</h2>
+  <p>The ARP reference covers 36 domains: identity, federations, memberships, families, governance, meetings, discipline, documents, rules engine, contributions, payments, cash boxes, tontines, allocations, auctions, cycles, savings, loans, schedules, repayments, guarantees, solidarity, aid, reserves, investments, projects, purchases, assets, events, community, reports, security, architecture, mobile, operations and internationalisation.</p>
+  <div class="kpi">
+    <div><div class="v">36</div><div class="l">design domains</div></div>
+    <div><div class="v">144</div><div class="l">management invariants</div></div>
+    <div><div class="v">23 328</div><div class="l">bounded combinations</div></div>
+    <div><div class="v">6</div><div class="l">compatibility conditions</div></div>
+  </div>
+  <p>Each domain contains its options, invariants, form, workflow, exceptions, test recipes and indicators. The administration console lets you browse this reference without leaving the application.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/64_admin_arp_referentiel.jpg" alt="ARP reference in the administration console">
+    <figcaption><b>Figure 19.1</b> — ARP reference: 36 domains, 144 invariants, 288 form fields, 216 workflow steps and 180 test recipes available for consultation.</figcaption>
+  </figure>
+
+  <h2>19.3 The ten dimensions of an association</h2>
+  <p>An ARP configuration is described by ten dimensions. They determine the modules available and the conditions to be met before publication.</p>
+  <table>
+    <thead><tr><th>Dimension</th><th>Values</th><th>Main consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Organisational form</td><td>Autonomous · Branch · Federation</td><td>Scope of decisions, ownership of funds, inheritance</td></tr>
+      <tr><td>Membership mode</td><td>Individual · Family · Institutional</td><td>Unit of rights, caps and representation</td></tr>
+      <tr><td>Contribution basis</td><td>Fixed · Shares · In-kind</td><td>Call computation, valuation, liquidity</td></tr>
+      <tr><td>Tontine mode</td><td>None · Rotation · Draw · Auction</td><td>Allocation, proof of draw, auction</td></tr>
+      <tr><td>Credit policy</td><td>None · Zero rate · Amortising</td><td>Schedule, interest, caps</td></tr>
+      <tr><td>Social aid</td><td>None · Flat rate · Daily allowance</td><td>Caps, events, supporting documents</td></tr>
+      <tr><td>Payment channel</td><td>Cash · Bank · Mobile Money</td><td>Proof, fees, reconciliation, confirmation</td></tr>
+      <tr><td>Currencies</td><td>Single · Conversion</td><td>Rate, margin, presentation currency</td></tr>
+      <tr><td>Connection mode</td><td>Online · Offline tolerated</td><td>Draft, synchronisation, server validation</td></tr>
+      <tr><td>Validation level</td><td>Single · Double</td><td>Separation of duties, second approver</td></tr>
+    </tbody>
+  </table>
+
+  <h2>19.4 The six compatibility conditions</h2>
+  <p>Not all combinations are equally simple. Six conditions flag the configurations that require additional parameters. They do not block creation, but they prevent publication until the required fields are filled in.</p>
+  <table>
+    <thead><tr><th>Code</th><th>Trigger</th><th>Required fields</th></tr></thead>
+    <tbody>
+      <tr><td><strong>C01</strong></td><td>In-kind contribution + open tontine</td><td>Valuation method, liquidity rule (sale or funding)</td></tr>
+      <tr><td><strong>C02</strong></td><td>Auction + offline connection</td><td>Discount base, closing rule, offline bidding policy</td></tr>
+      <tr><td><strong>C03</strong></td><td>Mobile Money + offline connection</td><td>Provider, payment policy, mandatory external confirmation</td></tr>
+      <tr><td><strong>C04</strong></td><td>Currency with conversion</td><td>Rate source, date, margin, presentation currency</td></tr>
+      <tr><td><strong>C05</strong></td><td>Family membership + social aid</td><td>Cap unit (member, household, dependant), household definition</td></tr>
+      <tr><td><strong>C06</strong></td><td>Credit + single validation</td><td>Decision threshold, recusal rule for interested persons</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Concrete example</span><p>An association that enables loans without defining a threshold or a recusal rule displays <strong>C06_THRESHOLD</strong> and <strong>C06_CONFLICT</strong>. The framework remains active for existing operations, but publication of a new version is refused until the board decides.</p></div>
+
+  <h2>19.5 Twenty-three thousand combinations, a single logic</h2>
+  <p>The ten dimensions produce 23 328 combinations. The engine does not store these rows: it computes the conditions from the values and checks each configuration with a test recipe. This approach avoids frozen catalogues and guarantees that a new value remains compatible with the existing controls.</p>
+  <div class="formula">conditions = C01(dimension nature + tontine)
+           ∪ C02(auction + offline)
+           ∪ C03(mobile money + offline)
+           ∪ C04(conversion)
+           ∪ C05(family + aid)
+           ∪ C06(credit + single validation)
+
+qualification = "conditional" if conditions ≠ ∅
+                "no additional condition" otherwise</div>
+
+  <h2>19.6 Profile, draft, publication and versions</h2>
+  <p>Each association has a single ARP profile but several versions. The active profile carries the configuration applied to new operations; the draft allows a change to be prepared without interrupting the existing one.</p>
+  <table>
+    <thead><tr><th>State</th><th>Meaning</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DRAFT</strong></td><td>Unpublished profile</td><td>New financial subscriptions are blocked until publication</td></tr>
+      <tr><td><strong>ACTIVE</strong></td><td>Published version</td><td>Modules and conditions are applied</td></tr>
+      <tr><td><strong>BACKFILL</strong></td><td>Profile imported for an existing association</td><td>Continues to operate; to be reviewed and published by the board</td></tr>
+      <tr><td><strong>SUSPENDED / ARCHIVED</strong></td><td>Framework suspended or archived</td><td>Viewing and liquidation possible, new subscriptions closed</td></tr>
+    </tbody>
+  </table>
+  <p>A publication creates an immutable version with a SHA-256 fingerprint. Old operations remain attached to their rule version; a retroactive correction never rewrites the history, it creates a linked operation in an open period.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/50_arp_profile.jpg" alt="ARP framework of an association">
+    <figcaption><b>Figure 19.2</b> — ARP framework of an association: status, version, completeness, active conditions and blocking controls.</figcaption>
+  </figure>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/51_arp_modules.jpg" alt="Modules and conditions of the ARP framework">
+    <figcaption><b>Figure 19.3</b> — Modules &amp; conditions tab: ten dimensions, computed qualification, required fields and guardrails that cannot be disabled.</figcaption>
+  </figure>
+
+  <h2>19.7 Funds, movements and reservations</h2>
+  <p>The financial core distinguishes the <strong>fund</strong> (economic allocation), the <strong>movement</strong> (confirmed inflow or outflow) and the <strong>reservation</strong> (a commitment that protects the available balance without changing the balance). The available balance is computed as follows:</p>
+  <div class="formula">available = balance (confirmed inflows − confirmed outflows)
+           − active reservations</div>
+  <ul>
+    <li>An <strong>outflow</strong> can never exceed the available balance; the check is performed under a concurrent lock.</li>
+    <li>A <strong>reservation</strong> can be released (returned to the available balance) or consumed (creating a linked disbursement).</li>
+    <li>Amounts are kept in <strong>whole minor units</strong>: XAF without decimals, EUR in cents. No financial calculation uses binary floating point.</li>
+    <li><strong>Disabling a module</strong> hides new subscriptions but preserves the viewing, corrections and liquidations required by existing obligations.</li>
+  </ul>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/52_arp_funds.jpg" alt="Funds and reservations of the ARP framework">
+    <figcaption><b>Figure 19.4</b> — Funds and reservations: balance, reserved amount and available balance kept distinct, with creation of movements and reservations.</figcaption>
+  </figure>
+
+  <h2>19.8 Simulators and proof of calculations</h2>
+  <p>Three simulators make the rules verifiable before any entry is posted: loan schedule (constant principal, constant annuity, bullet), tontine allocation (pot, session cap, remaining entitlements, minimum fraction) and social fund projection (headcount, contribution, collection rate).</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/53_arp_simulators.jpg" alt="ARP simulators">
+    <figcaption><b>Figure 19.5</b> — Schedule simulator: 120 000 XAF over three months at 3 % per month, constant principal — 43 600, 42 400 and 41 200 XAF, interest 7 200 XAF.</figcaption>
+  </figure>
+
+  <h2>19.9 Administration and coverage</h2>
+  <p>The administration console shows the ARP coverage of all associations: status, origin, version, completeness, errors, alerts, active modules and number of funds. It can initialise missing profiles from existing activities, without interrupting production.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/63_admin_arp.jpg" alt="ARP coverage in the administration console">
+    <figcaption><b>Figure 19.6</b> — ARP coverage: each association, its framework, its completeness and its modules; imported profiles remain flagged as needing validation.</figcaption>
+  </figure>
+  <div class="callout warn"><span class="tag">Accepted limitations</span><p>The ARP framework is the anchor point for future developments. The modules not yet built — double-entry accounting journal, guarantees register, payment connectors, projects and inventory, real-time auctions, federation consolidation — remain identified workstreams and are not presented as finished.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 20</div>
+  <h1 class="chapter" id="ch20" data-short="20 · Tabbed form">Creating or editing an association with tabs</h1>
+  <p class="lead">The former seven-step wizard has been replaced by a single form organised in tabs. You can go back, correct a field, consult the ARP framework or save at any time: no linear progression is imposed.</p>
+
+  <h2>20.1 A single form, two modes</h2>
+  <p>The same component is used for <strong>creation</strong> and for <strong>editing</strong>. In creation it starts from default values and offers the modules to activate. In editing it reloads the association, its ARP framework, its meetings, its caps, its internal rules and its existing activities.</p>
+  <table>
+    <thead><tr><th>Mode</th><th>Address</th><th>Saving</th></tr></thead>
+    <tbody>
+      <tr><td>Creation</td><td><span class="mono">/dashboard/associations/create</span></td><td>Creates the association, its initial activities, its internal rules and its ARP profile</td></tr>
+      <tr><td>Editing</td><td><span class="mono">/associations/[id]/modifier</span></td><td>Updates the record; the ARP framework moves to draft if it has changed</td></tr>
+    </tbody>
+  </table>
+
+  <h2>20.2 The eight tabs</h2>
+  <table>
+    <thead><tr><th>Tab</th><th>Main fields</th><th>Checks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Identity</strong></td><td>Name, type, description, parent, legal status, country, currency, time zone, purposes, template</td><td>Name ≥ 3 characters; ISO currency code; ISO country; time zone required</td></tr>
+      <tr><td><strong>Contacts</strong></td><td>Region, email, phone, website, logo, colour, public visibility</td><td>Valid email; public page with no financial data</td></tr>
+      <tr><td><strong>ARP framework</strong></td><td>Ten dimensions, C01–C06 conditions, modules, required parameters</td><td>Conditions computed; mandatory fields; invariants that cannot be disabled</td></tr>
+      <tr><td><strong>Activities</strong></td><td>Modules to activate, initial tontine parameters, session frequency</td><td>Module / ARP capacity consistency; positive amounts; valid cycle</td></tr>
+      <tr><td><strong>Meetings &amp; catering</strong></td><td>Frequency, day, time, quorum, contribution, host flat rate</td><td>Quorum 0–100; positive amounts</td></tr>
+      <tr><td><strong>Membership &amp; finances</strong></td><td>Entry fee, age, sponsors, aid caps, penalties, bank account</td><td>Positive amounts; consistent scales</td></tr>
+      <tr><td><strong>Internal rules</strong></td><td>Titled articles and content</td><td>Atomic update; approvals recreated</td></tr>
+      <tr><td><strong>Summary</strong></td><td>Overview, completeness, conditions, errors and warnings</td><td>Final check before creation or saving</td></tr>
+    </tbody>
+  </table>
+
+  <h2>20.3 Navigating and saving at any time</h2>
+  <p>The tab bar stays visible at the top of the form. The save button stays visible at the bottom, whichever tab is open. Switching tabs loses no input: the state is kept in the component until saving or cancelling.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/55_create_identite.jpg" alt="Tabbed creation form — identity">
+    <figcaption><b>Figure 20.1</b> — Creation by tabs: all eight entries are directly accessible, with no "Next" button. The "Create the association" button remains available.</figcaption>
+  </figure>
+  <div class="callout info"><span class="tag">Tip</span><p>Fill in the name and type first, then open the <strong>ARP framework</strong> tab: the "Apply the standard profile" button suggests a consistent combination (neighbourhood tontine, friendly society, federation, branch, cooperative…). You can then adjust each dimension.</p></div>
+
+  <h2>20.4 ARP framework and module consistency</h2>
+  <p>The <strong>Activities</strong> tab does not allow a module that the ARP framework does not authorise to be activated. If you select "Loans" without a credit policy, the form sends you back to the ARP framework tab to choose the credit mode and fill in the conditions. This rule avoids creating an activity that the controls would block on the very first request.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/56_create_arp.jpg" alt="ARP framework tab of the creation form">
+    <figcaption><b>Figure 20.2</b> — ARP framework tab: ten dimensions, qualification, conditions, modules and required parameters. The standard profile can be applied and then customised.</figcaption>
+  </figure>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/57_create_activites.jpg" alt="Activities tab of the creation form">
+    <figcaption><b>Figure 20.3</b> — Activities tab: modules, ARP consistency, initial tontine parameters and session frequency.</figcaption>
+  </figure>
+
+  <h2>20.5 Editing an existing association</h2>
+  <p>In editing mode, the data is reloaded from the database. The <strong>Edit</strong> button is visible on the association record for authorised board members. The principal administrator can also open the direct address.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/58_edit_identite.jpg" alt="Tabbed editing form">
+    <figcaption><b>Figure 20.4</b> — Editing: the same tabs, pre-filled with the existing identity, ARP framework, meetings, caps and internal rules.</figcaption>
+  </figure>
+  <p>Three behaviours are worth knowing:</p>
+  <ul>
+    <li>the record fields (name, contacts, meetings, membership, internal rules) are applied immediately;</li>
+    <li>if the ARP framework has changed, it is saved as a <strong>draft</strong> and the ARP page opens so that it can be published;</li>
+    <li>if only the rest of the record has changed, no ARP draft is created.</li>
+  </ul>
+  <div class="callout warn"><span class="tag">Warning</span><p>Editing the internal rules deletes the previous approvals and recreates the articles in a single transaction. Members must approve the new version; the history of the previous approvals is not kept as proof of the new version.</p></div>
+
+  <h2>20.6 Who can create, edit and configure</h2>
+  <table>
+    <thead><tr><th>Action</th><th>Authorised roles</th><th>Permission</th></tr></thead>
+    <tbody>
+      <tr><td>Create an association</td><td>Any authenticated user</td><td>Platform limits</td></tr>
+      <tr><td>Edit the association record</td><td>Founder, president, vice-president, principal administrator</td><td><span class="mono">EDIT_SETTINGS</span></td></tr>
+      <tr><td>Configure activities</td><td>Founder, president, vice-president, secretary, treasurer, principal administrator</td><td><span class="mono">MANAGE_ACTIVITIES</span></td></tr>
+      <tr><td>Publish the ARP framework</td><td>Founder, president, principal administrator</td><td>Publication decision</td></tr>
+      <tr><td>View the ARP framework</td><td>All members of the association</td><td>Read only</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Separation of duties</span><p>A member can view the framework and the activities but cannot modify them or publish a version. Creating a financial activity is also controlled by the corresponding ARP capacity.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 21</div>
+  <h1 class="chapter" id="ch21" data-short="21 · Activity configuration">Configuring each activity and managing funds</h1>
+  <p class="lead">Once the association is created, each activity is configured separately. The <strong>Configuration</strong> page groups tontines, loans, savings, contributions, solidarity, in-kind activities, investments, purchases and catering, with a form suited to each family.</p>
+
+  <h2>21.1 Accessing the configuration</h2>
+  <p>Two paths lead to the same page:</p>
+  <ul>
+    <li>from the association record, the <strong>Configure</strong> button;</li>
+    <li>from the side menu, section <strong>Association → Configuration</strong>, once the association is selected.</li>
+  </ul>
+  <p>Access is restricted to authorised board members and to the principal administrator. Other members can view the activities but cannot change their parameters.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/59_activity_config.jpg" alt="Activity configuration page">
+    <figcaption><b>Figure 21.1</b> — Association configuration: ARP dimensions, active conditions, activity families and creation button.</figcaption>
+  </figure>
+
+  <h2>21.2 The activity families</h2>
+  <table>
+    <thead><tr><th>Family</th><th>Activities concerned</th><th>Specific parameters</th></tr></thead>
+    <tbody>
+      <tr><td>Tontines</td><td>Rotating tontine, ASCA, auctions</td><td>Contribution, shares, beneficiary entitlement, fractions, cycle, reserve price</td></tr>
+      <tr><td>Loans</td><td>Loan fund</td><td>Short/long rate, cap, fund ratio, validation, active loans</td></tr>
+      <tr><td>Savings</td><td>Savings / investment</td><td>Contribution, frequency, payment method</td></tr>
+      <tr><td>Contributions</td><td>Cross-cutting rules</td><td>Basis, entry fee, admission, family cap, in-kind</td></tr>
+      <tr><td>Solidarity</td><td>Solidarity fund</td><td>Contribution, caps, events, validation</td></tr>
+      <tr><td>In-kind</td><td>Contribution in goods</td><td>Unit, valuation, liquidity, catalogue</td></tr>
+      <tr><td>Investment</td><td>Collective investment</td><td>Capital, income, dividends</td></tr>
+      <tr><td>Purchases &amp; collections</td><td>Group purchases, one-off collection</td><td>Quantities, costs, allocation, collection amount</td></tr>
+      <tr><td>Meetings &amp; catering</td><td>Cross-cutting parameters</td><td>Frequency, quorum, contribution, host flat rate</td></tr>
+    </tbody>
+  </table>
+
+  <h2>21.3 The activity form</h2>
+  <p>The form adapts to the selected type. It keeps an identity, a status (active, paused, closed), a participation mode (mandatory, optional, conditional), a contribution unit and a frequency. The following blocks appear only when relevant:</p>
+  <ul>
+    <li><strong>Tontine</strong>: amount per share, beneficiary entitlement, minimum fraction, caps, cycle mode, auctions;</li>
+    <li><strong>Loan</strong>: month 1–3 rate, rate beyond, cap per member, fund ratio, validation, number of active loans;</li>
+    <li><strong>Collection</strong>: collection amount;</li>
+    <li><strong>All</strong>: late penalties, payment methods, preview of the next twelve sessions.</li>
+  </ul>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/60_activity_form.jpg" alt="Tontine configuration form">
+    <figcaption><b>Figure 21.2</b> — Activity form: identity, status, participation, contribution, cycle, beneficiary shares and frequency.</figcaption>
+  </figure>
+  <div class="callout info"><span class="tag">Tip</span><p>A change of frequency does not rewrite past sessions: the new due dates apply to upcoming sessions. For an activity already under way, check the cycle and the remaining entitlements before changing a contribution.</p></div>
+
+  <h2>21.4 Contribution and membership rules</h2>
+  <p>The <strong>Contributions</strong> tab does not create an activity: it sets the cross-cutting parameters that feed the calls. It holds the basis (fixed, shares, in-kind), the entry fee, the minimum age, the admission mode, the sponsors, the waiting period, the family cap unit and the household definition.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/61_activity_cotisations.jpg" alt="Contribution rules">
+    <figcaption><b>Figure 21.3</b> — Contribution and membership rules: basis, entry fee, admission, family cap and in-kind valuation.</figcaption>
+  </figure>
+  <p>When the basis is "In-kind", the C01 fields appear: valuation method and liquidity rule. An in-kind contribution does not automatically become cash; it must be sold or funded before distribution.</p>
+
+  <h2>21.5 Meetings and catering</h2>
+  <p>The <strong>Meetings &amp; catering</strong> tab sets the frequency, day, time, quorum, contribution per member and the flat rate paid back to the host. These parameters are distinct from financial sessions: a meeting can cover several activities, and an activity can run without a physical meeting.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/62_activity_reunions.jpg" alt="Meeting and catering parameters">
+    <figcaption><b>Figure 21.4</b> — Meetings and catering: frequency, quorum, contribution and host flat rate, with no confusion with activity contributions.</figcaption>
+  </figure>
+
+  <h2>21.6 Funds and reservations</h2>
+  <p>The ARP page contains the <strong>Funds &amp; reservations</strong> tab. It allows several funds to be created (unrestricted, restricted, reserve, refundable deposit), inflows and outflows to be recorded, and an amount to be reserved for an aid, an allocation or a guarantee.</p>
+  <table>
+    <thead><tr><th>Concept</th><th>Definition</th><th>Impact on the available balance</th></tr></thead>
+    <tbody>
+      <tr><td>Balance</td><td>Confirmed inflows minus confirmed outflows</td><td>Accounting measure</td></tr>
+      <tr><td>Active reservation</td><td>Commitment on an amount, with purpose and expiry</td><td>Reduces the available balance without changing the balance</td></tr>
+      <tr><td>Released reservation</td><td>Commitment cancelled</td><td>Returns the amount to the available balance</td></tr>
+      <tr><td>Consumed reservation</td><td>Commitment converted into a disbursement</td><td>Creates a linked outflow; the available balance stays consistent</td></tr>
+    </tbody>
+  </table>
+  <div class="callout dark"><span class="tag">Rule</span><p>An outflow can never exceed the available balance after reservations. The check is performed under a concurrent lock: two treasurers cannot consume the same amount twice.</p></div>
+
+  <h2>21.7 Versions, audit and control</h2>
+  <p>Each save of the ARP framework creates a draft. Publication turns that draft into an active, immutable version, with a SHA-256 fingerprint. Versions can be viewed in the <strong>Versions</strong> tab; old operations keep the rule that applied on their date.</p>
+  <ul>
+    <li>Activity changes are logged with the author and the date.</li>
+    <li>Financial parameters are never corrected by deletion: a linked operation keeps the trace.</li>
+    <li>Disabling a module closes new subscriptions but lets repayments and liquidations continue.</li>
+    <li>The board can return to an earlier version by publishing a new version, never by overwriting the history.</li>
+  </ul>
+
+  <h2>21.8 Configuration checklist</h2>
+  <ul class="checklist">
+    <li>The name, type and country are filled in.</li>
+    <li>The functional currency is correct and the time zone matches the head office.</li>
+    <li>The ARP dimensions match the activities actually open.</li>
+    <li>Conditions C01–C06 are complete or explicitly accepted as still to be completed.</li>
+    <li>Each activity has a consistent status, participation mode and frequency.</li>
+    <li>Caps, rates and penalties have been reviewed by the treasurer.</li>
+    <li>The internal rules are up to date and members can approve them.</li>
+    <li>Funds and reservations are created before the first disbursements.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Annexes</div>
+  <h1 class="chapter" id="annexes" data-short="Annexes">Glossary, API and checklist</h1>
+  <p class="lead">The references used day to day: vocabulary, endpoints, configuration checklist and index of figures.</p>
+
+  <h2>A. Glossary</h2>
+  <table>
+    <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+    <tbody>
+      <tr><td>Activity</td><td>Collective contract managed by the association: tontine, savings, loan, solidarity, catering.</td></tr>
+      <tr><td>ARP</td><td>Association Resource Planning: versioned framework describing an association's dimensions, rules, modules and conditions.</td></tr>
+      <tr><td>ARP framework</td><td>Configuration profile of an association, with draft, published version and compatibility checks.</td></tr>
+      <tr><td>Condition C01–C06</td><td>Compatibility requirement that blocks publication until the required parameters are filled in.</td></tr>
+      <tr><td>Membership</td><td>Link between a user and an association, with role, status and join date.</td></tr>
+      <tr><td>Beneficiary</td><td>Member designated to receive one or more shares during a session.</td></tr>
+      <tr><td>Board</td><td>Executive body of the association: president, secretary, treasurer, etc.</td></tr>
+      <tr><td>Cash box</td><td>Financial envelope allocated to an activity or a fund.</td></tr>
+      <tr><td>Cycle</td><td>Complete period of an activity, from opening to closing.</td></tr>
+      <tr><td>Dividend</td><td>Share of the profits or interest distributed among the members.</td></tr>
+      <tr><td>Fraction</td><td>Fraction of a share: 1, 1/2 or 1/4.</td></tr>
+      <tr><td>Fund</td><td>Envelope allocated to a use (unrestricted, restricted, reserve, refundable deposit); distinct from the account that holds it.</td></tr>
+      <tr><td>Membership</td><td>Record of a user's belonging to an association.</td></tr>
+      <tr><td>Share</td><td>Unit of participation in a tontine.</td></tr>
+      <tr><td>Pot</td><td>Amount available for a session after contributions and carry-overs.</td></tr>
+      <tr><td>Quorum</td><td>Minimum number of people present in order to deliberate validly.</td></tr>
+      <tr><td>Reservation</td><td>Commitment on an amount that reduces a fund's available balance without changing its balance.</td></tr>
+      <tr><td>Session</td><td>Dated meeting of an activity.</td></tr>
+      <tr><td>Subscription</td><td>A member's commitment to a number of shares.</td></tr>
+      <tr><td>Solidarity</td><td>Non-repayable funds and aid intended for members.</td></tr>
+      <tr><td>ASCA tontine</td><td>Internal savings and credit tontine.</td></tr>
+      <tr><td>Rotating tontine</td><td>Tontine in which each member receives the pot in turn.</td></tr>
+      <tr><td>Template</td><td>Reusable association model with activities and internal rules.</td></tr>
+      <tr><td>Minor unit</td><td>Smallest whole monetary unit (XAF, euro cent) used for all financial calculations.</td></tr>
+      <tr><td>Wallet</td><td>Internal platform wallet for financial flows.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>B. Main endpoints</h2>
+  <table>
+    <thead><tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td>/api/associations</td><td>List of the user's associations</td></tr>
+      <tr><td>POST</td><td>/api/associations</td><td>Create an association</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}</td><td>Details, members, activities, documents</td></tr>
+      <tr><td>PATCH</td><td>/api/associations/{id}</td><td>Update the settings</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/history</td><td>Paginated history, filters, groupings</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/arp</td><td>ARP profile, draft, versions, checks</td></tr>
+      <tr><td>PUT</td><td>/api/associations/{id}/arp</td><td>Save the draft or publish a version</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/arp/funds</td><td>Funds, balances, reservations and movements</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/arp/funds/{fundId}/movements</td><td>Fund inflow or outflow</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/arp/funds/{fundId}/reservations</td><td>Reserve, release or consume an amount</td></tr>
+      <tr><td>GET</td><td>/api/admin/arp</td><td>ARP coverage of all associations</td></tr>
+      <tr><td>POST</td><td>/api/admin/arp/backfill</td><td>Initialise missing profiles</td></tr>
+      <tr><td>GET</td><td>/api/arp/referential</td><td>36 domains, 144 invariants, conditions</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/interests</td><td>Interest by member, repayment, period</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/activities/{actId}/cycle</td><td>Tontine cycle summary</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/activities</td><td>Create an activity</td></tr>
+      <tr><td>PATCH</td><td>/api/associations/{id}/activities/{actId}</td><td>Update an activity</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/documents</td><td>Association documents</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/documents</td><td>Upload a document</td></tr>
+      <tr><td>GET</td><td>/api/admin/settings</td><td>Platform settings (admin)</td></tr>
+      <tr><td>GET</td><td>/api/admin/templates</td><td>Association templates (admin)</td></tr>
+      <tr><td>GET</td><td>/api/me/aggregate</td><td>Personal multi-association summary</td></tr>
+    </tbody>
+  </table>
+  <p class="table-cap">Table B.1 — Main endpoints. All of them check the session and the membership of the association.</p>
+
+  <h2>C. Configuration checklist</h2>
+  <table>
+    <thead><tr><th>Step</th><th>To check</th><th>Done</th></tr></thead>
+    <tbody>
+      <tr><td>Identity</td><td>Name, type, region, logo, colour, description</td><td>☐</td></tr>
+      <tr><td>Attachment</td><td>Parent association, level, invitation code</td><td>☐</td></tr>
+      <tr><td>Board</td><td>President, secretary, treasurer, auditors</td><td>☐</td></tr>
+      <tr><td>Membership</td><td>Conditions, sponsorship, fee, contribution</td><td>☐</td></tr>
+      <tr><td>Meetings</td><td>Day, time, venue, quorum, notice</td><td>☐</td></tr>
+      <tr><td>Aid</td><td>Categories, caps, documents, deadlines</td><td>☐</td></tr>
+      <tr><td>Penalties</td><td>Scale, grounds, appeals</td><td>☐</td></tr>
+      <tr><td>Activities</td><td>Type, share, frequency, cycle, beneficiaries</td><td>☐</td></tr>
+      <tr><td>Loans</td><td>Rate, term, cap, guarantees, approval</td><td>☐</td></tr>
+      <tr><td>Cash boxes</td><td>Bank accounts, cash boxes, responsible persons</td><td>☐</td></tr>
+      <tr><td>Documents</td><td>Articles, internal rules, minutes, reports</td><td>☐</td></tr>
+      <tr><td>Tests</td><td>Membership, contribution, loan, aid, report</td><td>☐</td></tr>
+    </tbody>
+  </table>
+
+  <h2>D. Index of figures</h2>
+  <table>
+    <thead><tr><th>Figure</th><th>Title</th><th>Chapter</th></tr></thead>
+    <tbody>
+      <tr><td>1.1</td><td>Public home page</td><td>1</td></tr>
+      <tr><td>2.1</td><td>Platform architecture</td><td>2</td></tr>
+      <tr><td>2.2</td><td>Data model</td><td>2</td></tr>
+      <tr><td>3.1</td><td>Roles and permissions</td><td>3</td></tr>
+      <tr><td>3.2</td><td>Settings and themes</td><td>3</td></tr>
+      <tr><td>4.1</td><td>Lifecycle</td><td>4</td></tr>
+      <tr><td>4.2</td><td>FEV / SLD governance</td><td>4</td></tr>
+      <tr><td>4.3</td><td>FEV record</td><td>4</td></tr>
+      <tr><td>5.1</td><td>Module map</td><td>5</td></tr>
+      <tr><td>5.2</td><td>Member dashboard</td><td>5</td></tr>
+      <tr><td>6.1</td><td>Tontine engine</td><td>6</td></tr>
+      <tr><td>6.2</td><td>SLD activity</td><td>6</td></tr>
+      <tr><td>6.3</td><td>Tontine cycle</td><td>6</td></tr>
+      <tr><td>7.1</td><td>Sessions</td><td>7</td></tr>
+      <tr><td>8.1</td><td>Loan cycle</td><td>8</td></tr>
+      <tr><td>8.2</td><td>Interest</td><td>8</td></tr>
+      <tr><td>9.1</td><td>Solidarity</td><td>9</td></tr>
+      <tr><td>13.1</td><td>Themes</td><td>13</td></tr>
+      <tr><td>13.3–13.4</td><td>Mobile</td><td>13</td></tr>
+      <tr><td>17.1</td><td>Financial flows</td><td>17</td></tr>
+      <tr><td>18.1</td><td>Roadmap</td><td>18</td></tr>
+    </tbody>
+  </table>
+
+  <h2>E. References</h2>
+  <ul>
+    <li>FEV articles revised 2018; steering committee internal rules 2013; compilation of texts 2023.</li>
+    <li>SLD internal rules 2024.</li>
+    <li>ETS HORIZON data (import workbook and internal rules).</li>
+    <li>Functional specifications of the repository: tontine, association, wallet, savings, marketplace, vote.</li>
+  </ul>
+</section>
+
+      <div class="content-end">Tchoua.com · Complete manual · 2026 edition · Anonymized document</div>
+    </article>
+  </div>
+</main>
+<footer class="manual">Tchoua — Solidarity, digitized · <a href="/">tchoua.com</a> · <a href="/documentation">Documentation</a> · <a href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_EN.pdf">PDF</a></footer>
+<script>
+const bar=document.getElementById('progress');
+addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;bar.style.width=p+'%';},{passive:true});
+const links=[...document.querySelectorAll('.sidebar a[href^="#"]')];
+const heads=[...document.querySelectorAll('.content h1[id]')];
+function syncToc(){let cur=heads[0];for(const h of heads){if(h.getBoundingClientRect().top<=150)cur=h;else break;}if(cur){const id='#'+cur.id;links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===id));}}
+addEventListener('scroll',syncToc,{passive:true});syncToc();
+document.getElementById('print')?.addEventListener('click',()=>window.print());
+</script>
+</body></html>

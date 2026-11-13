@@ -1,10 +1,15 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8">
+<html lang="fr">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Manuel complet Tchoua 2026 — Documentation</title>
-<meta name="description" content="Manuel fonctionnel complet de Tchoua : associations, tontines, cotisations, prêts, solidarité, gouvernance, rapports et administration. 88 pages en ligne.">
-<meta name="robots" content="index,follow">
+<title>Tchoua · Documentation complète 2026</title>
+<meta name="description" content="Le fonctionnement réel de Tchoua : associations, cadre ARP, tontines, cotisations, prêts, solidarité, réunions, rapports, administration et configuration.">
 <link rel="canonical" href="https://www.tchoua.com/docs/manuel/index.html">
+<link rel="alternate" hreflang="fr" href="https://www.tchoua.com/docs/manuel/index.html">
+<link rel="alternate" hreflang="en" href="https://www.tchoua.com/docs/manuel/en/index.html">
+<link rel="alternate" hreflang="es" href="https://www.tchoua.com/docs/manuel/es/index.html">
+<link rel="alternate" hreflang="de" href="https://www.tchoua.com/docs/manuel/de/index.html">
 <style>
 :root{--ink:#0d3d28;--ink2:#145c43;--gold:#c08a2e;--cream:#f7f3eb;--paper:#fffdf8;--muted:#66756c;--line:#e2dccd}
 *{box-sizing:border-box}html{scroll-behavior:auto}
@@ -90,40 +95,41 @@ footer.manual{background:#0d3d28;color:#cfe0d6;font-size:12px;padding:28px 22px;
 footer.manual a{color:#f4d58d}
 @media(max-width:980px){.hero-in{grid-template-columns:1fr}.layout{display:block;padding-top:22px}.sidebar{display:none}.mobile-toc{display:block}.content{border-radius:16px;padding:22px 18px}.topbar a.top{display:none}.hero p{font-size:15px}h2{font-size:21px}}
 @media print{.topbar,.sidebar,.mobile-toc,.hero .actions,.progress,footer.manual{display:none!important}.layout{display:block;max-width:none;padding:0}.content{border:0;box-shadow:none;max-width:none;padding:0}.chapter{page-break-after:always}.chapter:last-of-type{page-break-after:auto}body{background:#fff}}
+
+.langs{display:flex;gap:4px;align-items:center;margin-left:4px}
+.langs a{font-size:11px;font-weight:800;color:#cfe0d6;padding:5px 7px;border-radius:6px}
+.langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
+.langs a.active{background:#e68a00;color:#0d3d28}
+@media(max-width:720px){.langs{display:none}}
 </style>
-</head><body>
+</head>
+<body>
 <div class="progress" id="progress"></div>
 <header class="topbar"><div class="topbar-in">
-  <a class="brand" href="/"><img src="assets/logo.png" alt="Tchoua"><span>Tchoua<small>Manuel complet</small></span></a>
-  <span class="spacer"></span>
-  <a class="top" href="/">Site</a>
+  <a class="brand" href="/"><img src="/docs/manuel/assets/logo.png" alt="Tchoua"><div>Tchoua<small>MANUEL COMPLET</small></div></a>
+  <div class="spacer"></div>
   <a class="top" href="/documentation">Documentation</a>
-  <a class="top" href="../Tchoua_Documentation_Complete_2026_Anonymisee.pdf" download>Télécharger le PDF</a>
-  <button class="btn ghost" id="print" type="button">Imprimer</button>
+  <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf">Télécharger le PDF</a>
+  <div class="langs"><a class="active" href="/docs/manuel/index.html" hreflang="fr">FR</a><a class="" href="/docs/manuel/en/index.html" hreflang="en">EN</a><a class="" href="/docs/manuel/es/index.html" hreflang="es">ES</a><a class="" href="/docs/manuel/de/index.html" hreflang="de">DE</a></div>
 </div></header>
-
 <section class="hero"><div class="hero-in">
   <div>
     <div class="kicker">Documentation officielle · Édition 2026</div>
-    <h1>Le manuel complet<br><span>de Tchoua.</span></h1>
-    <p>Comprendre, paramétrer et exploiter la plateforme : associations, tontines, cotisations, prêts, solidarité, gouvernance, rapports et administration.</p>
-    <div class="chips"><span class="chip">18 chapitres</span><span class="chip">Annexes</span><span class="chip">24 captures</span><span class="chip">10 schémas</span><span class="chip">Version 1.1 · Novembre 2026</span></div>
-    <div class="actions" style="display:flex;flex-wrap:wrap;gap:10px">
-      <a class="btn gold" href="../Tchoua_Documentation_Complete_2026_Anonymisee.pdf" download>Télécharger le PDF</a>
-      <a class="btn ghost" href="/documentation">Présentation & autres langues</a>
-    </div>
+    <h1>Manuel de l&#x27;existant<br><span>Documentation complète 2026</span></h1>
+    <p>Le fonctionnement réel de Tchoua : associations, cadre ARP, tontines, cotisations, prêts, solidarité, réunions, rapports, administration et configuration.</p>
+    <div class="chips"><span class="chip">21 chapitres</span><span class="chip">39 captures réelles</span><span class="chip">10 schémas</span><span class="chip">Version 2.0 · Novembre 2026</span></div>
+    <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf">Télécharger le PDF</a>
+    <a class="btn ghost" href="#ch01">Sommaire</a>
   </div>
   <div class="hero-card">
-    <div class="label">Ce que couvre ce manuel</div>
-    <div class="big">18 chapitres<br><span style="font-size:20px;color:#e6c98f">+ annexes</span></div>
-    <div class="small">Tontines · Prêts · Solidarité · Gouvernance · Administration</div>
-    <div class="notice">Édition anonymisée : les noms d'associations et de personnes ont été remplacés par des identifiants fictifs. Les montants, règles et exemples restent concrets.</div>
+    <div class="label">Documentation</div>
+    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Annexes</span></div>
+    <div class="small">21 chapitres · 10 schémas</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.0 · Novembre 2026</div>
   </div>
 </div></section>
-
 <main class="layout">
-  <aside class="sidebar">
-    <h2>Sommaire</h2>
+  <aside class="sidebar"><h2>Sommaire</h2>
     <div class="toc-part">Comprendre</div>
 <a href="#ch01"><span>1</span>Vision, positionnement et promesse</a>
 <a href="#ch02"><span>2</span>Architecture, données et sécurité</a>
@@ -145,8 +151,12 @@ footer.manual a{color:#f4d58d}
 <a href="#ch16"><span>16</span>Cas réels : HORIZON, FEV, SLD</a>
 <a href="#ch17"><span>17</span>Workflows de bout en bout</a>
 <a href="#ch18"><span>18</span>Roadmap, limites et support</a>
+<div class="toc-part">Cadre ARP et configuration</div>
+<a href="#ch19"><span>19</span>Cadre ARP : règles, combinaisons et versions</a>
+<a href="#ch20"><span>20</span>Créer ou modifier une association par onglets</a>
+<a href="#ch21"><span>21</span>Configurer chaque activité et gérer les fonds</a>
 <div class="toc-part">Annexes</div>
-<a href="#annexes"><span>A</span>Annexes : glossaire, API, checklist</a>
+<a href="#annexes"><span>A</span>Glossaire, API et checklist</a>
     <a class="back" href="/documentation">← Retour à la documentation</a>
   </aside>
   <div>
@@ -171,19 +181,22 @@ footer.manual a{color:#f4d58d}
 <a href="#ch16"><span>16</span>Cas réels : HORIZON, FEV, SLD</a>
 <a href="#ch17"><span>17</span>Workflows de bout en bout</a>
 <a href="#ch18"><span>18</span>Roadmap, limites et support</a>
+<div class="toc-part">Cadre ARP et configuration</div>
+<a href="#ch19"><span>19</span>Cadre ARP : règles, combinaisons et versions</a>
+<a href="#ch20"><span>20</span>Créer ou modifier une association par onglets</a>
+<a href="#ch21"><span>21</span>Configurer chaque activité et gérer les fonds</a>
 <div class="toc-part">Annexes</div>
-<a href="#annexes"><span>A</span>Annexes : glossaire, API, checklist</a></details>
-    <article class="content">
-      <section class="chapter">
+<a href="#annexes"><span>A</span>Glossaire, API et checklist</a></details>
+    <article class="content"><section class="chapter">
   <div class="chapter-kicker">Chapitre 1</div>
   <h1 class="chapter" id="ch01" data-short="1 · Vision">Vision, positionnement et promesse</h1>
   <p class="lead">Tchoua n'est pas un simple calculateur de tontine. C'est une infrastructure de confiance pour toutes les formes d'association de type tontine : amicales, sections, fédérations, coopératives, mutuelles, groupes de femmes, associations de ressortissants.</p>
 
-  <h2 id="ch01-1-1-le-probl-me">1.1 Le problème</h2>
+  <h2>1.1 Le problème</h2>
   <p>Au Cameroun et dans une grande partie de l'Afrique, la tontine est un mécanisme d'épargne et de crédit qui repose sur la parole, un cahier, un trésorier et la mémoire collective. Ce modèle fonctionne tant que le groupe est petit et que les membres se connaissent. Il se fragilise dès que l'association grandit : les écritures se perdent, les cotisations ne sont pas rapprochées, les prêts ne sont pas suivis, les aides sont attribuées sans base objective, les sections éloignées ne savent pas ce qui se décide au niveau national.</p>
   <p>Les outils existants sont soit des tableurs, soit des applications de tontine limitées au tour de rôle. Aucun ne couvre la réalité d'une amicale comme l'FEV : des statuts, un comité directeur, des sections, un fonds national, des aides maladie et décès, des distinctions, des sanctions, des quorums, des mandats et des documents à conserver.</p>
 
-  <h2 id="ch01-1-2-la-promesse">1.2 La promesse</h2>
+  <h2>1.2 La promesse</h2>
   <p>Tchoua apporte trois choses indissociables :</p>
   <ul>
     <li><strong>La transparence</strong> — chaque membre voit ses cotisations, ses prêts, ses aides, ses parts d'intérêts et son solde ; le bureau voit l'ensemble ; chaque mouvement est horodaté et attribué.</li>
@@ -192,11 +205,11 @@ footer.manual a{color:#f4d58d}
   </ul>
 
   <figure>
-    <img loading="lazy" src="assets/shots/01_home.jpg" alt="Page d'accueil publique de Tchoua">
+    <img loading="lazy" src="/docs/manuel/assets/shots/01_home.jpg" alt="Page d'accueil publique de Tchoua">
     <figcaption><b>Figure 1.1</b> — Page d'accueil publique : promesse, preuves sociales et accès à la création de compte. La navigation reste volontairement courte : fonctionnalités, méthode, tarifs, à propos, contact.</figcaption>
   </figure>
 
-  <h2 id="ch01-1-3-les-trois-piliers-du-produit">1.3 Les trois piliers du produit</h2>
+  <h2>1.3 Les trois piliers du produit</h2>
   <table>
     <thead><tr><th>Pilier</th><th>Ce qu'il apporte</th><th>Où le voir</th></tr></thead>
     <tbody>
@@ -206,7 +219,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch01-1-4-les-personas">1.4 Les personas</h2>
+  <h2>1.4 Les personas</h2>
   <table>
     <thead><tr><th>Persona</th><th>Besoins</th><th>Réponse Tchoua</th></tr></thead>
     <tbody>
@@ -219,7 +232,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch01-1-5-ce-qui-diff-rencie-tchoua">1.5 Ce qui différencie Tchoua</h2>
+  <h2>1.5 Ce qui différencie Tchoua</h2>
   <p><strong>La profondeur métier.</strong> Une tontine n'est pas seulement un tour de rôle : c'est un contrat avec des parts, des fractions, des sessions, un pot, des enchères, des bénéficiaires, un solde et une clôture. Tchoua implémente ces objets et leurs règles, y compris les cas limites (pot insuffisant, parts épuisées, membre défaillant, bénéficiaire multiple).</p>
   <p><strong>La gouvernance.</strong> Les statuts et règlements ne sont pas décoratifs : ils deviennent des paramètres (quorums, majorités, mandats, sanctions) et des documents opposables, avec historique des versions et approbations.</p>
   <p><strong>La fédération.</strong> Une association mère peut regrouper des sections ; chaque section garde ses fonds et ses règles locales. C'est le modèle FEV / SLD, transposable à toutes les amicales de ressortissants.</p>
@@ -231,7 +244,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch02" data-short="2 · Architecture">Architecture, données et sécurité</h1>
   <p class="lead">Tchoua est une application web moderne, déployée en production, accessible sur tchoua.com et www.tchoua.com. Elle est conçue pour servir plusieurs associations, plusieurs niveaux hiérarchiques et plusieurs devises sans dupliquer le code.</p>
 
-  <h2 id="ch02-2-1-vue-d-ensemble">2.1 Vue d'ensemble</h2>
+  <h2>2.1 Vue d'ensemble</h2>
   <p>L'application repose sur Next.js (App Router), React, TypeScript, Prisma et PostgreSQL. Les pages publiques et l'espace membre partagent le même socle ; les API vérifient systématiquement l'appartenance à l'association et le rôle avant toute lecture ou écriture. Les fichiers (statuts, PV, pièces justificatives) sont stockés sur le serveur et référencés en base.</p>
   <div class="kpi">
     <div><div class="v">Next.js</div><div class="l">rendu serveur et routes API</div></div>
@@ -239,7 +252,7 @@ footer.manual a{color:#f4d58d}
     <div><div class="v">JWT</div><div class="l">sessions signées, cookie sécurisé</div></div>
     <div><div class="v">PM2</div><div class="l">processus supervisé, redémarrage auto</div></div>
   </div>
-  <h2 id="ch02-2-2-composants-techniques">2.2 Composants techniques</h2>
+  <h2>2.2 Composants techniques</h2>
   <table>
     <thead><tr><th>Couche</th><th>Composant</th><th>Rôle</th></tr></thead>
     <tbody>
@@ -254,18 +267,18 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/architecture.png" alt="Architecture de la plateforme">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/architecture.png" alt="Architecture de la plateforme">
     <div class="cap"><b>Figure 2.1</b> — Architecture en trois couches : expérience utilisateur, application Next.js, données et intégrations.</div>
   </section>
 
-  <h2 id="ch02-2-3-mod-le-de-donn-es">2.3 Modèle de données</h2>
+  <h2>2.3 Modèle de données</h2>
   <p>Le modèle est volontairement centré sur l'association. Un utilisateur peut appartenir à plusieurs associations avec des rôles différents. Une association possède des activités ; chaque activité possède des sessions, des cotisations, des bénéficiaires, des prêts et des remboursements. Les documents et les articles de règlement sont rattachés à l'association.</p>
   <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/data_model.png" alt="Modèle de données">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/data_model.png" alt="Modèle de données">
     <div class="cap"><b>Figure 2.2</b> — Entités centrales et relations. Les cardinalités complètes sont décrites dans le schéma Prisma du dépôt.</div>
   </section>
 
-  <h2 id="ch02-2-4-s-curit">2.4 Sécurité</h2>
+  <h2>2.4 Sécurité</h2>
   <ul>
     <li><strong>Authentification</strong> — mots de passe hachés (bcrypt), sessions JWT signées, cookie <span class="mono">__Secure-next-auth.session-token</span>, expiration et renouvellement.</li>
     <li><strong>Autorisation</strong> — contrôle à deux niveaux : appartenance à l'association (membership) et rôle (membre, bureau, administrateur système). Les routes sensibles utilisent une garde commune.</li>
@@ -276,11 +289,11 @@ footer.manual a{color:#f4d58d}
   </ul>
   <div class="callout warn"><span class="tag">Attention</span><p>Les identifiants, secrets de session, clés d'API et mots de passe ne doivent jamais être affichés dans l'interface, les captures ou les documents. Les comptes de démonstration sont désactivés en production.</p></div>
 
-  <h2 id="ch02-2-5-multi-associations-et-hi-rarchie">2.5 Multi-associations et hiérarchie</h2>
+  <h2>2.5 Multi-associations et hiérarchie</h2>
   <p>Chaque association est un espace étanche : ses membres, ses activités, ses caisses, ses documents et ses rapports. Une association peut avoir un parent (fédération, amicale nationale) et des enfants (sections). Les rôles sont évalués au niveau de l'association concernée ; un membre peut être simple dans une section et membre du bureau national.</p>
   <p>Cette architecture permet de servir aussi bien une tontine de quartier de dix membres qu'une fédération nationale de plusieurs milliers de membres, sans changer de code ni de base.</p>
 
-  <h2 id="ch02-2-6-exploitation-et-continuit">2.6 Exploitation et continuité</h2>
+  <h2>2.6 Exploitation et continuité</h2>
   <p>La production est supervisée : processus PM2, reverse proxy HAProxy, certificats TLS, sauvegardes de base et journalisation. Les déploiements sont automatisés par un script qui aligne le dépôt, régénère le client Prisma, construit l'application et redémarre le processus. Les migrations SQL sont idempotentes et appliquées avant le redémarrage.</p>
   <table>
     <thead><tr><th>Risque</th><th>Mesure</th></tr></thead>
@@ -299,9 +312,9 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch03" data-short="3 · Rôles">Comptes, rôles et permissions</h1>
   <p class="lead">La confiance repose sur une règle simple : chacun voit ce qui le concerne, le bureau voit ce qu'il administre, l'administrateur système voit la plateforme — jamais les décisions métier à la place du bureau.</p>
 
-  <h2 id="ch03-3-1-deux-familles-de-r-les">3.1 Deux familles de rôles</h2>
+  <h2>3.1 Deux familles de rôles</h2>
   <p>Tchoua distingue les <strong>rôles d'association</strong> (président, trésorier, secrétaire, membre, etc.) des <strong>rôles système</strong> (administrateur principal, opérateur, auditeur). Un utilisateur peut cumuler un rôle d'association et un rôle système, mais les deux périmètres restent séparés.</p>
-  <h2 id="ch03-3-2-r-les-d-association">3.2 Rôles d'association</h2>
+  <h2>3.2 Rôles d'association</h2>
   <table>
     <thead><tr><th>Rôle</th><th>Périmètre</th><th>Actions typiques</th></tr></thead>
     <tbody>
@@ -320,11 +333,11 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tableau 3.1 — Rôles disponibles dans une association. Les libellés et les pouvoirs sont configurables ; les rôles personnalisés peuvent être créés et combinés à un rôle de base.</p>
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/roles.png" alt="Rôles et permissions">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roles.png" alt="Rôles et permissions">
     <div class="cap"><b>Figure 3.1</b> — Trois niveaux de privilèges et quatre règles transverses de sécurité.</div>
   </section>
 
-  <h2 id="ch03-3-3-matrice-de-visibilit">3.3 Matrice de visibilité</h2>
+  <h2>3.3 Matrice de visibilité</h2>
   <table>
     <thead><tr><th>Donnée</th><th>Membre</th><th>Bureau</th><th>Admin système</th></tr></thead>
     <tbody>
@@ -339,7 +352,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch03-3-4-cycle-de-vie-d-un-compte">3.4 Cycle de vie d'un compte</h2>
+  <h2>3.4 Cycle de vie d'un compte</h2>
   <ol>
     <li><strong>Inscription</strong> — nom, e-mail, mot de passe, acceptation des conditions ; ou invitation par le bureau.</li>
     <li><strong>Vérification</strong> — le compte est actif après validation de l'e-mail ou activation par un administrateur.</li>
@@ -350,14 +363,14 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="callout info"><span class="tag">Information</span><p>Un membre peut appartenir à plusieurs associations avec des rôles différents. Son tableau de bord agrège ses engagements, mais chaque association conserve sa comptabilité et ses règles.</p></div>
 
-  <h2 id="ch03-3-5-param-trage-du-profil">3.5 Paramétrage du profil</h2>
+  <h2>3.5 Paramétrage du profil</h2>
   <p>Chaque utilisateur gère son profil, son mot de passe, sa langue, son thème d'espace membre et ses notifications. Les préférences d'apparence sont enregistrées côté serveur et appliquées dès le chargement, sans clignotement.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/15_settings.jpg" alt="Paramètres du compte et choix du thème">
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Paramètres du compte et choix du thème">
     <figcaption><b>Figure 3.2</b> — Paramètres du compte : informations personnelles, langue et sélecteur de thème (Forêt, Minuit, Aurore, Océan, Sable, Néon).</figcaption>
   </figure>
 
-  <h2 id="ch03-3-6-bonnes-pratiques">3.6 Bonnes pratiques</h2>
+  <h2>3.6 Bonnes pratiques</h2>
   <ul class="checklist">
     <li>Un compte par personne, jamais de compte partagé.</li>
     <li>Le bureau ne communique jamais son mot de passe ; les droits se donnent par rôle.</li>
@@ -372,7 +385,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch04" data-short="4 · Cycle de vie">Cycle de vie d'une association</h1>
   <p class="lead">Créer une association ne se résume pas à saisir un nom. Il faut définir son identité, son rattachement, son bureau, ses conditions d'adhésion, ses réunions, ses aides, ses sanctions et son règlement — puis la faire vivre.</p>
 
-  <h2 id="ch04-4-1-les-six-tapes">4.1 Les six étapes</h2>
+  <h2>4.1 Les six étapes</h2>
   <h3>1. Création</h3>
   <p>Le créateur renseigne le nom, le type (amicale, section, fédération, tontine, coopérative, mutuelle…), la région, la couleur, le logo, la description, l'association parente éventuelle et le modèle de départ. Un code d'invitation unique est généré.</p>
   <h3>2. Configuration</h3>
@@ -386,7 +399,7 @@ footer.manual a{color:#f4d58d}
   <h3>6. Clôture</h3>
   <p>En fin de cycle, l'association produit son bilan, calcule les dividendes, archive les documents et passe en lecture seule. Un nouveau cycle peut être créé sans effacer l'historique.</p>
 
-  <h2 id="ch04-4-2-statuts-et-transitions">4.2 Statuts et transitions</h2>
+  <h2>4.2 Statuts et transitions</h2>
   <table>
     <thead><tr><th>Statut</th><th>Signification</th><th>Transitions autorisées</th></tr></thead>
     <tbody>
@@ -400,26 +413,26 @@ footer.manual a{color:#f4d58d}
   <p class="table-cap">Tableau 4.1 — Chaque transition est journalisée avec auteur, date et motif (événement de cycle de vie).</p>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/lifecycle.png" alt="Cycle de vie d'une association">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/lifecycle.png" alt="Cycle de vie d'une association">
     <div class="cap"><b>Figure 4.1</b> — De la création à l'archivage : six étapes, des contrôles à chaque transition.</div>
   </section>
 
-  <h2 id="ch04-4-3-gouvernance-deux-niveaux">4.3 Gouvernance à deux niveaux</h2>
+  <h2>4.3 Gouvernance à deux niveaux</h2>
   <p>Le modèle FEV / SLD montre la puissance de la hiérarchie : l'FEV est une amicale nationale avec assemblée générale, comité directeur, bureau exécutif, commissions et sections. L'SLD est la section de Douala, dotée de son propre comité, de son règlement et de ses fonds.</p>
   <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/org.png" alt="Gouvernance FEV / SLD">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/org.png" alt="Gouvernance FEV / SLD">
     <div class="cap"><b>Figure 4.2</b> — Organisation réelle FEV / SLD : AG nationale, comité directeur, bureau, commissions, section de Douala.</div>
   </section>
   <p>Chaque niveau possède ses règles : l'AG nationale se réunit une fois par an avec un quorum de la moitié des adhérents ; le comité directeur décide à la 2/3 ; la section de Douala se réunit le premier samedi après le 5, avec un quorum de 3/5. Tchoua stocke ces paramètres et les restitue dans les écrans de gouvernance.</p>
 
-  <h2 id="ch04-4-4-statuts-r-glement-et-documents">4.4 Statuts, règlement et documents</h2>
+  <h2>4.4 Statuts, règlement et documents</h2>
   <p>Les statuts et le règlement intérieur sont structurés en articles numérotés, consultables et approuvables par les membres. Les documents originaux (PDF, DOCX) sont téléchargeables depuis la fiche de l'association. Les versions sont conservées et les modifications sont tracées.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/17_ameibans.jpg" alt="Fiche FEV">
+    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="Fiche FEV">
     <figcaption><b>Figure 4.3</b> — Fiche FEV : 1 membre, 5 activités, 14 articles de règlement, 3 documents, rattachement national.</figcaption>
   </figure>
 
-  <h2 id="ch04-4-5-cas-particuliers">4.5 Cas particuliers</h2>
+  <h2>4.5 Cas particuliers</h2>
   <ul>
     <li><strong>Section sans personnalité juridique</strong> — elle hérite des statuts de la mère et gère ses fonds propres. Tchoua la modélise comme une association enfant.</li>
     <li><strong>Fédération</strong> — elle regroupe des associations autonomes ; la consolidation des effectifs et des fonds est décrite comme évolution.</li>
@@ -432,8 +445,8 @@ footer.manual a{color:#f4d58d}
 <section class="chapter">
   <div class="chapter-kicker">Chapitre 5</div>
   <h1 class="chapter" id="ch05" data-short="5 · Modules">Panorama des modules</h1>
-  <p class="lead">Huit domaines couvrent l'ensemble du cycle de vie d'une association. Ils partagent le même modèle de données et la même journalisation, ce qui évite les ressaisies et les incohérences.</p>
-  <h2 id="ch05-5-1-description-des-modules">5.1 Description des modules</h2>
+  <p class="lead">Huit domaines couvrent l'ensemble du cycle de vie d'une association. Ils partagent le même modèle de données et la même journalisation, ce qui évite les ressaisies et les incohérences. Depuis novembre 2026, un <strong>cadre ARP</strong> versionné encadre ces modules et conditionne les nouvelles souscriptions ; il est décrit aux chapitres 19 à 21.</p>
+  <h2>5.1 Description des modules</h2>
   <table>
     <thead><tr><th>Module</th><th>Fonctions</th><th>Écrans principaux</th></tr></thead>
     <tbody>
@@ -449,25 +462,25 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/modules.png" alt="Carte des modules">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/modules.png" alt="Carte des modules">
     <div class="cap"><b>Figure 5.1</b> — Les huit modules et le noyau commun : association → membre → activité → session → mouvement.</div>
   </section>
 
-  <h2 id="ch05-5-2-navigation-de-l-espace-membre">5.2 Navigation de l'espace membre</h2>
+  <h2>5.2 Navigation de l'espace membre</h2>
   <p>La navigation latérale est groupée par intention : <strong>Pilotage</strong> (tableau de bord, associations, calendrier), <strong>Finances</strong> (tontines, épargne, prêts, solidarité, sessions, portefeuille), <strong>Communauté</strong> (membres, marketplace, événements, chat), <strong>Analyse & apprentissage</strong> (rapports, conseils IA, gamification, académie). La section contextuelle de l'association ajoute vue d'ensemble, activités, prêts, aides, réunions, dividendes, membres, rapports, historique, intérêts et paramètres.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/03_dashboard.jpg" alt="Tableau de bord membre">
+    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Tableau de bord membre">
     <figcaption><b>Figure 5.2</b> — Tableau de bord membre : hero personnalisé, indicateurs, launchpad et raccourcis. Le thème et la langue sont ceux du profil.</figcaption>
   </figure>
 
-  <h2 id="ch05-5-3-launchpad">5.3 Launchpad</h2>
+  <h2>5.3 Launchpad</h2>
   <p>Le launchpad est un accès direct aux douze modules les plus utilisés : tontines, épargne, prêts, solidarité, sessions, membres, rapports, portefeuille, marketplace, chat, académie, événements. Il réduit le nombre de clics et rend l'espace membre utilisable sur mobile.</p>
   <figure class="mobile">
-    <img loading="lazy" src="assets/shots/40_mobile_dashboard.jpg" alt="Launchpad mobile">
+    <img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Launchpad mobile">
     <figcaption><b>Figure 5.3</b> — Launchpad mobile : grille de modules, actions rapides (cotiser, demander un prêt, nouvelle association) et navigation adaptée au pouce.</figcaption>
   </figure>
 
-  <h2 id="ch05-5-4-interactions-entre-modules">5.4 Interactions entre modules</h2>
+  <h2>5.4 Interactions entre modules</h2>
   <ul>
     <li>Une <strong>adhésion validée</strong> crée le membre, son rôle et son matricule ; elle alimente les appels de cotisation.</li>
     <li>Une <strong>session</strong> génère les cotisations attendues, les présences, les amendes et la collation.</li>
@@ -477,7 +490,7 @@ footer.manual a{color:#f4d58d}
     <li>Les <strong>rapports</strong> agrègent tous les mouvements ; l'<strong>historique</strong> les restitue au niveau membre, activité ou association.</li>
   </ul>
   <div class="callout info"><span class="tag">Information</span><p>Chaque module peut être activé ou désactivé par association selon sa configuration. Une tontine pure n'a pas besoin du module prêts ; une amicale nationale utilisera surtout adhésion, solidarité, réunions et rapports.</p></div>
-  <h2 id="ch05-5-5-principes-communs">5.5 Principes communs</h2>
+  <h2>5.5 Principes communs</h2>
   <p>Tous les modules partagent quatre garanties : la même identité de membre, la même horloge, la même devise et le même journal. Une opération saisie dans un module est immédiatement visible dans les autres, sans synchronisation manuelle.</p>
   <table>
     <thead><tr><th>Garantie</th><th>Effet concret</th></tr></thead>
@@ -495,7 +508,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch06" data-short="6 · Tontines">Activités et moteur de tontine</h1>
   <p class="lead">La tontine est le cœur historique de Tchoua. Le moteur va bien au-delà du tour de rôle : parts, fractions, sessions, pot, enchères, bénéficiaires multiples, cycles fixes ou épuisement des parts, solde et clôture.</p>
 
-  <h2 id="ch06-6-1-d-finitions">6.1 Définitions</h2>
+  <h2>6.1 Définitions</h2>
   <table>
     <thead><tr><th>Terme</th><th>Définition</th></tr></thead>
     <tbody>
@@ -510,7 +523,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch06-6-2-types-d-activit-s">6.2 Types d'activités</h2>
+  <h2>6.2 Types d'activités</h2>
   <table>
     <thead><tr><th>Type</th><th>Principe</th><th>Usage typique</th></tr></thead>
     <tbody>
@@ -527,11 +540,11 @@ footer.manual a{color:#f4d58d}
   </table>
 
   <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/tontine.png" alt="Moteur de tontine">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/tontine.png" alt="Moteur de tontine">
     <div class="cap"><b>Figure 6.1</b> — Les huit étapes du moteur, du choix des parts à la clôture du cycle, avec les trois formules de calcul.</div>
   </section>
 
-  <h2 id="ch06-6-3-souscription-et-parts">6.3 Souscription et parts</h2>
+  <h2>6.3 Souscription et parts</h2>
   <p>Un membre actif souscrit entre la fraction minimale et le plafond éventuel. Sa cotisation attendue à chaque session est le produit de ses parts par le montant de la part. S'il souscrit plusieurs parts, sa cotisation est multipliée d'autant ; son droit bénéficiaire suit la même proportion.</p>
   <div class="formula"><b>cotisation attendue</b> = parts souscrites × montant de la part<br><b>droit bénéficiaire</b> = parts bénéficiaires × montant par part bénéficiaire</div>
   <table>
@@ -546,12 +559,12 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch06-6-4-le-pot-et-les-parts-distribuables">6.4 Le pot et les parts distribuables</h2>
+  <h2>6.4 Le pot et les parts distribuables</h2>
   <p>Le pot d'une session est la somme des cotisations encaissées, du report éventuel et des ajustements validés. Le nombre de parts distribuables est le plus petit des deux nombres suivants : le plafond de parts par session, et le nombre de parts que le pot peut financer.</p>
   <div class="formula"><b>pot</b> = Σ cotisations encaissées + report + ajustements<br><b>parts distribuables</b> = min(plafond session, plancher(pot ÷ montant par part))<br><b>solde du cycle</b> = Σ cotisations − Σ distributions</div>
   <div class="callout warn"><span class="tag">Attention</span><p>Si le pot est insuffisant, la distribution peut être bloquée, partielle ou reportée selon la règle de l'activité. Aucune distribution ne doit rendre le solde négatif sans autorisation explicite d'avance de caisse.</p></div>
 
-  <h2 id="ch06-6-5-les-trois-modes-de-cycle">6.5 Les trois modes de cycle</h2>
+  <h2>6.5 Les trois modes de cycle</h2>
   <table>
     <thead><tr><th>Mode</th><th>Fin du cycle</th><th>Conséquence</th></tr></thead>
     <tbody>
@@ -562,7 +575,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p>La progression est calculée différemment selon le mode : sessions tenues / sessions prévues pour un cycle à nombre fixe, parts distribuées / parts souscrites pour un cycle à épuisement.</p>
 
-  <h2 id="ch06-6-6-attribution-des-b-n-ficiaires">6.6 Attribution des bénéficiaires</h2>
+  <h2>6.6 Attribution des bénéficiaires</h2>
   <table>
     <thead><tr><th>Mode</th><th>Règle</th><th>Contrôle</th></tr></thead>
     <tbody>
@@ -576,14 +589,14 @@ footer.manual a{color:#f4d58d}
   </table>
   <p>L'éligibilité d'un bénéficiaire tient compte de son statut actif, de ses cotisations à jour, de ses parts restantes et de ses éventuelles réceptions antérieures. Un membre peut recevoir plusieurs parts sur une même session si l'activité l'autorise et dans la limite du plafond.</p>
 
-  <h2 id="ch06-6-7-ench-res-l-sld">6.7 Enchères à l'SLD</h2>
+  <h2>6.7 Enchères à l'SLD</h2>
   <p>L'SLD applique une tontine annuelle de 25 000 FCFA et ses multiples, attribuée par enchères publiques avec une mise à prix de 5 % du taux de cotisation. Le membre qui remporte l'enchère reçoit le pot diminué de la décote ; les intérêts générés sont répartis en lots ou reportés. Les défaillants subissent une majoration de 15 % s'ils n'ont pas encore bénéficié et de 20 % s'ils ont déjà bénéficié.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/20_amsed_tontine.jpg" alt="Activité de tontine SLD">
+    <img loading="lazy" src="/docs/manuel/assets/shots/20_amsed_tontine.jpg" alt="Activité de tontine SLD">
     <figcaption><b>Figure 6.2</b> — Activité « Tontine annuelle aux enchères » de l'SLD : 25 000 FCFA par part, 12 sessions, mode enchères. Les paramètres de cycle et de parts sont éditables.</figcaption>
   </figure>
 
-  <h2 id="ch06-6-8-exemples-chiffr-s">6.8 Exemples chiffrés</h2>
+  <h2>6.8 Exemples chiffrés</h2>
   <h3>Exemple A — 12 sessions, 1 part, 12 membres</h3>
   <p>Part à 50 000 FCFA, montant par part bénéficiaire 550 000 FCFA, un bénéficiaire par session. Chaque session encaisse 12 × 50 000 = 600 000 FCFA, distribue 550 000 FCFA et laisse un solde de 50 000 FCFA. Après 12 sessions, les 12 membres ont bénéficié et le solde cumulé est de 600 000 FCFA.</p>
   <h3>Exemple B — parts multiples</h3>
@@ -593,14 +606,14 @@ footer.manual a{color:#f4d58d}
   <h3>Exemple D — demi-part</h3>
   <p>Part à 100 000 FCFA, membre à 0,5 part : cotisation de 50 000 FCFA et droit bénéficiaire de 0,5 × le montant par part.</p>
 
-  <h2 id="ch06-6-9-cycle-r-el-et-solde">6.9 Cycle réel et solde</h2>
+  <h2>6.9 Cycle réel et solde</h2>
   <p>L'écran de cycle restitue les cotisations, les distributions, le solde, les parts souscrites et distribuées, la progression et la situation par membre. La figure suivante montre un cycle de démonstration à quatre membres et deux sessions : 800 000 FCFA cotisés, 800 000 FCFA distribués, solde nul, deux parts distribuées sur quatre.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/21_cycle_demo.jpg" alt="Cycle de tontine">
+    <img loading="lazy" src="/docs/manuel/assets/shots/21_cycle_demo.jpg" alt="Cycle de tontine">
     <figcaption><b>Figure 6.3</b> — Cycle de tontine : cotisations, distributions, solde, progression, situation par membre, sessions et bénéficiaires. Données de démonstration.</figcaption>
   </figure>
 
-  <h2 id="ch06-6-10-cas-limites-et-r-gles-de-gestion">6.10 Cas limites et règles de gestion</h2>
+  <h2>6.10 Cas limites et règles de gestion</h2>
   <table>
     <thead><tr><th>Cas</th><th>Comportement attendu</th></tr></thead>
     <tbody>
@@ -616,9 +629,9 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch06-6-11-param-trage-dans-l-interface">6.11 Paramétrage dans l'interface</h2>
+  <h2>6.11 Paramétrage dans l'interface</h2>
   <p>Le formulaire d'activité permet de définir le type, le montant de la part, la fréquence, le mode d'attribution, le montant par part bénéficiaire, la fraction minimale, les plafonds, l'autorisation des fractions et le mode de cycle. Les paramètres avancés (règle de surplus, tolérance de retard, clôture anticipée) sont stockés dans la configuration de cycle et documentés dans la spécification tontine.</p>
-  <h2 id="ch06-6-12-autres-activit-s">6.12 Autres activités</h2>
+  <h2>6.12 Autres activités</h2>
   <p>Le moteur ne se limite pas aux tontines financières. Les activités complémentaires utilisent les mêmes sessions, cotisations et rapports, avec des règles adaptées.</p>
   <table>
     <thead><tr><th>Activité</th><th>Principe</th><th>Points de contrôle</th></tr></thead>
@@ -641,7 +654,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch07" data-short="7 · Cotisations">Cotisations, sessions et présences</h1>
   <p class="lead">La session est l'unité de temps de la vie associative : on s'y retrouve, on cotise, on contrôle les présences, on applique les amendes, on sert la collation et l'on décide.</p>
 
-  <h2 id="ch07-7-1-anatomie-d-une-session">7.1 Anatomie d'une session</h2>
+  <h2>7.1 Anatomie d'une session</h2>
   <table>
     <thead><tr><th>Élément</th><th>Description</th></tr></thead>
     <tbody>
@@ -658,7 +671,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch07-7-2-cycle-de-vie-d-une-cotisation">7.2 Cycle de vie d'une cotisation</h2>
+  <h2>7.2 Cycle de vie d'une cotisation</h2>
   <ol>
     <li><strong>Appel</strong> — la session ouverte génère les cotisations attendues à partir des parts souscrites.</li>
     <li><strong>Encaissement</strong> — le trésorier saisit le montant, le mode (espèces, Mobile Money, virement, nature) et la référence.</li>
@@ -669,7 +682,7 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="formula"><b>attendu</b> = parts × montant de la part<br><b>encaissé</b> = Σ paiements validés<br><b>reste dû</b> = attendu − encaissé</div>
 
-  <h2 id="ch07-7-3-statuts-et-cons-quences">7.3 Statuts et conséquences</h2>
+  <h2>7.3 Statuts et conséquences</h2>
   <table>
     <thead><tr><th>Statut</th><th>Définition</th><th>Conséquence</th></tr></thead>
     <tbody>
@@ -681,7 +694,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch07-7-4-pr-sences-et-amendes">7.4 Présences et amendes</h2>
+  <h2>7.4 Présences et amendes</h2>
   <p>Les présences sont enregistrées pour chaque session. Le règlement de l'SLD fournit un barème complet : retard 500 FCFA, absence 1 000 FCFA, deux absences consécutives 3 000 FCFA, trois absences 5 000 FCFA, départ avant 19 h 500 FCFA, bavardage 500 FCFA, indiscipline 3 000 FCFA, engagement non mandaté 10 000 FCFA, commission manquée 5 000 FCFA, absence à l'AG nationale 20 000 FCFA, absence aux obsèques 25 000 FCFA.</p>
   <table>
     <thead><tr><th>Manquement</th><th>Sanction SLD</th><th>Effet Tchoua</th></tr></thead>
@@ -698,25 +711,25 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tableau 7.1 — Barème SLD. Tous les montants sont paramétrables ; aucune valeur n'est codée en dur.</p>
 
-  <h2 id="ch07-7-5-collation">7.5 Collation</h2>
+  <h2>7.5 Collation</h2>
   <p>La collation est une caisse de réception : chaque membre cotise un montant fixe par séance, et le membre qui reçoit la réunion perçoit un forfait, déduction faite de ses arriérés. À l'SLD, la cotisation est de 3 000 FCFA et le forfait de 150 000 FCFA.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/43_sessions.jpg" alt="Calendrier des sessions">
+    <img loading="lazy" src="/docs/manuel/assets/shots/43_sessions.jpg" alt="Calendrier des sessions">
     <figcaption><b>Figure 7.1</b> — Exemple de calendrier de sessions (données de démonstration) : dates, activités, statuts et accès direct à la session. Les sessions proviennent de la fréquence configurée.</figcaption>
   </figure>
 
-  <h2 id="ch07-7-6-activit-s-et-appels-de-cotisation">7.6 Activités et appels de cotisation</h2>
+  <h2>7.6 Activités et appels de cotisation</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/06_ndi_activities.jpg" alt="Activités de l'association">
+    <img loading="lazy" src="/docs/manuel/assets/shots/06_ndi_activities.jpg" alt="Activités de l'association">
     <figcaption><b>Figure 7.2</b> — Activités de l'association : cartes par activité, montant, participation, caisse, abonnements et accès aux détails.</figcaption>
   </figure>
   <p>Chaque carte d'activité affiche le montant de la cotisation, la fréquence, la caisse disponible, le nombre d'abonnés et les actions (consulter, cotiser, gérer). Les activités obligatoires apparaissent dans l'espace membre avec le montant attendu et l'échéance.</p>
 
-  <h2 id="ch07-7-7-relances-et-automatisation">7.7 Relances et automatisation</h2>
+  <h2>7.7 Relances et automatisation</h2>
   <p>Un traitement planifié identifie les cotisations en retard, les échéances de prêt et les sessions à venir, puis envoie des notifications. Le traitement peut être exécuté en mode simulation pour vérifier les destinataires avant l'envoi réel. Les relances sont historisées pour éviter les doublons.</p>
   <div class="callout info"><span class="tag">Information</span><p>Les canaux de notification (e-mail, WhatsApp, SMS) sont configurés par la plateforme. Le contenu et la langue suivent les préférences du membre.</p></div>
 
-  <h2 id="ch07-7-8-bonnes-pratiques-de-tr-sorerie">7.8 Bonnes pratiques de trésorerie</h2>
+  <h2>7.8 Bonnes pratiques de trésorerie</h2>
   <ul class="checklist">
     <li>Saisir les cotisations le jour même, jamais en fin de mois.</li>
     <li>Joindre la référence Mobile Money ou le reçu pour chaque paiement.</li>
@@ -725,7 +738,7 @@ footer.manual a{color:#f4d58d}
     <li>Exporter le journal de caisse à chaque fin de mois.</li>
     <li>Rapprocher le solde Tchoua et le solde bancaire avant l'AG.</li>
   </ul>
-  <h2 id="ch07-7-9-contr-les-de-cl-ture-de-session">7.9 Contrôles de clôture de session</h2>
+  <h2>7.9 Contrôles de clôture de session</h2>
   <p>La clôture d'une session est un point de contrôle, pas une formalité. Elle vérifie que les encaissements, les présences, les amendes et la collation sont cohérents avant de figer le pot et de produire le procès-verbal.</p>
   <table>
     <thead><tr><th>Contrôle</th><th>Question à se poser</th><th>Trace</th></tr></thead>
@@ -744,7 +757,7 @@ footer.manual a{color:#f4d58d}
   <div class="chapter-kicker">Chapitre 8</div>
   <h1 class="chapter" id="ch08" data-short="8 · Prêts">Prêts, remboursements et intérêts</h1>
   <p class="lead">Le module prêts transforme l'épargne collective en crédit maîtrisé : demande, instruction, garanties, décaissement, échéancier, remboursements et répartition transparente des intérêts.</p>
-  <h2 id="ch08-8-1-types-de-pr-ts">8.1 Types de prêts</h2>
+  <h2>8.1 Types de prêts</h2>
   <table>
     <thead><tr><th>Type</th><th>Source</th><th>Règles typiques</th></tr></thead>
     <tbody>
@@ -754,7 +767,7 @@ footer.manual a{color:#f4d58d}
       <tr><td>Avance de caisse</td><td>Trésorerie</td><td>Courte durée, validation du bureau</td></tr>
     </tbody>
   </table>
-  <h2 id="ch08-8-2-r-gles-de-pr-t">8.2 Règles de prêt</h2>
+  <h2>8.2 Règles de prêt</h2>
   <ul>
     <li><strong>Plafond</strong> — montant fixe, pourcentage de la caisse ou multiple de la mise du membre.</li>
     <li><strong>Taux</strong> — taux mensuel, éventuellement dégressif après quelques mois.</li>
@@ -767,11 +780,11 @@ footer.manual a{color:#f4d58d}
   <div class="formula"><b>intérêt</b> = capital restant × taux mensuel × nombre de mois<br><b>échéance</b> = principal ÷ durée + intérêts de la période<br><b>plafond</b> = min(caisse disponible, plafond membre, multiple de la mise)</div>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/loan.png" alt="Cycle d'un prêt">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/loan.png" alt="Cycle d'un prêt">
     <div class="cap"><b>Figure 8.1</b> — Les six étapes d'un prêt, de la demande à la répartition des intérêts, avec les garanties et les pénalités.</div>
   </section>
 
-  <h2 id="ch08-8-3-cycle-d-un-pr-t">8.3 Cycle d'un prêt</h2>
+  <h2>8.3 Cycle d'un prêt</h2>
   <ol>
     <li>Le membre crée une demande : montant, motif, durée, garanties proposées.</li>
     <li>Le bureau instruit : vérification de la caisse, du plafond, des prêts actifs et de la capacité de remboursement.</li>
@@ -781,16 +794,16 @@ footer.manual a{color:#f4d58d}
     <li>Le prêt est soldé ; les intérêts alimentent la répartition et les dividendes.</li>
   </ol>
 
-  <h2 id="ch08-8-4-r-partition-des-int-r-ts">8.4 Répartition des intérêts</h2>
+  <h2>8.4 Répartition des intérêts</h2>
   <p>Chaque remboursement comprend une part de principal et une part d'intérêt. L'intérêt est réparti entre les membres au prorata du capital qu'ils détenaient à la date de décaissement du prêt. Cette clé evite qu'un membre qui a rejoint après le prêt bénéficie d'intérêts qu'il n'a pas contribué à générer.</p>
   <div class="formula"><b>quote-part</b> = capital du membre à la date du prêt ÷ capital total à la date du prêt<br><b>part d'intérêt</b> = intérêt remboursé × quote-part</div>
   <p>L'écran « Intérêts » détaille, pour chaque remboursement : la date, l'emprunteur, l'activité, l'intérêt total, le capital du membre, le capital global, la quote-part et le montant qui lui revient. Le bureau peut déplier la répartition entre tous les membres.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/14_interests.jpg" alt="Intérêts et dividendes">
+    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Intérêts et dividendes">
     <figcaption><b>Figure 8.2</b> — Intérêts et dividendes : 5 219 831 FCFA d'intérêts générés, part du membre, dividendes 2026 et détail par remboursement.</figcaption>
   </figure>
 
-  <h2 id="ch08-8-5-le-cas-ets-horizon">8.5 Le cas ETS HORIZON</h2>
+  <h2>8.5 Le cas ETS HORIZON</h2>
   <p>HORIZON est une association d'investissement et de prêts de sept membres. Les données importées permettent de vérifier le module sur un volume réel : 49 prêts, 100 360 001 FCFA décaissés, 44 prêts remboursés, 5 prêts actifs pour 12 000 000 FCFA, 88 360 001 FCFA de principal remboursé et 5 219 831 FCFA d'intérêts.</p>
   <table>
     <thead><tr><th>Indicateur</th><th>Valeur</th><th>Lecture</th></tr></thead>
@@ -808,13 +821,13 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tableau 8.1 — Chiffres clés HORIZON issus de l'import réel et vérifiés dans l'application.</p>
 
-  <h2 id="ch08-8-6-cran-des-pr-ts">8.6 Écran des prêts</h2>
+  <h2>8.6 Écran des prêts</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/07_ndi_loans.jpg" alt="Prêts internes HORIZON">
+    <img loading="lazy" src="/docs/manuel/assets/shots/07_ndi_loans.jpg" alt="Prêts internes HORIZON">
     <figcaption><b>Figure 8.3</b> — Prêts internes : caisse disponible, prêts en cours, historique, statuts et accès aux échéanciers.</figcaption>
   </figure>
 
-  <h2 id="ch08-8-7-risques-et-contr-les">8.7 Risques et contrôles</h2>
+  <h2>8.7 Risques et contrôles</h2>
   <table>
     <thead><tr><th>Risque</th><th>Contrôle</th></tr></thead>
     <tbody>
@@ -834,7 +847,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch09" data-short="9 · Solidarité">Solidarité et aides sociales</h1>
   <p class="lead">La solidarité est la raison d'être de nombreuses associations. Tchoua transforme l'entraide informelle en un droit lisible : un catalogue, des plafonds, une demande, une validation et un décaissement traçable.</p>
 
-  <h2 id="ch09-9-1-le-catalogue-d-aides">9.1 Le catalogue d'aides</h2>
+  <h2>9.1 Le catalogue d'aides</h2>
   <table>
     <thead><tr><th>Catégorie</th><th>Événement</th><th>Exemple de plafond</th></tr></thead>
     <tbody>
@@ -853,7 +866,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tableau 9.1 — Catalogue indicatif. Chaque association définit ses catégories, ses plafonds et ses conditions.</p>
 
-  <h2 id="ch09-9-2-workflow-d-une-demande">9.2 Workflow d'une demande</h2>
+  <h2>9.2 Workflow d'une demande</h2>
   <ol>
     <li><strong>Ouverture</strong> — le membre choisit la catégorie, décrit l'événement, joint les pièces (certificat, facture, acte).</li>
     <li><strong>Contrôle</strong> — le bureau vérifie l'éligibilité, la complétude et le plafond disponible.</li>
@@ -863,13 +876,13 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="formula"><b>solde du fonds</b> = cotisations affectées − aides versées − frais<br><b>plafond disponible</b> = plafond annuel − aides déjà versées sur la période</div>
 
-  <h2 id="ch09-9-3-cran-solidarit">9.3 Écran Solidarité</h2>
+  <h2>9.3 Écran Solidarité</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/42_solidarite.jpg" alt="Espace solidarité">
+    <img loading="lazy" src="/docs/manuel/assets/shots/42_solidarite.jpg" alt="Espace solidarité">
     <figcaption><b>Figure 9.1</b> — Espace Solidarité & Entraide : recherche d'une demande, filtres par catégorie et par association, état de la file.</figcaption>
   </figure>
 
-  <h2 id="ch09-9-4-r-gles-sld">9.4 Règles SLD</h2>
+  <h2>9.4 Règles SLD</h2>
   <p>Le règlement SLD précise les montants et les conditions : hospitalisation d'au moins cinq jours constatée par un membre missionné et vérifiée auprès de la formation sanitaire ; aide maladie limitée à une période d'un an ; mariage limité au premier mariage ; naissance dans un mariage ; décès du membre avec ventilation enterrement, transport, restauration, boissons et frais divers ; veillée obligatoire trois jours à Douala.</p>
   <table>
     <thead><tr><th>Aide SLD</th><th>Montant</th><th>Condition</th></tr></thead>
@@ -886,10 +899,10 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch09-9-5-r-gles-fev">9.5 Règles FEV</h2>
+  <h2>9.5 Règles FEV</h2>
   <p>Au niveau national, l'FEV dispose d'un fonds de dépôt provisionnel de 10 000 FCFA par membre. En cas de décès, 300 000 FCFA sont prélevés : 200 000 pour la famille, 50 000 pour la gerbe de fleurs, 50 000 pour la section du défunt. L'aide maladie est de 10 000 FCFA par jour d'hospitalisation, avec un minimum de 3 jours et un maximum de 15 jours par an, sous contrôle d'une équipe de la section et certificat médical.</p>
 
-  <h2 id="ch09-9-6-contr-les-et-anti-abus">9.6 Contrôles et anti-abus</h2>
+  <h2>9.6 Contrôles et anti-abus</h2>
   <ul>
     <li>Pièces justificatives obligatoires et archivées.</li>
     <li>Contrôle par un membre missionné pour les hospitalisations.</li>
@@ -906,7 +919,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch10" data-short="10 · Réunions">Réunions, discipline et collation</h1>
   <p class="lead">La réunion est le lieu où la vie associative se décide. Tchoua en fait un objet structuré : convocation, ordre du jour, présences, quorum, votes, sanctions, procès-verbal et collation.</p>
 
-  <h2 id="ch10-10-1-types-de-r-unions">10.1 Types de réunions</h2>
+  <h2>10.1 Types de réunions</h2>
   <table>
     <thead><tr><th>Type</th><th>Objet</th><th>Quorum typique</th></tr></thead>
     <tbody>
@@ -919,7 +932,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch10-10-2-d-roul-d-une-r-union">10.2 Déroulé d'une réunion</h2>
+  <h2>10.2 Déroulé d'une réunion</h2>
   <ol>
     <li><strong>Convocation</strong> — date, lieu, ordre du jour, documents joints, délai statutaire.</li>
     <li><strong>Ouverture</strong> — vérification du quorum, désignation du président de séance et du secrétaire.</li>
@@ -931,13 +944,13 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="formula"><b>quorum atteint</b> = présents ≥ quorum requis<br><b>majorité</b> = voix pour &gt; voix contre (ou 2/3 selon la règle)<br><b>amende</b> = barème selon le manquement constaté</div>
 
-  <h2 id="ch10-10-3-cran-r-unions">10.3 Écran Réunions</h2>
+  <h2>10.3 Écran Réunions</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/09_ndi_meetings.jpg" alt="Sessions et réunions">
+    <img loading="lazy" src="/docs/manuel/assets/shots/09_ndi_meetings.jpg" alt="Sessions et réunions">
     <figcaption><b>Figure 10.1</b> — Sessions & Réunions : recherche, filtres par activité et par association, état de la file des réunions.</figcaption>
   </figure>
 
-  <h2 id="ch10-10-4-discipline">10.4 Discipline</h2>
+  <h2>10.4 Discipline</h2>
   <p>La discipline est traitée comme un registre, pas comme une humeur. Chaque manquement est rattaché à une session, à un membre, à un article du règlement et à un montant. Le censeur applique ; le trésorier encaisse ; le commissaire aux comptes vérifie. En cas de contestation, le membre peut demander une remise gracieuse au bureau, qui décide et motive.</p>
   <table>
     <thead><tr><th>Étape</th><th>Acteur</th><th>Trace</th></tr></thead>
@@ -950,7 +963,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch10-10-5-collation-et-r-ception">10.5 Collation et réception</h2>
+  <h2>10.5 Collation et réception</h2>
   <p>La collation est une contribution de chaque membre à chaque séance statutaire. Le membre qui reçoit la réunion perçoit un forfait, déduction faite de ses arriérés. À l'SLD, la cotisation est de 3 000 FCFA et le forfait de 150 000 FCFA ; le versement est remis au récipiendaire pendant la séance.</p>
   <ul>
     <li>Le taux de collation est un paramètre de l'association.</li>
@@ -959,11 +972,11 @@ footer.manual a{color:#f4d58d}
     <li>Le solde de collation est suivi dans les rapports.</li>
   </ul>
 
-  <h2 id="ch10-10-6-proc-s-verbaux-et-archives">10.6 Procès-verbaux et archives</h2>
+  <h2>10.6 Procès-verbaux et archives</h2>
   <p>Chaque réunion produit un procès-verbal : ordre du jour, présents, absents, résolutions, votes, actions et responsables. Le PV est téléversé dans les documents de l'association, avec un type dédié, et reste consultable par les membres. Les décisions peuvent être liées à des tâches et à des échéances.</p>
   <div class="callout info"><span class="tag">Information</span><p>Les convocations et PV peuvent être exportés en PDF. Les documents sont horodatés et rattachés à l'association ; ils ne sont jamais écrasés silencieusement.</p></div>
 
-  <h2 id="ch10-10-7-bonnes-pratiques">10.7 Bonnes pratiques</h2>
+  <h2>10.7 Bonnes pratiques</h2>
   <ul class="checklist">
     <li>Publier l'ordre du jour au moins 15 jours avant (30 jours pour une AG).</li>
     <li>Vérifier le quorum avant d'ouvrir les votes.</li>
@@ -979,7 +992,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch11" data-short="11 · Rapports">Comptabilité, rapports et dividendes</h1>
   <p class="lead">Une association sans rapports est une association sans preuve. Tchoua produit des états lisibles par le bureau, les commissaires aux comptes et les membres : caisses, mouvements, bilan, dividendes et exports.</p>
 
-  <h2 id="ch11-11-1-les-caisses">11.1 Les caisses</h2>
+  <h2>11.1 Les caisses</h2>
   <p>Chaque activité possède sa caisse : tontine, solidarité, investissement, prêt, collation. Le solde est calculé à partir des mouvements validés. Les transferts entre caisses sont des opérations explicites, jamais des corrections silencieuses.</p>
   <table>
     <thead><tr><th>Caisse</th><th>Alimentée par</th><th>Utilisée pour</th></tr></thead>
@@ -992,22 +1005,22 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch11-11-2-le-rapport-d-activit">11.2 Le rapport d'activité</h2>
+  <h2>11.2 Le rapport d'activité</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/11_ndi_reports.jpg" alt="Rapports de l'association">
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Rapports de l'association">
     <figcaption><b>Figure 11.1</b> — Rapports : synthèse par activité, caisses, cotisations récentes, exports et indicateurs de pilotage.</figcaption>
   </figure>
   <p>Le rapport présente les cotisations attendues et encaissées, les impayés, les prêts décaissés et remboursés, les aides versées, les soldes de caisses, les dépenses et les résultats. Il peut être filtré par période, par activité et par membre, puis exporté en PDF ou CSV.</p>
 
-  <h2 id="ch11-11-3-les-dividendes">11.3 Les dividendes</h2>
+  <h2>11.3 Les dividendes</h2>
   <p>Le module dividendes calcule la répartition des intérêts et bénéfices entre les membres, selon une clé définie en assemblée générale : nombre de parts, capital détenu, ancienneté ou combinaison. Le calcul est figé dans un « run » annuel, avec statut, base de calcul et quote-part par membre.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/12_ndi_dividends.jpg" alt="Dividendes 2026">
+    <img loading="lazy" src="/docs/manuel/assets/shots/12_ndi_dividends.jpg" alt="Dividendes 2026">
     <figcaption><b>Figure 11.2</b> — Dividendes 2026 de HORIZON : base de 5 433 499 FCFA, sept parts, montant par part et répartition nominative.</figcaption>
   </figure>
   <div class="formula"><b>dividende par part</b> = montant total à répartir ÷ nombre de parts<br><b>dividende membre</b> = parts du membre × dividende par part</div>
 
-  <h2 id="ch11-11-4-le-cas-horizon">11.4 Le cas HORIZON</h2>
+  <h2>11.4 Le cas HORIZON</h2>
   <table>
     <thead><tr><th>Élément</th><th>Valeur</th></tr></thead>
     <tbody>
@@ -1020,7 +1033,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch11-11-5-exports-et-pi-ces">11.5 Exports et pièces</h2>
+  <h2>11.5 Exports et pièces</h2>
   <ul>
     <li><strong>PDF</strong> — rapport de gestion, bilan, liste des mouvements, attestation de solde.</li>
     <li><strong>CSV</strong> — journal détaillé pour tableur ou expert-comptable.</li>
@@ -1028,7 +1041,7 @@ footer.manual a{color:#f4d58d}
     <li><strong>Archivage</strong> — chaque export est horodaté et rattaché à l'association.</li>
   </ul>
 
-  <h2 id="ch11-11-6-audit-et-contr-le-interne">11.6 Audit et contrôle interne</h2>
+  <h2>11.6 Audit et contrôle interne</h2>
   <table>
     <thead><tr><th>Contrôle</th><th>Objectif</th><th>Fréquence</th></tr></thead>
     <tbody>
@@ -1042,7 +1055,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <div class="callout warn"><span class="tag">Attention</span><p>Un rapport exporté ne remplace pas une comptabilité légale. Pour les associations soumises à des obligations comptables, les exports doivent être remis à un expert-comptable et rapprochés des journaux officiels.</p></div>
 
-  <h2 id="ch11-11-7-indicateurs-de-pilotage">11.7 Indicateurs de pilotage</h2>
+  <h2>11.7 Indicateurs de pilotage</h2>
   <div class="kpi">
     <div><div class="v">Taux</div><div class="l">de recouvrement des cotisations</div></div>
     <div><div class="v">Encours</div><div class="l">de prêts et taux de remboursement</div></div>
@@ -1057,7 +1070,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch12" data-short="12 · Historique">Historique et analyses</h1>
   <p class="lead">Chaque membre doit pouvoir répondre à trois questions : qu'ai-je versé, qu'ai-je reçu, que me reste-t-il ? Le module historique y répond au niveau du membre, de l'activité et de l'association.</p>
 
-  <h2 id="ch12-12-1-trois-p-rim-tres">12.1 Trois périmètres</h2>
+  <h2>12.1 Trois périmètres</h2>
   <table>
     <thead><tr><th>Périmètre</th><th>Contenu</th><th>Usage</th></tr></thead>
     <tbody>
@@ -1067,10 +1080,10 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch12-12-2-les-quatre-vues">12.2 Les quatre vues</h2>
+  <h2>12.2 Les quatre vues</h2>
   <p>L'écran d'historique reprend les modes d'affichage des ERP modernes : liste, kanban, graphique et grille. L'utilisateur filtre par type, membre, activité, période et texte, puis regroupe par membre, activité, type ou mois.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/13_history.jpg" alt="Historique des mouvements">
+    <img loading="lazy" src="/docs/manuel/assets/shots/13_history.jpg" alt="Historique des mouvements">
     <figcaption><b>Figure 12.1</b> — Historique : entrées, sorties, solde net, liste paginée, filtres, regroupements et quatre modes d'affichage.</figcaption>
   </figure>
   <table>
@@ -1083,7 +1096,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch12-12-3-les-types-de-mouvements">12.3 Les types de mouvements</h2>
+  <h2>12.3 Les types de mouvements</h2>
   <table>
     <thead><tr><th>Type</th><th>Sens</th><th>Source</th></tr></thead>
     <tbody>
@@ -1096,18 +1109,18 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch12-12-4-chiffres-de-r-f-rence">12.4 Chiffres de référence</h2>
+  <h2>12.4 Chiffres de référence</h2>
   <p>Sur HORIZON, l'historique global restitue 144 mouvements : 101 579 832 FCFA d'entrées (8 000 000 de capital, 88 360 001 de principal remboursé, 5 219 831 d'intérêts) et 100 360 001 FCFA de sorties (prêts décaissés), soit un solde net de 1 219 831 FCFA. Ces chiffres sont calculés à partir des mouvements, pas saisis.</p>
   <div class="formula"><b>solde net</b> = Σ entrées − Σ sorties<br><b>intérêts</b> = Σ intérêts des remboursements<br><b>part membre</b> = Σ (intérêt × quote-part de capital)</div>
 
-  <h2 id="ch12-12-5-d-tail-des-int-r-ts">12.5 Détail des intérêts</h2>
+  <h2>12.5 Détail des intérêts</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/14_interests.jpg" alt="Détail des intérêts">
+    <img loading="lazy" src="/docs/manuel/assets/shots/14_interests.jpg" alt="Détail des intérêts">
     <figcaption><b>Figure 12.2</b> — Intérêts : total généré, part du membre, dividendes, répartition par période et détail par remboursement.</figcaption>
   </figure>
   <p>Le bureau peut ouvrir chaque ligne pour voir la composition : intérêt total du remboursement, capital du membre à la date du prêt, capital global, quote-part et montant attribué. C'est la preuve de la répartition, pas seulement son résultat.</p>
 
-  <h2 id="ch12-12-6-pagination-filtres-et-export">12.6 Pagination, filtres et export</h2>
+  <h2>12.6 Pagination, filtres et export</h2>
   <ul>
     <li>Pagination serveur (25 lignes par défaut, jusqu'à 100).</li>
     <li>Filtres combinables : type, membre, activité, date de début, date de fin, recherche texte.</li>
@@ -1116,7 +1129,7 @@ footer.manual a{color:#f4d58d}
     <li>Export CSV/PDF pour les rapports et les commissaires.</li>
   </ul>
 
-  <h2 id="ch12-12-7-transparence-et-vie-priv-e">12.7 Transparence et vie privée</h2>
+  <h2>12.7 Transparence et vie privée</h2>
   <p>L'historique global de l'association est consultable par les membres, conformément à la promesse de transparence. En revanche, les données personnelles, les pièces médicales et les coordonnées ne sont pas exposées. Un membre simple voit ses propres opérations en détail ; le bureau voit tout ce qui relève de sa gestion.</p>
   <div class="callout info"><span class="tag">Information</span><p>La visibilité est calculée à chaque requête : elle dépend du rôle effectif dans l'association, pas d'un paramètre d'affichage. Un membre qui change de rôle voit immédiatement son périmètre évoluer.</p></div>
 </section>
@@ -1126,7 +1139,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch13" data-short="13 · Espace membre">Espace membre, thèmes et mobile</h1>
   <p class="lead">L'espace membre est conçu comme un poste de pilotage personnel : il montre ce qui compte, permet d'agir en deux clics et s'adapte à la langue et au thème choisis.</p>
 
-  <h2 id="ch13-13-1-structure-de-l-espace">13.1 Structure de l'espace</h2>
+  <h2>13.1 Structure de l'espace</h2>
   <table>
     <thead><tr><th>Zone</th><th>Contenu</th></tr></thead>
     <tbody>
@@ -1138,7 +1151,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch13-13-2-les-six-th-mes">13.2 Les six thèmes</h2>
+  <h2>13.2 Les six thèmes</h2>
   <p>Chaque membre choisit son thème dans Paramètres → Apparence & langue. Le thème est appliqué immédiatement et enregistré sur le compte. Les six thèmes couvrent les goûts et les contextes d'usage, du plus sobre au plus contrasté.</p>
   <table>
     <thead><tr><th>Thème</th><th>Ambiance</th><th>Usage</th></tr></thead>
@@ -1152,25 +1165,25 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
   <figure>
-    <img loading="lazy" src="assets/shots/15_settings.jpg" alt="Choix du thème">
+    <img loading="lazy" src="/docs/manuel/assets/shots/15_settings.jpg" alt="Choix du thème">
     <figcaption><b>Figure 13.1</b> — Paramètres : informations personnelles, langue et sélecteur de thème avec aperçu immédiat.</figcaption>
   </figure>
 
-  <h2 id="ch13-13-3-navigation-et-launchpad">13.3 Navigation et launchpad</h2>
+  <h2>13.3 Navigation et launchpad</h2>
   <p>Le launchpad regroupe les modules par usage et propose trois actions rapides : cotiser, demander un prêt, créer une association. Sur mobile, il devient une grille de cartes tactiles ; sur desktop, une grille de cartes avec icônes et sous-titres.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/03_dashboard.jpg" alt="Tableau de bord">
+    <img loading="lazy" src="/docs/manuel/assets/shots/03_dashboard.jpg" alt="Tableau de bord">
     <figcaption><b>Figure 13.2</b> — Tableau de bord : hero personnalisé, indicateurs, launchpad et raccourcis. Le ton et les couleurs suivent le thème actif.</figcaption>
   </figure>
 
-  <h2 id="ch13-13-4-mobile">13.4 Mobile</h2>
+  <h2>13.4 Mobile</h2>
   <p>L'application est utilisable sur téléphone : navigation compacte, cartes empilées, actions accessibles au pouce, tableaux défilants. Les écrans clés (tableau de bord, tontines, prêts, historique) sont testés en 390 × 844.</p>
   <div class="duo">
-    <figure><img loading="lazy" src="assets/shots/40_mobile_dashboard.jpg" alt="Tableau de bord mobile"><figcaption><b>Figure 13.3</b> — Launchpad mobile.</figcaption></figure>
-    <figure><img loading="lazy" src="assets/shots/41_mobile_tontines.jpg" alt="Tontines mobile"><figcaption><b>Figure 13.4</b> — Liste des tontines mobile.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/40_mobile_dashboard.jpg" alt="Tableau de bord mobile"><figcaption><b>Figure 13.3</b> — Launchpad mobile.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/41_mobile_tontines.jpg" alt="Tontines mobile"><figcaption><b>Figure 13.4</b> — Liste des tontines mobile.</figcaption></figure>
   </div>
 
-  <h2 id="ch13-13-5-langue-et-accessibilit">13.5 Langue et accessibilité</h2>
+  <h2>13.5 Langue et accessibilité</h2>
   <p>Le sélecteur de langue est disponible dans le menu utilisateur et dans les paramètres. Les pages publiques acceptent <span class="mono">?lang=fr|en|es|de</span>. Les libellés, les dates et les montants suivent la locale ; les devises sont formatées avec séparateurs et symbole.</p>
   <ul>
     <li>Contraste vérifié sur les six thèmes, y compris les boutons primaires.</li>
@@ -1179,10 +1192,10 @@ footer.manual a{color:#f4d58d}
     <li>Messages d'erreur explicites, jamais de code technique seul.</li>
   </ul>
 
-  <h2 id="ch13-13-6-notifications">13.6 Notifications</h2>
+  <h2>13.6 Notifications</h2>
   <p>Le membre reçoit des notifications pour les échéances de cotisation, les sessions à venir, les décisions sur ses demandes, les remboursements et les publications du bureau. Les canaux (in-app, e-mail, WhatsApp, SMS) sont configurés par la plateforme et par l'association.</p>
   <div class="callout dark"><span class="tag">Principe</span><p>L'espace membre ne doit jamais obliger à deviner : chaque montant affiché renvoie à un mouvement, chaque mouvement renvoie à une session, chaque session renvoie à une activité.</p></div>
-  <h2 id="ch13-13-7-accompagnement-et-inclusion-num-rique">13.7 Accompagnement et inclusion numérique</h2>
+  <h2>13.7 Accompagnement et inclusion numérique</h2>
   <p>Tous les membres n'ont pas le même niveau d'aisance numérique. L'espace membre propose des libellés explicites, des états vides pédagogiques et des actions guidées. Les bureaux peuvent organiser des séances de prise en main et utiliser les captures de ce manuel comme support de formation.</p>
   <ul>
     <li>Prise en main en moins de dix minutes pour un membre qui sait utiliser WhatsApp.</li>
@@ -1198,17 +1211,17 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch14" data-short="14 · Administration">Administration et modèles</h1>
   <p class="lead">La console système pilote la plateforme, pas les associations. Elle gère les modèles réutilisables, les utilisateurs système, les rôles, les paramètres globaux et la maintenance.</p>
 
-  <h2 id="ch14-14-1-tableau-de-bord-syst-me">14.1 Tableau de bord système</h2>
+  <h2>14.1 Tableau de bord système</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/30_admin.jpg" alt="Console d'administration">
+    <img loading="lazy" src="/docs/manuel/assets/shots/30_admin.jpg" alt="Console d'administration">
     <figcaption><b>Figure 14.1</b> — Console d'administration : associations, utilisateurs, modèles, wallets, paramètres et journal d'audit récent.</figcaption>
   </figure>
   <p>Le tableau de bord affiche le nombre d'associations, d'utilisateurs, de modèles et de wallets, les dernières actions d'audit et les demandes en attente. Il permet de diagnostiquer rapidement l'état de la plateforme.</p>
 
-  <h2 id="ch14-14-2-mod-les-d-association">14.2 Modèles d'association</h2>
+  <h2>14.2 Modèles d'association</h2>
   <p>Un modèle contient un nom, une catégorie, une description, un règlement type et une liste d'activités préconfigurées. Il sert de point de départ à la création d'une association ; le créateur peut ensuite ajuster chaque paramètre.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/32_admin_templates.jpg" alt="Modèles d'association">
+    <img loading="lazy" src="/docs/manuel/assets/shots/32_admin_templates.jpg" alt="Modèles d'association">
     <figcaption><b>Figure 14.2</b> — Modèles : FEV (amicale nationale), SLD (section locale), catégories tontine, famille, commerce, village, projet, religieux, épargne, amicale, section, fédération.</figcaption>
   </figure>
   <table>
@@ -1222,28 +1235,28 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch14-14-3-utilisateurs-et-r-les-syst-me">14.3 Utilisateurs et rôles système</h2>
+  <h2>14.3 Utilisateurs et rôles système</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/31_admin_users.jpg" alt="Utilisateurs système">
+    <img loading="lazy" src="/docs/manuel/assets/shots/31_admin_users.jpg" alt="Utilisateurs système">
     <figcaption><b>Figure 14.3</b> — Utilisateurs système : comptes, rôles, statut, dernier accès et actions de sécurité.</figcaption>
   </figure>
   <p>L'administrateur crée les comptes, attribue un rôle système, réinitialise un mot de passe ou désactive un compte. Les rôles système combinent des permissions par ressource et par action (CREATE, READ, UPDATE, DELETE). Le rôle « Admin Principal » contourne les restrictions ; les autres rôles sont limités à leurs permissions.</p>
 
-  <h2 id="ch14-14-4-associations-supervis-es">14.4 Associations supervisées</h2>
+  <h2>14.4 Associations supervisées</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/33_admin_associations.jpg" alt="Supervision des associations">
+    <img loading="lazy" src="/docs/manuel/assets/shots/33_admin_associations.jpg" alt="Supervision des associations">
     <figcaption><b>Figure 14.4</b> — Supervision : liste des associations, type, statut, membres, activités et accès à la fiche.</figcaption>
   </figure>
   <p>La console permet de suspendre une association, de la réactiver, de changer son statut ou de consulter ses données. Ces actions sont journalisées et ne modifient pas les écritures métier.</p>
 
-  <h2 id="ch14-14-5-param-tres-de-la-plateforme">14.5 Paramètres de la plateforme</h2>
+  <h2>14.5 Paramètres de la plateforme</h2>
   <figure>
-    <img loading="lazy" src="assets/shots/34_admin_settings.jpg" alt="Paramètres de la plateforme">
+    <img loading="lazy" src="/docs/manuel/assets/shots/34_admin_settings.jpg" alt="Paramètres de la plateforme">
     <figcaption><b>Figure 14.5</b> — Paramètres : nom, devise, pays, contact, limites, fonctionnalités, maintenance, inscription.</figcaption>
   </figure>
   <p>Les paramètres globaux définissent l'identité de la plateforme, la devise par défaut, les limites (nombre d'associations, membres, activités), les fonctionnalités activées, le mode maintenance et l'ouverture des inscriptions. Ils sont enregistrés en base et appliqués immédiatement.</p>
 
-  <h2 id="ch14-14-6-journal-d-audit">14.6 Journal d'audit</h2>
+  <h2>14.6 Journal d'audit</h2>
   <table>
     <thead><tr><th>Action</th><th>Acteur</th><th>Données</th></tr></thead>
     <tbody>
@@ -1255,7 +1268,15 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch14-14-7-maintenance-et-sauvegardes">14.7 Maintenance et sauvegardes</h2>
+  <h2>14.7 Référentiel ARP et couverture</h2>
+  <p>L'entrée <strong>Organisation → Référentiel ARP</strong> donne accès aux 36 domaines de l'étude ARP, aux 144 invariants, aux conditions C01–C06 et au catalogue de 23 328 combinaisons. La même console affiche la couverture de chaque association : statut du cadre, origine (manuel, importé, modèle), version, complétude, erreurs, alertes, modules actifs et nombre de fonds.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/63_admin_arp.jpg" alt="Couverture ARP des associations">
+    <figcaption><b>Figure 14.6</b> — Couverture ARP : les quatre associations, leur version, leur complétude et leurs modules. Les profils importés restent signalés comme à valider.</figcaption>
+  </figure>
+  <p>Le bouton « Initialiser les profils manquants » crée un profil <span class="mono">ACTIVE / BACKFILL</span> pour les associations qui n'en ont pas encore. Ce profil ne bloque pas l'existant ; il doit être revu puis publié par le bureau de l'association.</p>
+
+  <h2>14.8 Maintenance et sauvegardes</h2>
   <ul>
     <li>Sauvegarde quotidienne de la base PostgreSQL.</li>
     <li>Export des documents et des rapports critiques.</li>
@@ -1272,7 +1293,7 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch15" data-short="15 · International">Multilingue et internationalisation</h1>
   <p class="lead">Tchoua vise l'Afrique francophone, anglophone et au-delà. L'interface, les contenus, les devises et les règles doivent pouvoir changer de pays sans réécrire l'application.</p>
 
-  <h2 id="ch15-15-1-langues">15.1 Langues</h2>
+  <h2>15.1 Langues</h2>
   <table>
     <thead><tr><th>Langue</th><th>Code</th><th>Couverture</th></tr></thead>
     <tbody>
@@ -1285,7 +1306,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p>Le sélecteur de langue est disponible dans le menu utilisateur, les paramètres et le site public. Les traductions sont centralisées dans des fichiers de locale ; aucun texte ne doit être codé en dur dans les composants.</p>
 
-  <h2 id="ch15-15-2-devises-et-formats">15.2 Devises et formats</h2>
+  <h2>15.2 Devises et formats</h2>
   <p>Les montants sont stockés en valeur numérique et affichés selon la devise de l'association. Le formatage respecte les séparateurs, le symbole et le nombre de décimales. Les taux de conversion et les devises multiples sont prévus pour les fédérations internationales.</p>
   <table>
     <thead><tr><th>Devise</th><th>Code</th><th>Usage</th></tr></thead>
@@ -1298,7 +1319,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch15-15-3-adaptation-juridique">15.3 Adaptation juridique</h2>
+  <h2>15.3 Adaptation juridique</h2>
   <p>Chaque pays a son droit des associations : au Cameroun, la loi n° 90/053 du 19 décembre 1990 ; dans l'espace OHADA, des règles comptables communes ; ailleurs, des régimes spécifiques. Tchoua ne prétend pas remplacer un juriste : la plateforme fournit des modèles et des paramètres, l'association valide ses statuts avec ses conseils.</p>
   <ul>
     <li>Modèles de statuts et de règlements par pays (à enrichir).</li>
@@ -1307,7 +1328,7 @@ footer.manual a{color:#f4d58d}
     <li>Protection des données personnelles.</li>
   </ul>
 
-  <h2 id="ch15-15-4-paiements-et-mobile-money">15.4 Paiements et mobile money</h2>
+  <h2>15.4 Paiements et mobile money</h2>
   <p>Les moyens de paiement sont paramétrables par association : espèces, MTN MoMo, Orange Money, Wave, virement, nature, temps. Les intégrations de paiement doivent être conformes aux opérateurs et aux régulateurs locaux ; la plateforme prépare les points d'entrée et la reconciliation.</p>
   <table>
     <thead><tr><th>Moyen</th><th>Usage</th><th>Statut</th></tr></thead>
@@ -1321,7 +1342,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch15-15-5-feuille-de-route-internationale">15.5 Feuille de route internationale</h2>
+  <h2>15.5 Feuille de route internationale</h2>
   <ol>
     <li>Stabiliser le français et l'anglais sur l'interface complète.</li>
     <li>Ajouter les devises et les formats locaux.</li>
@@ -1338,10 +1359,10 @@ footer.manual a{color:#f4d58d}
   <h1 class="chapter" id="ch16" data-short="16 · Cas réels">Cas réels : HORIZON, FEV, SLD</h1>
   <p class="lead">Trois associations, trois modèles différents, une même plateforme. HORIZON illustre l'investissement et le prêt ; FEV l'amicale nationale fédératrice ; SLD la section locale avec tontine aux enchères.</p>
 
-  <h2 id="ch16-16-1-ets-horizon-investissement-et-pr-ts">16.1 ETS HORIZON — investissement et prêts</h2>
+  <h2>16.1 ETS HORIZON — investissement et prêts</h2>
   <p>HORIZON est une association de sept membres qui gère un capital, des prêts et des dividendes. Les données historiques ont été importées et vérifiées : 49 prêts, 5 actifs, 44 remboursés, 5 433 499 FCFA de dividendes 2026.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/05_ndi_overview.jpg" alt="Fiche ETS HORIZON">
+    <img loading="lazy" src="/docs/manuel/assets/shots/05_ndi_overview.jpg" alt="Fiche ETS HORIZON">
     <figcaption><b>Figure 16.1</b> — Fiche ETS HORIZON : 7 membres, 2 activités, capital, caisse, prêts, dividendes et raccourcis de gestion.</figcaption>
   </figure>
   <table>
@@ -1358,10 +1379,10 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch16-16-2-fev-amicale-nationale">16.2 FEV — amicale nationale</h2>
+  <h2>16.2 FEV — amicale nationale</h2>
   <p><strong>FEV</strong> (Fédération des Élites de la Vallée) est une amicale d'élites régie par la loi de 1990. Elle fédère des sections, tient une AG annuelle, un comité directeur semestriel, un bureau exécutif et des commissions. Ses ressources proviennent des droits d'adhésion (10 000 FCFA), des cotisations annuelles (15 000 FCFA), des placements et des amendes.</p>
   <figure>
-    <img loading="lazy" src="assets/shots/17_ameibans.jpg" alt="Fiche FEV">
+    <img loading="lazy" src="/docs/manuel/assets/shots/17_ameibans.jpg" alt="Fiche FEV">
     <figcaption><b>Figure 16.2</b> — FEV : amicale nationale, 1 membre rattaché, 5 activités, 14 articles, 3 documents fondateurs.</figcaption>
   </figure>
   <table>
@@ -1379,11 +1400,11 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch16-16-3-sld-section-de-douala">16.3 SLD — section de Douala</h2>
+  <h2>16.3 SLD — section de Douala</h2>
   <p><strong>SLD</strong> (Section Locale de Douala) est la section FEV de Douala. Elle applique les statuts nationaux et son propre règlement 2024 : réunions le premier samedi après le 5, quorum 3/5, tontine aux enchères de 25 000 FCFA, fonds de solidarité de 72 000 FCFA/an, fonds d'investissement de 5 000 FCFA/mois, collation de 3 000 FCFA et aides familiales.</p>
   <div class="duo">
-    <figure><img loading="lazy" src="assets/shots/18_amsed.jpg" alt="Fiche SLD"><figcaption><b>Figure 16.3</b> — SLD, section de Douala rattachée à FEV.</figcaption></figure>
-    <figure><img loading="lazy" src="assets/shots/19_amsed_activities.jpg" alt="Activités SLD"><figcaption><b>Figure 16.4</b> — Sept activités SLD.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/18_amsed.jpg" alt="Fiche SLD"><figcaption><b>Figure 16.3</b> — SLD, section de Douala rattachée à FEV.</figcaption></figure>
+    <figure><img loading="lazy" src="/docs/manuel/assets/shots/19_amsed_activities.jpg" alt="Activités SLD"><figcaption><b>Figure 16.4</b> — Sept activités SLD.</figcaption></figure>
   </div>
   <table>
     <thead><tr><th>Activité</th><th>Montant</th><th>Fréquence / règle</th></tr></thead>
@@ -1398,7 +1419,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch16-16-4-comparaison">16.4 Comparaison</h2>
+  <h2>16.4 Comparaison</h2>
   <table>
     <thead><tr><th>Dimension</th><th>HORIZON</th><th>FEV</th><th>SLD</th></tr></thead>
     <tbody>
@@ -1417,7 +1438,7 @@ footer.manual a{color:#f4d58d}
   <div class="chapter-kicker">Chapitre 17</div>
   <h1 class="chapter" id="ch17" data-short="17 · Workflows">Workflows de bout en bout</h1>
   <p class="lead">Ce chapitre enchaîne les écrans et les règles pour les parcours les plus fréquents. Chaque étape indique l'acteur, l'action, le contrôle et la trace produite.</p>
-  <h2 id="ch17-17-1-cr-er-une-association-et-son-bureau">17.1 Créer une association et son bureau</h2>
+  <h2>17.1 Créer une association et son bureau</h2>
   <table>
     <thead><tr><th>#</th><th>Acteur</th><th>Action</th><th>Contrôle / trace</th></tr></thead>
     <tbody>
@@ -1429,7 +1450,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch17-17-2-faire-adh-rer-un-membre">17.2 Faire adhérer un membre</h2>
+  <h2>17.2 Faire adhérer un membre</h2>
   <ol>
     <li>Le candidat crée son compte ou reçoit une invitation.</li>
     <li>Il rejoint l'association par code, lien ou demande.</li>
@@ -1439,7 +1460,7 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="callout info"><span class="tag">Information</span><p>Une adhésion refusée est conservée avec son motif. Une radiation ne supprime pas l'historique : elle change le statut et clôt les droits.</p></div>
 
-  <h2 id="ch17-17-3-ouvrir-une-session-et-encaisser-les-cotisations">17.3 Ouvrir une session et encaisser les cotisations</h2>
+  <h2>17.3 Ouvrir une session et encaisser les cotisations</h2>
   <table>
     <thead><tr><th>#</th><th>Action</th><th>Résultat</th></tr></thead>
     <tbody>
@@ -1452,7 +1473,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch17-17-4-distribuer-une-tontine">17.4 Distribuer une tontine</h2>
+  <h2>17.4 Distribuer une tontine</h2>
   <ol>
     <li>Vérifier le pot et les parts distribuables.</li>
     <li>Appliquer la règle d'attribution (rotation, tirage, enchères).</li>
@@ -1463,7 +1484,7 @@ footer.manual a{color:#f4d58d}
   </ol>
   <div class="formula"><b>montant</b> = parts bénéficiaires × montant par part<br><b>solde session</b> = cotisations − distributions<br><b>solde cycle</b> = Σ soldes de session</div>
 
-  <h2 id="ch17-17-5-accorder-et-suivre-un-pr-t">17.5 Accorder et suivre un prêt</h2>
+  <h2>17.5 Accorder et suivre un prêt</h2>
   <table>
     <thead><tr><th>#</th><th>Acteur</th><th>Action</th><th>Contrôle</th></tr></thead>
     <tbody>
@@ -1476,7 +1497,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch17-17-6-attribuer-une-aide-sociale">17.6 Attribuer une aide sociale</h2>
+  <h2>17.6 Attribuer une aide sociale</h2>
   <ol>
     <li>Le membre crée la demande avec catégorie et pièces.</li>
     <li>Le bureau contrôle l'éligibilité et le plafond.</li>
@@ -1485,7 +1506,7 @@ footer.manual a{color:#f4d58d}
     <li>L'aide apparaît dans l'historique, le rapport et le solde du fonds.</li>
   </ol>
 
-  <h2 id="ch17-17-7-cl-turer-un-exercice">17.7 Clôturer un exercice</h2>
+  <h2>17.7 Clôturer un exercice</h2>
   <table>
     <thead><tr><th>Étape</th><th>Contenu</th><th>Responsable</th></tr></thead>
     <tbody>
@@ -1499,11 +1520,11 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/payments.png" alt="Flux financiers">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/payments.png" alt="Flux financiers">
     <div class="cap"><b>Figure 17.1</b> — Flux financiers : encaissements, décaissements, contrôles et circuit membre → caisse → bénéficiaire → journal.</div>
   </section>
 
-  <h2 id="ch17-17-8-matrice-raci">17.8 Matrice RACI</h2>
+  <h2>17.8 Matrice RACI</h2>
   <table>
     <thead><tr><th>Activité</th><th>Membre</th><th>Bureau</th><th>Trésorier</th><th>Commissaires</th><th>Admin</th></tr></thead>
     <tbody>
@@ -1517,7 +1538,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">R = responsable de l'exécution, A = autorité de validation, C = consulté, I = informé.</p>
 
-  <h2 id="ch17-17-9-gestion-des-exceptions">17.9 Gestion des exceptions</h2>
+  <h2>17.9 Gestion des exceptions</h2>
   <ul>
     <li><strong>Session annulée</strong> — les cotisations restent, la distribution est annulée par mouvement inverse.</li>
     <li><strong>Erreur de saisie</strong> — correction par ajustement, jamais par suppression.</li>
@@ -1532,7 +1553,7 @@ footer.manual a{color:#f4d58d}
   <div class="chapter-kicker">Chapitre 18</div>
   <h1 class="chapter" id="ch18" data-short="18 · Roadmap">Roadmap, limites et support</h1>
   <p class="lead">Un document honnête dit aussi ce qui n'est pas encore fait. Ce chapitre présente la trajectoire produit, les limites actuelles et les modalités de support.</p>
-  <h2 id="ch18-18-1-ce-qui-est-op-rationnel">18.1 Ce qui est opérationnel</h2>
+  <h2>18.1 Ce qui est opérationnel</h2>
   <ul class="checklist">
     <li>Site public multilingue et accès membre.</li>
     <li>Création et gestion d'associations, sections et fédérations.</li>
@@ -1546,7 +1567,7 @@ footer.manual a{color:#f4d58d}
     <li>Console système, modèles, rôles, paramètres.</li>
   </ul>
 
-  <h2 id="ch18-18-2-limites-actuelles">18.2 Limites actuelles</h2>
+  <h2>18.2 Limites actuelles</h2>
   <table>
     <thead><tr><th>Domaine</th><th>Limite</th><th>Contournement / prochaine étape</th></tr></thead>
     <tbody>
@@ -1562,15 +1583,15 @@ footer.manual a{color:#f4d58d}
   </table>
 
 <section class="diagram-page">
-    <img loading="lazy" src="assets/diagrams/roadmap.png" alt="Feuille de route Afrique">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/roadmap.png" alt="Feuille de route Afrique">
     <div class="cap"><b>Figure 18.1</b> — Trajectoire : fondations Cameroun, fédération, Afrique de l'Ouest, continental.</div>
   </section>
 
-  <h2 id="ch18-18-3-s-curit-et-conformit">18.3 Sécurité et conformité</h2>
+  <h2>18.3 Sécurité et conformité</h2>
   <p>La plateforme applique les principes de moindre privilège, de traçabilité et de séparation des pouvoirs. Les données personnelles sont limitées au nécessaire ; les pièces médicales et les coordonnées ne sont pas exposées aux autres membres. Les sauvegardes et les journaux permettent de reconstituer les opérations.</p>
   <div class="callout warn"><span class="tag">Attention</span><p>Aucun système ne remplace la vigilance humaine : le bureau doit contrôler les rapports, les commissaires doivent auditionner les comptes, et les membres doivent vérifier leurs propres mouvements.</p></div>
 
-  <h2 id="ch18-18-4-support-et-maintenance">18.4 Support et maintenance</h2>
+  <h2>18.4 Support et maintenance</h2>
   <table>
     <thead><tr><th>Niveau</th><th>Canal</th><th>Délai cible</th></tr></thead>
     <tbody>
@@ -1582,7 +1603,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="ch18-18-5-gouvernance-du-document">18.5 Gouvernance du document</h2>
+  <h2>18.5 Gouvernance du document</h2>
   <p>Ce manuel est la référence fonctionnelle. Toute évolution du produit doit être répercutée dans le chapitre concerné, avec mise à jour de la version et de la date. Les captures d'écran doivent être refaites lorsque l'interface change ; les schémas sont régénérables par script.</p>
   <ul>
     <li>Version 1.0 — novembre 2026 — état de la production.</li>
@@ -1594,15 +1615,319 @@ footer.manual a{color:#f4d58d}
 </section>
 
 <section class="chapter">
+  <div class="chapter-kicker">Chapitre 19</div>
+  <h1 class="chapter" id="ch19" data-short="19 · Cadre ARP">Cadre ARP : règles, combinaisons et versions</h1>
+  <p class="lead">Depuis novembre 2026, Tchoua ne se contente pas d'enregistrer des activités : chaque association dispose d'un <strong>cadre ARP</strong> (Association Resource Planning) qui décrit sa forme, ses règles, ses modules autorisés et ses conditions de compatibilité. Ce cadre est versionné, contrôlé et opposable aux nouvelles opérations.</p>
+
+  <h2>19.1 Pourquoi un cadre ARP</h2>
+  <p>Une tontine de quartier, une amicale familiale, une section locale et une fédération nationale n'ont ni les mêmes organes, ni les mêmes fonds, ni les mêmes obligations. Le cadre ARP sépare ce qui doit l'être :</p>
+  <ul>
+    <li>le <strong>compte utilisateur</strong> et l'<strong>adhésion</strong> ;</li>
+    <li>la <strong>cotisation attendue</strong> (créance), le <strong>paiement</strong> (trésorerie) et l'<strong>affectation</strong> (imputation) ;</li>
+    <li>le <strong>fonds</strong> (usage autorisé) et le <strong>compte</strong> (lieu de conservation) ;</li>
+    <li>la <strong>décision</strong> d'attribution et le <strong>décaissement</strong> ;</li>
+    <li>la <strong>règle publiée</strong> et les <strong>opérations historiques</strong> qui gardent leur version.</li>
+  </ul>
+  <div class="callout dark"><span class="tag">Principe</span><p>Le cadre ARP ne remplace pas les statuts ni le règlement intérieur. Il les rend <strong>exécutables</strong> : une règle déclarée devient un contrôle, un champ obligatoire ou un refus explicite. Le modèle logiciel ne vaut ni statut déposé ni autorisation d'exercer une activité réglementée.</p></div>
+
+  <h2>19.2 Trente-six domaines, cent quarante-quatre invariants</h2>
+  <p>Le référentiel ARP couvre 36 domaines : identité, fédérations, adhésions, familles, gouvernance, réunions, discipline, documents, moteur de règles, cotisations, paiements, caisses, tontines, attributions, enchères, cycles, épargne, prêts, échéanciers, remboursements, garanties, solidarité, aides, réserves, investissements, projets, achats, patrimoine, événements, communauté, rapports, sécurité, architecture, mobile, exploitation et internationalisation.</p>
+  <div class="kpi">
+    <div><div class="v">36</div><div class="l">domaines de conception</div></div>
+    <div><div class="v">144</div><div class="l">invariants de gestion</div></div>
+    <div><div class="v">23 328</div><div class="l">combinaisons bornées</div></div>
+    <div><div class="v">6</div><div class="l">conditions de compatibilité</div></div>
+  </div>
+  <p>Chaque domaine contient ses options, ses invariants, son formulaire, son workflow, ses exceptions, ses recettes et ses indicateurs. La console administrateur permet de parcourir ce référentiel sans quitter l'application.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/64_admin_arp_referentiel.jpg" alt="Référentiel ARP dans la console administrateur">
+    <figcaption><b>Figure 19.1</b> — Référentiel ARP : 36 domaines, 144 invariants, 288 champs de formulaire, 216 étapes de workflow et 180 recettes consultables.</figcaption>
+  </figure>
+
+  <h2>19.3 Les dix dimensions d'une association</h2>
+  <p>Une configuration ARP est décrite par dix dimensions. Elles déterminent les modules disponibles et les conditions à remplir avant publication.</p>
+  <table>
+    <thead><tr><th>Dimension</th><th>Valeurs</th><th>Conséquence principale</th></tr></thead>
+    <tbody>
+      <tr><td>Forme d'organisation</td><td>Autonome · Section · Fédération</td><td>Périmètre des décisions, propriété des fonds, héritage</td></tr>
+      <tr><td>Mode d'adhésion</td><td>Individuelle · Familiale · Institutionnelle</td><td>Unité de droits, de plafonds et de représentation</td></tr>
+      <tr><td>Assiette des cotisations</td><td>Fixe · Parts · Nature</td><td>Calcul de l'appel, valorisation, liquidité</td></tr>
+      <tr><td>Mode de tontine</td><td>Aucune · Rotation · Tirage · Enchères</td><td>Attribution, preuve du tirage, enchère</td></tr>
+      <tr><td>Politique de crédit</td><td>Aucun · Taux zéro · Amortissable</td><td>Échéancier, intérêts, plafonds</td></tr>
+      <tr><td>Aides sociales</td><td>Aucune · Forfait · Indemnité par jour</td><td>Plafonds, événements, justificatifs</td></tr>
+      <tr><td>Canal de paiement</td><td>Espèces · Banque · Mobile Money</td><td>Preuve, frais, rapprochement, confirmation</td></tr>
+      <tr><td>Devises</td><td>Unique · Conversion</td><td>Cours, marge, devise de présentation</td></tr>
+      <tr><td>Mode de connexion</td><td>En ligne · Hors ligne toléré</td><td>Brouillon, synchronisation, validation serveur</td></tr>
+      <tr><td>Niveau de validation</td><td>Simple · Double</td><td>Séparation des fonctions, second approbateur</td></tr>
+    </tbody>
+  </table>
+
+  <h2>19.4 Les six conditions de compatibilité</h2>
+  <p>Toutes les combinaisons ne sont pas également simples. Six conditions signalent les configurations qui exigent des paramètres supplémentaires. Elles ne bloquent pas la création, mais empêchent la publication tant que les champs requis ne sont pas renseignés.</p>
+  <table>
+    <thead><tr><th>Code</th><th>Déclenchement</th><th>Champs requis</th></tr></thead>
+    <tbody>
+      <tr><td><strong>C01</strong></td><td>Cotisation en nature + tontine ouverte</td><td>Méthode de valorisation, règle de liquidité (vente ou financement)</td></tr>
+      <tr><td><strong>C02</strong></td><td>Enchères + connexion hors ligne</td><td>Assiette de la décote, règle de clôture, politique d'offre hors ligne</td></tr>
+      <tr><td><strong>C03</strong></td><td>Mobile Money + connexion hors ligne</td><td>Prestataire, politique de paiement, confirmation externe obligatoire</td></tr>
+      <tr><td><strong>C04</strong></td><td>Devise avec conversion</td><td>Source du cours, date, marge, devise de présentation</td></tr>
+      <tr><td><strong>C05</strong></td><td>Adhésion familiale + aides sociales</td><td>Unité de plafond (membre, ménage, ayant droit), définition du ménage</td></tr>
+      <tr><td><strong>C06</strong></td><td>Crédit + validation simple</td><td>Seuil de décision, règle de déport des personnes intéressées</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Exemple concret</span><p>Une association qui active les prêts sans définir de seuil ni de règle de déport affiche <strong>C06_THRESHOLD</strong> et <strong>C06_CONFLICT</strong>. Le cadre reste actif pour les opérations existantes, mais la publication d'une nouvelle version est refusée jusqu'à décision du bureau.</p></div>
+
+  <h2>19.5 Vingt-trois mille combinaisons, une seule logique</h2>
+  <p>Les dix dimensions produisent 23 328 combinaisons. Le moteur ne stocke pas ces lignes : il calcule les conditions à partir des valeurs et vérifie chaque configuration par recette. Cette approche évite les catalogues figés et garantit qu'une nouvelle valeur reste compatible avec les contrôles existants.</p>
+  <div class="formula">conditions = C01(dimension nature + tontine)
+           ∪ C02(enchères + hors ligne)
+           ∪ C03(mobile money + hors ligne)
+           ∪ C04(conversion)
+           ∪ C05(famille + aide)
+           ∪ C06(crédit + validation simple)
+
+qualification = « conditionnelle » si conditions ≠ ∅
+                « sans condition supplémentaire » sinon</div>
+
+  <h2>19.6 Profil, brouillon, publication et versions</h2>
+  <p>Chaque association possède un seul profil ARP, mais plusieurs versions. Le profil actif porte la configuration appliquée aux nouvelles opérations ; le brouillon permet de préparer une modification sans interrompre l'existant.</p>
+  <table>
+    <thead><tr><th>État</th><th>Signification</th><th>Effet</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DRAFT</strong></td><td>Profil non publié</td><td>Les nouvelles souscriptions financières sont bloquées jusqu'à publication</td></tr>
+      <tr><td><strong>ACTIVE</strong></td><td>Version publiée</td><td>Les modules et conditions sont appliqués</td></tr>
+      <tr><td><strong>BACKFILL</strong></td><td>Profil importé pour une association existante</td><td>Continue de fonctionner ; à revoir et publier par le bureau</td></tr>
+      <tr><td><strong>SUSPENDED / ARCHIVED</strong></td><td>Cadre suspendu ou archivé</td><td>Consultation et liquidation possibles, nouvelles souscriptions fermées</td></tr>
+    </tbody>
+  </table>
+  <p>Une publication crée une version immuable avec une empreinte SHA-256. Les opérations anciennes restent rattachées à leur version de règle ; une correction rétroactive ne réécrit jamais l'historique, elle crée une opération liée dans une période ouverte.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/50_arp_profile.jpg" alt="Cadre ARP d'une association">
+    <figcaption><b>Figure 19.2</b> — Cadre ARP d'une association : statut, version, complétude, conditions actives et contrôles bloquants.</figcaption>
+  </figure>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/51_arp_modules.jpg" alt="Modules et conditions du cadre ARP">
+    <figcaption><b>Figure 19.3</b> — Onglet Modules &amp; conditions : dix dimensions, qualification calculée, champs requis et garde-fous non désactivables.</figcaption>
+  </figure>
+
+  <h2>19.7 Fonds, mouvements et réservations</h2>
+  <p>Le noyau financier distingue le <strong>fonds</strong> (affectation économique), le <strong>mouvement</strong> (entrée ou sortie confirmée) et la <strong>réservation</strong> (engagement qui protège le disponible sans modifier le solde). Le disponible se calcule ainsi :</p>
+  <div class="formula">disponible = solde (entrées confirmées − sorties confirmées)
+           − réservations actives</div>
+  <ul>
+    <li>Une <strong>sortie</strong> ne peut jamais dépasser le disponible ; le contrôle est effectué sous verrou concurrent.</li>
+    <li>Une <strong>réservation</strong> peut être libérée (retour au disponible) ou consommée (création d'un décaissement lié).</li>
+    <li>Les montants sont conservés en <strong>unités mineures entières</strong> : XAF sans décimale, EUR en centimes. Aucun calcul financier n'utilise de flottant binaire.</li>
+    <li>Une <strong>désactivation de module</strong> masque les nouvelles souscriptions mais préserve les consultations, corrections et liquidations nécessaires aux obligations existantes.</li>
+  </ul>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/52_arp_funds.jpg" alt="Fonds et réservations du cadre ARP">
+    <figcaption><b>Figure 19.4</b> — Fonds et réservations : solde, montant réservé et disponible distincts, avec création de mouvements et de réservations.</figcaption>
+  </figure>
+
+  <h2>19.8 Simulateurs et preuve des calculs</h2>
+  <p>Trois simulateurs rendent les règles vérifiables avant toute écriture : échéancier de prêt (principal constant, annuité constante, in fine), attribution de tontine (pot, plafond de séance, droits restants, fraction minimale) et projection du fonds social (effectif, cotisation, taux de recouvrement).</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/53_arp_simulators.jpg" alt="Simulateurs ARP">
+    <figcaption><b>Figure 19.5</b> — Simulateur d'échéancier : 120 000 XAF sur trois mois à 3 % par mois, principal constant — 43 600, 42 400 et 41 200 XAF, intérêts 7 200 XAF.</figcaption>
+  </figure>
+
+  <h2>19.9 Administration et couverture</h2>
+  <p>La console administrateur affiche la couverture ARP de toutes les associations : statut, origine, version, complétude, erreurs, alertes, modules actifs et nombre de fonds. Elle permet d'initialiser les profils manquants à partir des activités existantes, sans interrompre la production.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/63_admin_arp.jpg" alt="Couverture ARP dans la console administrateur">
+    <figcaption><b>Figure 19.6</b> — Couverture ARP : chaque association, son cadre, sa complétude et ses modules ; les profils importés restent signalés comme à valider.</figcaption>
+  </figure>
+  <div class="callout warn"><span class="tag">Limites assumées</span><p>Le cadre ARP est le point d'ancrage des évolutions. Les modules non encore construits — journal comptable en partie double, registre des garanties, connecteurs de paiement, projets et stocks, enchères temps réel, consolidation fédérale — restent des chantiers identifiés et ne sont pas présentés comme terminés.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapitre 20</div>
+  <h1 class="chapter" id="ch20" data-short="20 · Formulaire par onglets">Créer ou modifier une association par onglets</h1>
+  <p class="lead">L'ancien assistant en sept étapes a été remplacé par un formulaire unique organisé en onglets. On peut revenir en arrière, corriger un champ, consulter le cadre ARP ou enregistrer à tout moment : aucune progression linéaire n'est imposée.</p>
+
+  <h2>20.1 Un seul formulaire, deux modes</h2>
+  <p>Le même composant sert à la <strong>création</strong> et à la <strong>modification</strong>. En création, il part de valeurs par défaut et propose les modules à activer. En modification, il recharge l'association, son cadre ARP, ses réunions, ses plafonds, son règlement et ses activités existantes.</p>
+  <table>
+    <thead><tr><th>Mode</th><th>Adresse</th><th>Enregistrement</th></tr></thead>
+    <tbody>
+      <tr><td>Création</td><td><span class="mono">/dashboard/associations/create</span></td><td>Crée l'association, ses activités initiales, son règlement et son profil ARP</td></tr>
+      <tr><td>Modification</td><td><span class="mono">/associations/[id]/modifier</span></td><td>Met à jour la fiche ; le cadre ARP passe en brouillon s'il a changé</td></tr>
+    </tbody>
+  </table>
+
+  <h2>20.2 Les huit onglets</h2>
+  <table>
+    <thead><tr><th>Onglet</th><th>Champs principaux</th><th>Contrôles</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Identité</strong></td><td>Nom, type, description, parent, statut juridique, pays, devise, fuseau, finalités, modèle</td><td>Nom ≥ 3 caractères ; code devise ISO ; pays ISO ; fuseau requis</td></tr>
+      <tr><td><strong>Contacts</strong></td><td>Région, email, téléphone, site, logo, couleur, visibilité publique</td><td>Email valide ; lien public sans données financières</td></tr>
+      <tr><td><strong>Cadre ARP</strong></td><td>Dix dimensions, conditions C01–C06, modules, paramètres requis</td><td>Conditions calculées ; champs obligatoires ; invariants non désactivables</td></tr>
+      <tr><td><strong>Activités</strong></td><td>Modules à activer, paramètres initiaux de tontine, fréquence des sessions</td><td>Cohérence module / capacité ARP ; montants positifs ; cycle valide</td></tr>
+      <tr><td><strong>Réunions &amp; collation</strong></td><td>Fréquence, jour, heure, quorum, contribution, forfait hôte</td><td>Quorum 0–100 ; montants positifs</td></tr>
+      <tr><td><strong>Adhésion &amp; finances</strong></td><td>Droit d'entrée, âge, parrains, plafonds d'aides, sanctions, compte bancaire</td><td>Montants positifs ; barèmes cohérents</td></tr>
+      <tr><td><strong>Règlement</strong></td><td>Articles titrés et contenu</td><td>Mise à jour atomique ; approbations recréées</td></tr>
+      <tr><td><strong>Récapitulatif</strong></td><td>Synthèse, complétude, conditions, erreurs et avertissements</td><td>Contrôle final avant création ou enregistrement</td></tr>
+    </tbody>
+  </table>
+
+  <h2>20.3 Naviguer et enregistrer à tout moment</h2>
+  <p>La barre d'onglets reste visible en haut du formulaire. Le bouton d'enregistrement reste visible en bas, quel que soit l'onglet. Un changement d'onglet ne perd aucune saisie : l'état est conservé dans le composant jusqu'à l'enregistrement ou l'annulation.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/55_create_identite.jpg" alt="Formulaire de création par onglets — identité">
+    <figcaption><b>Figure 20.1</b> — Création par onglets : les huit entrées sont accessibles directement, sans bouton « Suivant ». Le bouton « Créer l'association » reste disponible.</figcaption>
+  </figure>
+  <div class="callout info"><span class="tag">Astuce</span><p>Renseignez d'abord le nom et le type, puis ouvrez l'onglet <strong>Cadre ARP</strong> : le bouton « Appliquer le profil type » propose une combinaison cohérente (tontine de quartier, amicale, fédération, section, coopérative…). Vous pouvez ensuite ajuster chaque dimension.</p></div>
+
+  <h2>20.4 Cadre ARP et cohérence des modules</h2>
+  <p>L'onglet <strong>Activités</strong> ne permet pas d'activer un module que le cadre ARP n'autorise pas. Si vous sélectionnez « Prêts » sans politique de crédit, le formulaire vous renvoie vers l'onglet Cadre ARP pour choisir le mode de crédit et renseigner les conditions. Cette règle évite de créer une activité que les contrôles bloqueraient dès la première demande.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/56_create_arp.jpg" alt="Onglet Cadre ARP du formulaire de création">
+    <figcaption><b>Figure 20.2</b> — Onglet Cadre ARP : dix dimensions, qualification, conditions, modules et paramètres requis. Le profil type peut être appliqué puis personnalisé.</figcaption>
+  </figure>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/57_create_activites.jpg" alt="Onglet Activités du formulaire de création">
+    <figcaption><b>Figure 20.3</b> — Onglet Activités : modules, cohérence ARP, paramètres initiaux de la tontine et fréquence des sessions.</figcaption>
+  </figure>
+
+  <h2>20.5 Modifier une association existante</h2>
+  <p>En mode modification, les données sont rechargées depuis la base. Le bouton <strong>Modifier</strong> est visible sur la fiche de l'association pour les membres du bureau habilités. L'administrateur principal peut également ouvrir l'adresse directe.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/58_edit_identite.jpg" alt="Formulaire de modification par onglets">
+    <figcaption><b>Figure 20.4</b> — Modification : les mêmes onglets, préremplis avec l'identité, le cadre ARP, les réunions, les plafonds et le règlement existants.</figcaption>
+  </figure>
+  <p>Trois comportements sont à connaître :</p>
+  <ul>
+    <li>les champs de la fiche (nom, contacts, réunions, adhésion, règlement) sont appliqués immédiatement ;</li>
+    <li>si le cadre ARP a changé, il est enregistré en <strong>brouillon</strong> et la page ARP s'ouvre pour permettre sa publication ;</li>
+    <li>si seul le reste de la fiche a changé, aucun brouillon ARP n'est créé.</li>
+  </ul>
+  <div class="callout warn"><span class="tag">Attention</span><p>La modification du règlement supprime les anciennes approbations et recrée les articles dans une seule transaction. Les membres doivent approuver la nouvelle version ; l'historique des anciennes approbations n'est pas conservé comme preuve de la nouvelle version.</p></div>
+
+  <h2>20.6 Qui peut créer, modifier, configurer</h2>
+  <table>
+    <thead><tr><th>Action</th><th>Rôles autorisés</th><th>Permission</th></tr></thead>
+    <tbody>
+      <tr><td>Créer une association</td><td>Tout utilisateur authentifié</td><td>Limites de plateforme</td></tr>
+      <tr><td>Modifier la fiche association</td><td>Fondateur, président, vice-président, administrateur principal</td><td><span class="mono">EDIT_SETTINGS</span></td></tr>
+      <tr><td>Configurer les activités</td><td>Fondateur, président, vice-président, secrétaire, trésorier, administrateur principal</td><td><span class="mono">MANAGE_ACTIVITIES</span></td></tr>
+      <tr><td>Publier le cadre ARP</td><td>Fondateur, président, administrateur principal</td><td>Décision de publication</td></tr>
+      <tr><td>Consulter le cadre ARP</td><td>Tous les membres de l'association</td><td>Lecture seule</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Séparation des fonctions</span><p>Un membre peut consulter le cadre et les activités, mais ne peut ni les modifier ni publier une version. La création d'une activité financière est en outre contrôlée par la capacité ARP correspondante.</p></div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapitre 21</div>
+  <h1 class="chapter" id="ch21" data-short="21 · Configuration des activités">Configurer chaque activité et gérer les fonds</h1>
+  <p class="lead">Une fois l'association créée, chaque activité se configure séparément. La page <strong>Configuration</strong> regroupe les tontines, prêts, épargnes, cotisations, solidarités, activités nature, investissements, achats et collations, avec un formulaire adapté à chaque famille.</p>
+
+  <h2>21.1 Accéder à la configuration</h2>
+  <p>Deux chemins mènent à la même page :</p>
+  <ul>
+    <li>depuis la fiche de l'association, bouton <strong>Configurer</strong> ;</li>
+    <li>depuis le menu latéral, section <strong>Association → Configuration</strong>, une fois l'association sélectionnée.</li>
+  </ul>
+  <p>L'accès est réservé aux membres du bureau habilités et à l'administrateur principal. Les autres membres peuvent consulter les activités, mais pas modifier leurs paramètres.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/59_activity_config.jpg" alt="Page de configuration des activités">
+    <figcaption><b>Figure 21.1</b> — Configuration de l'association : dimensions ARP, conditions actives, familles d'activités et bouton de création.</figcaption>
+  </figure>
+
+  <h2>21.2 Les familles d'activités</h2>
+  <table>
+    <thead><tr><th>Famille</th><th>Activités concernées</th><th>Paramètres spécifiques</th></tr></thead>
+    <tbody>
+      <tr><td>Tontines</td><td>Tontine rotative, ASCA, enchères</td><td>Cotisation, parts, droit bénéficiaire, fractions, cycle, mise à prix</td></tr>
+      <tr><td>Prêts</td><td>Caisse de prêts</td><td>Taux court/long, plafond, ratio fonds, validation, prêts actifs</td></tr>
+      <tr><td>Épargne</td><td>Épargne / investissement</td><td>Cotisation, fréquence, mode de paiement</td></tr>
+      <tr><td>Cotisations</td><td>Règles transversales</td><td>Assiette, droit d'entrée, admission, plafond familial, nature</td></tr>
+      <tr><td>Solidarité</td><td>Caisse de solidarité</td><td>Contribution, plafonds, événements, validation</td></tr>
+      <tr><td>Nature</td><td>Cotisation en produits</td><td>Unité, valorisation, liquidité, catalogue</td></tr>
+      <tr><td>Investissement</td><td>Investissement collectif</td><td>Capital, revenus, dividendes</td></tr>
+      <tr><td>Achats &amp; collectes</td><td>Achats groupés, collecte ponctuelle</td><td>Quantités, coûts, répartition, montant de collecte</td></tr>
+      <tr><td>Réunions &amp; collation</td><td>Paramètres transversaux</td><td>Fréquence, quorum, contribution, forfait hôte</td></tr>
+    </tbody>
+  </table>
+
+  <h2>21.3 Le formulaire d'une activité</h2>
+  <p>Le formulaire s'adapte au type sélectionné. Il conserve une identité, un statut (active, en pause, clôturée), une participation (obligatoire, optionnelle, conditionnelle), une unité de cotisation et une fréquence. Les blocs suivants n'apparaissent que lorsqu'ils sont pertinents :</p>
+  <ul>
+    <li><strong>Tontine</strong> : montant par part, droit bénéficiaire, fraction minimale, plafonds, mode de cycle, enchères ;</li>
+    <li><strong>Prêt</strong> : taux mois 1–3, taux au-delà, plafond par membre, ratio fonds, validation, nombre de prêts actifs ;</li>
+    <li><strong>Collecte</strong> : montant de la collecte ;</li>
+    <li><strong>Toutes</strong> : pénalités de retard, modes de paiement, aperçu des douze prochaines sessions.</li>
+  </ul>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/60_activity_form.jpg" alt="Formulaire de configuration d'une tontine">
+    <figcaption><b>Figure 21.2</b> — Formulaire d'activité : identité, statut, participation, cotisation, cycle, parts bénéficiaires et fréquence.</figcaption>
+  </figure>
+  <div class="callout info"><span class="tag">Astuce</span><p>Un changement de fréquence ne réécrit pas les sessions passées : les nouvelles échéances s'appliquent aux prochaines sessions. Pour une activité déjà en cours, vérifiez le cycle et les droits restants avant de modifier une cotisation.</p></div>
+
+  <h2>21.4 Règles de cotisation et d'adhésion</h2>
+  <p>L'onglet <strong>Cotisations</strong> ne crée pas une activité : il règle les paramètres transversaux qui alimentent les appels. On y trouve l'assiette (fixe, parts, nature), le droit d'entrée, l'âge minimum, le mode d'admission, les parrains, le délai d'attente, l'unité de plafond familial et la définition du ménage.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/61_activity_cotisations.jpg" alt="Règles de cotisation">
+    <figcaption><b>Figure 21.3</b> — Règles de cotisation et d'adhésion : assiette, droit d'entrée, admission, plafond familial et valorisation en nature.</figcaption>
+  </figure>
+  <p>Lorsque l'assiette est « Nature », les champs C01 apparaissent : méthode de valorisation et règle de liquidité. Une cotisation en nature ne devient pas automatiquement de la trésorerie ; elle doit être vendue ou financée avant distribution.</p>
+
+  <h2>21.5 Réunions et collation</h2>
+  <p>L'onglet <strong>Réunions &amp; collation</strong> règle la fréquence, le jour, l'heure, le quorum, la contribution par membre et le forfait reversé à l'hôte. Ces paramètres sont distincts des sessions financières : une réunion peut couvrir plusieurs activités, et une activité peut fonctionner sans réunion physique.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/62_activity_reunions.jpg" alt="Paramètres des réunions et de la collation">
+    <figcaption><b>Figure 21.4</b> — Réunions et collation : fréquence, quorum, contribution et forfait hôte, sans confusion avec les cotisations d'activité.</figcaption>
+  </figure>
+
+  <h2>21.6 Fonds et réservations</h2>
+  <p>La page ARP contient l'onglet <strong>Fonds &amp; réservations</strong>. Il permet de créer plusieurs fonds (libre, affecté, réserve, dépôt remboursable), d'enregistrer des entrées et sorties, et de réserver un montant pour une aide, une attribution ou une garantie.</p>
+  <table>
+    <thead><tr><th>Notion</th><th>Définition</th><th>Impact sur le disponible</th></tr></thead>
+    <tbody>
+      <tr><td>Solde</td><td>Entrées confirmées moins sorties confirmées</td><td>Mesure comptable</td></tr>
+      <tr><td>Réservation active</td><td>Engagement sur un montant, avec motif et expiration</td><td>Diminue le disponible sans modifier le solde</td></tr>
+      <tr><td>Réservation libérée</td><td>Engagement annulé</td><td>Rend le montant au disponible</td></tr>
+      <tr><td>Réservation consommée</td><td>Engagement transformé en décaissement</td><td>Crée une sortie liée ; le disponible reste cohérent</td></tr>
+    </tbody>
+  </table>
+  <div class="callout dark"><span class="tag">Règle</span><p>Une sortie ne peut jamais dépasser le disponible après réservations. Le contrôle est effectué sous verrou concurrent : deux trésoriers ne peuvent pas consommer deux fois le même montant.</p></div>
+
+  <h2>21.7 Versions, audit et contrôle</h2>
+  <p>Chaque enregistrement du cadre ARP crée un brouillon. La publication transforme ce brouillon en version active et immuable, avec une empreinte SHA-256. Les versions sont consultables dans l'onglet <strong>Versions</strong> ; les opérations anciennes conservent la règle qui était applicable à leur date.</p>
+  <ul>
+    <li>Les modifications d'activité sont journalisées avec l'auteur et la date.</li>
+    <li>Les paramètres financiers ne sont jamais corrigés par une suppression : une opération liée conserve la trace.</li>
+    <li>Une désactivation de module ferme les nouvelles souscriptions mais laisse les remboursements et liquidations se poursuivre.</li>
+    <li>Le bureau peut revenir à une version antérieure en publiant une nouvelle version, jamais en écrasant l'historique.</li>
+  </ul>
+
+  <h2>21.8 Checklist de configuration</h2>
+  <ul class="checklist">
+    <li>Le nom, le type et le pays sont renseignés.</li>
+    <li>La devise fonctionnelle est correcte et le fuseau correspond au siège.</li>
+    <li>Les dimensions ARP correspondent aux activités réellement ouvertes.</li>
+    <li>Les conditions C01–C06 sont complètes ou explicitement acceptées comme à compléter.</li>
+    <li>Chaque activité a un statut, une participation et une fréquence cohérentes.</li>
+    <li>Les plafonds, taux et pénalités sont relus par le trésorier.</li>
+    <li>Le règlement intérieur est à jour et les membres peuvent l'approuver.</li>
+    <li>Les fonds et réservations sont créés avant les premiers décaissements.</li>
+  </ul>
+</section>
+
+<section class="chapter">
   <div class="chapter-kicker">Annexes</div>
   <h1 class="chapter" id="annexes" data-short="Annexes">Glossaire, API et checklist</h1>
   <p class="lead">Les références utiles au quotidien : vocabulaire, endpoints, checklist de paramétrage et index des figures.</p>
 
-  <h2 id="annexes-a-glossaire">A. Glossaire</h2>
+  <h2>A. Glossaire</h2>
   <table>
     <thead><tr><th>Terme</th><th>Définition</th></tr></thead>
     <tbody>
       <tr><td>Activité</td><td>Contrat collectif géré par l'association : tontine, épargne, prêt, solidarité, collation.</td></tr>
+      <tr><td>ARP</td><td>Association Resource Planning : cadre versionné qui décrit les dimensions, règles, modules et conditions d'une association.</td></tr>
+      <tr><td>Cadre ARP</td><td>Profil de configuration d'une association, avec brouillon, version publiée et contrôles de compatibilité.</td></tr>
+      <tr><td>Condition C01–C06</td><td>Exigence de compatibilité qui bloque la publication tant que les paramètres requis ne sont pas renseignés.</td></tr>
       <tr><td>Adhésion</td><td>Lien entre un utilisateur et une association, avec rôle, statut et date d'entrée.</td></tr>
       <tr><td>Bénéficiaire</td><td>Membre désigné pour recevoir une ou plusieurs parts lors d'une session.</td></tr>
       <tr><td>Bureau</td><td>Organe exécutif de l'association : président, secrétaire, trésorier, etc.</td></tr>
@@ -1610,21 +1935,24 @@ footer.manual a{color:#f4d58d}
       <tr><td>Cycle</td><td>Période complète d'une activité, de l'ouverture à la clôture.</td></tr>
       <tr><td>Dividende</td><td>Part des bénéfices ou intérêts répartie entre les membres.</td></tr>
       <tr><td>Fraction</td><td>Part de part : 1, 1/2 ou 1/4.</td></tr>
+      <tr><td>Fonds</td><td>Enveloppe affectée à un usage (libre, affecté, réserve, dépôt remboursable) ; distincte du compte qui la conserve.</td></tr>
       <tr><td>Membership</td><td>Enregistrement de l'appartenance d'un utilisateur à une association.</td></tr>
       <tr><td>Part</td><td>Unité de participation à une tontine.</td></tr>
       <tr><td>Pot</td><td>Somme disponible pour une session après cotisations et reports.</td></tr>
       <tr><td>Quorum</td><td>Nombre minimal de présents pour délibérer valablement.</td></tr>
+      <tr><td>Réservation</td><td>Engagement sur un montant qui diminue le disponible d'un fonds sans modifier son solde.</td></tr>
       <tr><td>Session</td><td>Rencontre datée d'une activité.</td></tr>
       <tr><td>Souscription</td><td>Engagement d'un membre sur un nombre de parts.</td></tr>
       <tr><td>Solidarité</td><td>Fonds et aides non remboursables destinés aux membres.</td></tr>
       <tr><td>Tontine ASCA</td><td>Tontine d'épargne et de crédit internes.</td></tr>
       <tr><td>Tontine rotative</td><td>Tontine où chacun reçoit le pot à tour de rôle.</td></tr>
       <tr><td>Template</td><td>Modèle réutilisable d'association avec activités et règlement.</td></tr>
+      <tr><td>Unité mineure</td><td>Plus petite unité monétaire entière (XAF, centime EUR) utilisée pour tous les calculs financiers.</td></tr>
       <tr><td>Wallet</td><td>Portefeuille interne de la plateforme pour les flux financiers.</td></tr>
     </tbody>
   </table>
 
-  <h2 id="annexes-b-endpoints-principaux">B. Endpoints principaux</h2>
+  <h2>B. Endpoints principaux</h2>
   <table>
     <thead><tr><th>Méthode</th><th>Endpoint</th><th>Rôle</th></tr></thead>
     <tbody>
@@ -1633,6 +1961,14 @@ footer.manual a{color:#f4d58d}
       <tr><td>GET</td><td>/api/associations/{id}</td><td>Détail, membres, activités, documents</td></tr>
       <tr><td>PATCH</td><td>/api/associations/{id}</td><td>Modifier les paramètres</td></tr>
       <tr><td>GET</td><td>/api/associations/{id}/history</td><td>Historique paginé, filtres, regroupements</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/arp</td><td>Profil ARP, brouillon, versions, contrôles</td></tr>
+      <tr><td>PUT</td><td>/api/associations/{id}/arp</td><td>Enregistrer le brouillon ou publier une version</td></tr>
+      <tr><td>GET</td><td>/api/associations/{id}/arp/funds</td><td>Fonds, soldes, réservations et mouvements</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/arp/funds/{fundId}/movements</td><td>Entrée ou sortie de fonds</td></tr>
+      <tr><td>POST</td><td>/api/associations/{id}/arp/funds/{fundId}/reservations</td><td>Réserver, libérer ou consommer un montant</td></tr>
+      <tr><td>GET</td><td>/api/admin/arp</td><td>Couverture ARP de toutes les associations</td></tr>
+      <tr><td>POST</td><td>/api/admin/arp/backfill</td><td>Initialiser les profils manquants</td></tr>
+      <tr><td>GET</td><td>/api/arp/referential</td><td>36 domaines, 144 invariants, conditions</td></tr>
       <tr><td>GET</td><td>/api/associations/{id}/interests</td><td>Intérêts par membre, remboursement, période</td></tr>
       <tr><td>GET</td><td>/api/associations/{id}/activities/{actId}/cycle</td><td>Synthèse du cycle de tontine</td></tr>
       <tr><td>POST</td><td>/api/associations/{id}/activities</td><td>Créer une activité</td></tr>
@@ -1646,7 +1982,7 @@ footer.manual a{color:#f4d58d}
   </table>
   <p class="table-cap">Tableau B.1 — Endpoints principaux. Tous vérifient la session et l'appartenance à l'association.</p>
 
-  <h2 id="annexes-c-checklist-de-param-trage">C. Checklist de paramétrage</h2>
+  <h2>C. Checklist de paramétrage</h2>
   <table>
     <thead><tr><th>Étape</th><th>À vérifier</th><th>Fait</th></tr></thead>
     <tbody>
@@ -1665,7 +2001,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="annexes-d-index-des-figures">D. Index des figures</h2>
+  <h2>D. Index des figures</h2>
   <table>
     <thead><tr><th>Figure</th><th>Titre</th><th>Chapitre</th></tr></thead>
     <tbody>
@@ -1693,7 +2029,7 @@ footer.manual a{color:#f4d58d}
     </tbody>
   </table>
 
-  <h2 id="annexes-e-r-f-rences">E. Références</h2>
+  <h2>E. Références</h2>
   <ul>
     <li>Statuts FEV révisés 2018 ; règlement intérieur du Comité directeur 2013 ; recueil des textes 2023.</li>
     <li>Règlement intérieur SLD 2024.</li>
@@ -1706,12 +2042,12 @@ footer.manual a{color:#f4d58d}
     </article>
   </div>
 </main>
-<footer class="manual">Tchoua — La solidarité digitalisée · <a href="/">tchoua.com</a> · <a href="/documentation">Documentation</a> · <a href="../Tchoua_Documentation_Complete_2026_Anonymisee.pdf">PDF</a></footer>
+<footer class="manual">Tchoua — La solidarité digitalisée · <a href="/">tchoua.com</a> · <a href="/documentation">Documentation</a> · <a href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf">PDF</a></footer>
 <script>
 const bar=document.getElementById('progress');
 addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;bar.style.width=p+'%';},{passive:true});
 const links=[...document.querySelectorAll('.sidebar a[href^="#"]')];
-const heads=[...document.querySelectorAll('.content h1[id], .content h2[id]')];
+const heads=[...document.querySelectorAll('.content h1[id]')];
 function syncToc(){let cur=heads[0];for(const h of heads){if(h.getBoundingClientRect().top<=150)cur=h;else break;}if(cur){const id='#'+cur.id;links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===id));}}
 addEventListener('scroll',syncToc,{passive:true});syncToc();
 document.getElementById('print')?.addEventListener('click',()=>window.print());

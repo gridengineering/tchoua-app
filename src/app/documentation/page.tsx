@@ -9,10 +9,30 @@ import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 const PDF = "/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf";
 const HTML_MANUAL = "/docs/manuel/index.html";
+const PDFS: Record<string, string> = {
+  fr: PDF,
+  en: "/docs/Tchoua_Documentation_Complete_2026_Anonymisee_EN.pdf",
+  es: "/docs/Tchoua_Documentation_Complete_2026_Anonymisee_ES.pdf",
+  de: "/docs/Tchoua_Documentation_Complete_2026_Anonymisee_DE.pdf",
+};
+const MANUALS: Record<string, string> = {
+  fr: "/docs/manuel/index.html",
+  en: "/docs/manuel/en/index.html",
+  es: "/docs/manuel/es/index.html",
+  de: "/docs/manuel/de/index.html",
+};
+const MANUAL_LANGS = [
+  { code: "fr", label: "FR" },
+  { code: "en", label: "EN" },
+  { code: "es", label: "ES" },
+  { code: "de", label: "DE" },
+];
 
 export default function DocumentationPage() {
   const { lang, setLang, availableLangs } = useI18n();
   const d = DOCS_COPY[publicLang(lang)];
+  const manual = MANUALS[publicLang(lang)] ?? HTML_MANUAL;
+  const pdf = PDFS[publicLang(lang)] ?? PDF;
   const docLangs = availableLangs.filter((l) => ["fr", "en", "es", "de"].includes(l.code));
 
   return (
@@ -41,15 +61,27 @@ export default function DocumentationPage() {
                 ))}
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <a href={HTML_MANUAL}
+                <a href={manual}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#e68a00] px-6 py-4 text-xs font-black uppercase tracking-widest text-[#0d3d28] shadow-xl shadow-[#e68a00]/20 transition-all hover:bg-[#ff9d0a]">
                   <BookOpen className="h-4 w-4" /> {d.readOnline}
                 </a>
-                <a href={PDF} target="_blank" rel="noopener noreferrer"
+                <a href={pdf} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-medium text-white transition-all"
                   style={{ border: "1px solid rgba(255,255,255,0.25)" }}>
                   <Download className="h-4 w-4" /> {d.download}
                 </a>
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/60">
+                <span>Manuel</span>
+                {MANUAL_LANGS.map((l) => (
+                  <a key={l.code} href={MANUALS[l.code]} hrefLang={l.code}
+                    className="rounded-lg border px-2.5 py-1 transition-colors"
+                    style={publicLang(lang) === l.code
+                      ? { background: "#e68a00", borderColor: "#e68a00", color: "#0d3d28" }
+                      : { borderColor: "rgba(255,255,255,0.25)", color: "#e8f0ea" }}>
+                    {l.label}
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -65,7 +97,7 @@ export default function DocumentationPage() {
               </div>
               <div className="rounded-2xl bg-[#f7f3eb] p-5 text-[#0d3d28]">
                 <div className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a97b18]">{d.contents}</div>
-                <div className="mt-2 text-2xl font-black leading-tight">18 {d.chaptersWord}<br />+ {d.annexWord}</div>
+                <div className="mt-2 text-2xl font-black leading-tight">21 {d.chaptersWord}<br />+ {d.annexWord}</div>
                 <div className="mt-4 space-y-2">
                   {d.parts.map((p) => (
                     <div key={p.title} className="flex items-center justify-between border-b border-[#ddd5c4] pb-2 text-xs">
@@ -108,7 +140,7 @@ export default function DocumentationPage() {
               <div className="mb-2 text-xs font-black uppercase tracking-[0.25em] text-[#a97b18]">Documentation</div>
               <h2 className="text-3xl font-bold" style={{ color: "#0d3d28" }}>{d.contents}</h2>
             </div>
-            <a href={PDF} target="_blank" rel="noopener noreferrer"
+            <a href={pdf} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border-2 px-5 py-2.5 text-sm font-bold"
               style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
               <Download className="h-4 w-4" /> {d.download}
@@ -123,7 +155,7 @@ export default function DocumentationPage() {
                 </div>
                 <div className="divide-y divide-[#f1ebdf]">
                   {part.chapters.map((ch) => (
-                    <a key={ch.n} href={`${HTML_MANUAL}#${ch.n === "A" ? "annexes" : "ch" + ch.n.padStart(2, "0")}`}
+                    <a key={ch.n} href={`${manual}#${ch.n === "A" ? "annexes" : "ch" + ch.n.padStart(2, "0")}`}
                       className="flex items-start gap-4 px-5 py-3 transition-colors hover:bg-[#fdfaf2]">
                       <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-black"
                         style={{ background: "#0d3d28", color: "#f4d58d" }}>{ch.n}</span>
@@ -174,9 +206,9 @@ export default function DocumentationPage() {
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mb-3 text-3xl font-bold" style={{ color: "#0d3d28" }}>{d.ctaDesc}</h2>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <a href={HTML_MANUAL} className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-semibold text-white"
+            <a href={manual} className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-semibold text-white"
               style={{ background: "#0d3d28" }}>{d.readOnline} <ArrowRight className="h-4 w-4" /></a>
-            <a href={PDF} target="_blank" rel="noopener noreferrer"
+            <a href={pdf} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl border px-7 py-3.5 font-semibold"
               style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
               <Download className="h-4 w-4" /> {d.download}
