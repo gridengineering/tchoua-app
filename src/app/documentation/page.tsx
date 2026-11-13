@@ -8,7 +8,7 @@ import { publicLang } from "@/lib/i18n/public-copy";
 import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 const PDF = "/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf";
-const HTML_MANUAL = "/docs/manuel/";
+const HTML_MANUAL = "/docs/manuel/index.html";
 
 export default function DocumentationPage() {
   const { lang, setLang, availableLangs } = useI18n();

@@ -311,7 +311,7 @@ export default function HomePage() {
               <p className="max-w-2xl text-gray-500">{docs.home.desc}</p>
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
-              <Link href="/docs/manuel/" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white" style={{ background: "#0d3d28" }}>
+              <Link href="/docs/manuel/index.html" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white" style={{ background: "#0d3d28" }}>
                 <BookOpen className="h-4 w-4" /> {docs.readOnline}
               </Link>
               <a href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf" target="_blank" rel="noopener noreferrer"
