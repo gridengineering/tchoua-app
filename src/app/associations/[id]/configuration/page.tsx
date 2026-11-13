@@ -234,7 +234,7 @@ export default function AssociationConfigurationPage() {
           <IssueList issues={arpChecks.errors} tone="error" title="Cadre ARP : contrôles à compléter" />
         ) : null}
 
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
+        <div className="flex flex-wrap gap-1 rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
           {CATEGORIES.map((item) => {
             const count = item.types ? activities.filter((activity) => item.types?.includes(activity.type)).length : 0;
             return (
@@ -263,8 +263,11 @@ export default function AssociationConfigurationPage() {
             associationId={id}
             association={association}
             arp={arp}
-            onSaved={(next) => {
+            onSaved={(next, membership) => {
               setArp(next);
+              setAssociation((current) =>
+                current ? { ...current, membershipConfig: JSON.stringify(membership) } : current
+              );
               setNotice("Règles de cotisation enregistrées. Elles s'appliquent aux prochains appels.");
             }}
           />
@@ -274,7 +277,12 @@ export default function AssociationConfigurationPage() {
           <MeetingRulesPanel
             associationId={id}
             association={association}
-            onSaved={() => setNotice("Paramètres de réunion et de collation enregistrés.")}
+            onSaved={(meeting) => {
+              setAssociation((current) =>
+                current ? { ...current, meetingConfig: JSON.stringify(meeting) } : current
+              );
+              setNotice("Paramètres de réunion et de collation enregistrés.");
+            }}
           />
         ) : null}
 
@@ -397,7 +405,7 @@ function ContributionRulesPanel({
   associationId: string;
   association: AssociationInfo;
   arp: ArpConfig;
-  onSaved: (arp: ArpConfig) => void;
+  onSaved: (arp: ArpConfig, membership: unknown) => void;
 }) {
   const [membership, setMembership] = useState(() =>
     parseJson(association.membershipConfig, {
@@ -448,7 +456,7 @@ function ContributionRulesPanel({
       });
       const arpData = await arpResponse.json().catch(() => ({}));
       if (!arpResponse.ok) throw new Error(arpData.error ?? "Cadre ARP refusé");
-      onSaved(arpData.config ?? draft);
+      onSaved(arpData.config ?? draft, membership);
       setMessage("Règles de cotisation enregistrées.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
@@ -553,7 +561,7 @@ function MeetingRulesPanel({
 }: {
   associationId: string;
   association: AssociationInfo;
-  onSaved: () => void;
+  onSaved: (meeting: unknown) => void;
 }) {
   const [meeting, setMeeting] = useState(() =>
     parseJson(association.meetingConfig, {
@@ -582,7 +590,7 @@ function MeetingRulesPanel({
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error ?? "Enregistrement impossible");
       setMessage("Paramètres enregistrés.");
-      onSaved();
+      onSaved(meeting);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
     } finally {

@@ -358,7 +358,7 @@ export default function ArpPage() {
           </div>
         </div>
 
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
+        <div className="flex flex-wrap gap-1 rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
           {tabs.map(({ key, label, icon: Icon }) => (
             <button
               key={key}

@@ -669,7 +669,7 @@ export function AssociationFormWorkspace({
           </div>
         ) : null}
 
-        <div className="mb-4 flex gap-1 overflow-x-auto rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
+        <div className="mb-4 flex flex-wrap gap-1 rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-1">
           {tabs.map(({ key, label, icon: Icon, badge }) => (
             <button
               key={key}
