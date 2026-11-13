@@ -2049,7 +2049,10 @@ addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scroll
 const links=[...document.querySelectorAll('.sidebar a[href^="#"]')];
 const heads=[...document.querySelectorAll('.content h1[id]')];
 function syncToc(){let cur=heads[0];for(const h of heads){if(h.getBoundingClientRect().top<=150)cur=h;else break;}if(cur){const id='#'+cur.id;links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===id));}}
-addEventListener('scroll',syncToc,{passive:true});syncToc();
+addEventListener('scroll',syncToc,{passive:true});
+addEventListener('hashchange',()=>setTimeout(syncToc,100));
+setTimeout(syncToc,800);
+syncToc();
 document.getElementById('print')?.addEventListener('click',()=>window.print());
 </script>
 </body></html>
