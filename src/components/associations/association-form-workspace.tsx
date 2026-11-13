@@ -603,15 +603,20 @@ export function AssociationFormWorkspace({
       const coreData = await coreResponse.json().catch(() => ({}));
       if (!coreResponse.ok) throw new Error(coreData.error ?? "Enregistrement impossible");
 
-      const arpResponse = await fetch(`/api/associations/${associationId}/arp`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config: arp, publish: false }),
-      });
-      const arpData = await arpResponse.json().catch(() => ({}));
-      if (!arpResponse.ok) throw new Error(arpData.error ?? "Le cadre ARP n'a pas pu être enregistré");
-
-      router.push(`/associations/${associationId}`);
+      const arpChanged = JSON.stringify(arp) !== JSON.stringify(initial?.arpConfig ?? null);
+      if (arpChanged) {
+        const arpResponse = await fetch(`/api/associations/${associationId}/arp`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ config: arp, publish: false }),
+        });
+        const arpData = await arpResponse.json().catch(() => ({}));
+        if (!arpResponse.ok) throw new Error(arpData.error ?? "Le cadre ARP n'a pas pu être enregistré");
+        // Le cadre est enregistré en brouillon : la page ARP permet de le publier.
+        router.push(`/associations/${associationId}/arp`);
+      } else {
+        router.push(`/associations/${associationId}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inattendue");
       setSaving(false);
