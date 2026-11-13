@@ -12,7 +12,7 @@ import {
 } from "@/components/associations/association-form-workspace";
 import type { ArpConfig } from "@/lib/arp/types";
 
-const EDIT_ROLES = ["FOUNDER", "PRESIDENT", "VICE_PRESIDENT"];
+const EDIT_ROLES = ["FOUNDER", "PRESIDENT", "VICE_PRESIDENT", "SECRETARY"];
 
 type AssociationPayload = {
   association: {
@@ -115,7 +115,7 @@ export default function EditAssociationPage() {
           <AlertTriangle className="mb-2 h-6 w-6 text-[#b45309]" />
           <p className="font-semibold text-[#92400e]">Modification réservée au bureau</p>
           <p className="mt-1 text-sm text-[#7a7368]">
-            Seuls le président, le fondateur, le vice-président ou l&apos;administrateur principal
+            Le président, le fondateur, le vice-président, le secrétaire ou l&apos;administrateur principal
             peuvent modifier l&apos;association. Votre rôle : {myRole ?? "aucun"}.
           </p>
           <Link href={`/associations/${id}`} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#0d3d28]">
