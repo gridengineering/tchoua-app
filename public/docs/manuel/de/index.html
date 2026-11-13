@@ -101,6 +101,14 @@ footer.manual a{color:#f4d58d}
 .langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
 .langs a.active{background:#e68a00;color:#0d3d28}
 @media(max-width:720px){.langs{display:none}}
+
+.langs{display:flex;gap:4px;align-items:center;margin-left:4px}
+.langs a{font-size:11px;font-weight:800;color:#cfe0d6;padding:5px 7px;border-radius:6px}
+.langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
+.langs a.active{background:#e68a00;color:#0d3d28}
+@media(max-width:720px){.langs{display:none}}
+.langs-mobile{display:none}
+@media(max-width:720px){.langs-mobile{display:flex;justify-content:center;background:#0d3d28;padding:0 12px 8px}.langs-mobile .langs{display:flex!important;margin:0}.langs-mobile .langs a{color:#e8f0ea}}
 </style>
 </head>
 <body>
@@ -112,6 +120,7 @@ footer.manual a{color:#f4d58d}
   <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_DE.pdf">PDF herunterladen</a>
   <div class="langs"><a class="" href="/docs/manuel/index.html" hreflang="fr">FR</a><a class="" href="/docs/manuel/en/index.html" hreflang="en">EN</a><a class="" href="/docs/manuel/es/index.html" hreflang="es">ES</a><a class="active" href="/docs/manuel/de/index.html" hreflang="de">DE</a></div>
 </div></header>
+<div class="langs-mobile"><div class="langs"><a class="" href="/docs/manuel/index.html" hreflang="fr">FR</a><a class="" href="/docs/manuel/en/index.html" hreflang="en">EN</a><a class="" href="/docs/manuel/es/index.html" hreflang="es">ES</a><a class="active" href="/docs/manuel/de/index.html" hreflang="de">DE</a></div></div>
 <section class="hero"><div class="hero-in">
   <div>
     <div class="kicker">Offizielle Dokumentation · Ausgabe 2026</div>
