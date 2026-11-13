@@ -15,7 +15,6 @@ const NAV: { key: string; href: string }[] = [
   { key: "how_it_works", href: "/#steps" },
   { key: "tarifs", href: "/#pricing" },
   { key: "documentation", href: "/documentation" },
-  { key: "about", href: "/about" },
 ];
 
 export function PublicHeader() {
