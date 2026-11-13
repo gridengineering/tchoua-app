@@ -100,12 +100,12 @@ export function PublicHeader() {
         <nav ref={menuRef} className="hidden items-center gap-1 lg:flex">
           {NAV.map((item) => (
             <Link key={item.key} href={item.href}
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-[#0d3d28]/5 hover:text-[#0d3d28]">
+              className="whitespace-nowrap rounded-lg px-2.5 py-2 text-[13px] font-semibold text-gray-600 transition-colors hover:bg-[#0d3d28]/5 hover:text-[#0d3d28]">
               {label(item.key)}
             </Link>
           ))}
           <a href="mailto:contact@tchoua.com"
-            className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-[#0d3d28]/5 hover:text-[#0d3d28]">
+            className="whitespace-nowrap rounded-lg px-2.5 py-2 text-[13px] font-semibold text-gray-600 transition-colors hover:bg-[#0d3d28]/5 hover:text-[#0d3d28]">
             {c.footer.contact}
           </a>
         </nav>
