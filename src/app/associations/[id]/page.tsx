@@ -38,6 +38,7 @@ type AssocDetail = {
   sanctionsConfig?: string;
   memberships?: AssocMember[];
   activities?: AssocActivity[];
+  parent?: { id: string; name: string } | null;
 };
 
 type AssocActivity = {
@@ -692,6 +693,11 @@ export default function AssociationDetailPage() {
                 </div>
                 {assoc.description && (
                   <p className="text-sm text-gray-600 mt-2 line-clamp-2">{assoc.description}</p>
+                )}
+                {assoc.parent && (
+                  <a href={`/associations/${assoc.parent.id}`} className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-forest hover:underline">
+                    <Building2 className="w-3 h-3" /> Section de {assoc.parent.name}
+                  </a>
                 )}
               </div>
 

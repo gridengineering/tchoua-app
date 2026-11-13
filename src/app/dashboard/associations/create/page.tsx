@@ -286,6 +286,11 @@ export default function WizardCreationAssociation() {
                     <option value="INVESTMENT">Club d&apos;investissement</option>
                     <option value="MUTUAL">Mutuelle</option>
                     <option value="AGRICULTURAL">Coopérative agricole</option>
+                    <option value="AMICALE">Amicale d&apos;élites / association de ressortissants</option>
+                    <option value="SECTION">Section / démembrement d&apos;une association mère</option>
+                    <option value="FEDERATION">Fédération / union d&apos;associations</option>
+                    <option value="CULTURAL">Association culturelle</option>
+                    <option value="PROFESSIONAL">Association professionnelle</option>
                     <option value="OTHER">Autre</option>
                   </select>
                 </div>

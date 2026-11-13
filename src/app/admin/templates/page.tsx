@@ -21,7 +21,7 @@ type Template = {
   createdAt: string;
 };
 
-const CATEGORIES = ["TONTINE", "FAMILLE", "COMMERCE", "VILLAGE", "PROJET", "RELIGIEUX", "EPARGNE"];
+const CATEGORIES = ["TONTINE", "FAMILLE", "COMMERCE", "VILLAGE", "PROJET", "RELIGIEUX", "EPARGNE", "AMICALE", "SECTION", "FEDERATION", "CULTUREL", "PROFESSIONNEL"];
 
 const emptyForm = {
   name: "",

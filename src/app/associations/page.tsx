@@ -15,7 +15,7 @@ import {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type AssocType = "TONTINE_CLUB" | "COOPERATIVE" | "SOLIDARITY" | "INVESTMENT" | "AGRICULTURAL" | "MUTUAL" | "OTHER";
+type AssocType = "TONTINE_CLUB" | "COOPERATIVE" | "SOLIDARITY" | "INVESTMENT" | "AGRICULTURAL" | "MUTUAL" | "AMICALE" | "SECTION" | "FEDERATION" | "CULTURAL" | "PROFESSIONAL" | "OTHER";
 type ActivityType = "TONTINE_ROTATIVE" | "TONTINE_ASCA" | "TONTINE_ENCHERES" | "EPARGNE" | "AIDE_SOLIDAIRE" | "PRET" | "NATURE" | "INVESTISSEMENT" | "ACHATS_GROUPES" | "COLLECTION";
 type Participation = "MANDATORY" | "OPTIONAL" | "CONDITIONAL";
 type ApprovalProcess = "UNANIMOUS" | "MAJORITY" | "AUTO";
@@ -108,12 +108,18 @@ const ASSOC_TYPES: { value: AssocType; label: string; icon: React.ReactNode }[] 
   { value: "INVESTMENT", label: "Fonds d'Investissement", icon: <TrendingUp className="w-4 h-4" /> },
   { value: "AGRICULTURAL", label: "Groupement Agricole", icon: <Wheat className="w-4 h-4" /> },
   { value: "MUTUAL", label: "Mutuelle", icon: <Shield className="w-4 h-4" /> },
+  { value: "AMICALE", label: "Amicale d'élites", icon: <span>🌍</span> },
+  { value: "SECTION", label: "Section / démembrement", icon: <span>🏘️</span> },
+  { value: "FEDERATION", label: "Fédération", icon: <span>🏛️</span> },
+  { value: "CULTURAL", label: "Association culturelle", icon: <span>🎭</span> },
+  { value: "PROFESSIONAL", label: "Association professionnelle", icon: <span>💼</span> },
   { value: "OTHER", label: "Autre", icon: <Globe2 className="w-4 h-4" /> },
 ];
 
 const ASSOC_TYPE_ICON: Record<AssocType, string> = {
   TONTINE_CLUB: "🔄", COOPERATIVE: "🤝", SOLIDARITY: "❤️",
-  INVESTMENT: "📈", AGRICULTURAL: "🌾", MUTUAL: "🏥", OTHER: "🌍",
+  INVESTMENT: "📈", AGRICULTURAL: "🌾", MUTUAL: "🏥",
+  AMICALE: "🌍", SECTION: "🏘️", FEDERATION: "🏛️", CULTURAL: "🎭", PROFESSIONAL: "💼", OTHER: "🌍",
 };
 
 const COLORS = ["#0d3d28", "#e68a00", "#2563eb", "#dc2626", "#7c3aed", "#db2777", "#ea580c", "#16a34a"];
