@@ -6,6 +6,7 @@ import { PublicFooter, PublicHeader } from "@/components/layout/public-layout";
 import { useI18n } from "@/lib/i18n/context";
 import { publicLang } from "@/lib/i18n/public-copy";
 import { DOCS_COPY } from "@/lib/i18n/docs-copy";
+import { STUDY_COPY } from "@/lib/i18n/study-copy";
 
 const PDF = "/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf";
 const HTML_MANUAL = "/docs/manuel/index.html";
@@ -27,12 +28,27 @@ const MANUAL_LANGS = [
   { code: "es", label: "ES" },
   { code: "de", label: "DE" },
 ];
+const STUDY_HTML: Record<string, string> = {
+  fr: "/docs/etude-arp/index.html",
+  en: "/docs/etude-arp/en/index.html",
+  es: "/docs/etude-arp/es/index.html",
+  de: "/docs/etude-arp/de/index.html",
+};
+const STUDY_PDF: Record<string, string> = {
+  fr: "/docs/Tchoua_Etude_Complete_ARP_2026.pdf",
+  en: "/docs/Tchoua_Etude_Complete_ARP_2026_EN.pdf",
+  es: "/docs/Tchoua_Etude_Complete_ARP_2026_ES.pdf",
+  de: "/docs/Tchoua_Etude_Complete_ARP_2026_DE.pdf",
+};
 
 export default function DocumentationPage() {
   const { lang, setLang, availableLangs } = useI18n();
   const d = DOCS_COPY[publicLang(lang)];
+  const s = STUDY_COPY[publicLang(lang)] ?? STUDY_COPY.fr;
   const manual = MANUALS[publicLang(lang)] ?? HTML_MANUAL;
   const pdf = PDFS[publicLang(lang)] ?? PDF;
+  const studyHtml = STUDY_HTML[publicLang(lang)] ?? STUDY_HTML.fr;
+  const studyPdf = STUDY_PDF[publicLang(lang)] ?? STUDY_PDF.fr;
   const docLangs = availableLangs.filter((l) => ["fr", "en", "es", "de"].includes(l.code));
 
   return (
@@ -115,6 +131,28 @@ export default function DocumentationPage() {
         </div>
       </section>
 
+      <section className="border-b border-[#e2ddd4] bg-white px-6 py-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-3 text-[10px] font-black uppercase tracking-[0.25em] text-[#a97b18]">{s.documents}</div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <a href="#manuel" className="group flex items-start gap-4 rounded-2xl border border-[#e2ddd4] bg-[#fdfbf6] p-5 transition-colors hover:border-[#0d3d28]">
+              <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl" style={{ background: "#0d3d28", color: "#f4d58d" }}><BookOpen className="h-5 w-5" /></div>
+              <div>
+                <div className="text-sm font-black" style={{ color: "#0d3d28" }}>{s.manualLabel}</div>
+                <p className="mt-1 text-xs leading-relaxed text-gray-500">{s.manualDesc}</p>
+              </div>
+            </a>
+            <a href="#etude-arp" className="group flex items-start gap-4 rounded-2xl border border-[#e2ddd4] bg-[#fdfbf6] p-5 transition-colors hover:border-[#0d3d28]">
+              <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl" style={{ background: "#e68a00", color: "#0b2f3a" }}><Globe2 className="h-5 w-5" /></div>
+              <div>
+                <div className="text-sm font-black" style={{ color: "#0d3d28" }}>{s.studyLabel}</div>
+                <p className="mt-1 text-xs leading-relaxed text-gray-500">{s.studyDesc}</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-[#e2ddd4] bg-white px-6 py-12">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 text-center">
@@ -133,8 +171,70 @@ export default function DocumentationPage() {
         </div>
       </section>
 
-      <section id="contents" className="px-6 py-16">
+      <section id="etude-arp" className="scroll-mt-24 border-b border-[#e2ddd4] bg-[#0b2f3a] px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+            <div className="max-w-3xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em]" style={{ background: "rgba(230,201,143,0.12)", color: "#f0c56a", border: "1px solid rgba(230,201,143,0.25)" }}>
+                <Globe2 className="h-3.5 w-3.5" /> {s.badge}
+              </div>
+              <h2 className="text-3xl font-black leading-tight md:text-4xl">{s.title}</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/65">{s.desc}</p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[s.pages, s.domains, s.sheets, s.languages].map((x) => (
+                  <span key={x} className="rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: "rgba(255,255,255,0.08)", color: "#e8f0ea", border: "1px solid rgba(255,255,255,0.12)" }}>{x}</span>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <a href={studyHtml} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e68a00] px-6 py-3.5 text-sm font-black text-[#0b2f3a] hover:bg-[#ff9d0a]">
+                <BookOpen className="h-4 w-4" /> {s.readOnline}
+              </a>
+              <a href={studyPdf} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border px-6 py-3.5 text-sm font-bold text-white" style={{ borderColor: "rgba(255,255,255,0.3)" }}>
+                <Download className="h-4 w-4" /> {s.download}
+              </a>
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {s.highlights.map((h) => (
+                <div key={h.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="text-sm font-black text-[#f0c56a]">{h.title}</div>
+                  <p className="mt-1 text-xs leading-relaxed text-white/55">{h.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">ARP · 2026</div>
+              <div className="mt-2 text-5xl font-black leading-none">36</div>
+              <div className="mt-1 text-sm font-bold text-[#f0c56a]">{s.domains}</div>
+              <div className="mt-4 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/55">{s.studyDesc}</div>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-bold text-white/70">
+                <span className="uppercase tracking-widest text-white/35">HTML</span>
+                {MANUAL_LANGS.map((l) => (
+                  <a key={l.code} href={STUDY_HTML[l.code]} hrefLang={l.code}
+                    className="rounded-lg border px-2.5 py-1"
+                    style={publicLang(lang) === l.code
+                      ? { background: "#e68a00", borderColor: "#e68a00", color: "#0b2f3a" }
+                      : { borderColor: "rgba(255,255,255,0.2)", color: "#e8f0ea" }}>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="manuel" className="scroll-mt-24 px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8">
+            <div className="mb-2 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-[#a97b18]">
+              <BookOpen className="h-3.5 w-3.5" /> {s.manualLabel}
+            </div>
+            <p className="max-w-2xl text-sm text-gray-500">{s.manualDesc}</p>
+          </div>
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <div className="mb-2 text-xs font-black uppercase tracking-[0.25em] text-[#a97b18]">Documentation</div>
