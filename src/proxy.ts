@@ -1,6 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { decode, type JWT } from "next-auth/jwt";
+
+function cookieFromHeader(header: string | null, name: string): string | null {
+  if (!header) return null;
+  for (const part of header.split(";")) {
+    const [key, ...rest] = part.trim().split("=");
+    if (key === name) return rest.join("=");
+  }
+  return null;
+}
+
+async function readSessionToken(headers: Headers): Promise<JWT | null> {
+  const secret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET;
+  if (!secret) return null;
+  const cookie = headers.get("cookie");
+  const raw =
+    cookieFromHeader(cookie, "__Secure-next-auth.session-token") ??
+    cookieFromHeader(cookie, "next-auth.session-token");
+  if (!raw) return null;
+  try {
+    return (await decode({ token: raw, secret })) as JWT;
+  } catch {
+    return null;
+  }
+}
 
 function applyCorsHeaders(res: NextResponse, origin: string | null) {
   res.headers.set("Access-Control-Allow-Origin", origin || "*");
@@ -34,11 +58,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (pathname.startsWith("/api/admin")) {
-      const forwardedReq = new Request(request.url, { headers: requestHeaders });
-      const token = await getToken({
-        req: forwardedReq as unknown as NextRequest,
-        secret: process.env.NEXTAUTH_SECRET,
-      });
+      const token = await readSessionToken(requestHeaders);
       if (!token) {
         return applyCorsHeaders(NextResponse.json({ error: "Non autorisé" }, { status: 401 }), origin);
       }
@@ -56,7 +76,7 @@ export async function proxy(request: NextRequest) {
 
   // ─── Routes Admin : Nécessite un systemRoleId valide ─────────────────────
   if (pathname.startsWith("/admin")) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const token = await readSessionToken(request.headers);
 
     // Non authentifié → redirige vers login
     if (!token) {
@@ -81,7 +101,7 @@ export async function proxy(request: NextRequest) {
 
   // ─── API Admin : session + rôle système obligatoires ─────────────────────
   if (pathname.startsWith("/api/admin")) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const token = await readSessionToken(request.headers);
     if (!token) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
@@ -101,7 +121,7 @@ export async function proxy(request: NextRequest) {
   const isProtected = protectedPaths.some(p => pathname.startsWith(p));
   
   if (isProtected) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const token = await readSessionToken(request.headers);
     if (!token) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
