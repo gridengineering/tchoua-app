@@ -73,46 +73,55 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     parentId, parentSubscriptionFee, regulations
   } = body;
 
-  const association = await prisma.association.update({
-    where: { id },
-    data: {
-      ...(name !== undefined && { name }),
-      ...(description !== undefined && { description }),
-      ...(type !== undefined && { type }),
-      ...(isPublic !== undefined && { isPublic }),
-      ...(color !== undefined && { color }),
-      ...(logo !== undefined && { logo }),
-      ...(region !== undefined && { region }),
-      ...(website !== undefined && { website }),
-      ...(email !== undefined && { email }),
-      ...(phone !== undefined && { phone }),
-      ...(reglementHtml !== undefined && { reglementHtml }),
-      ...(reglementUrl !== undefined && { reglementUrl }),
-      ...(bureauConfig !== undefined && { bureauConfig: JSON.stringify(bureauConfig) }),
-      ...(membershipConfig !== undefined && { membershipConfig: JSON.stringify(membershipConfig) }),
-      ...(meetingConfig !== undefined && { meetingConfig: JSON.stringify(meetingConfig) }),
-      ...(socialAidCaps !== undefined && { socialAidCaps: JSON.stringify(socialAidCaps) }),
-      ...(sanctionsConfig !== undefined && { sanctionsConfig: JSON.stringify(sanctionsConfig) }),
-      ...(bankConfig !== undefined && { bankConfig: JSON.stringify(bankConfig) }),
-      ...(status !== undefined && { status }),
-      ...(parentId !== undefined && { parentId }),
-      ...(parentSubscriptionFee !== undefined && { parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null }),
-    },
-  });
+  const association = await prisma.$transaction(async (tx) => {
+    const updated = await tx.association.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(type !== undefined && { type }),
+        ...(isPublic !== undefined && { isPublic }),
+        ...(color !== undefined && { color }),
+        ...(logo !== undefined && { logo }),
+        ...(region !== undefined && { region }),
+        ...(website !== undefined && { website }),
+        ...(email !== undefined && { email }),
+        ...(phone !== undefined && { phone }),
+        ...(reglementHtml !== undefined && { reglementHtml }),
+        ...(reglementUrl !== undefined && { reglementUrl }),
+        ...(bureauConfig !== undefined && { bureauConfig: JSON.stringify(bureauConfig) }),
+        ...(membershipConfig !== undefined && { membershipConfig: JSON.stringify(membershipConfig) }),
+        ...(meetingConfig !== undefined && { meetingConfig: JSON.stringify(meetingConfig) }),
+        ...(socialAidCaps !== undefined && { socialAidCaps: JSON.stringify(socialAidCaps) }),
+        ...(sanctionsConfig !== undefined && { sanctionsConfig: JSON.stringify(sanctionsConfig) }),
+        ...(bankConfig !== undefined && { bankConfig: JSON.stringify(bankConfig) }),
+        ...(status !== undefined && { status }),
+        ...(parentId !== undefined && { parentId }),
+        ...(parentSubscriptionFee !== undefined && { parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null }),
+      },
+    });
 
-  if (regulations !== undefined && Array.isArray(regulations)) {
-    await prisma.$transaction([
-      prisma.associationRegulationArticle.deleteMany({ where: { associationId: id } }),
-      prisma.associationRegulationArticle.createMany({
-        data: regulations.map((reg: any, i: number) => ({
-          associationId: id,
-          articleNumber: i + 1,
-          title: reg.title,
-          content: reg.content
-        }))
-      })
-    ]);
-  }
+    if (regulations !== undefined && Array.isArray(regulations)) {
+      // Les approbations référencent les articles : les supprimer d'abord,
+      // dans la même transaction, pour éviter une violation de clé étrangère.
+      await tx.membershipRegulationApproval.deleteMany({
+        where: { article: { associationId: id } },
+      });
+      await tx.associationRegulationArticle.deleteMany({ where: { associationId: id } });
+      if (regulations.length > 0) {
+        await tx.associationRegulationArticle.createMany({
+          data: regulations.map((reg: any, i: number) => ({
+            associationId: id,
+            articleNumber: i + 1,
+            title: reg.title,
+            content: reg.content,
+          })),
+        });
+      }
+    }
+
+    return updated;
+  });
 
   return NextResponse.json({ association });
 }
