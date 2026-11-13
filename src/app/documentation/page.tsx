@@ -62,13 +62,13 @@ export default function DocumentationPage() {
                 </div>
               </div>
               <div className="rounded-2xl bg-[#f7f3eb] p-5 text-[#0d3d28]">
-                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a97b18]">Sommaire</div>
-                <div className="mt-2 text-2xl font-black leading-tight">18 chapitres<br />+ annexes</div>
+                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a97b18]">{d.contents}</div>
+                <div className="mt-2 text-2xl font-black leading-tight">18 {d.chaptersWord}<br />+ {d.annexWord}</div>
                 <div className="mt-4 space-y-2">
                   {d.parts.map((p) => (
                     <div key={p.title} className="flex items-center justify-between border-b border-[#ddd5c4] pb-2 text-xs">
                       <span className="font-semibold">{p.title}</span>
-                      <span className="text-[#7a857e]">{p.chapters.length} ch.</span>
+                      <span className="text-[#7a857e]">{p.chapters.length} {d.chWord}</span>
                     </div>
                   ))}
                 </div>

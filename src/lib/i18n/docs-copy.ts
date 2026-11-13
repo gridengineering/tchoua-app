@@ -17,6 +17,9 @@ export type DocsCopy = {
   diagrams: string;
   version: string;
   contents: string;
+  chaptersWord: string;
+  annexWord: string;
+  chWord: string;
   domainsTitle: string;
   domainsDesc: string;
   domains: { icon: string; title: string; desc: string }[];
@@ -42,6 +45,9 @@ const fr: DocsCopy = {
   diagrams: "10 schémas",
   version: "Version 1.1 · Novembre 2026",
   contents: "Sommaire",
+  chaptersWord: "chapitres",
+  annexWord: "annexes",
+  chWord: "ch.",
   domainsTitle: "Tout ce que le manuel couvre",
   domainsDesc: "De la création de l'association à la clôture du cycle, chaque écran et chaque règle sont documentés.",
   domains: [
@@ -125,6 +131,9 @@ const en: DocsCopy = {
   diagrams: "10 diagrams",
   version: "Version 1.1 · November 2026",
   contents: "Contents",
+  chaptersWord: "chapters",
+  annexWord: "appendices",
+  chWord: "ch.",
   domainsTitle: "What the manual covers",
   domainsDesc: "From association creation to cycle closure, every screen and every rule is documented.",
   domains: [
@@ -192,7 +201,7 @@ const es: DocsCopy = {
   read: "Ver el índice",
   notice: "Edición anonimizada: los nombres de las asociaciones y de las personas fueron sustituidos por identificadores ficticios. Los montos, reglas y capturas siguen siendo concretos.",
   pages: "88 páginas", captures: "24 capturas reales", diagrams: "10 esquemas",
-  version: "Versión 1.1 · Noviembre 2026", contents: "Índice",
+  version: "Versión 1.1 · Noviembre 2026", contents: "Índice", chaptersWord: "capítulos", annexWord: "anexos", chWord: "cap.",
   domainsTitle: "Todo lo que cubre el manual",
   domainsDesc: "Desde la creación de la asociación hasta el cierre del ciclo, cada pantalla y cada regla están documentadas.",
   domains: [
@@ -258,7 +267,7 @@ const de: DocsCopy = {
   read: "Inhaltsverzeichnis ansehen",
   notice: "Anonymisierte Ausgabe: Namen von Vereinen und Personen wurden durch fiktive Kennungen ersetzt. Beträge, Regeln und Screenshots bleiben konkret.",
   pages: "88 Seiten", captures: "24 echte Screenshots", diagrams: "10 Diagramme",
-  version: "Version 1.1 · November 2026", contents: "Inhalt",
+  version: "Version 1.1 · November 2026", contents: "Inhalt", chaptersWord: "Kapitel", annexWord: "Anhänge", chWord: "Kap.",
   domainsTitle: "Was das Handbuch abdeckt",
   domainsDesc: "Von der Gründung des Vereins bis zum Abschluss des Zyklus werden jeder Bildschirm und jede Regel dokumentiert.",
   domains: [
