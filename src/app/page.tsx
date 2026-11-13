@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Star, Users, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle, Download, Star, TrendingUp } from "lucide-react";
 import { PublicFooter, PublicHeader } from "@/components/layout/public-layout";
 import { useI18n } from "@/lib/i18n/context";
 import { HOME_COPY, publicLang } from "@/lib/i18n/public-copy";
+import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 const TYPE_ICONS = ["💰", "🌾", "🤝"];
 const TYPE_BGS = [
@@ -21,6 +22,7 @@ const ROW_COLORS = ["#4ade80", "#4ade80", "#f87171", "#4ade80"];
 export default function HomePage() {
   const { lang } = useI18n();
   const c = HOME_COPY[publicLang(lang)];
+  const docs = DOCS_COPY[publicLang(lang)];
 
   return (
     <div className="min-h-screen" style={{ background: "#f7f3eb", color: "#1a1a1a" }}>
@@ -291,6 +293,44 @@ export default function HomePage() {
                 <h3 className="mb-1 text-sm font-semibold group-hover:text-[#0d3d28]" style={{ color: "#1a1a1a" }}>{m.title}</h3>
                 <p className="text-xs leading-relaxed text-gray-400">{m.desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DOCUMENTATION */}
+      <section id="documentation" className="px-6 py-20" style={{ background: "#f7f3eb" }}>
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 grid items-end gap-6 lg:grid-cols-[1.3fr_.7fr]">
+            <div>
+              <span className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
+                style={{ background: "rgba(212,163,67,0.15)", color: "#7c2d12" }}>
+                <BookOpen className="h-3.5 w-3.5" /> {docs.home.badge}
+              </span>
+              <h2 className="mb-3 text-3xl font-bold md:text-4xl" style={{ color: "#0d3d28" }}>{docs.home.title}</h2>
+              <p className="max-w-2xl text-gray-500">{docs.home.desc}</p>
+            </div>
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <a href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white" style={{ background: "#0d3d28" }}>
+                <Download className="h-4 w-4" /> {docs.download}
+              </a>
+              <Link href="/documentation" className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-bold"
+                style={{ borderColor: "#0d3d28", color: "#0d3d28" }}>
+                {docs.read} <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {docs.home.cards.map((card) => (
+              <Link key={card.title} href="/documentation" className="group rounded-2xl border border-[#e2ddd4] bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
+                <div className="mb-3 text-3xl">{card.icon}</div>
+                <h3 className="mb-1 text-sm font-bold" style={{ color: "#0d3d28" }}>{card.title}</h3>
+                <p className="text-xs leading-relaxed text-gray-500">{card.desc}</p>
+                <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: "#a97b18" }}>
+                  {docs.read} <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </Link>
             ))}
           </div>
         </div>

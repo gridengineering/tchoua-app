@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n/context";
 import { Check, ChevronDown, Globe, Menu, X } from "lucide-react";
 import { HEADER_COPY, HOME_COPY, publicLang } from "@/lib/i18n/public-copy";
+import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 type SubLink = { href: string; key: string };
 
@@ -13,6 +14,7 @@ const NAV: { key: string; href: string }[] = [
   { key: "fonctionnalites", href: "/#modules" },
   { key: "how_it_works", href: "/#steps" },
   { key: "tarifs", href: "/#pricing" },
+  { key: "documentation", href: "/documentation" },
   { key: "about", href: "/about" },
 ];
 
@@ -55,7 +57,7 @@ export function PublicHeader() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const label = (key: string) => (t.nav as Record<string, string>)[key] ?? key;
+  const label = (key: string) => key === "documentation" ? DOCS_COPY[publicLang(lang)].nav : (t.nav as Record<string, string>)[key] ?? key;
 
   const LanguageList = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={mobile ? "grid grid-cols-2 gap-2" : "max-h-80 w-64 overflow-y-auto py-1"}>
@@ -199,6 +201,7 @@ export function PublicFooter() {
     { label: c.footer.aboutLink, href: "/about" },
     { label: c.footer.help, href: "/aide" },
     { label: c.footer.security, href: "/security" },
+    { label: DOCS_COPY[publicLang(lang)].nav, href: "/documentation" },
     { label: c.footer.contact, href: "mailto:contact@tchoua.com" },
   ];
 
