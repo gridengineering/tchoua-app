@@ -77,6 +77,7 @@ function AssociationNav({ id }: { id: string }) {
     { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },
     { href: `/associations/${id}/dividendes`, label: "Dividendes", icon: Coins },
     { href: `/associations/${id}/members`, label: "Membres", icon: Users },
+    { href: `/associations/${id}/kyc`, label: "Conformité KYC", icon: ShieldCheck },
     { href: `/associations/${id}/rapports`, label: "Rapports", icon: FileText },
     { href: `/associations/${id}/historique`, label: "Historique", icon: History },
     { href: `/associations/${id}/interets`, label: "Intérêts", icon: TrendingUp },
