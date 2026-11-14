@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Building2, Download, History, Loader2, Search, ShieldAlert, User } from "lucide-react";
 
 type TimelineItem = { at: string; type: string; title: string; detail?: string | null; actor?: string | null; href?: string | null };
@@ -21,15 +22,23 @@ const TYPE_TONES: Record<string, string> = {
 };
 
 export default function AdminHistoryPage() {
-  const [entity, setEntity] = useState<"association" | "user">("association");
+  const searchParams = useSearchParams();
+  const queryEntity = searchParams.get("entity") === "user" ? "user" : "association";
+  const queryId = searchParams.get("id") ?? "";
+  const [entity, setEntity] = useState<"association" | "user">(queryEntity);
   const [associations, setAssociations] = useState<AssocOption[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState(queryId);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [data, setData] = useState<{ header: any; items: TimelineItem[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setEntity(queryEntity);
+    setSelectedId(queryId);
+  }, [queryEntity, queryId]);
 
   useEffect(() => {
     Promise.all([

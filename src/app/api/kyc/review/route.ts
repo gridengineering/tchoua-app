@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission, isSuperAdmin } from "@/lib/permissions";
 import { normalizeKycLevel } from "@/lib/kyc";
+import { refreshTrustForUser } from "@/lib/trust";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
       });
       return request;
     });
+    await refreshTrustForUser(kycRequest.userId).catch(() => {});
     return NextResponse.json({ request: updated, status: "REJECTED" });
   }
 
@@ -135,5 +137,6 @@ export async function POST(req: NextRequest) {
     return request;
   });
 
+  await refreshTrustForUser(kycRequest.userId).catch(() => {});
   return NextResponse.json({ request: updated, level, status: "VERIFIED" });
 }

@@ -144,3 +144,13 @@ export async function computeAllAssociationTrust() {
   }
   return results;
 }
+
+export async function refreshTrustForUser(userId: string) {
+  const memberships = await prisma.associationMembership.findMany({
+    where: { userId, status: { not: "LEFT" } },
+    select: { associationId: true },
+  });
+  for (const membership of memberships) {
+    await computeAssociationTrust(membership.associationId);
+  }
+}

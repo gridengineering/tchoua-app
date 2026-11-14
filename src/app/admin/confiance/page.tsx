@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Filter, RefreshCw, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { TRUST_LEVELS, trustLevelForScore, type TrustBreakdown } from "@/lib/trust-levels";
 
@@ -156,6 +157,7 @@ export default function AdminTrustPage() {
                           <div className="flex justify-end gap-1.5">
                             <button onClick={() => setSelected(association)} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">Détail</button>
                             <button onClick={() => recompute(association.id)} disabled={busy} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 disabled:opacity-40">Recalculer</button>
+                            <Link href={`/admin/historique?entity=association&id=${association.id}`} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">Historique</Link>
                             <button onClick={() => quarantine(association)} className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold ${association.quarantinedAt ? "border-emerald-200 text-emerald-700" : "border-red-200 text-red-600"}`}>{association.quarantinedAt ? "Libérer" : "Quarantaine"}</button>
                           </div>
                         </td>

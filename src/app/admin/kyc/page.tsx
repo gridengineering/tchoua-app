@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AlertCircle, CheckCircle2, Filter, Loader2, Search, ShieldAlert, ShieldCheck, X, XCircle } from "lucide-react";
 import { KycBadge } from "@/components/kyc/kyc-badge";
 import { kycLevelInfo } from "@/lib/kyc";
@@ -234,6 +235,7 @@ export default function AdminKycPage() {
                             <button onClick={() => setSelected(user)} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">
                               Examiner
                             </button>
+                            <Link href={`/admin/historique?entity=user&id=${user.id}`} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50">Historique</Link>
                             <button onClick={() => quarantine(user)} className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold ${user.quarantinedAt ? "border-emerald-200 text-emerald-700" : "border-red-200 text-red-600"}`}>
                               {user.quarantinedAt ? "Libérer" : "Quarantaine"}
                             </button>

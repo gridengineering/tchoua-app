@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSystemAdmin } from "@/lib/admin-auth";
+import { computeAssociationTrust, refreshTrustForUser } from "@/lib/trust";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
         details: `${action === "QUARANTINE" ? "Mise en quarantaine" : "Levée de quarantaine"} de ${association.name}${reason ? ` — ${reason}` : ""}`,
       },
     });
+    await computeAssociationTrust(id).catch(() => {});
     return NextResponse.json({ association });
   }
 
@@ -49,5 +51,6 @@ export async function POST(request: NextRequest) {
       details: `${action === "QUARANTINE" ? "Mise en quarantaine" : "Levée de quarantaine"} de ${user.email}${reason ? ` — ${reason}` : ""}`,
     },
   });
+  await refreshTrustForUser(id).catch(() => {});
   return NextResponse.json({ user });
 }
