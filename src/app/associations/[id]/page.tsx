@@ -111,7 +111,8 @@ type ChatMessage = {
   mediaUrl?: string | null;
 };
 
-function mapChatMessage(raw: any): ChatMessage {
+function mapChatMessage(raw: any): ChatMessage | null {
+  if (!raw?.id) return null;
   return {
     id: raw.id,
     senderId: raw.membership?.userId ?? raw.senderId ?? "",
@@ -536,7 +537,7 @@ export default function AssociationDetailPage() {
     fetch(`/api/associations/${id}/messages?channel=${chatChannel}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        setMessages((data?.messages ?? []).map(mapChatMessage));
+        setMessages((data?.messages ?? []).map(mapChatMessage).filter((message: ChatMessage | null): message is ChatMessage => Boolean(message)));
       })
       .catch(() => {
         setMessages(mockMessages(chatChannel));
@@ -562,7 +563,7 @@ export default function AssociationDetailPage() {
         client = new Centrifuge(data.wsUrl, { token: data.token });
         client.on("publication", (ctx: any) => {
           const message = mapChatMessage(ctx?.data?.message);
-          if (!message.id || message.channel !== chatChannel) return;
+          if (!message || message.channel !== chatChannel) return;
           setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
         });
         client.connect();
@@ -628,7 +629,7 @@ export default function AssociationDetailPage() {
     const data = await res?.json().catch(() => ({}));
     if (data?.message) {
       const message = mapChatMessage(data.message);
-      setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
+      if (message) setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
     }
   };
 
@@ -1897,7 +1898,14 @@ export default function AssociationDetailPage() {
         {tab === "chat" && (
           <div className="flex flex-col" style={{ height: "65vh" }}>
             {/* Channel selector */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <button
+                type="button"
+                onClick={() => joinVideo(null)}
+                className="inline-flex items-center gap-1 rounded-full border border-[#cfe0d5] bg-[#f6fbf7] px-3 py-1.5 text-sm font-bold text-[#0d3d28] hover:bg-[#ecf7ef]"
+              >
+                <Video className="h-4 w-4" /> Visio
+              </button>
               {[
                 { key: "GENERAL", label: "# Général" },
                 { key: "BUREAU", label: "# Bureau" },
