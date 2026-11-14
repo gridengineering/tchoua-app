@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     include: {
       memberships: {
         where: { status: "ACTIVE" },
-        include: { user: { select: { id: true, name: true, avatar: true, score: true, level: true } } },
+        include: { user: { select: { id: true, name: true, avatar: true, score: true, level: true, kycLevel: true, kycStatus: true } } },
       },
       sessions: { orderBy: { sessionNumber: "asc" } },
       contributions: {

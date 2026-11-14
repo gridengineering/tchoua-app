@@ -5,6 +5,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { getInitials, getLevelInfo } from "@/lib/utils";
 import { Users, Search, Filter, Mail, Phone, MessageSquare, ShieldCheck, Star, Trophy, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { KycBadge } from "@/components/kyc/kyc-badge";
 
 export default function MembresPage() {
   const [tontines, setTontines] = useState<any[]>([]);
