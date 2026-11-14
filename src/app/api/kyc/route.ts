@@ -220,7 +220,15 @@ export async function POST(req: NextRequest) {
 
   const request = await prisma.$transaction(async (tx) => {
     const created = await tx.kycRequest.create({
-      data: { userId: user.id, requestedLevel, status: "PENDING", ...data },
+      data: {
+        userId: user.id,
+        requestedLevel,
+        status: "PENDING",
+        ...data,
+        ...(documents.length > 0
+          ? { documents: { connect: documents.map((doc) => ({ id: doc.id })) } }
+          : {}),
+      },
     });
     await tx.user.update({ where: { id: user.id }, data: { kycStatus: "PENDING" } });
     return created;
