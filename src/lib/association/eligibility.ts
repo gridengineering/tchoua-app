@@ -36,12 +36,13 @@ export async function checkAssociationEligibility(
         id: true,
         minKycLevel: true,
         requireRegulationApproval: true,
+        quarantinedAt: true,
         _count: { select: { regulations: true } },
       },
     }),
     prisma.associationMembership.findUnique({
       where: { userId_associationId: { userId, associationId } },
-      select: { id: true, status: true, user: { select: { kycLevel: true } } },
+      select: { id: true, status: true, user: { select: { kycLevel: true, quarantinedAt: true } } },
     }),
     prisma.platformConsent.findMany({
       where: { userId, version: CONSENT_VERSION },
@@ -52,8 +53,14 @@ export async function checkAssociationEligibility(
   if (!association) {
     return { ok: false, code: "MEMBERSHIP_REQUIRED", error: "Association introuvable" };
   }
+  if (association.quarantinedAt) {
+    return { ok: false, code: "MEMBERSHIP_INACTIVE", error: "Cette association est en quarantaine administrative." };
+  }
   if (!membership) {
     return { ok: false, code: "MEMBERSHIP_REQUIRED", error: "Vous n'êtes pas membre de cette association" };
+  }
+  if (membership.user.quarantinedAt) {
+    return { ok: false, code: "MEMBERSHIP_INACTIVE", error: "Votre compte est en quarantaine administrative." };
   }
 
   const accepted = new Set(consents.map((c) => c.document));

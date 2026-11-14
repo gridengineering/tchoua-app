@@ -47,3 +47,6 @@ playwright-report/
 # Python temp files
 *.py
 __pycache__/
+
+# KYC documents (private, served via authenticated API)
+/storage/kyc/

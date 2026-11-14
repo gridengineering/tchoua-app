@@ -15,11 +15,18 @@ export async function GET() {
       select: {
         id: true, name: true, email: true, phone: true, profession: true, location: true,
         kycLevel: true, kycStatus: true, kycVerifiedAt: true, kycData: true,
+        emailVerifiedAt: true, phoneVerifiedAt: true, whatsappVerifiedAt: true,
+        quarantinedAt: true,
       },
     }),
     prisma.kycRequest.findFirst({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
+      include: {
+        documents: {
+          select: { id: true, type: true, label: true, mimeType: true, size: true, status: true, createdAt: true },
+        },
+      },
     }),
     prisma.platformConsent.findMany({
       where: { userId: session.user.id, version: CONSENT_VERSION },
@@ -33,6 +40,11 @@ export async function GET() {
     level: normalizeKycLevel(user.kycLevel),
     status: user.kycStatus,
     verifiedAt: user.kycVerifiedAt,
+    verification: {
+      email: Boolean(user.emailVerifiedAt),
+      phone: Boolean(user.phoneVerifiedAt),
+      whatsapp: Boolean(user.whatsappVerifiedAt),
+    },
     profile: (() => {
       if (!user.kycData) return null;
       try { return JSON.parse(user.kycData); } catch { return null; }
@@ -60,7 +72,10 @@ export async function POST(req: NextRequest) {
   const [user, pending, consents] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, phone: true, kycLevel: true, kycStatus: true },
+      select: {
+        id: true, name: true, phone: true, kycLevel: true, kycStatus: true,
+        emailVerifiedAt: true, phoneVerifiedAt: true, whatsappVerifiedAt: true,
+      },
     }),
     prisma.kycRequest.findFirst({
       where: { userId: session.user.id, status: "PENDING" },
@@ -91,6 +106,16 @@ export async function POST(req: NextRequest) {
   const current = normalizeKycLevel(user.kycLevel);
   if (requestedLevel <= current) {
     return NextResponse.json({ error: "Ce niveau est déjà acquis" }, { status: 400 });
+  }
+
+  if (!user.emailVerifiedAt && !user.phoneVerifiedAt && !user.whatsappVerifiedAt) {
+    return NextResponse.json(
+      {
+        error: "Vérifiez d'abord votre e-mail, votre téléphone ou votre WhatsApp avec un code à 6 chiffres.",
+        code: "VERIFICATION_REQUIRED",
+      },
+      { status: 403 }
+    );
   }
 
   const fullName = String(body.fullName ?? user.name ?? "").trim();
@@ -134,6 +159,35 @@ export async function POST(req: NextRequest) {
     sourceOfFunds: body.sourceOfFunds ? String(body.sourceOfFunds) : null,
     documentRef: body.documentRef ? String(body.documentRef) : null,
   };
+
+  const documentIds: string[] = Array.isArray(body.documentIds)
+    ? body.documentIds.map(String).filter(Boolean)
+    : [];
+  const documents = documentIds.length > 0
+    ? await prisma.kycDocument.findMany({ where: { id: { in: documentIds }, userId: user.id } })
+    : [];
+
+  if (requestedLevel >= 2) {
+    const types = new Set(documents.map((doc) => doc.type));
+    if (!types.has("ID_DOCUMENT") && !types.has("PASSPORT_PHOTO")) {
+      return NextResponse.json(
+        { error: "Ajoutez une pièce d'identité (CNI, passeport ou titre de séjour) avant de demander ce niveau.", code: "DOCUMENTS_REQUIRED" },
+        { status: 400 }
+      );
+    }
+    if (!types.has("PASSPORT_PHOTO")) {
+      return NextResponse.json(
+        { error: "Ajoutez une photo récente de type passeport pour vérifier votre identité.", code: "DOCUMENTS_REQUIRED" },
+        { status: 400 }
+      );
+    }
+    if (requestedLevel === 3 && !types.has("LOCATION_PROOF") && !types.has("UTILITY_BILL") && !types.has("GOOGLE_MAPS")) {
+      return NextResponse.json(
+        { error: "Ajoutez une preuve de localisation (plan, facture ou lien Google Maps) pour la vigilance renforcée.", code: "DOCUMENTS_REQUIRED" },
+        { status: 400 }
+      );
+    }
+  }
 
   const now = new Date();
 

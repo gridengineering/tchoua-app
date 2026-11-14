@@ -18,6 +18,7 @@ import { formatCurrency, formatDate, getInitials, getFrequencyLabel } from "@/li
 import { useI18n } from "@/lib/i18n/context";
 import { RegulationApprovalModal } from "@/components/association/RegulationApprovalModal";
 import { KycBadge } from "@/components/kyc/kyc-badge";
+import { TrustBadge } from "@/components/association/trust-badge";
 import LifecycleBadge from "@/components/association/LifecycleBadge";
 import RelationsPanel from "@/components/association/RelationsPanel";
 import ElectionPanel from "@/components/association/ElectionPanel";
@@ -42,6 +43,8 @@ type AssocDetail = {
   parent?: { id: string; name: string } | null;
   minKycLevel?: number | null;
   requireRegulationApproval?: boolean | null;
+  trustScore?: number | null;
+  trustLevel?: number | null;
 };
 
 type AssocActivity = {
@@ -740,6 +743,7 @@ export default function AssociationDetailPage() {
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold text-gray-900 leading-tight">{assoc.name}</h1>
                   <LifecycleBadge status={assoc.status} />
+                  <TrustBadge score={assoc.trustScore} level={assoc.trustLevel} />
                 </div>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-graphite">
                   <span className="flex items-center gap-1"><Building2 className="w-3.5 h-3.5" />{getAssocTypeLabel(assoc.type)}</span>

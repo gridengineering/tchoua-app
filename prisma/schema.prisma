@@ -33,6 +33,12 @@ model User {
   kycStatus       String    @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
   kycVerifiedAt   DateTime?
   kycData         String?   // JSON: synthèse vérifiée (nom légal, pièce, adresse, origine des fonds)
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  whatsappVerifiedAt DateTime?
+  quarantinedAt   DateTime?
+  quarantineReason String?
+  quarantinedById String?
   referredById    String?
   referredBy      User?     @relation("Referrals", fields: [referredById], references: [id])
   referrals       User[]    @relation("Referrals")
@@ -71,6 +77,8 @@ model User {
   kycRequests           KycRequest[]       @relation("KycRequester")
   kycReviews            KycRequest[]       @relation("KycReviewer")
   platformConsents      PlatformConsent[]
+  kycDocuments          KycDocument[]
+  verificationCodes     VerificationCode[]
 
   @@map("users")
 }
@@ -806,6 +814,15 @@ model Association {
   // Conformité KYC / LBC-FT
   minKycLevel               Int     @default(0)
   requireRegulationApproval Boolean @default(true)
+
+  // Confiance / gamification et quarantaine administrative
+  trustScore        Int      @default(0)
+  trustLevel        Int      @default(0)
+  trustBreakdown    String?
+  trustComputedAt   DateTime?
+  quarantinedAt     DateTime?
+  quarantineReason  String?
+  quarantinedById   String?
 
   // Bureau (JSON: { president, vicePresident, secretaires[], tresorier, ... })
   bureauConfig  String?
@@ -2127,6 +2144,7 @@ model KycRequest {
 
   user       User  @relation("KycRequester", fields: [userId], references: [id], onDelete: Cascade)
   reviewedBy User? @relation("KycReviewer", fields: [reviewedById], references: [id])
+  documents  KycDocument[]
 
   @@index([userId, status])
   @@index([status, createdAt])
@@ -2147,4 +2165,41 @@ model PlatformConsent {
   @@unique([userId, document, version])
   @@index([userId])
   @@map("platform_consents")
+}
+
+model KycDocument {
+  id           String   @id @default(cuid())
+  userId       String
+  kycRequestId String?
+  type         String   // ID_DOCUMENT, PASSPORT_PHOTO, LOCATION_PROOF, UTILITY_BILL, GOOGLE_MAPS, OTHER
+  label        String
+  filePath     String
+  mimeType     String
+  size          Int
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt    DateTime @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kycRequest KycRequest? @relation(fields: [kycRequestId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([kycRequestId])
+  @@map("kyc_documents")
+}
+
+model VerificationCode {
+  id         String   @id @default(cuid())
+  userId     String
+  channel    String   // EMAIL, PHONE, WHATSAPP
+  target     String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, channel, expiresAt])
+  @@map("verification_codes")
 }

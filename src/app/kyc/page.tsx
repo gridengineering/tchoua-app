@@ -29,8 +29,20 @@ type KycResponse = {
     status: string;
     reviewNote?: string | null;
     createdAt: string;
+    documents?: KycDocument[];
   } | null;
+  verification?: { email: boolean; phone: boolean; whatsapp: boolean };
   platformConsentsComplete?: boolean;
+};
+
+type KycDocument = {
+  id: string;
+  type: string;
+  label: string;
+  mimeType: string;
+  size: number;
+  status: string;
+  createdAt: string;
 };
 
 const inputCls =
@@ -44,6 +56,14 @@ export default function KycPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<KycDocument[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [verifyChannel, setVerifyChannel] = useState<"EMAIL" | "PHONE" | "WHATSAPP">("EMAIL");
+  const [verifyTarget, setVerifyTarget] = useState("");
+  const [verifyCode, setVerifyCode] = useState("");
+  const [verifySent, setVerifySent] = useState(false);
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullName: "", phone: "", dateOfBirth: "", nationality: "Camerounaise",
     idType: "CNI", idNumber: "", address: "", city: "", country: "Cameroun",
@@ -57,6 +77,11 @@ export default function KycPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Chargement impossible");
       setData(json);
+      const docsRes = await fetch("/api/kyc/documents", { cache: "no-store" });
+      const docsJson = docsRes.ok ? await docsRes.json() : { documents: [] };
+      const merged = new Map<string, KycDocument>();
+      for (const doc of [...(json.latestRequest?.documents ?? []), ...(docsJson.documents ?? [])]) merged.set(doc.id, doc);
+      setDocuments(Array.from(merged.values()));
       setForm((current) => ({
         ...current,
         fullName: String(json.profile?.fullName ?? json.user?.name ?? ""),
@@ -73,6 +98,63 @@ export default function KycPage() {
 
   useEffect(() => { load(); }, []);
 
+  const sendCode = async () => {
+    setVerifyBusy(true); setVerifyMessage(null); setError(null);
+    try {
+      const res = await fetch("/api/kyc/verify/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel: verifyChannel, target: verifyTarget || undefined }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error ?? "Envoi impossible");
+      setVerifySent(true);
+      setVerifyMessage(
+        json.devCode
+          ? `Mode test : votre code est ${json.devCode}`
+          : `Code envoyé à ${json.target}. Il expire dans 10 minutes.`
+      );
+    } catch (err) {
+      setVerifyMessage(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally { setVerifyBusy(false); }
+  };
+
+  const confirmCode = async () => {
+    setVerifyBusy(true); setVerifyMessage(null); setError(null);
+    try {
+      const res = await fetch("/api/kyc/verify/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel: verifyChannel, code: verifyCode }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error ?? "Code invalide");
+      setVerifyMessage("Canal vérifié avec succès.");
+      setVerifyCode("");
+      await load();
+    } catch (err) {
+      setVerifyMessage(err instanceof Error ? err.message : "Erreur");
+    } finally { setVerifyBusy(false); }
+  };
+
+  const uploadDocument = async (type: string, label: string, file: File | null) => {
+    if (!file) return;
+    setUploading(true); setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", type);
+      formData.append("label", label);
+      const res = await fetch("/api/kyc/documents", { method: "POST", body: formData });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error ?? "Téléversement impossible");
+      setDocuments((current) => [json.document, ...current]);
+      setMessage("Document ajouté. Il sera contrôlé par le bureau.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally { setUploading(false); }
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!target) return;
@@ -83,7 +165,11 @@ export default function KycPage() {
       const res = await fetch("/api/kyc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestedLevel: target, ...form }),
+        body: JSON.stringify({
+          requestedLevel: target,
+          ...form,
+          documentIds: documents.filter((doc) => doc.status === "PENDING").map((doc) => doc.id),
+        }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error ?? "Demande impossible");
@@ -212,6 +298,95 @@ export default function KycPage() {
               </div>
               <button type="button" onClick={() => setTarget(null)} className="text-xs font-semibold m-muted">Fermer</button>
             </div>
+
+            {target === 1 ? (
+              <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50/70 p-4">
+                <p className="text-xs font-bold text-sky-950">Vérification automatique du contact</p>
+                <p className="mt-1 text-[11.5px] leading-4 text-sky-800">
+                  Vérifiez votre e-mail, votre téléphone ou votre WhatsApp avec un code à 6 chiffres.
+                  Au moins un canal vérifié est requis pour activer le KYC 1.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(["EMAIL", "PHONE", "WHATSAPP"] as const).map((channel) => {
+                    const verified = channel === "EMAIL" ? data?.verification?.email : channel === "PHONE" ? data?.verification?.phone : data?.verification?.whatsapp;
+                    return (
+                      <button key={channel} type="button" onClick={() => { setVerifyChannel(channel); setVerifySent(false); setVerifyMessage(null); }}
+                        className={`rounded-lg border px-3 py-1.5 text-[11px] font-bold ${verifyChannel === channel ? "border-[#0d3d28] bg-white text-[#0d3d28]" : "border-sky-200 bg-white/60 text-sky-800"}`}>
+                        {verified ? "✓ " : ""}{channel === "EMAIL" ? "E-mail" : channel === "PHONE" ? "SMS" : "WhatsApp"}
+                      </button>
+                    );
+                  })}
+                </div>
+                {verifyChannel !== "EMAIL" ? (
+                  <label className="mt-3 block">
+                    <span className={labelCls}>Numéro au format international</span>
+                    <input className={inputCls} value={verifyTarget} onChange={(e) => setVerifyTarget(e.target.value)} placeholder="+237 6XX XX XX XX" />
+                  </label>
+                ) : null}
+                <div className="mt-3 flex flex-wrap items-end gap-2">
+                  <button type="button" onClick={sendCode} disabled={verifyBusy} className="rounded-lg bg-sky-900 px-3 py-2 text-[11px] font-bold text-white disabled:opacity-50">
+                    {verifyBusy ? "Envoi…" : verifySent ? "Renvoyer le code" : "Envoyer le code"}
+                  </button>
+                  {verifySent ? (
+                    <>
+                      <input className={`${inputCls} !w-36`} value={verifyCode} onChange={(e) => setVerifyCode(e.target.value)} placeholder="Code à 6 chiffres" inputMode="numeric" maxLength={6} />
+                      <button type="button" onClick={confirmCode} disabled={verifyBusy || verifyCode.length !== 6} className="rounded-lg bg-[#0d3d28] px-3 py-2 text-[11px] font-bold text-white disabled:opacity-40">
+                        Vérifier
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+                {verifyMessage ? <p className="mt-2 text-[11px] font-medium text-sky-900">{verifyMessage}</p> : null}
+              </div>
+            ) : null}
+
+            {target >= 2 ? (
+              <div className="mt-4 rounded-xl border border-[#e2ddd4] bg-[#fbf9f3] p-4">
+                <p className="text-xs font-bold text-[#1f2937]">Pièces justificatives</p>
+                <p className="mt-1 text-[11.5px] leading-4 text-[#7a7368]">
+                  Ajoutez une pièce d&apos;identité et une photo récente de type passeport. Pour le niveau 3,
+                  ajoutez aussi une preuve de localisation. Chaque pièce sera contrôlée par un membre du bureau
+                  ayant un niveau KYC égal ou supérieur.
+                </p>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <label className="block rounded-lg border border-dashed border-[#cfc6b6] bg-white p-3 text-[11.5px]">
+                    <span className="font-bold text-[#1f2937]">Pièce d&apos;identité *</span>
+                    <span className="mt-0.5 block text-[10.5px] text-[#8a8175]">CNI, passeport ou titre de séjour (JPEG, PNG, PDF)</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="mt-2 block w-full text-[10.5px]" disabled={uploading} onChange={(e) => uploadDocument("ID_DOCUMENT", "Pièce d'identité", e.target.files?.[0] ?? null)} />
+                  </label>
+                  <label className="block rounded-lg border border-dashed border-[#cfc6b6] bg-white p-3 text-[11.5px]">
+                    <span className="font-bold text-[#1f2937]">Photo type passeport *</span>
+                    <span className="mt-0.5 block text-[10.5px] text-[#8a8175]">Photo récente, visage dégagé (JPEG, PNG)</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="mt-2 block w-full text-[10.5px]" disabled={uploading} onChange={(e) => uploadDocument("PASSPORT_PHOTO", "Photo type passeport", e.target.files?.[0] ?? null)} />
+                  </label>
+                  {target === 3 ? (
+                    <>
+                      <label className="block rounded-lg border border-dashed border-[#cfc6b6] bg-white p-3 text-[11.5px]">
+                        <span className="font-bold text-[#1f2937]">Preuve de localisation *</span>
+                        <span className="mt-0.5 block text-[10.5px] text-[#8a8175]">Plan de localisation ou lien Google Maps (PDF, image)</span>
+                        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="mt-2 block w-full text-[10.5px]" disabled={uploading} onChange={(e) => uploadDocument("LOCATION_PROOF", "Plan de localisation", e.target.files?.[0] ?? null)} />
+                      </label>
+                      <label className="block rounded-lg border border-dashed border-[#cfc6b6] bg-white p-3 text-[11.5px]">
+                        <span className="font-bold text-[#1f2937]">Facture (électricité, eau…)</span>
+                        <span className="mt-0.5 block text-[10.5px] text-[#8a8175]">Justificatif de domicile récent</span>
+                        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="mt-2 block w-full text-[10.5px]" disabled={uploading} onChange={(e) => uploadDocument("UTILITY_BILL", "Facture de domicile", e.target.files?.[0] ?? null)} />
+                      </label>
+                    </>
+                  ) : null}
+                </div>
+                {uploading ? <p className="mt-2 text-[11px] text-[#0d3d28]">Téléversement en cours…</p> : null}
+                {documents.length > 0 ? (
+                  <ul className="mt-3 space-y-1.5">
+                    {documents.map((doc) => (
+                      <li key={doc.id} className="flex items-center justify-between gap-2 rounded-lg border border-[#e8e2d8] bg-white px-3 py-2 text-[11px]">
+                        <span className="truncate text-[#3f3a33]">{doc.label} <span className="text-[#8a8175]">· {doc.type}</span></span>
+                        <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold ${doc.status === "APPROVED" ? "bg-emerald-50 text-emerald-700" : doc.status === "REJECTED" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"}`}>{doc.status}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <label className="block md:col-span-2">

@@ -20,7 +20,10 @@ export async function POST(req: NextRequest) {
 
   const kycRequest = await prisma.kycRequest.findUnique({
     where: { id: requestId },
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      documents: { select: { id: true, type: true, label: true, mimeType: true, size: true, status: true } },
+    },
   });
 
   if (!kycRequest) return NextResponse.json({ error: "Demande KYC introuvable" }, { status: 404 });
@@ -54,6 +57,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Validation réservée au bureau de l'association ou à l'administration" }, { status: 403 });
   }
 
+  const reviewer = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { kycLevel: true },
+  });
+  const reviewerLevel = normalizeKycLevel(reviewer?.kycLevel ?? 0);
+  const requestedLevel = normalizeKycLevel(kycRequest.requestedLevel);
+  if (!isSuperAdmin(session) && reviewerLevel < requestedLevel) {
+    return NextResponse.json(
+      {
+        error: `Un validateur doit avoir un niveau KYC au moins égal au niveau demandé (KYC ${requestedLevel}).`,
+        code: "REVIEWER_KYC_TOO_LOW",
+        reviewerLevel,
+        requiredLevel: requestedLevel,
+      },
+      { status: 403 }
+    );
+  }
+
   const now = new Date();
 
   if (decision === "REJECT") {
@@ -63,6 +84,10 @@ export async function POST(req: NextRequest) {
         data: { status: "REJECTED", reviewNote: note, reviewedById: session.user.id, reviewedAt: now },
       });
       await tx.user.update({ where: { id: kycRequest.userId }, data: { kycStatus: "REJECTED" } });
+      await tx.kycDocument.updateMany({
+        where: { kycRequestId: kycRequest.id },
+        data: { status: "REJECTED" },
+      });
       return request;
     });
     return NextResponse.json({ request: updated, status: "REJECTED" });
@@ -102,6 +127,10 @@ export async function POST(req: NextRequest) {
         kycVerifiedAt: now,
         kycData,
       },
+    });
+    await tx.kycDocument.updateMany({
+      where: { kycRequestId: kycRequest.id },
+      data: { status: "APPROVED" },
     });
     return request;
   });

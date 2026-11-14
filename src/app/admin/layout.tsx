@@ -25,6 +25,8 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Organisation",
     items: [
       { name: "Associations", href: "/admin/associations", icon: Building2 },
+      { name: "Confiance & conformité", href: "/admin/confiance", icon: ShieldCheck },
+      { name: "Historique complet", href: "/admin/historique", icon: History },
       { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes },
       { name: "Modèles", href: "/admin/templates", icon: FileText },
     ],
@@ -32,6 +34,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Accès",
     items: [
+      { name: "Conformité KYC", href: "/admin/kyc", icon: ShieldCheck },
       { name: "Utilisateurs système", href: "/admin/users", icon: Users },
       { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck },
     ],
@@ -58,6 +61,9 @@ const CRUMB_LABELS: Record<string, string> = {
   users: "Utilisateurs",
   roles: "Rôles",
   associations: "Associations",
+  confiance: "Confiance & conformité",
+  historique: "Historique complet",
+  kyc: "Conformité KYC",
   arp: "Référentiel ARP",
   templates: "Modèles",
   wallets: "Wallets",

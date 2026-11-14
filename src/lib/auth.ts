@@ -44,7 +44,7 @@ export const authOptions: NextAuthOptions = {
             });
           }
 
-          if (!user.isActive) return null;
+          if (!user.isActive || user.quarantinedAt) return null;
 
           return {
             id: user.id,
@@ -73,8 +73,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
         
-        if (!user.isActive) {
-          console.log(`[AUTH] User is inactive: ${credentials.email}`);
+        if (!user.isActive || user.quarantinedAt) {
+          console.log(`[AUTH] User is inactive or quarantined: ${credentials.email}`);
           return null;
         }
 
