@@ -111,6 +111,19 @@ type ChatMessage = {
   mediaUrl?: string | null;
 };
 
+function mapChatMessage(raw: any): ChatMessage {
+  return {
+    id: raw.id,
+    senderId: raw.membership?.userId ?? raw.senderId ?? "",
+    senderName: raw.membership?.user?.name ?? raw.senderName ?? "Membre",
+    content: raw.content ?? "",
+    createdAt: raw.createdAt ?? new Date().toISOString(),
+    channel: raw.channel ?? "GENERAL",
+    type: raw.type ?? "TEXT",
+    mediaUrl: raw.mediaUrl ?? null,
+  };
+}
+
 type FinanceReport = {
   activityId: string;
   activityName: string;
@@ -523,7 +536,7 @@ export default function AssociationDetailPage() {
     fetch(`/api/associations/${id}/messages?channel=${chatChannel}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        setMessages(data?.messages ?? []);
+        setMessages((data?.messages ?? []).map(mapChatMessage));
       })
       .catch(() => {
         setMessages(mockMessages(chatChannel));
@@ -534,7 +547,6 @@ export default function AssociationDetailPage() {
   useEffect(() => {
     if (!id) return;
     let client: any = null;
-    let sub: any = null;
     let cancelled = false;
     (async () => {
       try {
@@ -548,13 +560,11 @@ export default function AssociationDetailPage() {
         if (!data?.token || cancelled) return;
         const { Centrifuge } = await import("centrifuge");
         client = new Centrifuge(data.wsUrl, { token: data.token });
-        sub = client.newSubscription(`assoc:${id}:${chatChannel}`);
-        sub.on("publication", (ctx: any) => {
-          const message = ctx?.data?.message;
-          if (!message || message.channel !== chatChannel) return;
+        client.on("publication", (ctx: any) => {
+          const message = mapChatMessage(ctx?.data?.message);
+          if (!message.id || message.channel !== chatChannel) return;
           setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
         });
-        sub.subscribe();
         client.connect();
       } catch {
         /* le chargement HTTP reste disponible */
@@ -562,7 +572,7 @@ export default function AssociationDetailPage() {
     })();
     return () => {
       cancelled = true;
-      try { sub?.unsubscribe(); client?.disconnect(); } catch {}
+      try { client?.disconnect(); } catch {}
     };
   }, [id, chatChannel]);
 
@@ -606,24 +616,20 @@ export default function AssociationDetailPage() {
     }).catch(() => {});
   };
 
-  const sendMessage = () => {
-    if (!chatInput.trim()) return;
-    const newMsg: ChatMessage = {
-      id: Date.now().toString(),
-      senderId: "me",
-      senderName: myMembership?.user.name ?? "Moi",
-      content: chatInput.trim(),
-      createdAt: new Date().toISOString(),
-      channel: chatChannel,
-    };
-    setMessages(prev => [...prev, newMsg]);
+  const sendMessage = async () => {
+    const content = chatInput.trim();
+    if (!content) return;
     setChatInput("");
-    // Fire API (fire-and-forget)
-    fetch(`/api/associations/${id}/messages`, {
+    const res = await fetch(`/api/associations/${id}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ channel: chatChannel, content: chatInput.trim() }),
-    }).catch(() => {});
+      body: JSON.stringify({ channel: chatChannel, content }),
+    }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
+    if (data?.message) {
+      const message = mapChatMessage(data.message);
+      setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
+    }
   };
 
   const socialAidCaps = assoc?.socialAidCaps ? JSON.parse(assoc.socialAidCaps) as { category: string; label: string; cap: number }[] : [];
