@@ -68,6 +68,7 @@ Le script `/usr/local/sbin/tchoua-rtc-nat.sh` (service `tchoua-rtc-nat.service`)
 - DNAT UDP `10000` → JVB ;
 - DNAT TCP/UDP `3478`, `5349` → coturn ;
 - DNAT UDP/TCP `49160–49200` → coturn ;
+- DNAT UDP `3478` sur `vmbr1` pour que le test STUN depuis CT104 passe par le relais ;
 - acceptation du trafic `vmbr1 → vmbr1` nécessaire aux appels entre conteneurs.
 
 Vérification STUN depuis l'extérieur :
@@ -81,6 +82,19 @@ s.sendto(msg, ('162.19.169.28', 3478))
 print(s.recvfrom(2048)[0][:2].hex())
 PY
 ```
+
+## Paramétrage depuis l'administration
+
+La console **Administration → Paramètres → onglet « RTC & Chat »** permet de modifier sans redéploiement :
+
+- activation globale du RTC, de la visioconférence, du chat et du canal bureau ;
+- URL Jitsi, identifiant JWT, durée des jetons, préfixe des salles et niveau KYC minimal ;
+- URL WebSocket et URL API Centrifugo, taille maximale et extensions des fichiers ;
+- URLs STUN/TURN affichées et testées.
+
+Les valeurs sont stockées dans `system_settings` sous la clé `PLATFORM_CONFIG` (bloc `rtc`) et auditées. L'API `/api/admin/rtc/health` vérifie Jitsi, Centrifugo, les secrets serveur et le STUN ; le bouton « Tester la configuration » affiche le résultat.
+
+Les secrets (`JITSI_JWT_APP_SECRET`, `CENTRIFUGO_API_KEY`, `CENTRIFUGO_TOKEN_HMAC_SECRET`) restent dans `.env` et ne sont jamais renvoyés par l'API de paramètres. Les URLs TURN/ports décrivent l'infrastructure du CT109 ; une modification de ces valeurs doit être reportée dans `/opt/jitsi-cfg/web/custom-config.js` et dans les règles DNAT.
 
 ## Contrôle d'accès
 
