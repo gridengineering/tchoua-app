@@ -174,7 +174,8 @@ export default function RegisterPage() {
           </Link>
         </p>
         <p className="text-center text-gray-400 text-xs mt-3">
-          En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+          Après l&apos;inscription, vous devrez accepter les conditions d&apos;utilisation, la politique de confidentialité,
+          la protection des données et l&apos;engagement de non-divulgation avant d&apos;accéder à votre espace.
         </p>
       </div>
     </div>

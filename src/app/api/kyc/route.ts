@@ -33,7 +33,10 @@ export async function GET() {
     level: normalizeKycLevel(user.kycLevel),
     status: user.kycStatus,
     verifiedAt: user.kycVerifiedAt,
-    profile: user.kycData ? JSON.parse(user.kycData) : null,
+    profile: (() => {
+      if (!user.kycData) return null;
+      try { return JSON.parse(user.kycData); } catch { return null; }
+    })(),
     user,
     latestRequest,
     levels: KYC_LEVELS,

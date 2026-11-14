@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CONSENT_KEYS, CONSENT_VERSION } from "@/lib/consents";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -13,6 +14,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const { id: associationId } = await params;
+
+  const consents = await prisma.platformConsent.findMany({
+    where: { userId: session.user.id, version: CONSENT_VERSION },
+    select: { document: true },
+  });
+  const accepted = new Set(consents.map((c) => c.document));
+  if (!CONSENT_KEYS.every((key) => accepted.has(key))) {
+    return NextResponse.json(
+      {
+        error: "Acceptez d'abord les conditions, la confidentialité, la protection des données et la non-divulgation.",
+        code: "CONSENT_REQUIRED",
+      },
+      { status: 403 }
+    );
+  }
 
   try {
     const body = await req.json();

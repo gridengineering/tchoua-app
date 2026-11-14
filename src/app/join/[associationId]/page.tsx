@@ -55,6 +55,10 @@ export default function JoinAssociationPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        if (data.code === "CONSENT_REQUIRED") {
+          router.push("/consentements");
+          return;
+        }
         setError(data.error || "Une erreur est survenue");
       } else {
         setSuccess(true);
