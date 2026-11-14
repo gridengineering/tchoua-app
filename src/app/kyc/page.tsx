@@ -196,6 +196,7 @@ export default function KycPage() {
   }
 
   const current = normalizeKycLevel(data?.level ?? 0);
+  const hasVerifiedChannel = Boolean(data?.verification?.email || data?.verification?.phone || data?.verification?.whatsapp);
   const currentInfo = kycLevelInfo(current);
   const pending = data?.status === "PENDING";
   const rejected = data?.status === "REJECTED";
@@ -453,16 +454,17 @@ export default function KycPage() {
             <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50 p-3 text-[11.5px] leading-4 text-sky-900">
               <FileCheck2 className="mr-1 inline h-3.5 w-3.5" />
               Pour les niveaux 2 et 3, le bureau de l&apos;association ou l&apos;administration vérifie votre pièce
-              d&apos;identité. Vous pouvez présenter l&apos;original au secrétariat : aucune image de pièce n&apos;est
-              stockée dans l&apos;application.
+              d&apos;identité. Les pièces téléversées sont stockées de façon privée et ne sont accessibles
+              qu&apos;à vous, au bureau de l&apos;association et à l&apos;administration.
             </div>
 
             {error ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</p> : null}
             {message ? <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">{message}</p> : null}
 
+            {target === 1 && !hasVerifiedChannel ? <p className="mt-3 text-[11px] font-medium text-amber-700">Vérifiez au moins un canal ci-dessus pour activer le KYC 1.</p> : null}
             <div className="mt-4 flex justify-end gap-2">
               <button type="button" onClick={() => setTarget(null)} className="rounded-lg border m-border px-3 py-2 text-xs font-semibold m-text">Annuler</button>
-              <button type="submit" disabled={saving} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0d3d28] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
+              <button type="submit" disabled={saving || (target === 1 && !hasVerifiedChannel)} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0d3d28] px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
                 {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                 {target === 1 ? "Activer mon KYC 1" : "Envoyer pour vérification"}
               </button>
@@ -479,7 +481,7 @@ export default function KycPage() {
           <div className="mt-3 grid gap-3 text-xs leading-5 m-muted md:grid-cols-3">
             <p><strong className="m-text">Approche par risque.</strong> Les niveaux sont proportionnés aux montants et à la sensibilité des opérations, conformément aux principes du GAFI, sans exiger les mêmes pièces pour tout le monde.</p>
             <p><strong className="m-text">Validation par le bureau.</strong> Le secrétaire, le président ou le trésorier peut vérifier une demande KYC 2 ou 3 depuis la liste des membres. L&apos;administration peut aussi intervenir.</p>
-            <p><strong className="m-text">Données limitées.</strong> Seules les informations nécessaires sont conservées. Les pièces originales sont présentées au bureau ; l&apos;application garde la trace de la vérification, pas une copie de la pièce.</p>
+            <p><strong className="m-text">Données limitées.</strong> Seules les informations nécessaires sont conservées. Les pièces téléversées sont protégées et accessibles uniquement au membre, au bureau de son association et à l&apos;administration.</p>
           </div>
         </div>
       </div>
