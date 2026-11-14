@@ -417,6 +417,10 @@ function ContributionRulesPanel({
       admissionFee: "",
       approvalProcess: "MAJORITY",
       waitingPeriod: "",
+      annualDues: "",
+      solidarityFund: "",
+      investmentMonthly: "",
+      tontineAnnual: "",
     })
   );
   const [draft, setDraft] = useState<ArpConfig>(arp);
@@ -499,6 +503,22 @@ function ContributionRulesPanel({
           <label className="block">
             <span className={labelCls}>Droit d&apos;entrée (FCFA)</span>
             <input value={membership.admissionFee} onChange={(e) => setMembership({ ...membership, admissionFee: e.target.value })} type="number" min={0} step={500} className={inputCls} />
+          </label>
+          <label className="block">
+            <span className={labelCls}>Cotisation annuelle (FCFA)</span>
+            <input value={membership.annualDues ?? ""} onChange={(e) => setMembership({ ...membership, annualDues: e.target.value })} type="number" min={0} step={500} className={inputCls} />
+          </label>
+          <label className="block">
+            <span className={labelCls}>Fonds de solidarité (FCFA)</span>
+            <input value={membership.solidarityFund ?? ""} onChange={(e) => setMembership({ ...membership, solidarityFund: e.target.value })} type="number" min={0} step={500} className={inputCls} />
+          </label>
+          <label className="block">
+            <span className={labelCls}>Fonds d&apos;investissement / mois (FCFA)</span>
+            <input value={membership.investmentMonthly ?? ""} onChange={(e) => setMembership({ ...membership, investmentMonthly: e.target.value })} type="number" min={0} step={500} className={inputCls} />
+          </label>
+          <label className="block">
+            <span className={labelCls}>Tontine annuelle (FCFA)</span>
+            <input value={membership.tontineAnnual ?? ""} onChange={(e) => setMembership({ ...membership, tontineAnnual: e.target.value })} type="number" min={0} step={500} className={inputCls} />
           </label>
           <label className="block">
             <span className={labelCls}>Âge minimum</span>
@@ -612,6 +632,8 @@ function MeetingRulesPanel({
       quorumPercent: 60,
       collationRate: 3000,
       collationHostPayout: 150000,
+      dayRule: "",
+      venue: "",
     })
   );
   const [saving, setSaving] = useState(false);
@@ -657,6 +679,7 @@ function MeetingRulesPanel({
           <select value={meeting.frequency} onChange={(e) => setMeeting({ ...meeting, frequency: e.target.value })} className={inputCls}>
             <option value="MONTHLY">Mensuelle</option>
             <option value="QUARTERLY">Trimestrielle</option>
+            <option value="ANNUAL">Annuelle</option>
           </select>
         </label>
         <label className="block">
@@ -670,6 +693,14 @@ function MeetingRulesPanel({
         <label className="block">
           <span className={labelCls}>Heure</span>
           <input type="number" min={0} max={23} value={meeting.hour} onChange={(e) => setMeeting({ ...meeting, hour: Number(e.target.value) })} className={inputCls} />
+        </label>
+        <label className="block md:col-span-2">
+          <span className={labelCls}>Règle de date / lieu</span>
+          <input value={meeting.dayRule ?? ""} onChange={(e) => setMeeting({ ...meeting, dayRule: e.target.value })} className={inputCls} placeholder="Ex : premier samedi à compter du 5" />
+        </label>
+        <label className="block md:col-span-2">
+          <span className={labelCls}>Lieu</span>
+          <input value={meeting.venue ?? ""} onChange={(e) => setMeeting({ ...meeting, venue: e.target.value })} className={inputCls} placeholder="Foyer, rotation chez les adhérents…" />
         </label>
         <label className="block">
           <span className={labelCls}>Quorum (%)</span>

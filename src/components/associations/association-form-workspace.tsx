@@ -84,6 +84,10 @@ type MembershipConfig = {
   admissionFee: string;
   approvalProcess: "UNANIMITY" | "MAJORITY" | "AUTO";
   waitingPeriod: string;
+  annualDues?: string;
+  solidarityFund?: string;
+  investmentMonthly?: string;
+  tontineAnnual?: string;
 };
 type SocialAidCaps = {
   illness_member: string;
@@ -159,6 +163,10 @@ const DEFAULT_MEMBERSHIP: MembershipConfig = {
   admissionFee: "",
   approvalProcess: "MAJORITY",
   waitingPeriod: "",
+  annualDues: "",
+  solidarityFund: "",
+  investmentMonthly: "",
+  tontineAnnual: "",
 };
 const DEFAULT_AIDS: SocialAidCaps = {
   illness_member: "",
@@ -1023,6 +1031,10 @@ export function AssociationFormWorkspace({
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <NumberInput label="Âge minimum" value={membership.ageMin} onChange={(v) => setMembership({ ...membership, ageMin: v })} min={0} />
                 <NumberInput label="Droit d'entrée (FCFA)" value={membership.admissionFee} onChange={(v) => setMembership({ ...membership, admissionFee: v })} min={0} step={500} />
+                <NumberInput label="Cotisation annuelle (FCFA)" value={membership.annualDues ?? ""} onChange={(v) => setMembership({ ...membership, annualDues: v })} min={0} step={500} />
+                <NumberInput label="Fonds de solidarité (FCFA)" value={membership.solidarityFund ?? ""} onChange={(v) => setMembership({ ...membership, solidarityFund: v })} min={0} step={500} />
+                <NumberInput label="Fonds d'investissement / mois (FCFA)" value={membership.investmentMonthly ?? ""} onChange={(v) => setMembership({ ...membership, investmentMonthly: v })} min={0} step={500} />
+                <NumberInput label="Tontine annuelle (FCFA)" value={membership.tontineAnnual ?? ""} onChange={(v) => setMembership({ ...membership, tontineAnnual: v })} min={0} step={500} />
                 <NumberInput label="Parrains requis" value={membership.sponsorshipCount} onChange={(v) => setMembership({ ...membership, sponsorshipCount: Number(v) })} min={0} />
                 <SelectInput label="Processus d'admission" value={membership.approvalProcess} onChange={(v) => setMembership({ ...membership, approvalProcess: v as MembershipConfig["approvalProcess"] })} options={[{ value: "UNANIMITY", label: "Unanimité" }, { value: "MAJORITY", label: "Majorité" }, { value: "AUTO", label: "Automatique" }]} />
                 <TextInput label="Délai d'attente" value={membership.waitingPeriod} onChange={(v) => setMembership({ ...membership, waitingPeriod: v })} placeholder="Ex : 3 mois" />
