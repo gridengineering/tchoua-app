@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Bell, ChevronDown, HelpCircle, LogOut, Menu, Plus, Settings, ShieldCheck, User } from "lucide-react";
+import { KycBadge } from "@/components/kyc/kyc-badge";
 
 const LABELS: Record<string, string> = {
   dashboard: "Tableau de bord", associations: "Associations", tontines: "Tontines",
@@ -27,7 +28,15 @@ export function MemberTopbar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [kyc, setKyc] = useState<{ level: number; status: string } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch("/api/kyc", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => { if (data) setKyc({ level: data.level, status: data.status }); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
@@ -96,6 +105,7 @@ export function MemberTopbar({
                 {user?.name?.charAt(0)?.toUpperCase() ?? "M"}
               </span>
               <span className="hidden max-w-[120px] truncate text-sm font-medium m-text md:block">{user?.name}</span>
+              {kyc ? <KycBadge level={kyc.level} status={kyc.status} /> : null}
               <ChevronDown className="hidden h-3.5 w-3.5 m-muted md:block" />
             </button>
             {open && (
@@ -103,8 +113,10 @@ export function MemberTopbar({
                 <div className="border-b m-border px-4 py-3">
                   <div className="truncate text-sm font-semibold m-text">{user?.name}</div>
                   <div className="truncate text-xs m-muted">{user?.email}</div>
+                  {kyc ? <div className="mt-1.5"><KycBadge level={kyc.level} status={kyc.status} /></div> : null}
                 </div>
                 <Link href="/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm m-hover"><User className="h-4 w-4" /> Mon profil</Link>
+                <Link href="/kyc" className="flex items-center gap-2 px-4 py-2.5 text-sm m-hover"><ShieldCheck className="h-4 w-4" /> Vérification KYC</Link>
                 <Link href="/parametres" className="flex items-center gap-2 px-4 py-2.5 text-sm m-hover"><Settings className="h-4 w-4" /> Paramètres</Link>
                 {user?.systemRoleId && (
                   <Link href="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50"><ShieldCheck className="h-4 w-4" /> Console admin</Link>

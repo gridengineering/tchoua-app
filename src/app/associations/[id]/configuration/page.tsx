@@ -35,6 +35,8 @@ type AssociationInfo = {
   type: string;
   membershipConfig?: string | null;
   meetingConfig?: string | null;
+  minKycLevel?: number | null;
+  requireRegulationApproval?: boolean | null;
 };
 type Activity = ActivityInitial & {
   id: string;
@@ -418,6 +420,8 @@ function ContributionRulesPanel({
     })
   );
   const [draft, setDraft] = useState<ArpConfig>(arp);
+  const [minKycLevel, setMinKycLevel] = useState(association.minKycLevel ?? 0);
+  const [requireRegulation, setRequireRegulation] = useState(association.requireRegulationApproval ?? true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -445,7 +449,11 @@ function ContributionRulesPanel({
       const core = await fetch(`/api/associations/${associationId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ membershipConfig: membership }),
+        body: JSON.stringify({
+          membershipConfig: membership,
+          minKycLevel,
+          requireRegulationApproval: requireRegulation,
+        }),
       });
       const coreData = await core.json().catch(() => ({}));
       if (!core.ok) throw new Error(coreData.error ?? "Enregistrement impossible");
@@ -541,6 +549,39 @@ function ContributionRulesPanel({
             </div>
           </div>
         ) : null}
+
+        <div className="mt-4 rounded-xl border border-[#e2ddd4] bg-[#fbf9f3] p-3.5">
+          <div className="flex items-start gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0d3d28]/8 text-[#0d3d28]"><ShieldCheck className="h-4 w-4" /></span>
+            <div>
+              <p className="text-xs font-bold text-[#1f2937]">Conformité & contrôle d&apos;accès</p>
+              <p className="mt-0.5 text-[11px] leading-4 text-[#7a7368]">
+                Le KYC suit une approche par risque (principes GAFI) : l&apos;association peut exiger un niveau minimal
+                avant toute participation à une activité ou opération financière.
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <label className="block">
+              <span className={labelCls}>Niveau KYC minimal des membres</span>
+              <select value={minKycLevel} onChange={(e) => setMinKycLevel(Number(e.target.value))} className={inputCls}>
+                <option value={0}>Aucun niveau imposé</option>
+                <option value={1}>KYC 1 — Identité déclarée</option>
+                <option value={2}>KYC 2 — Identité vérifiée</option>
+                <option value={3}>KYC 3 — Vigilance renforcée</option>
+              </select>
+            </label>
+            <label className="flex items-start gap-2 rounded-lg border border-[#e2ddd4] bg-white px-3 py-2.5">
+              <input type="checkbox" checked={requireRegulation} onChange={(e) => setRequireRegulation(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#0d3d28]" />
+              <span className="text-[11.5px] leading-4 text-[#3f3a33]">
+                Exiger l&apos;approbation des statuts et du règlement intérieur avant toute activité
+              </span>
+            </label>
+          </div>
+          <p className="mt-2 text-[10.5px] text-[#8a8175]">
+            Les seuils indicatifs par montant restent appliqués : KYC 2 au-delà de 500 000 FCFA, KYC 3 au-delà de 5 000 000 FCFA.
+          </p>
+        </div>
 
         {error ? <p className="mt-3 rounded-lg border border-[#f3cdcd] bg-[#fef6f6] px-3 py-2 text-[11.5px] text-[#991b1b]">{error}</p> : null}
         {message ? <p className="mt-3 rounded-lg border border-[#cce8d4] bg-[#f7fcf8] px-3 py-2 text-[11.5px] text-[#166534]">{message}</p> : null}

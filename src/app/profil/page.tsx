@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLevelInfo, getInitials } from "@/lib/utils";
-import { Trophy, Star, Shield, Leaf } from "lucide-react";
+import { Trophy, Star, Shield, Leaf, ShieldCheck } from "lucide-react";
+import { KycBadge } from "@/components/kyc/kyc-badge";
 
 const levels = [
   { key: "NOVICE", icon: "🌱", label: "Novice", min: 0, max: 99, color: "bg-gold" },
@@ -28,6 +31,13 @@ const badges = [
 export default function ProfilPage() {
   const { data: session } = useSession();
   const user = session?.user as any;
+  const [kyc, setKyc] = useState<{ level: number; status: string } | null>(null);
+  useEffect(() => {
+    fetch("/api/kyc", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => { if (data) setKyc({ level: data.level, status: data.status }); })
+      .catch(() => {});
+  }, []);
   const score = user?.score || 0;
   const level = user?.level || "NOVICE";
   const levelInfo = getLevelInfo(level);
@@ -48,10 +58,14 @@ export default function ProfilPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold">{user?.name || "Membre"}</h2>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span className="text-3xl">{levelInfo.icon}</span>
                 <span className="text-violet-200">Niveau {levelInfo.label}</span>
+                {kyc ? <KycBadge level={kyc.level} status={kyc.status} className="!border-white/30 !bg-white/10 !text-white" /> : null}
               </div>
+              <Link href="/kyc" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-violet-100 underline decoration-violet-300/60 underline-offset-2">
+                <ShieldCheck className="h-3.5 w-3.5" /> Gérer ma vérification KYC
+              </Link>
             </div>
             <div className="text-right">
               <div className="text-4xl font-bold">{score}</div>

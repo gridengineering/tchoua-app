@@ -32,6 +32,21 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
     if (mounted && status === "unauthenticated") router.push("/login");
   }, [mounted, status, router]);
 
+  // Consentements plateforme obligatoires avant d'accéder à l'espace membre.
+  useEffect(() => {
+    if (status !== "authenticated" || pathname === "/consentements") return;
+    let cancelled = false;
+    fetch("/api/consents", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data && data.complete === false) {
+          router.replace("/consentements");
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [status, pathname, router]);
+
   useEffect(() => { setMobileOpen(false); setHelpOpen(false); }, [pathname]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setHelpOpen(false); };

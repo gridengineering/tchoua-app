@@ -8,7 +8,7 @@ import {
   ArrowLeft, Users, Calendar, DollarSign, FileText, MessageSquare,
   Activity, Settings, UserPlus, Plus, Search, Upload, Send,
   AlertCircle, CheckCircle, Clock, ChevronRight, X, Building2,
-  BarChart3, Shield, Gavel, Shuffle, Star, Heart, Boxes
+  BarChart3, Shield, ShieldCheck, Gavel, Shuffle, Star, Heart, Boxes
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import { Badge, StatusBadge } from "@/components/ui/badge";
 import { formatCurrency, formatDate, getInitials, getFrequencyLabel } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { RegulationApprovalModal } from "@/components/association/RegulationApprovalModal";
+import { KycBadge } from "@/components/kyc/kyc-badge";
 import LifecycleBadge from "@/components/association/LifecycleBadge";
 import RelationsPanel from "@/components/association/RelationsPanel";
 import ElectionPanel from "@/components/association/ElectionPanel";
@@ -39,6 +40,8 @@ type AssocDetail = {
   memberships?: AssocMember[];
   activities?: AssocActivity[];
   parent?: { id: string; name: string } | null;
+  minKycLevel?: number | null;
+  requireRegulationApproval?: boolean | null;
 };
 
 type AssocActivity = {
@@ -63,7 +66,13 @@ type AssocMember = {
   reliabilityScore: number;
   customRoleId?: string | null;
   customRole?: { id: string; name: string; color: string } | null;
-  user: { name: string; email: string };
+  user: {
+    name: string;
+    email: string;
+    kycLevel?: number | null;
+    kycStatus?: string | null;
+    kycRequests?: Array<{ id: string; requestedLevel: number; createdAt: string }>;
+  };
 };
 
 type CustomRoleLite = { id: string; name: string; color: string };
@@ -391,6 +400,8 @@ export default function AssociationDetailPage() {
   const [customRoles, setCustomRoles] = useState<CustomRoleLite[]>([]);
   const [showRegulationModal, setShowRegulationModal] = useState(false);
   const [myMembershipStatus, setMyMembershipStatus] = useState<string | null>(null);
+  const [eligibilityNotice, setEligibilityNotice] = useState<string | null>(null);
+  const [myKycLevel, setMyKycLevel] = useState<number | null>(null);
 
   const reloadMembers = async () => {
     const r = await fetch(`/api/associations/${id}/members`);
@@ -485,13 +496,20 @@ export default function AssociationDetailPage() {
     fetch(`/api/associations/${id}/regulations`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data && data.membershipStatus === "PENDING" && data.articles?.length > 0 && !data.allApproved) {
-          setMyMembershipStatus("PENDING");
+        if (data && data.required !== false && data.articles?.length > 0 && !data.allApproved) {
+          setMyMembershipStatus(data.membershipStatus ?? "PENDING");
           setShowRegulationModal(true);
         }
       })
       .catch(() => {});
   }, [id, members.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    fetch("/api/kyc", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => { if (data) setMyKycLevel(data.level); })
+      .catch(() => {});
+  }, []);
 
   // Load messages when channel changes
   useEffect(() => {
@@ -630,6 +648,20 @@ export default function AssociationDetailPage() {
     }
   };
 
+  const reviewKyc = async (requestId: string, decision: "APPROVE" | "REJECT") => {
+    const note = decision === "REJECT" ? window.prompt("Motif du refus (optionnel)") ?? undefined : undefined;
+    const res = await fetch("/api/kyc/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, decision, note }),
+    });
+    if (res.ok) await reloadMembers();
+    else {
+      const data = await res.json().catch(() => ({}));
+      setEligibilityNotice(data.error ?? "Validation KYC impossible");
+    }
+  };
+
   const removeBankAccount = async (accountId: string) => {
     const res = await fetch(`/api/associations/${id}/bank-accounts?accountId=${accountId}`, { method: "DELETE" });
     if (res.ok) setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
@@ -672,6 +704,23 @@ export default function AssociationDetailPage() {
         <Link href="/associations" className="inline-flex items-center gap-2 text-sm text-graphite hover:text-gray-800 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Retour aux associations
         </Link>
+
+        {eligibilityNotice ? (
+          <div className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+            <span className="flex items-start gap-2"><AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />{eligibilityNotice}</span>
+            <div className="flex flex-shrink-0 gap-2">
+              <Link href="/kyc" className="rounded-lg bg-[#0d3d28] px-3 py-1.5 text-xs font-bold text-white">Améliorer mon KYC</Link>
+              <button type="button" onClick={() => setEligibilityNotice(null)} className="rounded-lg border border-amber-300 px-3 py-1.5 text-xs font-semibold">Fermer</button>
+            </div>
+          </div>
+        ) : null}
+
+        {myKycLevel !== null && assoc.minKycLevel !== undefined && assoc.minKycLevel !== null && myKycLevel < assoc.minKycLevel ? (
+          <div className="flex flex-col gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900 sm:flex-row sm:items-center sm:justify-between">
+            <span className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" />Cette association exige au minimum le niveau KYC {assoc.minKycLevel}. Votre niveau actuel est KYC {myKycLevel}.</span>
+            <Link href="/kyc" className="flex-shrink-0 rounded-lg bg-sky-900 px-3 py-1.5 text-xs font-bold text-white">Passer au niveau requis</Link>
+          </div>
+        ) : null}
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="rounded-2xl overflow-hidden shadow-md">
@@ -1183,7 +1232,10 @@ export default function AssociationDetailPage() {
                               {getInitials(member.user.name)}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">{member.user.name}</p>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <p className="font-medium text-gray-900">{member.user.name}</p>
+                                <KycBadge level={member.user.kycLevel} status={member.user.kycStatus} />
+                              </div>
                               <p className="text-xs text-ash">{member.user.email}</p>
                             </div>
                           </div>
@@ -1221,6 +1273,24 @@ export default function AssociationDetailPage() {
                         {isBureauMember && (
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-1">
+                              {member.user.kycRequests?.[0] ? (
+                                <>
+                                  <button
+                                    onClick={() => reviewKyc(member.user.kycRequests![0].id, "APPROVE")}
+                                    className="text-xs px-2 py-1 rounded border border-emerald-200 hover:bg-emerald-50 text-emerald-700"
+                                    title={`Valider KYC ${member.user.kycRequests?.[0].requestedLevel}`}
+                                  >
+                                    KYC ✓
+                                  </button>
+                                  <button
+                                    onClick={() => reviewKyc(member.user.kycRequests![0].id, "REJECT")}
+                                    className="text-xs px-2 py-1 rounded border border-red-200 hover:bg-red-50 text-red-600"
+                                    title="Refuser la demande KYC"
+                                  >
+                                    KYC ✕
+                                  </button>
+                                </>
+                              ) : null}
                               <button
                                 onClick={() => setEditingMemberRole(member)}
                                 disabled={member.role === "FOUNDER"}
@@ -1889,14 +1959,21 @@ export default function AssociationDetailPage() {
                   Annuler
                 </button>
                 <button
-                  onClick={() => {
-                    // Fire API
-                    fetch(`/api/associations/${id}/activities/${modalSubscribe.id}/subscribe`, {
+                  onClick={async () => {
+                    const res = await fetch(`/api/associations/${id}/activities/${modalSubscribe.id}/subscribe`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ parts: subscribeForm.parts }),
-                    }).catch(() => {});
+                    }).catch(() => null);
+                    if (!res || !res.ok) {
+                      const data = await res?.json().catch(() => ({}));
+                      setEligibilityNotice(data?.error ?? "Souscription impossible.");
+                      setModalSubscribe(null);
+                      return;
+                    }
                     setModalSubscribe(null);
+                    setEligibilityNotice(null);
+                    window.location.reload();
                   }}
                   className="flex-1 py-2.5 rounded-xl text-white text-sm font-medium"
                   style={{ backgroundColor: "#0d3d28" }}

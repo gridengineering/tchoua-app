@@ -6,6 +6,7 @@ import Link from "next/link";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Users, Search, UserPlus, Filter, ShieldAlert } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { KycBadge } from "@/components/kyc/kyc-badge";
 
 export default function MembersDirectoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -119,7 +120,10 @@ export default function MembersDirectoryPage() {
                             {m.user.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-semibold text-gray-900">{m.user.name}</div>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="font-semibold text-gray-900">{m.user.name}</span>
+                              <KycBadge level={m.user.kycLevel} status={m.user.kycStatus} />
+                            </div>
                             <div className="text-xs text-graphite">Adhésion : {new Date(m.createdAt).toLocaleDateString()}</div>
                           </div>
                         </div>

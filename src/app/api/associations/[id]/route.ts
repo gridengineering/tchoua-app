@@ -70,7 +70,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     name, description, type, isPublic, color, logo, region, website, email, phone,
     reglementHtml, reglementUrl, bureauConfig, membershipConfig, meetingConfig,
     socialAidCaps, sanctionsConfig, bankConfig, status,
-    parentId, parentSubscriptionFee, regulations
+    parentId, parentSubscriptionFee, regulations,
+    minKycLevel, requireRegulationApproval
   } = body;
 
   const association = await prisma.$transaction(async (tx) => {
@@ -98,6 +99,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(status !== undefined && { status }),
         ...(parentId !== undefined && { parentId }),
         ...(parentSubscriptionFee !== undefined && { parentSubscriptionFee: parentSubscriptionFee ? parseFloat(parentSubscriptionFee) : null }),
+        ...(minKycLevel !== undefined && { minKycLevel: Math.max(0, Math.min(3, Number(minKycLevel))) }),
+        ...(requireRegulationApproval !== undefined && { requireRegulationApproval: Boolean(requireRegulationApproval) }),
       },
     });
 

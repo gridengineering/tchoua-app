@@ -14,10 +14,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     where: { userId_associationId: { userId: session.user.id, associationId } }
   });
 
-  const articles = await prisma.associationRegulationArticle.findMany({
-    where: { associationId },
-    orderBy: { articleNumber: "asc" }
-  });
+  const [articles, association] = await Promise.all([
+    prisma.associationRegulationArticle.findMany({
+      where: { associationId },
+      orderBy: { articleNumber: "asc" }
+    }),
+    prisma.association.findUnique({
+      where: { id: associationId },
+      select: { requireRegulationApproval: true },
+    }),
+  ]);
 
   let approvals: string[] = [];
   if (membership) {
@@ -32,6 +38,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     articles,
     approvals,
     membershipStatus: membership?.status ?? null,
+    required: association?.requireRegulationApproval ?? true,
     allApproved: articles.length > 0 && articles.every(a => approvals.includes(a.id)),
   });
 }

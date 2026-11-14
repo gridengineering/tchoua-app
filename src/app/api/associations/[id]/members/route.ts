@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -17,10 +18,37 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       whereClause.status = status;
     }
 
+    const actor = await prisma.associationMembership.findUnique({
+      where: { userId_associationId: { userId: session.user.id, associationId } },
+      include: { customRole: true },
+    });
+    const canReviewKyc = Boolean(actor && hasPermission(session, actor, "MANAGE_MEMBERS"));
+
     const members = await prisma.associationMembership.findMany({
       where: whereClause,
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            profession: true,
+            avatar: true,
+            kycLevel: true,
+            kycStatus: true,
+            ...(canReviewKyc
+              ? {
+                  kycRequests: {
+                    where: { status: "PENDING" },
+                    orderBy: { createdAt: "desc" as const },
+                    take: 1,
+                    select: { id: true, requestedLevel: true, createdAt: true },
+                  },
+                }
+              : {}),
+          },
+        },
         customRole: true,
       },
       orderBy: { createdAt: "desc" }

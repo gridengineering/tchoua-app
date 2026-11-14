@@ -33,6 +33,7 @@ const GLOBAL_GROUPS: Group[] = [
       { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
       { href: "/associations", label: "Mes associations", icon: Building2 },
       { href: "/dashboard/calendrier", label: "Calendrier", icon: Calendar },
+      { href: "/kyc", label: "Vérification KYC", icon: ShieldCheck },
     ],
   },
   {

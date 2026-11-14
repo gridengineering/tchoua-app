@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import {
   validateLoanToFundRatio,
@@ -97,6 +98,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (!activityId || !amount || !duration) {
     return NextResponse.json({ error: "activityId, amount et duration sont requis" }, { status: 400 });
+  }
+
+  const eligibility = await checkAssociationEligibility(session.user.id, id, { amount: Number(amount) });
+  if (!eligibility.ok) {
+    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
   }
 
   const activity = await prisma.associationActivity.findFirst({

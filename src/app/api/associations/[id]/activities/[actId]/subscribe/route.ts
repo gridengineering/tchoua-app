@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -28,6 +29,13 @@ export async function POST(
 
   if (activity.participation === "MANDATORY") {
     return NextResponse.json({ error: "L'adhésion à cette activité est automatique" }, { status: 400 });
+  }
+
+  const eligibility = await checkAssociationEligibility(session.user.id, id, {
+    amount: activity.contributionAmount ?? undefined,
+  });
+  if (!eligibility.ok) {
+    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
   }
 
   const existing = await prisma.activitySubscription.findFirst({

@@ -29,6 +29,10 @@ model User {
   score           Int       @default(0)
   level           String    @default("NOVICE")
   referralCode    String    @unique @default(cuid())
+  kycLevel        Int       @default(0)
+  kycStatus       String    @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
+  kycVerifiedAt   DateTime?
+  kycData         String?   // JSON: synthèse vérifiée (nom légal, pièce, adresse, origine des fonds)
   referredById    String?
   referredBy      User?     @relation("Referrals", fields: [referredById], references: [id])
   referrals       User[]    @relation("Referrals")
@@ -64,6 +68,9 @@ model User {
   templatesCreated      AssociationTemplate[] @relation("TemplateCreator")
   templateRatings       TemplateRating[]
   wallet                Wallet?
+  kycRequests           KycRequest[]       @relation("KycRequester")
+  kycReviews            KycRequest[]       @relation("KycReviewer")
+  platformConsents      PlatformConsent[]
 
   @@map("users")
 }
@@ -795,6 +802,10 @@ model Association {
   // Règlement intérieur
   reglementHtml String?
   reglementUrl  String?
+
+  // Conformité KYC / LBC-FT
+  minKycLevel               Int     @default(0)
+  requireRegulationApproval Boolean @default(true)
 
   // Bureau (JSON: { president, vicePresident, secretaires[], tresorier, ... })
   bureauConfig  String?
@@ -2090,4 +2101,50 @@ model ArpFundReservation {
 
   @@index([fundId, status])
   @@map("arp_fund_reservations")
+}
+
+model KycRequest {
+  id             String   @id @default(cuid())
+  userId         String
+  requestedLevel Int
+  status         String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  fullName       String?
+  dateOfBirth    String?
+  nationality    String?
+  idType         String?  // CNI, PASSPORT, RESIDENCE_PERMIT, OTHER
+  idNumber       String?
+  address        String?
+  city           String?
+  country        String?
+  occupation     String?
+  sourceOfFunds  String?
+  documentRef    String?
+  reviewNote     String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user       User  @relation("KycRequester", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("KycReviewer", fields: [reviewedById], references: [id])
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+  @@map("kyc_requests")
+}
+
+model PlatformConsent {
+  id         String   @id @default(cuid())
+  userId     String
+  document   String   // TERMS, PRIVACY, DATA_PROTECTION, CONFIDENTIALITY
+  version    String
+  acceptedAt DateTime @default(now())
+  ip         String?
+  userAgent  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, document, version])
+  @@index([userId])
+  @@map("platform_consents")
 }

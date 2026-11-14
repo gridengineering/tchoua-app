@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 
 const TREASURER_ROLES = ["PRESIDENT", "FOUNDER", "TREASURER"];
 
@@ -77,6 +78,13 @@ export async function POST(
     where: { id: membershipId, associationId: id },
   });
   if (!targetMembership) return NextResponse.json({ error: "Membre introuvable" }, { status: 404 });
+
+  const eligibility = await checkAssociationEligibility(targetMembership.userId, id, {
+    amount: Number(amount),
+  });
+  if (!eligibility.ok) {
+    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
+  }
 
   const contribution = await prisma.activityContribution.create({
     data: {

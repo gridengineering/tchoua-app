@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 
 const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
@@ -62,6 +63,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (!category || !requestedAmount) {
     return NextResponse.json({ error: "category et requestedAmount sont requis" }, { status: 400 });
+  }
+
+  const eligibility = await checkAssociationEligibility(session.user.id, id, {
+    amount: Number(requestedAmount),
+  });
+  if (!eligibility.ok) {
+    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
   }
 
   // Check cap from association socialAidCaps
