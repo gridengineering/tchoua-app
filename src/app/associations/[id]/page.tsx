@@ -304,7 +304,7 @@ function getReliabilityColor(score: number): string {
 }
 
 function isBureau(role: string): boolean {
-  return ["PRESIDENT", "TREASURER", "SECRETARY", "VICE_PRESIDENT", "AUDITOR"].includes(role);
+  return ["FOUNDER", "PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "TREASURER_ADJ", "AUDITOR", "SOLIDARITY_OFFICER"].includes(role);
 }
 
 function getMeetingTypeLabel(type: string): string {

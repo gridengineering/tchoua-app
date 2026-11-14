@@ -16,7 +16,7 @@ Un validateur du bureau ne peut approuver qu'un niveau inférieur ou égal à so
 
 Le code est généré côté serveur et haché en SHA-256. Les adaptateurs sont :
 
-- **E-mail** : `sendmail` local. Pour une livraison fiable en production, configurer un relais Postfix/SMTP sortant.
+- **E-mail** : `KYC_EMAIL_WEBHOOK_URL` (fournisseur transactionnel) ou `sendmail` local. Pour une livraison fiable en production, configurer un relais Postfix/SMTP sortant ou un webhook e-mail.
 - **SMS / WhatsApp** : `KYC_SMS_WEBHOOK_URL` ou `KYC_WHATSAPP_WEBHOOK_URL`, recevant `{ channel, to, message, code }`. `KYC_MESSAGING_TOKEN` est envoyé en `Authorization: Bearer`.
 - `KYC_EMAIL_FROM` permet de changer l'expéditeur.
 - `KYC_DEV_MODE=1` renvoie `devCode` dans la réponse **uniquement pour les tests** ; ne jamais l'activer en production.

@@ -27,6 +27,27 @@ export function isPhoneTarget(value: string) {
 }
 
 async function deliverEmail(to: string, code: string) {
+  const webhook = process.env.KYC_EMAIL_WEBHOOK_URL;
+  if (webhook) {
+    const response = await fetch(webhook, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.KYC_EMAIL_API_KEY ? { Authorization: `Bearer ${process.env.KYC_EMAIL_API_KEY}` } : {}),
+      },
+      body: JSON.stringify({
+        to,
+        subject: "Votre code de vérification Tchoua",
+        text: `Votre code de vérification Tchoua est ${code}. Il expire dans 10 minutes.`,
+        code,
+      }),
+    }).catch((error) => {
+      console.error("[KYC][EMAIL] webhook failed", error);
+      return null;
+    });
+    return Boolean(response?.ok);
+  }
+
   const from = process.env.KYC_EMAIL_FROM ?? "Tchoua <no-reply@tchoua.com>";
   const subject = "Votre code de vérification Tchoua";
   const text = [
