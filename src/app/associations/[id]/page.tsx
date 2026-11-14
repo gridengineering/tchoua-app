@@ -8,7 +8,7 @@ import {
   ArrowLeft, Users, Calendar, DollarSign, FileText, MessageSquare,
   Activity, Settings, UserPlus, Plus, Search, Upload, Send,
   AlertCircle, CheckCircle, Clock, ChevronRight, X, Building2,
-  BarChart3, Shield, ShieldCheck, Gavel, Shuffle, Star, Heart, Boxes
+  BarChart3, Shield, ShieldCheck, Gavel, Shuffle, Star, Heart, Boxes, Video
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -531,6 +531,20 @@ export default function AssociationDetailPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const joinVideo = async (meeting?: AssocMeetingT | null) => {
+    const res = await fetch("/api/rtc/jitsi-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ associationId: id, meetingId: meeting?.id }),
+    }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
+    if (!res || !res.ok) {
+      setEligibilityNotice(data?.error ?? "La visioconférence n'est pas accessible.");
+      return;
+    }
+    window.open(data.url, "_blank", "noopener,noreferrer");
+  };
 
   const sendMessage = () => {
     if (!chatInput.trim()) return;
@@ -1438,6 +1452,14 @@ export default function AssociationDetailPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-blue-800">{getMeetingTypeLabel(meeting.type)}</span>
                           <StatusBadge status={meeting.status} />
+                          <button
+                            type="button"
+                            onClick={(event) => { event.stopPropagation(); joinVideo(meeting); }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-[#cfe0d5] bg-[#f6fbf7] px-2 py-1 text-[11px] font-bold text-[#0d3d28] hover:bg-[#ecf7ef]"
+                            title="Rejoindre la visioconférence"
+                          >
+                            <Video className="h-3 w-3" /> Visio
+                          </button>
                         </div>
                       </div>
                     </CardContent>
