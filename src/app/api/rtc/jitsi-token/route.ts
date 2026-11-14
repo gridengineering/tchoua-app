@@ -4,6 +4,7 @@ import { createHmac } from "crypto";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 const MODERATOR_ROLES = new Set([
   "FOUNDER", "PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "TREASURER_ADJ",
@@ -24,9 +25,14 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
+  const settings = await getPlatformSettings();
+  const rtc = settings.rtc;
+  if (!rtc.enabled || !rtc.videoEnabled) {
+    return NextResponse.json({ error: "La visioconférence est désactivée par l'administration." }, { status: 503 });
+  }
   const secret = process.env.JITSI_JWT_APP_SECRET;
-  const appId = process.env.JITSI_JWT_APP_ID ?? "tchoua";
-  const jitsiUrl = process.env.JITSI_URL ?? "https://meet.tchoua.com";
+  const appId = rtc.jitsiAppId || process.env.JITSI_JWT_APP_ID || "tchoua";
+  const jitsiUrl = (rtc.jitsiUrl || process.env.JITSI_URL || "https://meet.tchoua.com").replace(/\/$/, "");
   if (!secret) {
     return NextResponse.json({ error: "Service visioconférence non configuré" }, { status: 503 });
   }
@@ -52,14 +58,17 @@ export async function POST(req: NextRequest) {
     if (!meeting) return NextResponse.json({ error: "Réunion introuvable" }, { status: 404 });
   }
 
-  const eligibility = await checkAssociationEligibility(session.user.id, associationId);
+  const eligibility = await checkAssociationEligibility(session.user.id, associationId, {
+    minKycLevel: Number(rtc.requireKycLevel ?? 1),
+  });
   if (!eligibility.ok) {
     return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
   }
 
+  const prefix = (rtc.jitsiRoomPrefix || "assoc").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 24) || "assoc";
   const room = meetingId
-    ? `assoc-${associationId}-reunion-${meetingId}`
-    : `assoc-${associationId}-general`;
+    ? `${prefix}-${associationId}-reunion-${meetingId}`
+    : `${prefix}-${associationId}-general`;
   const moderator = MODERATOR_ROLES.has(membership.role);
   const now = Math.floor(Date.now() / 1000);
   const token = signJitsiJwt(
@@ -68,7 +77,7 @@ export async function POST(req: NextRequest) {
       iss: appId,
       sub: appId,
       room,
-      exp: now + 3600,
+      exp: now + Math.max(5, Number(rtc.jitsiJwtTtlMinutes ?? 60)) * 60,
       nbf: now - 10,
       iat: now,
       context: {

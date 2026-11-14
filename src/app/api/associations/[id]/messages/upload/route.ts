@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 const ALLOWED = new Set([
   "application/pdf",
@@ -17,7 +18,6 @@ const ALLOWED = new Set([
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "text/plain",
 ]);
-const MAX_SIZE = 20 * 1024 * 1024;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -35,10 +35,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const form = await req.formData();
   const file = form.get("file") as File | null;
   if (!file) return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
-  if (!ALLOWED.has(file.type)) return NextResponse.json({ error: "Type de fichier non autorisé" }, { status: 400 });
-  if (file.size > MAX_SIZE) return NextResponse.json({ error: "Fichier trop volumineux (max 20 Mo)" }, { status: 400 });
-
+  const settings = await getPlatformSettings();
+  if (!settings.rtc.enabled || !settings.rtc.chatEnabled) {
+    return NextResponse.json({ error: "Le partage de fichiers est désactivé." }, { status: 503 });
+  }
+  const allowedExtensions = new Set((settings.rtc.chatAllowedExtensions ?? []).map((value) => value.toLowerCase()));
   const ext = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!allowedExtensions.has(ext) || !ALLOWED.has(file.type)) {
+    return NextResponse.json({ error: "Type de fichier non autorisé" }, { status: 400 });
+  }
+  const maxSize = Math.max(1, Number(settings.rtc.chatFileMaxMb ?? 20)) * 1024 * 1024;
+  if (file.size > maxSize) {
+    return NextResponse.json({ error: `Fichier trop volumineux (max ${Math.round(maxSize / 1024 / 1024)} Mo)` }, { status: 400 });
+  }
   const filename = `${randomUUID()}.${ext}`;
   const dir = join(process.cwd(), "storage", "chat", id);
   await mkdir(dir, { recursive: true });

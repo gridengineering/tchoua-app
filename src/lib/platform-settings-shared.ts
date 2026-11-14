@@ -40,6 +40,23 @@ export type PlatformSettings = {
     pushEnabled: boolean;
     reminderOffsets: number[];
   };
+  rtc: {
+    enabled: boolean;
+    videoEnabled: boolean;
+    chatEnabled: boolean;
+    jitsiUrl: string;
+    jitsiAppId: string;
+    jitsiJwtTtlMinutes: number;
+    jitsiRoomPrefix: string;
+    chatWsUrl: string;
+    chatApiUrl: string;
+    chatFileMaxMb: number;
+    chatAllowedExtensions: string[];
+    turnUrls: string[];
+    stunUrl: string;
+    requireKycLevel: number;
+    bureauChannelEnabled: boolean;
+  };
 };
 
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
@@ -83,6 +100,23 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     smsEnabled: false,
     pushEnabled: true,
     reminderOffsets: [3, 1, 0],
+  },
+  rtc: {
+    enabled: true,
+    videoEnabled: true,
+    chatEnabled: true,
+    jitsiUrl: "https://meet.tchoua.com",
+    jitsiAppId: "tchoua",
+    jitsiJwtTtlMinutes: 60,
+    jitsiRoomPrefix: "assoc",
+    chatWsUrl: "wss://chat.tchoua.com/connection/websocket",
+    chatApiUrl: "https://chat.tchoua.com",
+    chatFileMaxMb: 20,
+    chatAllowedExtensions: ["pdf", "jpg", "jpeg", "png", "webp", "doc", "docx", "xls", "xlsx", "txt"],
+    turnUrls: ["turn:turn.tchoua.com:3478?transport=udp", "turn:turn.tchoua.com:3478?transport=tcp"],
+    stunUrl: "stun:turn.tchoua.com:3478",
+    requireKycLevel: 1,
+    bureauChannelEnabled: true,
   },
 };
 

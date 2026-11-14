@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Layout,
-  Lock, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, Sparkles,
-  ToggleLeft, ToggleRight, Wrench,
+  Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Layout,
+  Lock, MessageSquare, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, Sparkles,
+  ToggleLeft, ToggleRight, Video, Wrench,
 } from "lucide-react";
 import { PlatformSettings } from "@/lib/platform-settings-shared";
 
@@ -14,6 +14,7 @@ const TABS = [
   { id: "access", label: "Accès & sécurité", icon: Lock },
   { id: "limits", label: "Limites & finances", icon: Coins },
   { id: "features", label: "Fonctionnalités", icon: Sparkles },
+  { id: "rtc", label: "RTC & Chat", icon: Video },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "maintenance", label: "Maintenance", icon: Wrench },
 ] as const;
@@ -74,6 +75,8 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [rtcHealth, setRtcHealth] = useState<any>(null);
+  const [testingRtc, setTestingRtc] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -161,6 +164,19 @@ export default function AdminSettingsPage() {
     link.download = `tchoua-settings-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const testRtc = async () => {
+    setTestingRtc(true);
+    try {
+      const res = await fetch("/api/admin/rtc/health", { cache: "no-store" });
+      const data = await res.json();
+      setRtcHealth({ ...data, ok: res.ok });
+    } catch (error: any) {
+      setRtcHealth({ ok: false, error: error.message });
+    } finally {
+      setTestingRtc(false);
+    }
   };
 
   if (loading && !settings) {
@@ -435,6 +451,113 @@ export default function AdminSettingsPage() {
                 ))}
               </div>
             </Section>
+          )}
+
+          {tab === "rtc" && (
+            <div className="space-y-6">
+              <Section title="Service RTC & chat interne" icon={Video} desc="Visioconférence Jitsi, messagerie temps réel Centrifugo et relais TURN/STUN.">
+                <div className="space-y-3">
+                  <Toggle title="Service RTC actif" desc="Désactive à la fois la visioconférence et le chat temps réel." checked={settings.rtc.enabled} onChange={(v) => update("rtc.enabled", v)} />
+                  <Toggle title="Visioconférence" desc="Autorise l'émission de jetons Jitsi et l'ouverture des salles de réunion." checked={settings.rtc.videoEnabled} onChange={(v) => update("rtc.videoEnabled", v)} />
+                  <Toggle title="Chat temps réel" desc="Autorise la connexion Centrifugo et la publication des messages." checked={settings.rtc.chatEnabled} onChange={(v) => update("rtc.chatEnabled", v)} />
+                  <Toggle title="Canal bureau" desc="Ajoute le canal réservé au bureau dans les jetons de chat." checked={settings.rtc.bureauChannelEnabled} onChange={(v) => update("rtc.bureauChannelEnabled", v)} />
+                </div>
+              </Section>
+
+              <Section title="Jitsi Meet" icon={Video} desc="URL publique, identité JWT et durée des sessions.">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="URL publique Jitsi">
+                    <input className={inputCls} value={settings.rtc.jitsiUrl} onChange={(e) => update("rtc.jitsiUrl", e.target.value)} placeholder="https://meet.tchoua.com" />
+                  </Field>
+                  <Field label="Identifiant d'application JWT">
+                    <input className={inputCls} value={settings.rtc.jitsiAppId} onChange={(e) => update("rtc.jitsiAppId", e.target.value)} placeholder="tchoua" />
+                  </Field>
+                  <Field label="Durée du jeton (minutes)">
+                    <input type="number" min={5} max={1440} className={inputCls} value={settings.rtc.jitsiJwtTtlMinutes} onChange={(e) => update("rtc.jitsiJwtTtlMinutes", Number(e.target.value))} />
+                  </Field>
+                  <Field label="Préfixe des salles">
+                    <input className={inputCls} value={settings.rtc.jitsiRoomPrefix} onChange={(e) => update("rtc.jitsiRoomPrefix", e.target.value)} placeholder="assoc" />
+                  </Field>
+                  <Field label="Niveau KYC minimal pour la visio">
+                    <select className={inputCls} value={settings.rtc.requireKycLevel} onChange={(e) => update("rtc.requireKycLevel", Number(e.target.value))}>
+                      <option value={0}>Aucun</option>
+                      <option value={1}>KYC 1 — identité déclarée</option>
+                      <option value={2}>KYC 2 — identité vérifiée</option>
+                      <option value={3}>KYC 3 — vigilance renforcée</option>
+                    </select>
+                  </Field>
+                </div>
+                <p className="mt-4 text-xs text-slate-500">
+                  Le secret JWT Jitsi reste dans le fichier <code>.env</code> du serveur et n&apos;est jamais affiché dans cette interface.
+                  Les salles sont imposées côté serveur : <code>assoc-&lt;association&gt;-reunion-&lt;réunion&gt;</code> ou <code>assoc-&lt;association&gt;-general</code>.
+                </p>
+              </Section>
+
+              <Section title="Centrifugo — chat" icon={MessageSquare} desc="WebSocket public, API serveur, taille et types de fichiers.">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="URL WebSocket publique">
+                    <input className={inputCls} value={settings.rtc.chatWsUrl} onChange={(e) => update("rtc.chatWsUrl", e.target.value)} placeholder="wss://chat.tchoua.com/connection/websocket" />
+                  </Field>
+                  <Field label="URL API serveur">
+                    <input className={inputCls} value={settings.rtc.chatApiUrl} onChange={(e) => update("rtc.chatApiUrl", e.target.value)} placeholder="https://chat.tchoua.com" />
+                  </Field>
+                  <Field label="Taille maximale des fichiers (Mo)">
+                    <input type="number" min={1} max={100} className={inputCls} value={settings.rtc.chatFileMaxMb} onChange={(e) => update("rtc.chatFileMaxMb", Number(e.target.value))} />
+                  </Field>
+                  <Field label="Extensions autorisées (séparées par des virgules)">
+                    <input className={inputCls} value={settings.rtc.chatAllowedExtensions.join(", ")} onChange={(e) => update("rtc.chatAllowedExtensions", e.target.value.split(",").map((v) => v.trim().toLowerCase().replace(/^\./, "")).filter(Boolean))} placeholder="pdf, jpg, png, docx" />
+                  </Field>
+                </div>
+                <p className="mt-4 text-xs text-slate-500">
+                  La clé API Centrifugo et le secret HMAC des jetons restent dans <code>.env</code>. Le canal bureau n&apos;est distribué qu&apos;aux rôles de bureau.
+                </p>
+              </Section>
+
+              <Section title="TURN / STUN" icon={Sliders} desc="Relais média pour les réseaux qui bloquent l'UDP direct.">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="URL STUN">
+                    <input className={inputCls} value={settings.rtc.stunUrl} onChange={(e) => update("rtc.stunUrl", e.target.value)} placeholder="stun:turn.tchoua.com:3478" />
+                  </Field>
+                  <Field label="URLs TURN (une par ligne ou séparées par des virgules)">
+                    <textarea
+                      className={`${inputCls} min-h-[90px]`}
+                      value={settings.rtc.turnUrls.join("\n")}
+                      onChange={(e) => update("rtc.turnUrls", e.target.value.split(/[\n,]+/).map((v) => v.trim()).filter(Boolean))}
+                      placeholder={"turn:turn.tchoua.com:3478?transport=udp\nturn:turn.tchoua.com:3478?transport=tcp"}
+                    />
+                  </Field>
+                </div>
+                <div className="mt-4 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
+                  <Info label="Ports média" value="UDP 10000 · TCP/UDP 3478 · 5349 · UDP 49160–49200" />
+                  <Info label="Hôte RTC" value="CT109 TCHOUA-COMM · 192.168.100.109" />
+                </div>
+              </Section>
+
+              <Section title="État du service" icon={ShieldCheck} desc="Test de disponibilité des URLs configurées.">
+                <div className="flex flex-wrap items-center gap-3">
+                  <button onClick={testRtc} disabled={testingRtc} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+                    {testingRtc ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Activity className="h-4 w-4" />}
+                    {testingRtc ? "Test en cours…" : "Tester la configuration"}
+                  </button>
+                  {rtcHealth && (
+                    <span className={`text-sm font-semibold ${rtcHealth.ok ? "text-emerald-600" : "text-red-600"}`}>
+                      {rtcHealth.ok ? "Configuration joignable" : "Un contrôle a échoué"}
+                    </span>
+                  )}
+                </div>
+                {rtcHealth && (
+                  <div className="mt-4 space-y-2">
+                    {(rtcHealth.checks ?? []).map((check: any) => (
+                      <div key={check.name} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-2.5 text-sm">
+                        <span className="font-medium text-slate-700">{check.name}</span>
+                        <span className={check.ok ? "font-semibold text-emerald-600" : "font-semibold text-red-600"}>{check.ok ? "OK" : check.error || "Échec"}</span>
+                      </div>
+                    ))}
+                    {rtcHealth.error && <p className="text-sm text-red-600">{rtcHealth.error}</p>}
+                  </div>
+                )}
+              </Section>
+            </div>
           )}
 
           {tab === "notifications" && (

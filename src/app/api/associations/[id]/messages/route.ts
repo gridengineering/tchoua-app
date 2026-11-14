@@ -3,8 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { publishAssociationEvent } from "@/lib/rtc/centrifugo";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
-const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
+const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "TREASURER_ADJ", "SOLIDARITY_OFFICER"];
+
+async function chatEnabled() {
+  const settings = await getPlatformSettings();
+  return settings.rtc.enabled && settings.rtc.chatEnabled;
+}
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -15,6 +21,7 @@ async function getMembership(userId: string, associationId: string) {
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  if (!(await chatEnabled())) return NextResponse.json({ error: "Le chat est désactivé." }, { status: 503 });
 
   const { id } = await params;
   const membership = await getMembership(session.user.id, id);
@@ -50,6 +57,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  if (!(await chatEnabled())) return NextResponse.json({ error: "Le chat est désactivé." }, { status: 503 });
 
   const { id } = await params;
   const membership = await getMembership(session.user.id, id);
@@ -70,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     data: {
       associationId: id,
       membershipId: membership.id,
-      content: content.slice(0, 4000),
+      content: String(content ?? "").slice(0, 4000),
       type,
       channel,
       mediaUrl,

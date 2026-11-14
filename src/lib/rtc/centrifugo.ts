@@ -1,4 +1,5 @@
 import { createHmac } from "crypto";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 export function centrifugoToken(userId: string, channels: string[], ttlSeconds = 3600) {
   const secret = process.env.CENTRIFUGO_TOKEN_HMAC_SECRET;
@@ -18,7 +19,9 @@ export function centrifugoToken(userId: string, channels: string[], ttlSeconds =
 }
 
 export async function publishAssociationEvent(associationId: string, channel: string, data: unknown) {
-  const url = process.env.CENTRIFUGO_API_URL;
+  const settings = await getPlatformSettings().catch(() => null);
+  if (settings && (!settings.rtc.enabled || !settings.rtc.chatEnabled)) return false;
+  const url = settings?.rtc.chatApiUrl || process.env.CENTRIFUGO_API_URL;
   const key = process.env.CENTRIFUGO_API_KEY;
   if (!url || !key) return false;
   try {

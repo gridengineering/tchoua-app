@@ -27,7 +27,7 @@ export type EligibilityResult = { ok: true } | EligibilityFailure;
 export async function checkAssociationEligibility(
   userId: string,
   associationId: string,
-  options: { amount?: number | null } = {}
+  options: { amount?: number | null; minKycLevel?: number | null } = {}
 ): Promise<EligibilityResult> {
   const [association, membership, consents] = await Promise.all([
     prisma.association.findUnique({
@@ -99,6 +99,7 @@ export async function checkAssociationEligibility(
   const requestedKyc = Math.max(
     1,
     Number(association.minKycLevel ?? 0),
+    Number(options.minKycLevel ?? 0),
     options.amount ? requiredKycForAmount(options.amount) : 1
   ) as KycLevel;
 
