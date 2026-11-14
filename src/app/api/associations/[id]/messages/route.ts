@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { publishAssociationEvent } from "@/lib/rtc/centrifugo";
 
 const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
 
@@ -57,7 +58,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const body = await req.json();
   const { content, type = "TEXT", channel = "GENERAL", mediaUrl, replyToId } = body;
 
-  if (!content || !content.trim()) return NextResponse.json({ error: "content requis" }, { status: 400 });
+  if ((!content || !content.trim()) && !mediaUrl) {
+    return NextResponse.json({ error: "content ou fichier requis" }, { status: 400 });
+  }
 
   if (channel === "BUREAU" && !BUREAU_ROLES.includes(membership.role)) {
     return NextResponse.json({ error: "Réservé au bureau" }, { status: 403 });
@@ -77,6 +80,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       membership: { include: { user: { select: { id: true, name: true, avatar: true } } } },
     },
   });
+
+  await publishAssociationEvent(id, channel, { type: "message", message });
 
   return NextResponse.json({ message }, { status: 201 });
 }

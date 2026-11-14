@@ -8,7 +8,7 @@ import {
   ArrowLeft, Users, Calendar, DollarSign, FileText, MessageSquare,
   Activity, Settings, UserPlus, Plus, Search, Upload, Send,
   AlertCircle, CheckCircle, Clock, ChevronRight, X, Building2,
-  BarChart3, Shield, ShieldCheck, Gavel, Shuffle, Star, Heart, Boxes, Video
+  BarChart3, Shield, ShieldCheck, Gavel, Shuffle, Star, Heart, Boxes, Video, Paperclip
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -107,6 +107,8 @@ type ChatMessage = {
   content: string;
   createdAt: string;
   channel: string;
+  type?: string;
+  mediaUrl?: string | null;
 };
 
 type FinanceReport = {
@@ -389,6 +391,7 @@ export default function AssociationDetailPage() {
   const [selectedMeeting, setSelectedMeeting] = useState<AssocMeetingT | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<AssocActivity | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatFileRef = useRef<HTMLInputElement>(null);
 
   // Modal states
   const [modalSubscribe, setModalSubscribe] = useState<AssocActivity | null>(null);
@@ -527,6 +530,42 @@ export default function AssociationDetailPage() {
       });
   }, [id, chatChannel]);
 
+  // Temps réel : messages de l'association via Centrifugo
+  useEffect(() => {
+    if (!id) return;
+    let client: any = null;
+    let sub: any = null;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/rtc/chat-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ associationId: id }),
+        });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (!data?.token || cancelled) return;
+        const { Centrifuge } = await import("centrifuge");
+        client = new Centrifuge(data.wsUrl, { token: data.token });
+        sub = client.newSubscription(`assoc:${id}:${chatChannel}`);
+        sub.on("publication", (ctx: any) => {
+          const message = ctx?.data?.message;
+          if (!message || message.channel !== chatChannel) return;
+          setMessages((prev) => (prev.some((m) => m.id === message.id) ? prev : [...prev, message]));
+        });
+        sub.subscribe();
+        client.connect();
+      } catch {
+        /* le chargement HTTP reste disponible */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      try { sub?.unsubscribe(); client?.disconnect(); } catch {}
+    };
+  }, [id, chatChannel]);
+
   // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -544,6 +583,27 @@ export default function AssociationDetailPage() {
       return;
     }
     window.open(data.url, "_blank", "noopener,noreferrer");
+  };
+
+  const uploadChatFile = async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`/api/associations/${id}/messages/upload`, { method: "POST", body: form }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
+    if (!res || !res.ok) {
+      setEligibilityNotice(data?.error ?? "Envoi du fichier impossible.");
+      return;
+    }
+    await fetch(`/api/associations/${id}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channel: chatChannel,
+        content: data.name,
+        type: data.isImage ? "IMAGE" : "FILE",
+        mediaUrl: data.url,
+      }),
+    }).catch(() => {});
   };
 
   const sendMessage = () => {
@@ -1889,7 +1949,17 @@ export default function AssociationDetailPage() {
                           }`}
                           style={msg.senderId === "me" ? { backgroundColor: "#0d3d28" } : {}}
                         >
-                          {msg.content}
+                          {msg.mediaUrl && msg.type === "IMAGE" && (
+                            <a href={msg.mediaUrl} target="_blank" rel="noreferrer">
+                              <img src={msg.mediaUrl} alt={msg.content} className="mb-2 max-h-64 rounded-lg object-cover" />
+                            </a>
+                          )}
+                          {msg.mediaUrl && msg.type !== "IMAGE" && (
+                            <a href={msg.mediaUrl} target="_blank" rel="noreferrer" className="mb-1 flex items-center gap-1 underline">
+                              <Paperclip className="h-3 w-3" /> {msg.content}
+                            </a>
+                          )}
+                          {!msg.mediaUrl && msg.content}
                         </div>
                       </div>
                     </div>
@@ -1901,6 +1971,25 @@ export default function AssociationDetailPage() {
               {/* Input */}
               <div className="border-t border-stone p-4">
                 <div className="flex gap-2">
+                  <input
+                    ref={chatFileRef}
+                    type="file"
+                    className="hidden"
+                    accept="image/jpeg,image/png,image/webp,application/pdf,.doc,.docx,.xls,.xlsx,.txt"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) uploadChatFile(file);
+                      event.target.value = "";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => chatFileRef.current?.click()}
+                    className="rounded-xl border border-gray-200 px-3 text-gray-600 hover:bg-gray-50"
+                    title="Joindre une image ou un document"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </button>
                   <input
                     type="text"
                     placeholder={`Message dans ${chatChannel === "GENERAL" ? "Général" : chatChannel === "BUREAU" ? "Bureau" : chatChannel === "ANNONCES" ? "Annonces" : "ce canal"}...`}
