@@ -25,7 +25,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Organisation",
     items: [
       { name: "Associations", href: "/admin/associations", icon: Building2 },
-      { name: "Confiance & conformité", href: "/admin/confiance", icon: ShieldCheck },
+      { name: "Confiance", href: "/admin/confiance", icon: ShieldCheck },
       { name: "Historique complet", href: "/admin/historique", icon: History },
       { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes },
       { name: "Modèles", href: "/admin/templates", icon: FileText },

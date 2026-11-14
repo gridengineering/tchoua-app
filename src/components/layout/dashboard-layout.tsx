@@ -34,6 +34,9 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
 
   // Consentements plateforme obligatoires avant d'accéder à l'espace membre.
   useEffect(() => {
+    const sessionUser = session?.user as { systemRoleId?: string | null } | undefined;
+    // L'administration système n'est pas soumise au parcours membre.
+    if (sessionUser?.systemRoleId) return;
     if (status !== "authenticated" || pathname === "/consentements") return;
     let cancelled = false;
     fetch("/api/consents", { cache: "no-store" })
@@ -45,7 +48,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [status, pathname, router]);
+  }, [status, pathname, router, session]);
 
   useEffect(() => { setMobileOpen(false); setHelpOpen(false); }, [pathname]);
   useEffect(() => {
