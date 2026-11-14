@@ -52,9 +52,9 @@ export async function GET() {
     user,
     latestRequest,
     levels: KYC_LEVELS,
-    platformConsentsComplete: CONSENT_KEYS.every((key) =>
-      consents.some((c) => c.document === key)
-    ),
+    platformConsentsComplete:
+      Boolean((session.user as any).systemRoleId) ||
+      CONSENT_KEYS.every((key) => consents.some((c) => c.document === key)),
   });
 }
 
@@ -96,7 +96,8 @@ export async function POST(req: NextRequest) {
   }
 
   const allConsents = CONSENT_KEYS.every((key) => consents.some((c) => c.document === key));
-  if (!allConsents) {
+  const isSystemAdmin = Boolean((session.user as any).systemRoleId);
+  if (!allConsents && !isSystemAdmin) {
     return NextResponse.json(
       { error: "Acceptez d'abord les conditions et politiques de la plateforme", code: "CONSENT_REQUIRED" },
       { status: 403 }
