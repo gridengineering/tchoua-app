@@ -943,7 +943,7 @@ export function AssociationFormWorkspace({
         {tab === "activites" ? (
           <div className="space-y-4">
             {mode === "edit" ? (
-              <Section title="Activités de l'association" description="Chaque activité se configure individuellement dans l'espace Configuration." icon={<Layers className="h-4 w-4" />}>
+              <Section title="Activités de l'association" description="Chaque activité se configure individuellement depuis l'onglet Activités." icon={<Layers className="h-4 w-4" />}>
                 {(initial?.activities ?? []).length === 0 ? (
                   <p className="rounded-lg border border-dashed border-[#ddd6c8] bg-[#fbf9f3] px-3 py-4 text-sm text-[#8a8378]">
                     Aucune activité. Créez-en une depuis la configuration.
@@ -971,7 +971,7 @@ export function AssociationFormWorkspace({
               </Section>
             ) : (
               <>
-                <Section title="Modules à activer" description="Les modules choisis créent les activités initiales ; le paramétrage fin se fait ensuite dans Configuration." icon={<Layers className="h-4 w-4" />}>
+                <Section title="Modules à activer" description="Les modules choisis créent les activités initiales ; le paramétrage fin se fait ensuite depuis l'onglet Activités." icon={<Layers className="h-4 w-4" />}>
                   <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
                     {MODULE_DEFS.map((module) => (
                       <button
@@ -1256,7 +1256,7 @@ export function AssociationFormWorkspace({
                 <div className="rounded-xl border border-[#eee8dc] bg-white p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">Activités</p>
                   <p className="mt-1 text-sm font-bold text-[#1f2937]">{totalActivities}</p>
-                  <p className="text-[11px] text-[#8a8378]">{mode === "edit" ? "Modifiables individuellement dans Configuration" : Object.entries(modules).filter(([, active]) => active).map(([key]) => key).join(" · ")}</p>
+                  <p className="text-[11px] text-[#8a8378]">{mode === "edit" ? "Modifiables individuellement depuis l'onglet Activités" : Object.entries(modules).filter(([, active]) => active).map(([key]) => key).join(" · ")}</p>
                 </div>
                 <div className="rounded-xl border border-[#eee8dc] bg-white p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">Complétude ARP</p>

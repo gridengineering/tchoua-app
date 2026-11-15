@@ -71,7 +71,7 @@ function AssociationNav({ id }: { id: string }) {
   const items: NavItem[] = [
     { href: `/associations/${id}`, label: "Vue d'ensemble", icon: LayoutDashboard },
     { href: `/associations/${id}/activities`, label: "Activités", icon: PiggyBank },
-    { href: `/associations/${id}/configuration`, label: "Configuration", icon: Settings },
+    { href: `/associations/${id}/modifier`, label: "Configurer l'association", icon: Settings },
     { href: `/associations/${id}/prets`, label: "Prêts", icon: Landmark },
     { href: `/associations/${id}/aides`, label: "Aides sociales", icon: Heart },
     { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },
@@ -81,7 +81,7 @@ function AssociationNav({ id }: { id: string }) {
     { href: `/associations/${id}/rapports`, label: "Rapports", icon: FileText },
     { href: `/associations/${id}/historique`, label: "Historique", icon: History },
     { href: `/associations/${id}/interets`, label: "Intérêts", icon: TrendingUp },
-    { href: `/associations/${id}/parametres`, label: "Paramètres", icon: Settings },
+    { href: `/associations/${id}/parametres`, label: "Sécurité & rôles", icon: ShieldCheck },
   ];
   const pathname = usePathname();
   return (
