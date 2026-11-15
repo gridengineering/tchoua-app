@@ -33,6 +33,7 @@ type KycResponse = {
   } | null;
   verification?: { email: boolean; phone: boolean; whatsapp: boolean };
   platformConsentsComplete?: boolean;
+  levels?: Array<{ level: number; shortLabel: string; label: string; description: string; requirements?: string[] }>;
 };
 
 type KycDocument = {
@@ -198,6 +199,7 @@ export default function KycPage() {
   const current = normalizeKycLevel(data?.level ?? 0);
   const hasVerifiedChannel = Boolean(data?.verification?.email || data?.verification?.phone || data?.verification?.whatsapp);
   const currentInfo = kycLevelInfo(current);
+  const levels = (data?.levels?.length ? data.levels : KYC_LEVELS) as typeof KYC_LEVELS;
   const pending = data?.status === "PENDING";
   const rejected = data?.status === "REJECTED";
 
@@ -258,7 +260,7 @@ export default function KycPage() {
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {KYC_LEVELS.map((level) => {
+          {levels.map((level) => {
             const acquired = current >= level.level;
             const isCurrent = current === level.level;
             const canRequest = level.level > current && !pending;

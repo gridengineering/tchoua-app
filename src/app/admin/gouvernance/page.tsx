@@ -76,6 +76,8 @@ export default function GovernancePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [mailTestTo, setMailTestTo] = useState("");
+  const [mailTesting, setMailTesting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -305,11 +307,26 @@ export default function GovernancePage() {
                 <Field label="Email expéditeur"><input className={input} value={config.email.fromEmail} onChange={(e) => update("email.fromEmail", e.target.value)} /></Field>
                 <Field label="Reply-To"><input className={input} value={config.email.replyTo} onChange={(e) => update("email.replyTo", e.target.value)} /></Field>
               </div>
+              <div className="mt-4 flex flex-wrap items-end gap-2">
+                <Field label="Tester l'envoi SMTP vers"><input className={input} value={mailTestTo} onChange={(e) => setMailTestTo(e.target.value)} placeholder="vous@exemple.com" /></Field>
+                <button className={btn} disabled={mailTesting || !mailTestTo} onClick={async () => {
+                  setMailTesting(true);
+                  try {
+                    const res = await fetch("/api/admin/governance/test-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: mailTestTo }) });
+                    const data = await res.json();
+                    setToast({ type: res.ok ? "success" : "error", message: data.message || data.error || "Test terminé" });
+                  } catch (error: any) { setToast({ type: "error", message: error.message }); }
+                  finally { setMailTesting(false); }
+                }}>{mailTesting ? "Envoi…" : "Tester SMTP"}</button>
+              </div>
               {(["smtp", "imap", "pop3"] as const).map((kind) => (
                 <div key={kind} className="mt-5 rounded-xl border border-slate-200 p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <span className="text-sm font-bold uppercase text-slate-700">{kind}</span>
-                    <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={config.email[kind].enabled} onChange={(e) => update(`email.${kind}.enabled`, e.target.checked)} /> Actif</label>
+                    <div className="flex items-center gap-4 text-xs">
+                      <label className="flex items-center gap-2"><input type="checkbox" checked={config.email[kind].enabled} onChange={(e) => update(`email.${kind}.enabled`, e.target.checked)} /> Actif</label>
+                      <label className="flex items-center gap-2"><input type="checkbox" checked={config.email[kind].secure} onChange={(e) => update(`email.${kind}.secure`, e.target.checked)} /> TLS/SSL</label>
+                    </div>
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     <Field label="Hôte"><input className={input} value={config.email[kind].host} onChange={(e) => update(`email.${kind}.host`, e.target.value)} /></Field>
