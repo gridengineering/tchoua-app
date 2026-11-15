@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import AdminSettingsPage from "../page";
 
-export default function DeprecatedWalletSettingsPage() {
-  redirect("/admin/settings?tab=wallet");
+export default function WalletSettingsPage() {
+  return <AdminSettingsPage initialTab="wallet" />;
 }

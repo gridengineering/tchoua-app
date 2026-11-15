@@ -71,11 +71,11 @@ const inputCls =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10";
 const labelCls = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500";
 
-export default function AdminSettingsPage() {
+export default function AdminSettingsPage({ initialTab = "general" }: { initialTab?: TabId }) {
   const [settings, setSettings] = useState<PlatformSettings | null>(null);
   const [initial, setInitial] = useState("");
   const [meta, setMeta] = useState<{ updatedAt: string | null; updatedBy: string | null } | null>(null);
-  const [tab, setTab] = useState<TabId>("general");
+  const [tab, setTab] = useState<TabId>(initialTab);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -101,13 +101,6 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("tab");
-    if (requested && TABS.some((item) => item.id === requested)) {
-      setTab(requested as TabId);
-    }
-  }, []);
 
   useEffect(() => {
     if (!toast) return;

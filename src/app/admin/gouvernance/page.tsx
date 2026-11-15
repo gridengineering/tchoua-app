@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import AdminSettingsPage from "@/app/admin/settings/page";
 
-export default function DeprecatedGovernancePage() {
-  redirect("/admin/settings?tab=gouvernance");
+export default function GovernancePage() {
+  return <AdminSettingsPage initialTab="governance" />;
 }
