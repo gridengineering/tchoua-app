@@ -71,7 +71,7 @@ function AssociationNav({ id }: { id: string }) {
   const items: NavItem[] = [
     { href: `/associations/${id}`, label: "Vue d'ensemble", icon: LayoutDashboard },
     { href: `/associations/${id}/activities`, label: "Activités", icon: PiggyBank },
-    { href: `/associations/${id}/modifier`, label: "Configurer l'association", icon: Settings },
+    { href: `/associations/${id}/modifier`, label: "Configurer", icon: Settings },
     { href: `/associations/${id}/prets`, label: "Prêts", icon: Landmark },
     { href: `/associations/${id}/aides`, label: "Aides sociales", icon: Heart },
     { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },
