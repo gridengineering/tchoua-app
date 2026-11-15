@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   getVotingThreshold,
   canVote,
+  closeElection,
   evaluateApprovalRequest,
 } from "@/lib/association/governance";
 
@@ -233,6 +234,61 @@ describe("governance", () => {
       await expect(
         evaluateApprovalRequest("request-1", prisma)
       ).rejects.toThrow("Demande introuvable");
+    });
+  });
+
+  describe("closeElection", () => {
+    beforeEach(() => {
+      (prisma.$transaction as any).mockImplementation(async (callback: any) => callback(prisma));
+      prisma.election.updateMany.mockResolvedValue({ count: 1 } as any);
+      prisma.electionCandidate.updateMany.mockResolvedValue({ count: 0 } as any);
+    });
+
+    it("ne crée aucun mandat lorsque le quorum n'est pas atteint", async () => {
+      prisma.election.findUnique.mockResolvedValue({
+        id: "election-1",
+        associationId: "assoc-1",
+        status: "OPEN",
+        quorumRequired: 3,
+        candidates: [{ id: "candidate-1", membershipId: "member-1", position: "PRESIDENT" }],
+        votes: [],
+        mandates: [],
+      } as any);
+      prisma.election.update.mockResolvedValue({ id: "election-1", status: "CLOSED", quorumReached: false } as any);
+
+      const result = await closeElection("election-1", prisma);
+      expect(result.quorumReached).toBe(false);
+      expect(prisma.mandatePeriod.createMany).not.toHaveBeenCalled();
+      expect(prisma.electionCandidate.update).not.toHaveBeenCalled();
+    });
+
+    it("ne crée aucun mandat en cas d'égalité parfaite", async () => {
+      prisma.election.findUnique.mockResolvedValue({
+        id: "election-1",
+        associationId: "assoc-1",
+        status: "OPEN",
+        quorumRequired: 1,
+        candidates: [
+          { id: "candidate-1", membershipId: "member-1", position: "PRESIDENT" },
+          { id: "candidate-2", membershipId: "member-2", position: "PRESIDENT" },
+        ],
+        votes: [
+          { membershipId: "voter-1", candidateId: "candidate-1", value: 1 },
+          { membershipId: "voter-2", candidateId: "candidate-2", value: 1 },
+        ],
+        mandates: [],
+      } as any);
+      prisma.election.update.mockResolvedValue({ id: "election-1", status: "CLOSED" } as any);
+
+      await closeElection("election-1", prisma);
+      expect(prisma.mandatePeriod.createMany).not.toHaveBeenCalled();
+      expect(prisma.election.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            result: expect.stringContaining("ties"),
+          }),
+        })
+      );
     });
   });
 });
