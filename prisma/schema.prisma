@@ -866,6 +866,7 @@ model Association {
   arpProfile     ArpProfile?
   arpVersions    ArpProfileVersion[]
   arpFunds       ArpFund[]
+  founderRevocations FounderRevocationRequest[]
 
   @@map("associations")
 }
@@ -894,6 +895,8 @@ model AssociationMembership {
   excludeReason   String?
   resignedAt      DateTime?
   deceasedAt      DateTime?
+  // Date à laquelle le privilège de fondateur a été retiré par deux membres du bureau
+  founderRevokedAt DateTime?
   invitedById     String?
   invitedBy       AssociationMembership? @relation("Inviter", fields: [invitedById], references: [id])
   invitedMembers  AssociationMembership[] @relation("Inviter")
@@ -927,6 +930,10 @@ model AssociationMembership {
   // Rôle personnalisé optionnel (cumulatif avec role de base)
   customRoleId    String?
   customRole      AssociationCustomRole? @relation(fields: [customRoleId], references: [id])
+
+  founderRevocationsProposed  FounderRevocationRequest[] @relation("FounderRevocationProposer")
+  founderRevocationsConfirmed FounderRevocationRequest[] @relation("FounderRevocationConfirmer")
+  founderRevocationsTarget    FounderRevocationRequest[] @relation("FounderRevocationFounder")
 
   @@unique([userId, associationId])
   @@map("association_memberships")
@@ -2243,4 +2250,26 @@ model VerificationCode {
 
   @@index([userId, channel, expiresAt])
   @@map("verification_codes")
+}
+
+
+model FounderRevocationRequest {
+  id                  String   @id @default(cuid())
+  associationId       String
+  founderMembershipId String
+  proposedById        String
+  confirmedById       String?
+  status              String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  reason              String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  association       Association           @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  founderMembership AssociationMembership @relation("FounderRevocationFounder", fields: [founderMembershipId], references: [id], onDelete: Cascade)
+  proposedBy        AssociationMembership @relation("FounderRevocationProposer", fields: [proposedById], references: [id], onDelete: Cascade)
+  confirmedBy       AssociationMembership? @relation("FounderRevocationConfirmer", fields: [confirmedById], references: [id], onDelete: SetNull)
+
+  @@index([associationId, status])
+  @@index([founderMembershipId])
+  @@map("founder_revocation_requests")
 }

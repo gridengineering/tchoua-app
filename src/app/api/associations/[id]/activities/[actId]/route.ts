@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission, isSuperAdmin } from "@/lib/permissions";
+import { hasPermission, isPlatformAdmin } from "@/lib/permissions";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -29,7 +29,7 @@ export async function GET(
   const membership = await getMembership(session.user.id, id);
   if (!membership) {
     const assoc = await prisma.association.findUnique({ where: { id }, select: { isPublic: true } });
-    if (!assoc?.isPublic && !isSuperAdmin(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+    if (!assoc?.isPublic && !isPlatformAdmin(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
   const activity = await prisma.associationActivity.findFirst({

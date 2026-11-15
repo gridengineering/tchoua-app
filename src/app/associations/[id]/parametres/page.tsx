@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AlertTriangle, ArrowLeft, Plus, Shield, Trash2, X } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { PERMISSIONS, ALL_PERMISSIONS, type Permission } from "@/lib/permissions";
+import { FounderProtection } from "@/components/associations/founder-protection";
 
 const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
 
@@ -73,6 +74,7 @@ export default function AssociationSecurityPage() {
           </p>
         </div>
 
+        <FounderProtection associationId={id} />
         <CustomRolesSection associationId={id} />
         {(myRole === "PRESIDENT" || myRole === "FOUNDER") && (
           <section className="overflow-hidden rounded-xl border-2 border-red-200 bg-white">

@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Layout,
+  Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Gavel, Globe, Layout,
   Lock, MessageSquare, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, Sparkles,
-  ToggleLeft, ToggleRight, Video, Wrench,
+  ToggleLeft, ToggleRight, Video, Wallet, Wrench,
 } from "lucide-react";
 import { PlatformSettings } from "@/lib/platform-settings-shared";
+import { GovernanceConsole } from "@/components/admin/governance-console";
+import { WalletSettingsPanel } from "@/components/admin/wallet-settings-panel";
 
 const TABS = [
   { id: "general", label: "Identité", icon: Layout },
@@ -15,6 +17,8 @@ const TABS = [
   { id: "limits", label: "Limites & finances", icon: Coins },
   { id: "features", label: "Fonctionnalités", icon: Sparkles },
   { id: "rtc", label: "RTC & Chat", icon: Video },
+  { id: "governance", label: "Gouvernance", icon: Gavel },
+  { id: "wallet", label: "Frais & plafonds Wallet", icon: Wallet },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "maintenance", label: "Maintenance", icon: Wrench },
 ] as const;
@@ -99,10 +103,19 @@ export default function AdminSettingsPage() {
   }, [load]);
 
   useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    if (requested && TABS.some((item) => item.id === requested)) {
+      setTab(requested as TabId);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  const isEmbeddedPanel = tab === "governance" || tab === "wallet";
 
   const dirty = useMemo(
     () => Boolean(settings) && JSON.stringify(settings) !== initial,
@@ -224,7 +237,7 @@ export default function AdminSettingsPage() {
             )}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={`flex flex-wrap items-center gap-2 ${isEmbeddedPanel ? "hidden" : ""}`}>
           <button
             onClick={exportConfig}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -249,7 +262,7 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {dirty && (
+      {dirty && !isEmbeddedPanel && (
         <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
           <AlertCircle className="h-4 w-4" />
           Modifications non enregistrées.
@@ -559,6 +572,10 @@ export default function AdminSettingsPage() {
               </Section>
             </div>
           )}
+
+          {tab === "governance" && <GovernanceConsole embedded />}
+
+          {tab === "wallet" && <WalletSettingsPanel embedded />}
 
           {tab === "notifications" && (
             <Section title="Notifications" icon={Bell} desc="Canaux et délais de rappel des échéances.">

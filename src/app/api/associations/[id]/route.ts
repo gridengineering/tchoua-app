@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission, isSuperAdmin } from "@/lib/permissions";
+import { hasPermission, isPlatformAdmin } from "@/lib/permissions";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const membership = await getMembership(session.user.id, id);
 
-  if (!association.isPublic && !membership && !isSuperAdmin(session)) {
+  if (!association.isPublic && !membership && !isPlatformAdmin(session)) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -136,7 +136,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params;
 
   const membership = await getMembership(session.user.id, id);
-  const canDelete = isSuperAdmin(session) || (membership && ["PRESIDENT", "FOUNDER"].includes(membership.role));
+  const canDelete = isPlatformAdmin(session) || (membership && ["PRESIDENT", "FOUNDER"].includes(membership.role));
   if (!canDelete) {
     return NextResponse.json({ error: "Réservé au président ou fondateur" }, { status: 403 });
   }

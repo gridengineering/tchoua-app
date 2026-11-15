@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isSuperAdmin } from "@/lib/permissions";
+import { isPlatformAdmin } from "@/lib/permissions";
 import { transitionAssociation } from "@/lib/association/lifecycle";
 
 async function getMembership(userId: string, associationId: string) {
@@ -41,7 +41,7 @@ export async function PATCH(
   }
 
   const membership = await getMembership(session.user.id, id);
-  const isAdmin = isSuperAdmin(session);
+  const isAdmin = isPlatformAdmin(session);
   const isPresident =
     membership && ["PRESIDENT", "FOUNDER"].includes(membership.role);
 

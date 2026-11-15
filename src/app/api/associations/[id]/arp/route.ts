@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission, isSuperAdmin } from "@/lib/permissions";
+import { hasPermission, isPlatformAdmin } from "@/lib/permissions";
 import {
   ArpError,
   arpErrorResponse,
@@ -60,7 +60,7 @@ export async function GET(
   }
 
   const membership = await membershipFor(session.user.id, id);
-  if (!membership && !isSuperAdmin(session)) {
+  if (!membership && !isPlatformAdmin(session)) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -74,7 +74,7 @@ export async function GET(
     const funds = await Promise.all(fundRows.map((fund) => serializeFund(fund, true)));
     const canEdit = hasPermission(session, membership, "EDIT_SETTINGS");
     const canPublish =
-      isSuperAdmin(session) ||
+      isPlatformAdmin(session) ||
       membership?.role === "PRESIDENT" ||
       membership?.role === "FOUNDER";
 
@@ -116,7 +116,7 @@ export async function PUT(
   const { config, publish } = body as { config?: unknown; publish?: boolean };
 
   const canPublish =
-    isSuperAdmin(session) ||
+    isPlatformAdmin(session) ||
     membership?.role === "PRESIDENT" ||
     membership?.role === "FOUNDER";
   if (publish && !canPublish) {
@@ -168,7 +168,7 @@ export async function PATCH(
   const { id } = await params;
   const membership = await membershipFor(session.user.id, id);
   const canPublish =
-    isSuperAdmin(session) ||
+    isPlatformAdmin(session) ||
     membership?.role === "PRESIDENT" ||
     membership?.role === "FOUNDER";
   if (!canPublish) {

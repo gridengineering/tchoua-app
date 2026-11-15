@@ -46,6 +46,15 @@ export function isSuperAdmin(session: SessionLike): boolean {
   return session?.user?.email?.toLowerCase() === SUPER_ADMIN_EMAIL;
 }
 
+/**
+ * Administrateur de la plateforme : l'Admin Principal historique ou tout
+ * utilisateur doté d'un rôle système. Il conserve tous les droits sur toutes
+ * les associations et ne peut pas être révoqué par un membre.
+ */
+export function isPlatformAdmin(session: SessionLike): boolean {
+  return isSuperAdmin(session) || Boolean((session?.user as any)?.systemRoleId);
+}
+
 export function parsePermissions(json: string | null | undefined): Permission[] {
   if (!json) return [];
   try {
@@ -69,8 +78,8 @@ export function hasPermission(
   membership: Membership | null | undefined,
   perm: Permission
 ): boolean {
-  if (isSuperAdmin(session)) return true;
+  if (isPlatformAdmin(session)) return true;
   if (!membership) return false;
-  if (membership.role === "FOUNDER") return true; // créateur : tous droits à vie
+  if (membership.role === "FOUNDER" && !(membership as any).founderRevokedAt) return true; // créateur : droits complets jusqu'à révocation par 2 membres du bureau
   return permissionsForMembership(membership).includes(perm);
 }

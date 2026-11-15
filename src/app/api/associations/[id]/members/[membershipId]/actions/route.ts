@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isSuperAdmin } from "@/lib/permissions";
+import { isPlatformAdmin } from "@/lib/permissions";
 import {
   validateMemberCanLeave,
   calculateDeceasedLiquidation,
@@ -18,7 +18,7 @@ function canPerformAction(
   session: any,
   actorMembership: any
 ): boolean {
-  if (isSuperAdmin(session)) return true;
+  if (isPlatformAdmin(session)) return true;
   if (!actorMembership) return false;
   if (actorMembership.role === "FOUNDER") return true;
   return ["PRESIDENT", "VICE_PRESIDENT", "SECRETARY"].includes(
@@ -81,6 +81,18 @@ export async function POST(
     return NextResponse.json(
       { error: "Membre introuvable" },
       { status: 404 }
+    );
+  }
+
+  // Protection du fondateur : aucune action individuelle ne peut réduire son
+  // rôle ou son statut. Seule la procédure à deux membres du bureau le peut.
+  if (targetMembership.role === "FOUNDER" && !isPlatformAdmin(session)) {
+    return NextResponse.json(
+      {
+        error:
+          "Le privilège de fondateur est protégé : il ne peut être retiré que par deux membres du bureau via la procédure de protection.",
+      },
+      { status: 403 }
     );
   }
 
@@ -188,7 +200,7 @@ export async function POST(
     }
 
     case "CHANGE_ROLE": {
-      if (actorMembership?.role !== "FOUNDER" && !isSuperAdmin(session)) {
+      if (actorMembership?.role !== "FOUNDER" && !isPlatformAdmin(session)) {
         return NextResponse.json(
           { error: "Changement de rôle du bureau réservé au fondateur" },
           { status: 403 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isPlatformAdmin } from "@/lib/permissions";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, membershipId: string }> }) {
   const session = await getServerSession(authOptions);
@@ -23,15 +24,32 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     });
 
-    if (!currentMember) {
+    if (!currentMember && !isPlatformAdmin(session)) {
       return NextResponse.json({ error: "Vous n'avez pas les droits pour cette action" }, { status: 403 });
     }
 
     const target = await prisma.associationMembership.findFirst({
       where: { id: membershipId, associationId },
-      select: { id: true, status: true, joinedAt: true },
+      select: { id: true, status: true, joinedAt: true, role: true },
     });
     if (!target) return NextResponse.json({ error: "Membre introuvable dans cette association" }, { status: 404 });
+
+    // Le rôle de fondateur est protégé : sa révocation exige la procédure
+    // dédiée (proposition + confirmation par deux membres distincts du bureau).
+    if (target.role === "FOUNDER" && !isPlatformAdmin(session)) {
+      if (role && role !== "FOUNDER") {
+        return NextResponse.json(
+          { error: "Le privilège de fondateur ne peut être retiré que par deux membres du bureau via la procédure de protection." },
+          { status: 403 }
+        );
+      }
+      if (status && status !== "ACTIVE") {
+        return NextResponse.json(
+          { error: "Le statut du fondateur ne peut pas être modifié directement. Utilisez la procédure de protection." },
+          { status: 403 }
+        );
+      }
+    }
 
     const dataToUpdate: Record<string, unknown> = {};
     if (status) dataToUpdate.status = status;

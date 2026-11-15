@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isSuperAdmin } from "@/lib/permissions";
+import { isPlatformAdmin } from "@/lib/permissions";
 import {
   validateTemplateConversionEligibility,
   anonymizeAssociationForTemplate,
@@ -59,7 +59,7 @@ export async function POST(
     return NextResponse.json({ error: "Association introuvable" }, { status: 404 });
   }
 
-  const isAdmin = isSuperAdmin(session);
+  const isAdmin = isPlatformAdmin(session);
   if (!isAdmin && (!membership || !["FOUNDER", "PRESIDENT"].includes(membership.role))) {
     return NextResponse.json(
       { error: "Seuls le fondateur ou le président peuvent convertir l'association en modèle" },

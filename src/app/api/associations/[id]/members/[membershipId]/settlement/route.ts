@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isSuperAdmin } from "@/lib/permissions";
+import { isPlatformAdmin } from "@/lib/permissions";
 import { computeMemberSettlement } from "@/lib/association/settlement";
 
 const BUREAU_ROLES = [
@@ -33,7 +33,7 @@ export async function GET(
   if (!actor) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
 
   const isSelf = actor.id === membershipId;
-  if (!isSelf && !BUREAU_ROLES.includes(actor.role) && !isSuperAdmin(session)) {
+  if (!isSelf && !BUREAU_ROLES.includes(actor.role) && !isPlatformAdmin(session)) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -46,7 +46,7 @@ export async function GET(
 
   return NextResponse.json({
     preview,
-    canManage: BUREAU_ROLES.includes(actor.role) || isSuperAdmin(session),
+    canManage: BUREAU_ROLES.includes(actor.role) || isPlatformAdmin(session),
     history: history.map((h) => ({
       id: h.id,
       type: h.type,
@@ -70,7 +70,7 @@ export async function POST(
 
   const { id: associationId, membershipId } = await params;
   const actor = await getMembership(session.user.id, associationId);
-  if (!actor || (!BUREAU_ROLES.includes(actor.role) && !isSuperAdmin(session))) {
+  if (!actor || (!BUREAU_ROLES.includes(actor.role) && !isPlatformAdmin(session))) {
     return NextResponse.json({ error: "Réservé au bureau" }, { status: 403 });
   }
 

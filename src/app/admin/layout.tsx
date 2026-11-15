@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Activity, ArrowLeftRight, Bell, Boxes, Building2, ChevronLeft, ChevronRight,
-  FileText, Gavel, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
+  FileText, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
   PanelLeftOpen, Settings, ShieldCheck, Users, Wallet, X,
 } from "lucide-react";
 
@@ -27,7 +27,6 @@ const NAV_GROUPS: NavGroup[] = [
       { name: "Associations", href: "/admin/associations", icon: Building2 },
       { name: "Confiance", href: "/admin/confiance", icon: ShieldCheck },
       { name: "Historique complet", href: "/admin/historique", icon: History },
-      { name: "Gouvernance", href: "/admin/gouvernance", icon: Gavel },
       { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes },
       { name: "Modèles", href: "/admin/templates", icon: FileText },
     ],
@@ -44,7 +43,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Finance",
     items: [
       { name: "Wallets", href: "/admin/wallets", icon: Wallet },
-      { name: "Paramètres wallet", href: "/admin/settings/wallet", icon: Settings },
     ],
   },
   {
@@ -66,7 +64,6 @@ const CRUMB_LABELS: Record<string, string> = {
   historique: "Historique complet",
   kyc: "Conformité KYC",
   arp: "Référentiel ARP",
-  gouvernance: "Gouvernance & conformité",
   templates: "Modèles",
   wallets: "Wallets",
   finance: "Audit financier",

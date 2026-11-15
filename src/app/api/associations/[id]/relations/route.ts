@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isSuperAdmin } from "@/lib/permissions";
+import { isPlatformAdmin } from "@/lib/permissions";
 import {
   validateSingleParent,
   validateMaxChildAssociations,
@@ -92,7 +92,7 @@ export async function GET(
   }
 
   const membership = await getMembership(session.user.id, id);
-  if (!membership && !isSuperAdmin(session)) {
+  if (!membership && !isPlatformAdmin(session)) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
@@ -158,7 +158,7 @@ export async function POST(
     );
   }
 
-  const isAdmin = isSuperAdmin(session);
+  const isAdmin = isPlatformAdmin(session);
   const canSource = isAdmin || (await isPresidentOrFounder(session.user.id, sourceId));
   const canTarget = isAdmin || (await isPresidentOrFounder(session.user.id, targetId));
 
@@ -251,7 +251,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Relation introuvable" }, { status: 404 });
   }
 
-  const isAdmin = isSuperAdmin(session);
+  const isAdmin = isPlatformAdmin(session);
   const canManage =
     isAdmin ||
     (await isPresidentOrFounder(session.user.id, relation.sourceId)) ||
