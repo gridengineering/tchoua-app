@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isPlatformAdmin } from "@/lib/permissions";
 import { designateSessionBeneficiary } from "@/lib/association/beneficiary-designation";
 
 const BUREAU_ROLES = [
@@ -27,7 +28,7 @@ export async function POST(
   const membership = await prisma.associationMembership.findFirst({
     where: { userId: session.user.id, associationId, status: "ACTIVE" },
   });
-  if (!membership || !BUREAU_ROLES.includes(membership.role)) {
+  if ((!membership || !BUREAU_ROLES.includes(membership.role)) && !isPlatformAdmin(session)) {
     return NextResponse.json(
       { error: "Accès refusé. Seul le bureau peut lancer la désignation automatique." },
       { status: 403 }
