@@ -265,9 +265,9 @@ export function PublicFooter() {
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 md:flex-row">
           <p className="text-[10px] font-bold tracking-wider text-gray-500">© 2026 TCHOUA · OPEN SOURCE · MIT/APACHE 2.0</p>
           <div className="flex items-center gap-6">
-            <Link href="/security" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.privacy}</Link>
-            <Link href="/security" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.terms}</Link>
-            <Link href="/security" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.cookies}</Link>
+            <Link href="/confidentialite" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.privacy}</Link>
+            <Link href="/conditions-utilisation" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.terms}</Link>
+            <Link href="/confidentialite#cookies" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-white">{c.footer.cookies}</Link>
           </div>
         </div>
       </div>
