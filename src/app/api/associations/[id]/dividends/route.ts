@@ -49,10 +49,18 @@ export async function GET(
       ? run.shares
       : run.shares.filter((s) => s.membershipId === membership.id)
     : [];
+  const visiblePreview = manager
+    ? preview
+    : {
+        ...preview,
+        shares: preview.shares.filter((share) => share.membershipId === membership.id),
+        eligibleCount: preview.shares.some((share) => share.membershipId === membership.id && share.eligible) ? 1 : 0,
+        excludedCount: preview.shares.some((share) => share.membershipId === membership.id && !share.eligible) ? 1 : 0,
+      };
 
   return NextResponse.json({
     year,
-    preview,
+    preview: visiblePreview,
     canManage: manager,
     run: run
       ? {
@@ -153,69 +161,86 @@ export async function POST(
   }
 
   if (action === "POST") {
-    const run = await prisma.associationDividendRun.findUnique({
-      where: { associationId_year: { associationId, year } },
-      include: { shares: { include: { membership: { select: { id: true, userId: true } } } } },
-    });
-    if (!run) return NextResponse.json({ error: "Aucune répartition calculée" }, { status: 404 });
-    if (run.status === "POSTED") {
-      return NextResponse.json({ error: "Répartition déjà créditée" }, { status: 409 });
-    }
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        // Revendication atomique : deux clôtures concurrentes ne peuvent pas
+        // créditer deux fois les mêmes parts.
+        const claimed = await tx.associationDividendRun.updateMany({
+          where: { associationId, year, status: "DRAFT" },
+          data: { status: "POSTING" },
+        });
+        if (claimed.count === 0) throw new Error("DIVIDEND_ALREADY_POSTED");
 
-    const toCredit = run.shares.filter((s) => !s.credited && s.interestShare > 0);
+        const run = await tx.associationDividendRun.findUnique({
+          where: { associationId_year: { associationId, year } },
+          include: { shares: { include: { membership: { select: { id: true, userId: true } } } } },
+        });
+        if (!run) throw new Error("DIVIDEND_NOT_FOUND");
 
-    const result = await prisma.$transaction(async (tx) => {
-      let credited = 0;
-      let totalCredited = 0;
-      for (const share of toCredit) {
-        const wallet = await tx.wallet.upsert({
-          where: { userId: share.membership.userId },
-          create: { userId: share.membership.userId, balance: 0 },
-          update: {},
+        const toCredit = run.shares.filter((s) => !s.credited && s.interestShare > 0);
+        let credited = 0;
+        let totalCredited = 0;
+
+        for (const share of toCredit) {
+          const wallet = await tx.wallet.upsert({
+            where: { userId: share.membership.userId },
+            create: { userId: share.membership.userId, balance: 0 },
+            update: {},
+          });
+          await tx.wallet.update({
+            where: { id: wallet.id },
+            data: { balance: { increment: share.interestShare } },
+          });
+          await tx.walletTransaction.create({
+            data: {
+              walletId: wallet.id,
+              amount: share.interestShare,
+              netAmount: share.interestShare,
+              feeAmount: 0,
+              type: "RECEIPT",
+              status: "COMPLETED",
+              description: `Quote-part de dividendes ${year}`,
+              associationId,
+            },
+          });
+          await tx.associationDividendShare.update({
+            where: { id: share.id },
+            data: { credited: true, creditedAt: new Date() },
+          });
+          credited += 1;
+          totalCredited += share.interestShare;
+        }
+
+        await tx.associationDividendRun.update({
+          where: { id: run.id },
+          data: { status: "POSTED", postedAt: new Date() },
         });
-        await tx.wallet.update({
-          where: { id: wallet.id },
-          data: { balance: { increment: share.interestShare } },
-        });
-        await tx.walletTransaction.create({
-          data: {
-            walletId: wallet.id,
-            amount: share.interestShare,
-            netAmount: share.interestShare,
-            feeAmount: 0,
-            type: "RECEIPT",
-            status: "COMPLETED",
-            description: `Quote-part de dividendes ${year}`,
-            associationId,
-          },
-        });
-        await tx.associationDividendShare.update({
-          where: { id: share.id },
-          data: { credited: true, creditedAt: new Date() },
-        });
-        credited += 1;
-        totalCredited += share.interestShare;
-      }
-      await tx.associationDividendRun.update({
-        where: { id: run.id },
-        data: { status: "POSTED", postedAt: new Date() },
+        await tx.associationAuditLog
+          .create({
+            data: {
+              associationId,
+              userId: session.user.id,
+              action: "DIVIDENDS_POST",
+              entity: "ASSOCIATION",
+              entityId: associationId,
+              details: `Dividendes ${year} crédités : ${totalCredited} FCFA sur ${credited} portefeuilles`,
+            },
+          })
+          .catch(() => {});
+
+        return { credited, totalCredited };
       });
-      await tx.associationAuditLog
-        .create({
-          data: {
-            associationId,
-            userId: session.user.id,
-            action: "DIVIDENDS_POST",
-            entity: "ASSOCIATION",
-            entityId: associationId,
-            details: `Dividendes ${year} crédités : ${totalCredited} FCFA sur ${credited} portefeuilles`,
-          },
-        })
-        .catch(() => {});
-      return { credited, totalCredited };
-    });
 
-    return NextResponse.json({ ok: true, ...result });
+      return NextResponse.json({ ok: true, ...result });
+    } catch (error: any) {
+      if (error?.message === "DIVIDEND_ALREADY_POSTED") {
+        return NextResponse.json({ error: "Répartition déjà créditée ou en cours de publication" }, { status: 409 });
+      }
+      if (error?.message === "DIVIDEND_NOT_FOUND") {
+        return NextResponse.json({ error: "Aucune répartition calculée" }, { status: 404 });
+      }
+      throw error;
+    }
   }
 
   if (action === "DELETE") {

@@ -96,12 +96,37 @@ export async function computeDividendPreview(
     eligibleMembers.reduce((sum, m) => sum + (capitalByMember.get(m.id) ?? 0), 0)
   );
 
+  // Répartition en unités mineures (centimes) avec la méthode du plus fort
+  // reste : la somme des quotes-parts est exactement égale aux intérêts.
+  const totalInterestMinor = Math.round(totalInterest * 100);
+  const allocMinor = new Map<string, number>();
+  const remainders: Array<{ membershipId: string; remainder: number }> = [];
+  let allocatedMinor = 0;
+
+  if (totalInterestMinor > 0 && totalCapital > 0) {
+    for (const member of eligibleMembers) {
+      const capital = capitalByMember.get(member.id) ?? 0;
+      const raw = (totalInterestMinor * capital) / totalCapital;
+      const base = Math.floor(raw);
+      allocMinor.set(member.id, base);
+      allocatedMinor += base;
+      remainders.push({ membershipId: member.id, remainder: raw - base });
+    }
+
+    let remainder = totalInterestMinor - allocatedMinor;
+    remainders.sort((a, b) => b.remainder - a.remainder || a.membershipId.localeCompare(b.membershipId));
+    for (const entry of remainders) {
+      if (remainder <= 0) break;
+      allocMinor.set(entry.membershipId, (allocMinor.get(entry.membershipId) ?? 0) + 1);
+      remainder -= 1;
+    }
+  }
+
   const shares: DividendSharePreview[] = memberships
     .map((m) => {
       const capital = roundFcfa(capitalByMember.get(m.id) ?? 0);
       const isExcluded = excluded.has(m.id);
-      const interestShare =
-        !isExcluded && totalCapital > 0 ? roundFcfa((totalInterest * capital) / totalCapital) : 0;
+      const interestShare = isExcluded ? 0 : (allocMinor.get(m.id) ?? 0) / 100;
       return {
         membershipId: m.id,
         memberName: m.user?.name ?? "Membre",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isPlatformAdmin } from "@/lib/permissions";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import {
@@ -182,12 +183,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const loan = await prisma.assocLoan.findFirst({
     where: { id: loanId, activity: { associationId: id } },
+    include: { activity: { select: { loanApprovalMode: true } } },
   });
   if (!loan) return NextResponse.json({ error: "Prêt introuvable" }, { status: 404 });
 
   if (action === "APPROVE") {
-    if (!BUREAU_ROLES.includes(membership.role)) {
+    const canApprove = BUREAU_ROLES.includes(membership.role) || isPlatformAdmin(session);
+    if (!canApprove) {
       return NextResponse.json({ error: "Réservé aux membres du bureau" }, { status: 403 });
+    }
+    if (loan.status !== "PENDING") {
+      return NextResponse.json({ error: "Ce prêt n'est plus en attente d'approbation" }, { status: 409 });
+    }
+    if (loan.borrowerMembershipId === membership.id && !isPlatformAdmin(session)) {
+      return NextResponse.json({ error: "Un membre ne peut pas approuver son propre prêt" }, { status: 403 });
     }
 
     // R-021 : Vérifier le ratio prêts / fonds avant approbation
@@ -199,70 +208,135 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       );
     }
 
-    // R-023 : Double validation obligatoire si montant > 500 000 FCFA et liste de validateurs fournie
-    if (Array.isArray(validators)) {
-      const doubleCheck = validateDoubleValidation(loan.amount, validators);
-      if (!doubleCheck.valid) {
-        return NextResponse.json(
-          { error: doubleCheck.error, code: API_ERROR_CODES.ASSOC_007.code },
-          { status: API_ERROR_CODES.ASSOC_007.httpStatus }
-        );
-      }
-    }
+    // R-023 : au-dessus de 500 000 FCFA, deux décisions réelles et distinctes
+    // sont exigées. Le client ne peut plus contourner le contrôle en omettant
+    // simplement le tableau `validators`.
+    const requiredApprovals = loan.amount > 500_000 ? 2 : 1;
 
-    await prisma.assocLoan.update({
-      where: { id: loanId },
-      data: { status: "ACTIVE", approvedAt: new Date(), disbursedAt: new Date() },
-    });
-    return NextResponse.json({ ok: true });
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        const current = await tx.assocLoan.findUnique({
+          where: { id: loanId },
+          include: { approvals: true },
+        });
+        if (!current) throw new Error("LOAN_NOT_FOUND");
+        if (current.status !== "PENDING") throw new Error("LOAN_NOT_PENDING");
+
+        const already = current.approvals.find((a) => a.membershipId === membership.id);
+        if (already) throw new Error("LOAN_ALREADY_APPROVED_BY_ACTOR");
+
+        await tx.assocLoanApproval.create({
+          data: { loanId, membershipId: membership.id, decision: "APPROVE" },
+        });
+        const approvalCount = current.approvals.length + 1;
+
+        if (approvalCount >= requiredApprovals) {
+          await tx.assocLoan.update({
+            where: { id: loanId },
+            data: {
+              status: "ACTIVE",
+              approvedAt: new Date(),
+              approvedById: session.user.id,
+              disbursedAt: new Date(),
+            },
+          });
+        }
+
+        return { approvalCount, requiredApprovals, activated: approvalCount >= requiredApprovals };
+      });
+
+      return NextResponse.json({
+        ok: true,
+        ...result,
+        requiresMoreApprovals: !result.activated,
+        message: result.activated
+          ? "Prêt approuvé et décaissé."
+          : `Approbation enregistrée (${result.approvalCount}/${result.requiredApprovals}). Une autre décision du bureau est requise.`,
+      });
+    } catch (error: any) {
+      if (error?.code === "P2002") {
+        return NextResponse.json({ error: "Vous avez déjà approuvé ce prêt" }, { status: 409 });
+      }
+      if (error?.message === "LOAN_NOT_PENDING") {
+        return NextResponse.json({ error: "Ce prêt n'est plus en attente d'approbation" }, { status: 409 });
+      }
+      if (error?.message === "LOAN_ALREADY_APPROVED_BY_ACTOR") {
+        return NextResponse.json({ error: "Vous avez déjà approuvé ce prêt" }, { status: 409 });
+      }
+      throw error;
+    }
   }
 
   if (action === "REPAY") {
-    if (!amount) return NextResponse.json({ error: "amount requis" }, { status: 400 });
-
-    const repaidSoFar = await prisma.assocLoanRepayment.aggregate({
-      where: { loanId },
-      _sum: { amount: true },
-    });
-    const alreadyPaid = repaidSoFar._sum.amount ?? 0;
-    
-    // Check if late (Module 6.4)
-    const isLate = loan.status === "ACTIVE" && loan.dueDate && new Date(loan.dueDate) < new Date();
-    let effectiveTotalDue = loan.totalDue;
-    
-    if (isLate) {
-      // Rule: Double the interest part if late
-      const initialInterest = loan.totalDue - loan.amount;
-      effectiveTotalDue = loan.totalDue + initialInterest; // Interest is doubled
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return NextResponse.json({ error: "Le montant doit être strictement positif" }, { status: 400 });
     }
 
-    const remaining = effectiveTotalDue - alreadyPaid;
-    const actualAmount = Math.min(amount, remaining);
-    
-    // Pro-rata split between principal and interest
-    const principal = Math.round(actualAmount * (loan.amount / effectiveTotalDue));
-    const interest = actualAmount - principal;
-
-    await prisma.assocLoanRepayment.create({
-      data: {
-        loanId,
-        amount: actualAmount,
-        principal,
-        interest,
-        paymentMethod: paymentMethod ?? "CASH",
-        paidAt: new Date(),
-      },
-    });
-
-    // Mark loan as REPAID if fully repaid
-    const newTotal = alreadyPaid + actualAmount;
-    if (newTotal >= effectiveTotalDue) {
-      await prisma.assocLoan.update({ where: { id: loanId }, data: { status: "REPAID", repaidAt: new Date() } });
-    } else {
-      await prisma.assocLoan.update({ where: { id: loanId }, data: { status: "ACTIVE" } });
+    const isBorrower = loan.borrowerMembershipId === membership.id;
+    const canRepay = isBorrower || BUREAU_ROLES.includes(membership.role) || isPlatformAdmin(session);
+    if (!canRepay) {
+      return NextResponse.json({ error: "Vous ne pouvez pas rembourser ce prêt" }, { status: 403 });
+    }
+    if (loan.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Seul un prêt actif peut être remboursé" }, { status: 409 });
     }
 
-    return NextResponse.json({ ok: true, remaining: Math.max(0, effectiveTotalDue - newTotal) });
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        const current = await tx.assocLoan.findUnique({
+          where: { id: loanId },
+          include: { repayments: true },
+        });
+        if (!current) throw new Error("LOAN_NOT_FOUND");
+        if (current.status !== "ACTIVE") throw new Error("LOAN_NOT_ACTIVE");
+
+        const alreadyPaid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
+        const isLate = current.dueDate && new Date(current.dueDate) < new Date();
+        const initialInterest = current.totalDue - current.amount;
+        const effectiveTotalDue = isLate ? current.totalDue + initialInterest : current.totalDue;
+        const remaining = Math.max(0, effectiveTotalDue - alreadyPaid);
+        if (remaining <= 0) throw new Error("LOAN_ALREADY_REPAID");
+        if (numericAmount > remaining) throw new Error("LOAN_OVERPAY");
+
+        const principal = Math.round(numericAmount * (current.amount / effectiveTotalDue));
+        const interest = numericAmount - principal;
+
+        await tx.assocLoanRepayment.create({
+          data: {
+            loanId,
+            amount: numericAmount,
+            principal,
+            interest,
+            paymentMethod: paymentMethod ?? "CASH",
+            paidAt: new Date(),
+          },
+        });
+
+        const newTotal = alreadyPaid + numericAmount;
+        if (newTotal >= effectiveTotalDue) {
+          await tx.assocLoan.update({
+            where: { id: loanId },
+            data: { status: "REPAID", repaidAt: new Date() },
+          });
+        }
+
+        return { remaining: Math.max(0, effectiveTotalDue - newTotal), repaidNow: numericAmount };
+      });
+
+      return NextResponse.json({ ok: true, ...result });
+    } catch (error: any) {
+      if (error?.message === "LOAN_OVERPAY") {
+        return NextResponse.json({ error: "Le montant dépasse le solde restant du prêt" }, { status: 400 });
+      }
+      if (error?.message === "LOAN_ALREADY_REPAID") {
+        return NextResponse.json({ error: "Ce prêt est déjà entièrement remboursé" }, { status: 409 });
+      }
+      if (error?.message === "LOAN_NOT_ACTIVE") {
+        return NextResponse.json({ error: "Seul un prêt actif peut être remboursé" }, { status: 409 });
+      }
+      throw error;
+    }
   }
 
   return NextResponse.json({ error: "Action inconnue" }, { status: 400 });

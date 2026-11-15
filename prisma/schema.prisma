@@ -931,6 +931,8 @@ model AssociationMembership {
   customRoleId    String?
   customRole      AssociationCustomRole? @relation(fields: [customRoleId], references: [id])
 
+  loanApprovals   AssocLoanApproval[]
+
   founderRevocationsProposed  FounderRevocationRequest[] @relation("FounderRevocationProposer")
   founderRevocationsConfirmed FounderRevocationRequest[] @relation("FounderRevocationConfirmer")
   founderRevocationsTarget    FounderRevocationRequest[] @relation("FounderRevocationFounder")
@@ -1559,8 +1561,24 @@ model AssocLoan {
   activity            AssociationActivity   @relation(fields: [activityId], references: [id])
   borrowerMembership  AssociationMembership @relation(fields: [borrowerMembershipId], references: [id])
   repayments          AssocLoanRepayment[]
+  approvals           AssocLoanApproval[]
 
   @@map("assoc_loans")
+}
+
+model AssocLoanApproval {
+  id           String   @id @default(cuid())
+  loanId       String
+  membershipId String
+  decision     String   @default("APPROVE") // APPROVE, REJECT
+  createdAt    DateTime @default(now())
+
+  loan       AssocLoan             @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  membership AssociationMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([loanId, membershipId])
+  @@index([loanId, decision])
+  @@map("assoc_loan_approvals")
 }
 
 model AssocLoanRepayment {
@@ -1664,7 +1682,7 @@ model Election {
   association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
   candidates    ElectionCandidate[]
   votes         ElectionVote[]
-  mandate       MandatePeriod?
+  mandates      MandatePeriod[]
 
   @@map("elections")
 }
@@ -1707,7 +1725,7 @@ model ElectionVote {
 
 model MandatePeriod {
   id            String   @id @default(cuid())
-  electionId    String   @unique
+  electionId    String
   associationId String
   membershipId  String
   role          String
@@ -1721,6 +1739,7 @@ model MandatePeriod {
   association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
   membership    AssociationMembership @relation(fields: [membershipId], references: [id])
 
+  @@index([electionId])
   @@map("mandate_periods")
 }
 

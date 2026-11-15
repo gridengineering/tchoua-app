@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     include: {
       candidates: { include: { membership: { include: { user: { select: { name: true, email: true } } } } } },
       _count: { select: { votes: true } },
-      mandate: true,
+      mandates: true,
     },
     orderBy: { createdAt: "desc" },
   });

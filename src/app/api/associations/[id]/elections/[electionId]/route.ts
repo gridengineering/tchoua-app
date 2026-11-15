@@ -30,7 +30,7 @@ export async function GET(
         include: { membership: { include: { user: { select: { name: true, email: true } } } }, votes: true },
       },
       votes: { include: { membership: { include: { user: { select: { name: true } } } } } },
-      mandate: true,
+      mandates: true,
     },
   });
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isPlatformAdmin } from "@/lib/permissions";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 
@@ -117,7 +118,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
 
   const membership = await getMembership(session.user.id, id);
-  if (!membership || !AID_APPROVER_ROLES.includes(membership.role)) {
+  if (!membership || (!AID_APPROVER_ROLES.includes(membership.role) && !isPlatformAdmin(session))) {
     return NextResponse.json({ error: "Réservé aux officiers désignés" }, { status: 403 });
   }
 
@@ -133,30 +134,184 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   });
   if (!aidRequest) return NextResponse.json({ error: "Demande introuvable" }, { status: 404 });
 
-  let newStatus = action;
-  if (action === "APPROVE") newStatus = "APPROVED";
-  if (action === "REJECT") newStatus = "REJECTED";
-  if (action === "PAY") newStatus = "PAID";
-
-  const updated = await prisma.assocSocialAidRequest.update({
-    where: { id: requestId },
-    data: {
-      status: newStatus,
-      ...(action === "APPROVE" && {
-        approvedAmount: approvedAmount ?? aidRequest.requestedAmount,
-        approvedAt: new Date(),
-        approvedById: session.user.id,
-      }),
-      ...(action === "REJECT" && { rejectedReason }),
-      ...(action === "PAY" && { paidAt: new Date() }),
-      ...(notes !== undefined && { notes }),
-    },
-    include: {
-      membership: {
-        include: { user: { select: { id: true, name: true, avatar: true } } },
-      },
-    },
+  const association = await prisma.association.findUnique({
+    where: { id },
+    select: { socialAidCaps: true },
   });
 
-  return NextResponse.json({ request: updated });
+  const caps = (() => {
+    try {
+      return association?.socialAidCaps ? JSON.parse(association.socialAidCaps) : {};
+    } catch {
+      return {};
+    }
+  })();
+
+  const cap = Number(caps[aidRequest.category] ?? caps.DEFAULT ?? 0);
+  const requested = Number(aidRequest.requestedAmount) || 0;
+
+  try {
+    if (action === "APPROVE") {
+      if (aidRequest.status !== "PENDING") {
+        return NextResponse.json({ error: "Seule une demande en attente peut être approuvée" }, { status: 409 });
+      }
+      const amount = Number(approvedAmount ?? requested);
+      if (!Number.isFinite(amount) || amount <= 0 || amount > requested) {
+        return NextResponse.json(
+          { error: "Le montant approuvé doit être positif et inférieur ou égal au montant demandé" },
+          { status: 400 }
+        );
+      }
+      if (cap > 0 && amount > cap) {
+        return NextResponse.json(
+          { error: `Montant supérieur au plafond de la catégorie (${cap} FCFA)` },
+          { status: 400 }
+        );
+      }
+
+      if (cap > 0) {
+        const yearStart = new Date(new Date().getFullYear(), 0, 1);
+        const used = await prisma.assocSocialAidRequest.aggregate({
+          where: {
+            associationId: id,
+            membershipId: aidRequest.membershipId,
+            category: aidRequest.category,
+            status: { in: ["APPROVED", "PAID"] },
+            createdAt: { gte: yearStart },
+            id: { not: requestId },
+          },
+          _sum: { approvedAmount: true },
+        });
+        const alreadyApproved = used._sum.approvedAmount ?? 0;
+        if (alreadyApproved + amount > cap) {
+          return NextResponse.json(
+            { error: `Plafond annuel dépassé pour cette catégorie (${cap} FCFA, déjà ${alreadyApproved} FCFA)` },
+            { status: 409 }
+          );
+        }
+      }
+
+      const updated = await prisma.$transaction(async (tx) => {
+        const changed = await tx.assocSocialAidRequest.updateMany({
+          where: { id: requestId, associationId: id, status: "PENDING" },
+          data: {
+            status: "APPROVED",
+            approvedAmount: amount,
+            approvedAt: new Date(),
+            approvedById: session.user.id,
+            ...(notes !== undefined && { notes }),
+          },
+        });
+        if (changed.count === 0) throw new Error("AID_STATE_CHANGED");
+        return tx.assocSocialAidRequest.findUniqueOrThrow({
+          where: { id: requestId },
+          include: { membership: { include: { user: { select: { id: true, name: true, avatar: true } } } } },
+        });
+      });
+
+      return NextResponse.json({ request: updated });
+    }
+
+    if (action === "REJECT") {
+      if (aidRequest.status !== "PENDING") {
+        return NextResponse.json({ error: "Seule une demande en attente peut être rejetée" }, { status: 409 });
+      }
+      const changed = await prisma.assocSocialAidRequest.updateMany({
+        where: { id: requestId, associationId: id, status: "PENDING" },
+        data: {
+          status: "REJECTED",
+          rejectedReason: rejectedReason ?? null,
+          ...(notes !== undefined && { notes }),
+        },
+      });
+      if (changed.count === 0) {
+        return NextResponse.json({ error: "La demande a déjà changé d'état" }, { status: 409 });
+      }
+      const updated = await prisma.assocSocialAidRequest.findUniqueOrThrow({ where: { id: requestId } });
+      return NextResponse.json({ request: updated });
+    }
+
+    if (action === "PAY") {
+      if (aidRequest.status !== "APPROVED") {
+        return NextResponse.json({ error: "Une aide doit être approuvée avant d'être payée" }, { status: 409 });
+      }
+      const amount = Number(aidRequest.approvedAmount ?? 0);
+      if (amount <= 0) {
+        return NextResponse.json({ error: "Le montant approuvé est invalide" }, { status: 400 });
+      }
+
+      const result = await prisma.$transaction(async (tx) => {
+        const solidarity = await tx.associationActivity.findFirst({
+          where: { associationId: id, type: { in: ["AIDE_SOLIDAIRE", "SOLIDARITY"] }, status: "ACTIVE" },
+          select: { id: true, caisseBalance: true },
+        });
+        if (!solidarity) throw new Error("AID_TREASURY_NOT_FOUND");
+        if (solidarity.caisseBalance < amount) throw new Error("AID_TREASURY_INSUFFICIENT");
+
+        const changed = await tx.assocSocialAidRequest.updateMany({
+          where: { id: requestId, associationId: id, status: "APPROVED" },
+          data: { status: "PAID", paidAt: new Date(), ...(notes !== undefined && { notes }) },
+        });
+        if (changed.count === 0) throw new Error("AID_STATE_CHANGED");
+
+        await tx.associationActivity.update({
+          where: { id: solidarity.id },
+          data: { caisseBalance: { decrement: amount } },
+        });
+
+        // Si un fonds ARP est rattaché à la caisse de solidarité, la sortie
+        // est également inscrite au journal du fonds.
+        const fund = await tx.arpFund.findFirst({
+          where: { associationId: id, activityId: solidarity.id, status: "ACTIVE" },
+          select: { id: true, currency: true },
+        });
+        if (fund) {
+          const amountMinor = BigInt(Math.round(amount * 100));
+          const [inflow, outflow, reserved] = await Promise.all([
+            tx.arpFundMovement.aggregate({ where: { fundId: fund.id, direction: "IN" }, _sum: { amountMinor: true } }),
+            tx.arpFundMovement.aggregate({ where: { fundId: fund.id, direction: "OUT" }, _sum: { amountMinor: true } }),
+            tx.arpFundReservation.aggregate({ where: { fundId: fund.id, status: "ACTIVE" }, _sum: { amountMinor: true } }),
+          ]);
+          const available =
+            (inflow._sum.amountMinor ?? BigInt(0)) -
+            (outflow._sum.amountMinor ?? BigInt(0)) -
+            (reserved._sum.amountMinor ?? BigInt(0));
+          if (available < amountMinor) {
+            throw new Error("AID_FUND_INSUFFICIENT");
+          }
+          await tx.arpFundMovement.create({
+            data: {
+              fundId: fund.id,
+              direction: "OUT",
+              amountMinor,
+              currency: fund.currency,
+              valueDate: new Date(),
+              sourceType: "SOCIAL_AID",
+              sourceId: requestId,
+              description: `Paiement aide ${aidRequest.category}`,
+              createdById: session.user.id,
+            },
+          });
+        }
+
+        return tx.assocSocialAidRequest.findUniqueOrThrow({ where: { id: requestId } });
+      });
+
+      return NextResponse.json({ request: result });
+    }
+  } catch (error: any) {
+    if (error?.message === "AID_STATE_CHANGED") {
+      return NextResponse.json({ error: "La demande a déjà changé d'état" }, { status: 409 });
+    }
+    if (error?.message === "AID_TREASURY_NOT_FOUND") {
+      return NextResponse.json({ error: "Aucune caisse de solidarité active" }, { status: 409 });
+    }
+    if (error?.message === "AID_TREASURY_INSUFFICIENT" || error?.message === "AID_FUND_INSUFFICIENT") {
+      return NextResponse.json({ error: "Solde insuffisant dans la caisse/fonds de solidarité" }, { status: 409 });
+    }
+    console.error("Social aid update error:", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+
+  return NextResponse.json({ error: "Action inconnue" }, { status: 400 });
 }
