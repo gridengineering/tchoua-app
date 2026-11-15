@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSystemAdmin } from "@/lib/admin-auth";
 import { computeAssociationTrust, refreshTrustForUser } from "@/lib/trust";
+import { dispatchNotification } from "@/lib/notifications/dispatch";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
@@ -34,6 +35,15 @@ export async function POST(request: NextRequest) {
       },
     });
     await computeAssociationTrust(id).catch(() => {});
+    if (action === "QUARANTINE") {
+      const members = await prisma.associationMembership.findMany({ where: { associationId: id, status: "ACTIVE" }, select: { userId: true } });
+      await Promise.all(members.map((member) => dispatchNotification({
+        event: "QUARANTINE", userId: member.userId, associationId: id,
+        title: "Association en quarantaine",
+        message: reason ? `Motif : ${reason}` : "L'association est temporairement restreinte par l'administration.",
+        link: `/associations/${id}`, type: "ERROR",
+      }).catch(() => null)));
+    }
     return NextResponse.json({ association });
   }
 
@@ -52,5 +62,11 @@ export async function POST(request: NextRequest) {
     },
   });
   await refreshTrustForUser(id).catch(() => {});
+  await dispatchNotification({
+    event: "QUARANTINE", userId: id,
+    title: action === "QUARANTINE" ? "Compte en quarantaine" : "Quarantaine levée",
+    message: reason ? `Motif : ${reason}` : "Votre accès a été mis à jour par l'administration.",
+    type: action === "QUARANTINE" ? "ERROR" : "SUCCESS",
+  }).catch(() => {});
   return NextResponse.json({ user });
 }

@@ -137,6 +137,17 @@ export async function computeAssociationTrust(associationId: string): Promise<Tr
     computedAt: new Date().toISOString(),
   };
 
+  const autoQuarantine = governance.quarantine.enabled
+    ? governance.quarantine.rules.find((rule) => rule.enabled && rule.trigger === "TRUST_SCORE")
+    : null;
+  const shouldQuarantine = Boolean(autoQuarantine && score < autoQuarantine.threshold && !association.quarantinedAt);
+  const shouldRelease = Boolean(
+    association.quarantinedAt &&
+    association.quarantineReason?.startsWith("AUTO_TRUST:") &&
+    autoQuarantine &&
+    score >= autoQuarantine.threshold
+  );
+
   await prisma.association.update({
     where: { id: associationId },
     data: {
@@ -144,6 +155,11 @@ export async function computeAssociationTrust(associationId: string): Promise<Tr
       trustLevel: level.level,
       trustBreakdown: JSON.stringify(breakdown),
       trustComputedAt: new Date(),
+      ...(shouldQuarantine ? {
+        quarantinedAt: new Date(),
+        quarantineReason: `AUTO_TRUST: score ${score} inférieur au seuil ${autoQuarantine?.threshold}`,
+      } : {}),
+      ...(shouldRelease ? { quarantinedAt: null, quarantineReason: null, quarantinedById: null } : {}),
     },
   });
 

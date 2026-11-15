@@ -153,7 +153,7 @@ export default function GovernancePage() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
-        <nav className="flex gap-2 overflow-x-auto lg:flex-col">
+        <nav className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col">
           {TABS.map((item) => (
             <button key={item.id} onClick={() => setTab(item.id)}
               className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold ${tab === item.id ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
@@ -162,7 +162,7 @@ export default function GovernancePage() {
           ))}
         </nav>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           {tab === "kyc" && (
             <>
               <Section title="Politique KYC" desc="Activez les niveaux, leurs exigences et les restrictions par opération.">

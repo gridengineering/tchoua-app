@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { hasPermission, isSuperAdmin } from "@/lib/permissions";
 import { normalizeKycLevel } from "@/lib/kyc";
 import { refreshTrustForUser } from "@/lib/trust";
+import { dispatchNotification } from "@/lib/notifications/dispatch";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -92,6 +93,12 @@ export async function POST(req: NextRequest) {
       return request;
     });
     await refreshTrustForUser(kycRequest.userId).catch(() => {});
+    await dispatchNotification({
+      event: "KYC_REJECTED", userId: kycRequest.userId,
+      title: "Demande KYC refusée",
+      message: note ? `Motif : ${note}` : "Votre demande KYC a été refusée. Consultez votre espace KYC.",
+      link: "/kyc", type: "WARNING",
+    }).catch(() => {});
     return NextResponse.json({ request: updated, status: "REJECTED" });
   }
 
@@ -138,5 +145,11 @@ export async function POST(req: NextRequest) {
   });
 
   await refreshTrustForUser(kycRequest.userId).catch(() => {});
+  await dispatchNotification({
+    event: "KYC_APPROVED", userId: kycRequest.userId,
+    title: `KYC ${level} approuvé`,
+    message: "Votre niveau d'identité a été validé. Vos droits wallet et activité sont mis à jour.",
+    link: "/kyc", type: "SUCCESS",
+  }).catch(() => {});
   return NextResponse.json({ request: updated, level, status: "VERIFIED" });
 }
