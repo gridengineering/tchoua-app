@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { BarChart3, ChevronLeft, Download, TrendingUp, Users, Activity, Star, Wallet, Sparkles } from "lucide-react";
+import { BarChart3, ChevronLeft, Download, FileSpreadsheet, Network, TrendingUp, Users, Activity, Star, Wallet, Sparkles } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { formatCurrency } from "@/lib/utils";
 
@@ -140,6 +140,22 @@ export default function RapportsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadServerReport = async (endpoint: string, filename: string) => {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      alert(payload.error ?? "Export indisponible");
+      return;
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <DashboardLayout title="Analyses & Rapports">
       <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -158,10 +174,24 @@ export default function RapportsPage() {
                 des activités et évaluez la fiabilité des membres en temps réel.
               </p>
             </div>
-            <button onClick={exportCSV} disabled={!report || report.type === "CROSS"}
-              className="bg-warm-white text-[#0d3d28] px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50">
-              <Download className="w-4 h-4" /> Exporter le rapport
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={exportCSV} disabled={!report || report.type === "CROSS"}
+                className="bg-warm-white text-[#0d3d28] px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50">
+                <Download className="w-4 h-4" /> Rapport
+              </button>
+              <button
+                onClick={() => downloadServerReport(`/api/associations/${assocId}/reports/ohada?format=journal-csv`, `journal-syscohada-${assocId}.csv`)}
+                className="bg-white/10 text-white border border-white/20 px-5 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2"
+              >
+                <FileSpreadsheet className="w-4 h-4" /> Journal SYSCOHADA
+              </button>
+              <button
+                onClick={() => downloadServerReport(`/api/associations/${assocId}/reports/federation?format=csv`, `consolidation-federale-${assocId}.csv`)}
+                className="bg-white/10 text-white border border-white/20 px-5 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2"
+              >
+                <Network className="w-4 h-4" /> Fédération
+              </button>
+            </div>
           </div>
         </div>
 
