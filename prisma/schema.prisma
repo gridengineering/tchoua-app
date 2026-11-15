@@ -1264,6 +1264,7 @@ model AssocMeetingCollation {
 
 model AssocSocialAidRequest {
   id              String   @id @default(cuid())
+  idempotencyKey  String?  @unique
   associationId   String
   membershipId    String
   // ILLNESS_MEMBER, ILLNESS_SPOUSE, DEATH_MEMBER, DEATH_SPOUSE,
@@ -1540,6 +1541,7 @@ model AssocMessage {
 
 model AssocLoan {
   id              String   @id @default(cuid())
+  idempotencyKey  String?  @unique
   activityId      String
   borrowerMembershipId String
   amount          Float
@@ -1583,6 +1585,7 @@ model AssocLoanApproval {
 
 model AssocLoanRepayment {
   id            String    @id @default(cuid())
+  idempotencyKey String?  @unique
   loanId        String
   amount        Float
   principal     Float?
@@ -1966,6 +1969,7 @@ model Wallet {
 
 model WalletTransaction {
   id            String   @id @default(cuid())
+  idempotencyKey String? @unique
   walletId      String
   amount        Float
   feeAmount     Float    @default(0)

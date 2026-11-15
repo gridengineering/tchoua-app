@@ -143,12 +143,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
+  const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
+  if (idempotencyKey) {
+    const existing = await prisma.assocLoan.findUnique({ where: { idempotencyKey } });
+    if (existing) return NextResponse.json({ loan: existing, replayed: true });
+  }
+
+  // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
   const totalDue = Math.round(amount * (1 + (rate * duration) / 100));
   const dueDate = new Date();
   dueDate.setMonth(dueDate.getMonth() + duration);
 
   const loan = await prisma.assocLoan.create({
     data: {
+      idempotencyKey,
       activityId,
       borrowerMembershipId: membership.id,
       amount,
@@ -178,6 +186,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const body = await req.json();
   const { loanId, action, amount, paymentMethod, validators } = body;
+  const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
 
   if (!loanId || !action) return NextResponse.json({ error: "loanId et action requis" }, { status: 400 });
 
@@ -302,8 +311,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const principal = Math.round(numericAmount * (current.amount / effectiveTotalDue));
         const interest = numericAmount - principal;
 
+        if (idempotencyKey) {
+          const replay = await tx.assocLoanRepayment.findUnique({ where: { idempotencyKey } });
+          if (replay) return { remaining: Math.max(0, effectiveTotalDue - alreadyPaid), repaidNow: replay.amount, replayed: true };
+        }
         await tx.assocLoanRepayment.create({
           data: {
+            idempotencyKey,
             loanId,
             amount: numericAmount,
             principal,

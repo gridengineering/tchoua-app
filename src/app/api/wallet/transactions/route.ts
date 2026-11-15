@@ -42,6 +42,17 @@ export async function POST(req: Request) {
     const description = body.description ? String(body.description) : undefined;
     const receiverId = body.receiverId ? String(body.receiverId) : undefined;
     const otpCode = body.otpCode ? String(body.otpCode) : undefined;
+    const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
+
+    if (idempotencyKey) {
+      const existing = await prisma.walletTransaction.findUnique({
+        where: { idempotencyKey },
+        include: { wallet: true },
+      });
+      if (existing) {
+        return NextResponse.json({ wallet: existing.wallet, transaction: existing, replayed: true });
+      }
+    }
 
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
@@ -151,6 +162,7 @@ export async function POST(req: Request) {
         // Le dépôt externe reste PENDING tant que le prestataire n'a pas confirmé.
         const transaction = await tx.walletTransaction.create({
           data: {
+            idempotencyKey,
             walletId: wallet.id,
             amount, feeAmount, netAmount: amount, type: "DEPOSIT", status,
             description: description || `Dépôt ${provider?.label ?? ""}`.trim(),
@@ -167,6 +179,7 @@ export async function POST(req: Request) {
         });
         const transaction = await tx.walletTransaction.create({
           data: {
+            idempotencyKey,
             walletId: wallet.id,
             amount, feeAmount, netAmount, type: "WITHDRAWAL", status,
             description: description || `Retrait ${provider?.label ?? ""}`.trim(),
@@ -190,12 +203,14 @@ export async function POST(req: Request) {
       await tx.wallet.update({ where: { id: receiverWallet.id }, data: { balance: { increment: amount } } });
       const txOut = await tx.walletTransaction.create({
         data: {
+          idempotencyKey,
           walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_OUT", status: "COMPLETED",
           description: description || `Virement à ${receiver.name}`,
         },
       });
       const txIn = await tx.walletTransaction.create({
         data: {
+          idempotencyKey: idempotencyKey ? `${idempotencyKey}:in` : undefined,
           walletId: receiverWallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_IN", status: "COMPLETED",
           description: description || `Virement de ${user.name}`, relatedTxId: txOut.id,
         },

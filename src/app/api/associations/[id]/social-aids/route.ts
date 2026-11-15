@@ -61,6 +61,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const body = await req.json();
   const { category, requestedAmount, justification, urgencyLevel, documentUrl } = body;
+  const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
+  if (idempotencyKey) {
+    const existing = await prisma.assocSocialAidRequest.findUnique({ where: { idempotencyKey } });
+    if (existing) return NextResponse.json({ request: existing, replayed: true });
+  }
 
   if (!category || !requestedAmount) {
     return NextResponse.json({ error: "category et requestedAmount sont requis" }, { status: 400 });
@@ -92,6 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const request = await prisma.assocSocialAidRequest.create({
     data: {
+      idempotencyKey,
       associationId: id,
       membershipId: membership.id,
       category,
