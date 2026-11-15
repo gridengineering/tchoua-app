@@ -137,12 +137,32 @@ type TabKey =
   | "contacts"
   | "arp"
   | "activites"
+  | "bureau"
   | "reunions"
   | "finances"
   | "reglement"
   | "recap";
 
 const DAYS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+const BUREAU_ROLE_OPTIONS = [
+  { value: "MEMBER", label: "Membre" },
+  { value: "PRESIDENT", label: "Président" },
+  { value: "VICE_PRESIDENT", label: "Vice-président" },
+  { value: "SECRETARY", label: "Secrétaire" },
+  { value: "SECRETARY_ADJ", label: "Secrétaire adjoint" },
+  { value: "TREASURER", label: "Trésorier" },
+  { value: "TREASURER_ADJ", label: "Trésorier adjoint" },
+  { value: "SOLIDARITY_OFFICER", label: "Responsable solidarité" },
+  { value: "AUDITOR", label: "Commissaire aux comptes" },
+  { value: "CENSOR", label: "Censeur" },
+];
+type MemberRow = {
+  id: string;
+  role: string;
+  status: string;
+  user: { name: string; email: string; kycLevel?: number };
+};
 
 const inputCls =
   "w-full rounded-lg border border-[#e2ddd4] bg-white px-3 py-2 text-sm text-[#1f2937] outline-none transition focus:border-[#0d3d28] focus:ring-2 focus:ring-[#0d3d28]/10 disabled:bg-[#f6f3ec] disabled:text-[#9ca3af]";
@@ -324,6 +344,10 @@ export function AssociationFormWorkspace({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [parents, setParents] = useState<Array<{ id: string; name: string }>>([]);
+  const [members, setMembers] = useState<MemberRow[]>([]);
+  const [bureauSaving, setBureauSaving] = useState<string | null>(null);
+  const [bureauNotice, setBureauNotice] = useState<string | null>(null);
+  const [bureauError, setBureauError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: initial?.name ?? "",
@@ -379,6 +403,14 @@ export function AssociationFormWorkspace({
   });
 
   useEffect(() => {
+    if (!associationId) return;
+    fetch(`/api/associations/${associationId}/members`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setMembers(data?.members ?? []))
+      .catch(() => {});
+  }, [associationId]);
+
+  useEffect(() => {
     fetch("/api/associations")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -392,6 +424,28 @@ export function AssociationFormWorkspace({
       })
       .catch(() => {});
   }, [associationId]);
+
+  const updateMemberRole = async (membershipId: string, role: string) => {
+    if (!associationId || role === "FOUNDER") return;
+    setBureauSaving(membershipId);
+    setBureauError(null);
+    setBureauNotice(null);
+    try {
+      const response = await fetch(`/api/associations/${associationId}/members/${membershipId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error ?? "Modification du rôle impossible");
+      setMembers((current) => current.map((member) => member.id === membershipId ? { ...member, role } : member));
+      setBureauNotice("Rôle mis à jour. Le membre concerné voit ses accès immédiatement.");
+    } catch (err) {
+      setBureauError(err instanceof Error ? err.message : "Erreur inattendue");
+    } finally {
+      setBureauSaving(null);
+    }
+  };
 
   const updateArp = (path: string, value: unknown) => {
     setArp((current) => setByPath(current, path, value));
@@ -636,6 +690,7 @@ export function AssociationFormWorkspace({
     { key: "contacts", label: "Contacts", icon: MapPin },
     { key: "arp", label: "Cadre ARP", icon: Gauge, badge: arpValidation.errors.length },
     { key: "activites", label: "Activités", icon: Layers },
+    { key: "bureau", label: "Bureau", icon: Users },
     { key: "reunions", label: "Réunions & collation", icon: CalendarClock },
     { key: "finances", label: "Adhésion & finances", icon: Wallet },
     { key: "reglement", label: "Règlement", icon: FileText },
@@ -1006,6 +1061,68 @@ export function AssociationFormWorkspace({
                 </Section>
               </>
             )}
+          </div>
+        ) : null}
+
+        {tab === "bureau" ? (
+          <div className="space-y-4">
+            <Section title="Membres du bureau" description="Nommez les responsables de l'association. Un membre actif peut recevoir un rôle du bureau ; le rôle détermine immédiatement ses droits." icon={<Users className="h-4 w-4" />}>
+              {bureauError ? (
+                <div className="mb-3 rounded-lg border border-[#f3cdcd] bg-[#fef6f6] px-3 py-2 text-xs text-[#991b1b]">{bureauError}</div>
+              ) : null}
+              {bureauNotice ? (
+                <div className="mb-3 rounded-lg border border-[#cce8d4] bg-[#f7fcf8] px-3 py-2 text-xs text-[#166534]">{bureauNotice}</div>
+              ) : null}
+              <div className="overflow-x-auto rounded-xl border border-[#e8e2d8]">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[#fbf9f3] text-[11px] uppercase tracking-[0.06em] text-[#7a7368]">
+                    <tr>
+                      <th className="px-4 py-3">Membre</th>
+                      <th className="px-4 py-3">Rôle / fonction</th>
+                      <th className="px-4 py-3">Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f0ece4]">
+                    {members.filter((member) => member.status === "ACTIVE").length === 0 ? (
+                      <tr><td colSpan={3} className="px-4 py-8 text-center text-sm italic text-[#7a7368]">Aucun membre actif. Invitez d&apos;abord des membres.</td></tr>
+                    ) : members.filter((member) => member.status === "ACTIVE").map((member) => (
+                      <tr key={member.id} className="bg-white">
+                        <td className="px-4 py-3">
+                          <p className="font-semibold text-[#1a1a1a]">{member.user.name}</p>
+                          <p className="text-xs text-[#7a7368]">{member.user.email}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          {member.role === "FOUNDER" ? (
+                            <span className="inline-flex rounded-full bg-[#fff1e6] px-2 py-1 text-xs font-semibold text-[#b45309]">Fondateur — non modifiable</span>
+                          ) : (
+                            <select
+                              value={member.role}
+                              disabled={bureauSaving === member.id}
+                              onChange={(event) => updateMemberRole(member.id, event.target.value)}
+                              className="rounded-lg border border-[#e2ddd4] bg-white px-2.5 py-1.5 text-sm text-[#1f2937] outline-none focus:border-[#0d3d28] disabled:opacity-50"
+                            >
+                              {BUREAU_ROLE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                            </select>
+                          )}
+                          {bureauSaving === member.id ? <span className="ml-2 text-xs text-[#7a7368]">Enregistrement…</span> : null}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${member.role === "MEMBER" ? "bg-[#f3f4f6] text-[#4b5563]" : "bg-[#e8f5ec] text-[#166534]"}`}>
+                            {member.role === "MEMBER" ? "Membre" : "Bureau"}
+                          </span>
+                          {typeof member.user.kycLevel === "number" ? <span className="ml-2 text-[11px] text-[#7a7368]">KYC {member.user.kycLevel}</span> : null}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-[#7a7368]">
+                Un seul rôle de bureau par membre. Pour cumuler des permissions supplémentaires, utilisez les
+                <Link href={`/associations/${associationId}/parametres`} className="mx-1 font-semibold text-[#0d3d28] underline">rôles personnalisés</Link>.
+                Le fondateur conserve son rôle et ne peut pas être remplacé depuis cet écran.
+              </p>
+            </Section>
           </div>
         ) : null}
 
