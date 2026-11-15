@@ -858,14 +858,14 @@ export default function AssociationDetailPage() {
                     className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-white text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f6fbf7] transition-colors"
                     onClick={() => router.push(`/associations/${id}/kyc`)}
                   >
-                    <ShieldCheck className="w-4 h-4" /> KYC
+                    <ShieldCheck className="w-4 h-4" /> Conformité KYC
                   </button>
                 )}
                 <button
                   className="inline-flex items-center gap-1.5 border border-[#cfe0d5] bg-white text-[#0d3d28] text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#f6fbf7] transition-colors"
                   onClick={() => router.push(`/associations/${id}/wallet`)}
                 >
-                  <Wallet className="w-4 h-4" /> Wallet
+                  <Wallet className="w-4 h-4" /> Wallet association
                 </button>
                 {isBureauMember && (
                   <button
