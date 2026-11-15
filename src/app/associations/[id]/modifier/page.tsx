@@ -86,7 +86,7 @@ export default function EditAssociationPage() {
 
   if (loading || sessionPending) {
     return (
-      <DashboardLayout title="Modifier l'association">
+      <DashboardLayout title="Configurer l'association">
         <div className="flex items-center justify-center gap-2 p-16 text-sm text-[#8a8378]">
           <Loader2 className="h-4 w-4 animate-spin" /> Chargement de l&apos;association…
         </div>
@@ -96,7 +96,7 @@ export default function EditAssociationPage() {
 
   if (error || !initial) {
     return (
-      <DashboardLayout title="Modifier l'association">
+      <DashboardLayout title="Configurer l'association">
         <div className="mx-auto max-w-lg rounded-2xl border border-[#f3cdcd] bg-[#fef6f6] p-6">
           <AlertTriangle className="mb-2 h-6 w-6 text-[#b91c1c]" />
           <p className="font-semibold text-[#991b1b]">{error ?? "Association introuvable"}</p>
@@ -110,7 +110,7 @@ export default function EditAssociationPage() {
 
   if (!canEdit) {
     return (
-      <DashboardLayout title={`Modifier — ${initial.name}`}>
+      <DashboardLayout title={`Configurer — ${initial.name}`}>
         <div className="mx-auto max-w-lg rounded-2xl border border-[#f2dfb8] bg-[#fffbf1] p-6">
           <AlertTriangle className="mb-2 h-6 w-6 text-[#b45309]" />
           <p className="font-semibold text-[#92400e]">Modification réservée au bureau</p>

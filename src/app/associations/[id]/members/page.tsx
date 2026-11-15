@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Users, Search, UserPlus, Filter, ShieldAlert } from "lucide-react";
@@ -11,12 +11,13 @@ import { KycBadge } from "@/components/kyc/kyc-badge";
 export default function MembersDirectoryPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(searchParams.get("invite") === "1");
   const [copied, setCopied] = useState(false);
   const [joinCode, setJoinCode] = useState("");
 

@@ -645,7 +645,7 @@ export function AssociationFormWorkspace({
   const totalActivities = mode === "edit" ? initial?.activities?.length ?? 0 : Object.values(modules).filter(Boolean).length;
 
   return (
-    <DashboardLayout title={mode === "create" ? "Créer une association" : `Modifier — ${initial?.name ?? "association"}`}>
+    <DashboardLayout title={mode === "create" ? "Créer une association" : `Configurer — ${initial?.name ?? "association"}`}>
       <div className="mx-auto max-w-6xl pb-24">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -656,7 +656,7 @@ export function AssociationFormWorkspace({
               <ArrowLeft className="h-4 w-4" /> {mode === "create" ? "Tableau de bord" : "Retour à l'association"}
             </Link>
             <h1 className="mt-1 text-2xl font-bold text-[#1a1a1a]">
-              {mode === "create" ? "Créer une association" : "Modifier l'association"}
+              {mode === "create" ? "Créer une association" : "Configurer l'association"}
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-[#6b7280]">
               Formulaire par onglets : naviguez librement, enregistrez à tout moment. Le cadre ARP
