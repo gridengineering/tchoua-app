@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Gavel, Globe, Layout,
-  Lock, MessageSquare, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, Sparkles,
-  ToggleLeft, ToggleRight, Video, Wallet, Wrench,
+  Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Globe2, KeyRound, Layout,
+  Lock, Mail, MessageSquare, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, SlidersHorizontal,
+  Sparkles, ToggleLeft, ToggleRight, Users, Video, Wallet, Wrench,
 } from "lucide-react";
 import { PlatformSettings } from "@/lib/platform-settings-shared";
 import { GovernanceConsole } from "@/components/admin/governance-console";
@@ -17,9 +17,16 @@ const TABS = [
   { id: "limits", label: "Limites & finances", icon: Coins },
   { id: "features", label: "Fonctionnalités", icon: Sparkles },
   { id: "rtc", label: "RTC & Chat", icon: Video },
-  { id: "governance", label: "Gouvernance", icon: Gavel },
+  { id: "kyc", label: "KYC", icon: ShieldCheck },
+  { id: "trust", label: "Confiance", icon: SlidersHorizontal },
+  { id: "quarantine", label: "Quarantaine", icon: AlertCircle },
+  { id: "email", label: "Messagerie", icon: Mail },
+  { id: "governance-wallet", label: "Wallet & paiements", icon: Wallet },
+  { id: "rbac", label: "RBAC / IAM / ACL", icon: Users },
+  { id: "governance-notifications", label: "Notifications Tchoua Mobile", icon: Globe2 },
+  { id: "openapi", label: "OpenAPI 3.1", icon: KeyRound },
   { id: "wallet", label: "Frais & plafonds Wallet", icon: Wallet },
-  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "notifications", label: "Notifications système", icon: Bell },
   { id: "maintenance", label: "Maintenance", icon: Wrench },
 ] as const;
 
@@ -108,7 +115,9 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const isEmbeddedPanel = tab === "governance" || tab === "wallet";
+  const isEmbeddedPanel =
+    tab === "wallet" ||
+    ["kyc", "trust", "quarantine", "email", "governance-wallet", "rbac", "governance-notifications", "openapi"].includes(tab);
 
   const dirty = useMemo(
     () => Boolean(settings) && JSON.stringify(settings) !== initial,
@@ -566,7 +575,14 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
             </div>
           )}
 
-          {tab === "governance" && <GovernanceConsole embedded />}
+          {tab === "kyc" && <GovernanceConsole embedded hideTabs initialTab="kyc" />}
+          {tab === "trust" && <GovernanceConsole embedded hideTabs initialTab="trust" />}
+          {tab === "quarantine" && <GovernanceConsole embedded hideTabs initialTab="quarantine" />}
+          {tab === "email" && <GovernanceConsole embedded hideTabs initialTab="email" />}
+          {tab === "governance-wallet" && <GovernanceConsole embedded hideTabs initialTab="wallet" />}
+          {tab === "rbac" && <GovernanceConsole embedded hideTabs initialTab="rbac" />}
+          {tab === "governance-notifications" && <GovernanceConsole embedded hideTabs initialTab="notifications" />}
+          {tab === "openapi" && <GovernanceConsole embedded hideTabs initialTab="openapi" />}
 
           {tab === "wallet" && <WalletSettingsPanel embedded />}
 

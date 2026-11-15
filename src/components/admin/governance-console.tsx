@@ -18,7 +18,8 @@ const TABS = [
   { id: "notifications", label: "Notifications", icon: Globe2 },
   { id: "openapi", label: "OpenAPI 3.1", icon: KeyRound },
 ] as const;
-type TabId = (typeof TABS)[number]["id"];
+export type GovernanceTabId = (typeof TABS)[number]["id"];
+type TabId = GovernanceTabId;
 
 const input = "w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10";
 const label = "mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500";
@@ -69,10 +70,18 @@ function Toggle({ checked, onChange, title, desc }: { checked: boolean; onChange
   );
 }
 
-export function GovernanceConsole({ embedded = false }: { embedded?: boolean }) {
+export function GovernanceConsole({
+  embedded = false,
+  hideTabs = false,
+  initialTab = "kyc",
+}: {
+  embedded?: boolean;
+  hideTabs?: boolean;
+  initialTab?: GovernanceTabId;
+}) {
   const [config, setConfig] = useState<GovernanceConfig | null>(null);
   const [initial, setInitial] = useState("");
-  const [tab, setTab] = useState<TabId>("kyc");
+  const [tab, setTab] = useState<TabId>(initialTab);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -161,15 +170,17 @@ export function GovernanceConsole({ embedded = false }: { embedded?: boolean }) 
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
-        <nav className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col">
-          {TABS.map((item) => (
-            <button key={item.id} onClick={() => setTab(item.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold ${tab === item.id ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
-              <item.icon className="h-4 w-4" /> {item.label}
-            </button>
-          ))}
-        </nav>
+      <div className={`grid gap-5 ${hideTabs ? "" : "lg:grid-cols-[220px_1fr]"}`}>
+        {!hideTabs && (
+          <nav className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col">
+            {TABS.map((item) => (
+              <button key={item.id} onClick={() => setTab(item.id)}
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold ${tab === item.id ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
+                <item.icon className="h-4 w-4" /> {item.label}
+              </button>
+            ))}
+          </nav>
+        )}
 
         <div className="min-w-0 space-y-5">
           {tab === "kyc" && (
