@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Vous n'êtes pas membre de cette association" }, { status: 403 });
   }
 
-  const channels = [`assoc:${associationId}:GENERAL`, `assoc:${associationId}:ANNONCES`];
+  const channels = [`user:${session.user.id}`, `assoc:${associationId}:GENERAL`, `assoc:${associationId}:ANNONCES`];
   if (rtc.bureauChannelEnabled && ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ADJ", "TREASURER", "TREASURER_ADJ"].includes(membership.role)) {
     channels.push(`assoc:${associationId}:BUREAU`);
   }

@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { KYC_LEVELS, normalizeKycLevel } from "@/lib/kyc";
+import { getGovernanceConfig } from "@/lib/governance";
 import { CONSENT_KEYS, CONSENT_VERSION } from "@/lib/consents";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const [user, latestRequest, consents] = await Promise.all([
+  const [user, latestRequest, consents, governance] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -32,6 +33,7 @@ export async function GET() {
       where: { userId: session.user.id, version: CONSENT_VERSION },
       select: { document: true, acceptedAt: true },
     }),
+    getGovernanceConfig(),
   ]);
 
   if (!user) return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
@@ -51,7 +53,7 @@ export async function GET() {
     })(),
     user,
     latestRequest,
-    levels: KYC_LEVELS,
+    levels: governance.kyc.enabled ? governance.kyc.levels : KYC_LEVELS,
     platformConsentsComplete:
       Boolean((session.user as any).systemRoleId) ||
       CONSENT_KEYS.every((key) => consents.some((c) => c.document === key)),
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Niveau KYC invalide" }, { status: 400 });
   }
 
-  const [user, pending, consents] = await Promise.all([
+  const [user, pending, consents, governance] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -84,6 +86,7 @@ export async function POST(req: NextRequest) {
       where: { userId: session.user.id, version: CONSENT_VERSION },
       select: { document: true },
     }),
+    getGovernanceConfig(),
   ]);
 
   if (!user) return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
@@ -168,31 +171,25 @@ export async function POST(req: NextRequest) {
     ? await prisma.kycDocument.findMany({ where: { id: { in: documentIds }, userId: user.id } })
     : [];
 
-  if (requestedLevel >= 2) {
+  const rule = governance.kyc.levels.find((item) => item.level === requestedLevel);
+  if (rule) {
     const types = new Set(documents.map((doc) => doc.type));
-    if (!types.has("ID_DOCUMENT") && !types.has("PASSPORT_PHOTO")) {
-      return NextResponse.json(
-        { error: "Ajoutez une pièce d'identité (CNI, passeport ou titre de séjour) avant de demander ce niveau.", code: "DOCUMENTS_REQUIRED" },
-        { status: 400 }
-      );
-    }
-    if (!types.has("PASSPORT_PHOTO")) {
-      return NextResponse.json(
-        { error: "Ajoutez une photo récente de type passeport pour vérifier votre identité.", code: "DOCUMENTS_REQUIRED" },
-        { status: 400 }
-      );
-    }
-    if (requestedLevel === 3 && !types.has("LOCATION_PROOF") && !types.has("UTILITY_BILL") && !types.has("GOOGLE_MAPS")) {
-      return NextResponse.json(
-        { error: "Ajoutez une preuve de localisation (plan, facture ou lien Google Maps) pour la vigilance renforcée.", code: "DOCUMENTS_REQUIRED" },
-        { status: 400 }
-      );
+    for (const required of rule.documents) {
+      const accepted = required === "LOCATION_PROOF"
+        ? ["LOCATION_PROOF", "UTILITY_BILL", "GOOGLE_MAPS"]
+        : [required];
+      if (!accepted.some((type) => types.has(type))) {
+        return NextResponse.json(
+          { error: `Document requis pour KYC ${requestedLevel} : ${required}.`, code: "DOCUMENTS_REQUIRED", requiredDocument: required },
+          { status: 400 }
+        );
+      }
     }
   }
 
   const now = new Date();
 
-  if (requestedLevel === 1) {
+  if (rule?.approval === "AUTO") {
     const result = await prisma.$transaction(async (tx) => {
       const request = await tx.kycRequest.create({
         data: {

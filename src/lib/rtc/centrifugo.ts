@@ -18,6 +18,23 @@ export function centrifugoToken(userId: string, channels: string[], ttlSeconds =
   return `${header}.${payload}.${sig}`;
 }
 
+export async function publishToUser(userId: string, data: unknown) {
+  const settings = await getPlatformSettings().catch(() => null);
+  const url = settings?.rtc.chatApiUrl || process.env.CENTRIFUGO_API_URL;
+  const key = process.env.CENTRIFUGO_API_KEY;
+  if (!url || !key) return false;
+  try {
+    const res = await fetch(`${url}/api/publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-API-Key": key },
+      body: JSON.stringify({ channel: `user:${userId}`, data }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function publishAssociationEvent(associationId: string, channel: string, data: unknown) {
   const settings = await getPlatformSettings().catch(() => null);
   if (settings && (!settings.rtc.enabled || !settings.rtc.chatEnabled)) return false;

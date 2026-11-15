@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSystemAdmin } from "@/lib/admin-auth";
 import { computeAllAssociationTrust, computeAssociationTrust, TRUST_LEVELS } from "@/lib/trust";
+import { getGovernanceConfig } from "@/lib/governance";
 
 export async function GET(request: NextRequest) {
   const guard = await requireSystemAdmin("ASSOCIATIONS", "READ");
@@ -25,7 +26,8 @@ export async function GET(request: NextRequest) {
     orderBy: [{ trustScore: "desc" }, { name: "asc" }],
   });
 
-  return NextResponse.json({ associations, levels: TRUST_LEVELS });
+  const governance = await getGovernanceConfig();
+  return NextResponse.json({ associations, levels: governance.trust.levels, criteria: governance.trust.criteria, quarantineBelow: governance.trust.quarantineBelow });
 }
 
 export async function POST(request: NextRequest) {

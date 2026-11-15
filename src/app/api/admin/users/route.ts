@@ -82,6 +82,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await prisma.wallet.create({ data: { userId: user.id, balance: 0, currency: "XAF", status: "ACTIVE" } }).catch(() => {});
+
     // Logger l'action
     await prisma.auditLog.create({
       data: {

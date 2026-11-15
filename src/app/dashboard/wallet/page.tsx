@@ -19,12 +19,28 @@ type Transaction = {
   createdAt: string;
 };
 
+type WalletProvider = {
+  id: string;
+  label: string;
+  type: string;
+  feePct: number;
+  feeFixed: number;
+  min: number;
+  max: number;
+  instructions: string;
+};
+
 type WalletData = {
   id: string;
   balance: number;
   currency: string;
   status: string;
   transactions: Transaction[];
+  kyc?: { level: number; label: string; maxAmountPerTx: number; maxDaily: number; access: Record<string, boolean> };
+  providers?: WalletProvider[];
+  canDeposit?: boolean;
+  canWithdraw?: boolean;
+  canTransfer?: boolean;
 };
 
 export default function WalletPage() {
@@ -40,33 +56,49 @@ export default function WalletPage() {
   const [error, setError] = useState("");
   const [requiresOTP, setRequiresOTP] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [otpMessage, setOtpMessage] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [providers, setProviders] = useState<WalletProvider[]>([]);
+  const [kyc, setKyc] = useState<WalletData["kyc"]>(undefined);
 
-  const calculateFees = (amountStr: string, actionType: string | null, method: string) => {
-    const amt = parseFloat(amountStr);
-    if (isNaN(amt) || amt <= 0) return 0;
-    if (actionType === "DEPOSIT") {
-      if (method === "MOBILE_MONEY") { let f = amt * 0.01; if (f < 100) f = 100; if (f > 5000) f = 5000; return f; }
-      else if (method === "BANK_CARD") return amt * 0.025;
-      else return 500;
-    } else if (actionType === "WITHDRAWAL") {
-      if (method === "MOBILE_MONEY") return 500;
-      else if (method === "BANK_TRANSFER") return 1000;
-    }
-    return 0;
-  };
-
-  const currentFee = calculateFees(amount, action, paymentMethod);
+  const selectedProvider = providers.find((provider) => provider.id === paymentMethod);
+  const currentFee = selectedProvider && action !== "TRANSFER" && parseFloat(amount || "0") > 0
+    ? Math.round(parseFloat(amount || "0") * selectedProvider.feePct / 100 + selectedProvider.feeFixed)
+    : 0;
   const totalAmount = (action === "DEPOSIT" || action === "WITHDRAWAL") ? parseFloat(amount || "0") + currentFee : parseFloat(amount || "0");
 
   const fetchWallet = async () => {
     try {
       const res = await fetch("/api/wallet");
-      if (res.ok) { const data = await res.json(); setWallet(data.wallet); }
+      if (res.ok) {
+        const data = await res.json();
+        setWallet({ ...data.wallet, canDeposit: data.canDeposit, canWithdraw: data.canWithdraw, canTransfer: data.canTransfer });
+        setProviders(data.providers ?? []);
+        setKyc(data.kyc);
+        if (data.providers?.[0] && !data.providers.some((provider: WalletProvider) => provider.id === paymentMethod)) {
+          setPaymentMethod(data.providers[0].id);
+        }
+      }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
   useEffect(() => { if (session) fetchWallet(); }, [session]);
+
+  const sendOtp = async () => {
+    setOtpSending(true);
+    setOtpMessage("");
+    try {
+      const res = await fetch("/api/wallet/otp", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Envoi impossible");
+      setOtpMessage(`Code envoyé à ${data.target}. Il expire dans 10 minutes.`);
+    } catch (error: any) {
+      setOtpMessage(error.message);
+    } finally {
+      setOtpSending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,13 +108,13 @@ export default function WalletPage() {
       const res = await fetch("/api/wallet/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: action, amount: parseFloat(amount), receiverId: action === "TRANSFER" ? receiverId : undefined, description: description || undefined, reference: paymentMethod, otpCode: requiresOTP ? otpCode : undefined }),
+        body: JSON.stringify({ type: action, amount: parseFloat(amount), receiverId: action === "TRANSFER" ? receiverId : undefined, description: description || undefined, provider: action === "TRANSFER" ? undefined : paymentMethod, otpCode: requiresOTP ? otpCode : undefined }),
       });
       const data = await res.json();
       if (res.status === 200 && data.requiresOTP) { setRequiresOTP(true); setIsSubmitting(false); return; }
       if (!res.ok) throw new Error(data.error || "Une erreur est survenue");
       await fetchWallet();
-      setAction(null); setAmount(""); setReceiverId(""); setDescription(""); setRequiresOTP(false); setOtpCode("");
+      setAction(null); setAmount(""); setReceiverId(""); setDescription(""); setRequiresOTP(false); setOtpCode(""); setOtpMessage("");
     } catch (err: any) { setError(err.message); }
     finally { setIsSubmitting(false); }
   };
@@ -129,13 +161,13 @@ export default function WalletPage() {
                 <img src="/logo-icon.svg" alt="Tchoua" className="w-10 h-10 opacity-50" />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setAction("DEPOSIT")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-sm", action === "DEPOSIT" ? "bg-[#E38513] ring-2 ring-white" : "bg-[#E38513]/80 hover:bg-[#E38513]")}>
+                <button disabled={!wallet?.canDeposit} onClick={() => setAction("DEPOSIT")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-sm disabled:opacity-40", action === "DEPOSIT" ? "bg-[#E38513] ring-2 ring-white" : "bg-[#E38513]/80 hover:bg-[#E38513]")}>
                   <ArrowDownLeft className="w-4 h-4" /> Dépôt
                 </button>
-                <button onClick={() => setAction("WITHDRAWAL")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all backdrop-blur-sm text-sm", action === "WITHDRAWAL" ? "bg-white/30 ring-2 ring-white" : "bg-white/10 hover:bg-white/20")}>
+                <button disabled={!wallet?.canWithdraw} onClick={() => setAction("WITHDRAWAL")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all backdrop-blur-sm text-sm disabled:opacity-40", action === "WITHDRAWAL" ? "bg-white/30 ring-2 ring-white" : "bg-white/10 hover:bg-white/20")}>
                   <ArrowUpRight className="w-4 h-4" /> Retrait
                 </button>
-                <button onClick={() => setAction("TRANSFER")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all backdrop-blur-sm text-sm", action === "TRANSFER" ? "bg-white/30 ring-2 ring-white" : "bg-white/10 hover:bg-white/20")}>
+                <button disabled={!wallet?.canTransfer} onClick={() => setAction("TRANSFER")} className={cn("flex-1 py-2.5 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all backdrop-blur-sm text-sm disabled:opacity-40", action === "TRANSFER" ? "bg-white/30 ring-2 ring-white" : "bg-white/10 hover:bg-white/20")}>
                   <ArrowRightLeft className="w-4 h-4" /> Transfert
                 </button>
               </div>
@@ -150,7 +182,7 @@ export default function WalletPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-forest animate-pulse flex-shrink-0" />
                 <div>
                   <p className="text-xs font-black text-emerald-900">Actif & Sécurisé</p>
-                  <p className="text-xs text-forest">Aucune limite imposée</p>
+                  <p className="text-xs text-forest">{kyc ? `${kyc.label} · plafond ${kyc.maxAmountPerTx.toLocaleString("fr-FR")} ${wallet?.currency ?? "XAF"}/transaction` : "Plafonds KYC appliqués"}</p>
                 </div>
               </div>
             </div>
@@ -234,7 +266,11 @@ export default function WalletPage() {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="p-3 bg-warning/10 text-orange-800 rounded-xl border border-orange-100">
                       <p className="font-bold text-sm mb-1">🔒 Vérification 2FA</p>
-                      <p className="text-xs">Code OTP requis pour cette transaction. (Simulation: 123456)</p>
+                      <p className="text-xs">Un code à 6 chiffres est requis pour cette transaction.</p>
+                      <button type="button" onClick={sendOtp} disabled={otpSending} className="mt-2 rounded-lg bg-[#165E39] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50">
+                        {otpSending ? "Envoi…" : "Envoyer le code par e-mail"}
+                      </button>
+                      {otpMessage && <p className="mt-2 text-xs font-semibold">{otpMessage}</p>}
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">Code OTP à 6 chiffres</label>
@@ -253,7 +289,7 @@ export default function WalletPage() {
                       <label className="block text-xs font-bold text-gray-700 mb-1">Montant ({wallet?.currency})</label>
                       <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
                         className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none"
-                        placeholder="Ex: 10000" required min="100" />
+                        placeholder="Ex: 10000" required min={selectedProvider?.min ?? 100} max={selectedProvider?.max} />
                     </div>
 
                     {action === "TRANSFER" && (
@@ -270,11 +306,11 @@ export default function WalletPage() {
                         <label className="block text-xs font-bold text-gray-700 mb-1">Moyen de paiement</label>
                         <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}
                           className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none">
-                          <option value="MOBILE_MONEY">Mobile Money (Orange/MTN)</option>
-                          <option value="BANK_CARD">Carte Bancaire</option>
-                          <option value="BANK_TRANSFER">Virement Bancaire</option>
-                          <option value="CASH">Espèces</option>
+                          {providers.map((provider) => (
+                            <option key={provider.id} value={provider.id}>{provider.label}</option>
+                          ))}
                         </select>
+                        {selectedProvider && <p className="mt-1 text-[11px] text-ash">{selectedProvider.instructions}</p>}
                       </div>
                     )}
 

@@ -1,6 +1,7 @@
 import { createHash, randomInt, timingSafeEqual } from "crypto";
 import { spawn } from "child_process";
 import { prisma } from "@/lib/prisma";
+import { sendTransactionalEmail } from "@/lib/mailer";
 
 export type VerificationChannel = "EMAIL" | "PHONE" | "WHATSAPP";
 
@@ -27,6 +28,18 @@ export function isPhoneTarget(value: string) {
 }
 
 async function deliverEmail(to: string, code: string) {
+  const subject = "Votre code de vérification Tchoua";
+  const text = [
+    "Bonjour,",
+    "",
+    `Votre code de vérification Tchoua est : ${code}`,
+    "",
+    "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.",
+    "",
+    "— Tchoua, la plateforme des tontines et associations",
+  ].join("\n");
+  if (await sendTransactionalEmail({ to, subject, text })) return true;
+
   const webhook = process.env.KYC_EMAIL_WEBHOOK_URL;
   if (webhook) {
     const response = await fetch(webhook, {
@@ -49,16 +62,6 @@ async function deliverEmail(to: string, code: string) {
   }
 
   const from = process.env.KYC_EMAIL_FROM ?? "Tchoua <no-reply@tchoua.com>";
-  const subject = "Votre code de vérification Tchoua";
-  const text = [
-    "Bonjour,",
-    "",
-    `Votre code de vérification Tchoua est : ${code}`,
-    "",
-    "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.",
-    "",
-    "— Tchoua, la plateforme des tontines et associations",
-  ].join("\n");
   const message = [
     `From: ${from}`,
     `To: ${to}`,

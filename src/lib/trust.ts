@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeKycLevel } from "@/lib/kyc";
 import { TRUST_LEVELS, trustLevelForScore, type TrustBreakdown, type TrustCriterion } from "@/lib/trust-levels";
+import { getGovernanceConfig } from "@/lib/governance";
+import { trustLevelForScoreWithConfig } from "@/lib/governance-types";
 
 export { TRUST_LEVELS, trustLevelForScore };
 export type { TrustBreakdown, TrustCriterion };
 
 export async function computeAssociationTrust(associationId: string): Promise<TrustBreakdown> {
-  const association = await prisma.association.findUnique({
+  const [association, governance] = await Promise.all([prisma.association.findUnique({
     where: { id: associationId },
     include: {
       documents: { select: { id: true, type: true } },
@@ -20,7 +22,7 @@ export async function computeAssociationTrust(associationId: string): Promise<Tr
       },
       arpProfile: { select: { status: true } },
     },
-  });
+  }), getGovernanceConfig()]);
 
   if (!association) throw new Error("Association introuvable");
 
@@ -38,7 +40,7 @@ export async function computeAssociationTrust(associationId: string): Promise<Tr
     return age >= 0 && age <= 90 * 24 * 60 * 60 * 1000;
   }).length;
 
-  const criteria: TrustCriterion[] = [
+  const rawCriteria: TrustCriterion[] = [
     {
       key: "fiche",
       label: "Qualité de la fiche association",
@@ -112,8 +114,20 @@ export async function computeAssociationTrust(associationId: string): Promise<Tr
     },
   ];
 
-  const score = Math.max(0, Math.min(100, criteria.reduce((sum, item) => sum + item.score, 0)));
-  const level = trustLevelForScore(score);
+  const criteria: TrustCriterion[] = rawCriteria
+    .map((item) => {
+      const rule = governance.trust.criteria.find((criterion) => criterion.key === item.key);
+      if (rule && !rule.enabled) return null;
+      const max = rule?.max ?? item.max;
+      const score = item.max > 0 ? Math.round((item.score / item.max) * max) : 0;
+      return { ...item, label: rule?.label ?? item.label, max, score: Math.max(0, Math.min(max, score)) };
+    })
+    .filter((item): item is TrustCriterion => Boolean(item));
+
+  const totalMax = criteria.reduce((sum, item) => sum + item.max, 0) || 100;
+  const rawTotal = criteria.reduce((sum, item) => sum + item.score, 0);
+  const score = Math.max(0, Math.min(100, Math.round((rawTotal / totalMax) * 100)));
+  const level = trustLevelForScoreWithConfig(governance, score);
 
   const breakdown: TrustBreakdown = {
     score,

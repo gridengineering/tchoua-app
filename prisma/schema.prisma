@@ -844,6 +844,7 @@ model Association {
   meetings      AssocMeeting[]
   documents     AssocDocument[]
   accounts      AssocBankAccount[]
+  wallet        AssociationWallet?
   socialAidReqs AssocSocialAidRequest[]
   assocMessages AssocMessage[]
   customRoles   AssociationCustomRole[]
@@ -918,6 +919,7 @@ model AssociationMembership {
   candidates      ElectionCandidate[]
   mandates        MandatePeriod[]
   notifs          AssociationNotification[]
+  assocWalletTx   AssociationWalletTransaction[]
   approvalVotes   ApprovalVote[]
   dividendShares  AssociationDividendShare[]
   settlements     MemberSettlement[]
@@ -1302,6 +1304,45 @@ model AssocDocument {
 }
 
 // ─── Comptes Bancaires de l'Association ───────────────────────────────────
+
+/// Wallet propre à une association (un seul par association).
+model AssociationWallet {
+  id            String   @id @default(cuid())
+  associationId String   @unique
+  balance       Float    @default(0)
+  currency      String   @default("XAF")
+  status        String   @default("ACTIVE") // ACTIVE, SUSPENDED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  association   Association @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  transactions  AssociationWalletTransaction[]
+
+  @@map("association_wallets")
+}
+
+model AssociationWalletTransaction {
+  id            String   @id @default(cuid())
+  walletId      String
+  amount        Float
+  feeAmount     Float    @default(0)
+  netAmount     Float    @default(0)
+  type          String   // DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, PAYMENT, RECEIPT
+  status        String   @default("COMPLETED") // PENDING, COMPLETED, FAILED, CANCELLED
+  provider      String?  // MTN_MOMO, ORANGE_MONEY, WAVE, CAMTEL_MOMO, VISA, MASTERCARD, PAYPAL, BANK_TRANSFER, CASH
+  reference     String?
+  description   String?
+  memberId      String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  wallet        AssociationWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  member        AssociationMembership? @relation(fields: [memberId], references: [id])
+
+  @@index([walletId, createdAt])
+  @@map("association_wallet_transactions")
+}
 
 model AssocBankAccount {
   id              String   @id @default(cuid())

@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { normalizeKycLevel, requiredKycForAmount, type KycLevel } from "@/lib/kyc";
+import { normalizeKycLevel, type KycLevel } from "@/lib/kyc";
+import { getGovernanceConfig } from "@/lib/governance";
+import { kycRequiredForAmount, kycRuleForLevel, type KycAccess } from "@/lib/governance-types";
 import { CONSENT_KEYS, CONSENT_VERSION } from "@/lib/consents";
 
 export type EligibilityFailure = {
@@ -27,9 +29,9 @@ export type EligibilityResult = { ok: true } | EligibilityFailure;
 export async function checkAssociationEligibility(
   userId: string,
   associationId: string,
-  options: { amount?: number | null; minKycLevel?: number | null } = {}
+  options: { amount?: number | null; minKycLevel?: number | null; operation?: keyof KycAccess } = {}
 ): Promise<EligibilityResult> {
-  const [association, membership, consents] = await Promise.all([
+  const [association, membership, consents, governance] = await Promise.all([
     prisma.association.findUnique({
       where: { id: associationId },
       select: {
@@ -48,6 +50,7 @@ export async function checkAssociationEligibility(
       where: { userId, version: CONSENT_VERSION },
       select: { document: true },
     }),
+    getGovernanceConfig(),
   ]);
 
   if (!association) {
@@ -96,12 +99,21 @@ export async function checkAssociationEligibility(
   }
 
   const currentKyc = normalizeKycLevel(membership.user.kycLevel);
-  const requestedKyc = Math.max(
+  let requestedKyc = Math.max(
     1,
     Number(association.minKycLevel ?? 0),
     Number(options.minKycLevel ?? 0),
-    options.amount ? requiredKycForAmount(options.amount) : 1
+    options.amount ? kycRequiredForAmount(governance, options.amount) : 1
   ) as KycLevel;
+
+  const operation = options.operation;
+  if (operation) {
+    const currentRule = kycRuleForLevel(governance, currentKyc);
+    if (!currentRule.access[operation]) {
+      const eligibleRule = governance.kyc.levels.find((rule) => rule.access[operation] && rule.level > currentKyc);
+      requestedKyc = Math.max(requestedKyc as number, eligibleRule?.level ?? 3) as KycLevel;
+    }
+  }
 
   if (currentKyc < requestedKyc) {
     return {

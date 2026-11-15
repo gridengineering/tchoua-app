@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
   }
 
   const level = normalizeKycLevel(kycRequest.requestedLevel);
-  if (level < 2) {
+  if (level < 1) {
     return NextResponse.json({ error: "Niveau de validation incohérent" }, { status: 400 });
   }
 

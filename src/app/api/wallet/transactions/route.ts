@@ -2,225 +2,226 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getGovernanceConfig } from "@/lib/governance";
+import { getWalletConfig, providerFee, walletProvider } from "@/lib/wallet/config";
+import { kycRuleForLevel, type PaymentProvider } from "@/lib/governance-types";
+import { confirmVerificationCode } from "@/lib/verification";
+import { dispatchNotification } from "@/lib/notifications/dispatch";
+
+function startOfDay() {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function startOfMonth() {
+  const date = new Date();
+  date.setDate(1);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function resolveProvider(config: Awaited<ReturnType<typeof getWalletConfig>>, input: unknown): PaymentProvider | null {
+  const value = String(input ?? "");
+  const aliases: Record<string, string> = {
+    MOBILE_MONEY: "MTN_MOMO",
+    BANK_CARD: "VISA",
+  };
+  return walletProvider(config, aliases[value] ?? value);
+}
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
+    if (!session?.user?.id) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
     const userId = session.user.id;
     const body = await req.json();
-    const { type, amount, description, reference, receiverId, otpCode } = body;
+    const type = String(body.type ?? "");
+    const amount = Number(body.amount);
+    const description = body.description ? String(body.description) : undefined;
+    const receiverId = body.receiverId ? String(body.receiverId) : undefined;
+    const otpCode = body.otpCode ? String(body.otpCode) : undefined;
 
-    if (!amount || amount <= 0) {
+    if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
-
     if (!["DEPOSIT", "WITHDRAWAL", "TRANSFER"].includes(type)) {
       return NextResponse.json({ error: "Type de transaction invalide" }, { status: 400 });
     }
 
-    // --- Vérification des paramètres (Frais et Plafonds) ---
-    // Récupération de la configuration globale
-    let config = {
-      depositMobileMoneyPct: 1,
-      depositMobileMoneyMin: 100,
-      depositMobileMoneyMax: 5000,
-      depositBankCardPct: 2.5,
-      depositCashFixed: 500,
-      withdrawalMobileMoneyFixed: 500,
-      withdrawalBankFixed: 1000,
-      depositMaxTx: 1000000,
-      depositMaxDay: 2000000,
-      withdrawalMaxTx: 500000,
-      withdrawalMaxDay: 1000000,
-      otpWithdrawalThreshold: 100000,
-      otpTransferThreshold: 200000
-    };
+    const [governance, config, user] = await Promise.all([
+      getGovernanceConfig(),
+      getWalletConfig(),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { kycLevel: true, email: true, name: true },
+      }),
+    ]);
+    if (!config.enabled || !user) return NextResponse.json({ error: "Wallet indisponible" }, { status: 503 });
 
-    const setting = await prisma.systemSetting.findUnique({
-      where: { key: "WALLET_CONFIG" }
-    });
-
-    if (setting) {
-      config = { ...config, ...JSON.parse(setting.value) };
+    const level = Number(user.kycLevel) || 0;
+    const rule = kycRuleForLevel(governance, level);
+    const operation = type === "DEPOSIT" ? "deposit" : type === "WITHDRAWAL" ? "withdrawal" : "transfer";
+    if (!rule.access[operation]) {
+      return NextResponse.json({
+        error: `Votre niveau KYC (${level}) ne permet pas cette opération.`,
+        code: "KYC_ACCESS_DENIED",
+        requiredLevel: governance.kyc.levels.find((item) => item.access[operation] && item.level > level)?.level ?? 1,
+      }, { status: 403 });
     }
+    if (type === "DEPOSIT" && !config.allowDeposit) return NextResponse.json({ error: "Les dépôts sont désactivés." }, { status: 403 });
+    if (type === "WITHDRAWAL" && !config.allowWithdrawal) return NextResponse.json({ error: "Les retraits sont désactivés." }, { status: 403 });
+    if (type === "TRANSFER" && !config.allowTransfer) return NextResponse.json({ error: "Les virements sont désactivés." }, { status: 403 });
 
-    let feeAmount = 0;
-    
-    // Calcul des frais
-    if (type === "DEPOSIT") {
-      if (reference === "MOBILE_MONEY") {
-        feeAmount = amount * (config.depositMobileMoneyPct / 100);
-        if (feeAmount < config.depositMobileMoneyMin) feeAmount = config.depositMobileMoneyMin;
-        if (feeAmount > config.depositMobileMoneyMax) feeAmount = config.depositMobileMoneyMax;
-      } else if (reference === "BANK_CARD") {
-        feeAmount = amount * (config.depositBankCardPct / 100);
-      } else if (reference === "BANK_TRANSFER" || reference === "CASH") {
-        feeAmount = config.depositCashFixed;
+    const provider = type === "TRANSFER" ? null : resolveProvider(config, body.provider ?? body.reference);
+    if (type !== "TRANSFER") {
+      if (!provider || !provider.enabled) {
+        return NextResponse.json({ error: "Moyen de paiement indisponible." }, { status: 400 });
       }
-    } else if (type === "WITHDRAWAL") {
-      if (reference === "MOBILE_MONEY") feeAmount = config.withdrawalMobileMoneyFixed;
-      else if (reference === "BANK_TRANSFER") feeAmount = config.withdrawalBankFixed;
+      if (level < provider.requiresKycLevel) {
+        return NextResponse.json({ error: `Ce moyen de paiement exige KYC ${provider.requiresKycLevel}.` }, { status: 403 });
+      }
+      if (amount < provider.min || amount > provider.max) {
+        return NextResponse.json({ error: `Montant hors limites du moyen de paiement (${provider.min}–${provider.max}).` }, { status: 400 });
+      }
     }
 
-    const netAmount = amount; // Montant net appliqué au solde
-    const totalAmount = type === "DEPOSIT" ? amount + feeAmount : amount + feeAmount; 
-    // Pour un dépôt, on doit payer netAmount + feeAmount. (Le solde est incrémenté de netAmount)
-    // Pour un retrait/transfert, on prélève netAmount + feeAmount du solde.
-
-    // --- Sécurité et Plafonds ---
-    if (type === "DEPOSIT" && amount > config.depositMaxTx) {
-      return NextResponse.json({ error: `Dépôt par transaction limité à ${config.depositMaxTx} FCFA` }, { status: 400 });
-    }
-    if (type === "WITHDRAWAL" && amount > config.withdrawalMaxTx) {
-      return NextResponse.json({ error: `Retrait par transaction limité à ${config.withdrawalMaxTx} FCFA` }, { status: 400 });
+    const transactionLimit = type === "DEPOSIT" ? config.depositMaxTx : type === "WITHDRAWAL" ? config.withdrawalMaxTx : config.transferMaxTx;
+    const dailyLimit = type === "DEPOSIT" ? config.depositMaxDay : type === "WITHDRAWAL" ? config.withdrawalMaxDay : config.transferMaxDay;
+    const maxTx = rule.maxAmountPerTx > 0 ? Math.min(transactionLimit, rule.maxAmountPerTx) : transactionLimit;
+    if (amount > maxTx) {
+      return NextResponse.json({ error: `Montant maximum par transaction : ${maxTx.toLocaleString("fr-FR")} ${config.currency}.` }, { status: 400 });
     }
 
-    // OTP / 2FA Verification
-    if ((type === "WITHDRAWAL" && amount >= config.otpWithdrawalThreshold) || 
-        (type === "TRANSFER" && amount >= config.otpTransferThreshold)) {
+    const wallet = await prisma.wallet.findUnique({ where: { userId } });
+    if (!wallet) return NextResponse.json({ error: "Portefeuille introuvable" }, { status: 404 });
+    if (wallet.status !== "ACTIVE") return NextResponse.json({ error: "Portefeuille suspendu" }, { status: 403 });
+
+    const dayStart = startOfDay();
+    const monthStart = startOfMonth();
+    const relevantTypes = type === "DEPOSIT" ? ["DEPOSIT"] : type === "WITHDRAWAL" ? ["WITHDRAWAL"] : ["TRANSFER_OUT"];
+    const [daily, monthly] = await Promise.all([
+      prisma.walletTransaction.aggregate({
+        where: { walletId: wallet.id, type: { in: relevantTypes }, status: { in: ["COMPLETED", "PENDING"] }, createdAt: { gte: dayStart } },
+        _sum: { amount: true },
+      }),
+      prisma.walletTransaction.aggregate({
+        where: { walletId: wallet.id, type: { in: relevantTypes }, status: { in: ["COMPLETED", "PENDING"] }, createdAt: { gte: monthStart } },
+        _sum: { amount: true },
+      }),
+    ]);
+    if (Number(daily._sum.amount ?? 0) + amount > dailyLimit) {
+      return NextResponse.json({ error: `Plafond journalier atteint (${dailyLimit.toLocaleString("fr-FR")} ${config.currency}).` }, { status: 400 });
+    }
+    if (rule.maxDaily > 0 && Number(daily._sum.amount ?? 0) + amount > rule.maxDaily) {
+      return NextResponse.json({ error: `Plafond journalier KYC atteint (${rule.maxDaily.toLocaleString("fr-FR")} ${config.currency}).` }, { status: 400 });
+    }
+    if (rule.maxMonthly > 0 && Number(monthly._sum.amount ?? 0) + amount > rule.maxMonthly) {
+      return NextResponse.json({ error: `Plafond mensuel KYC atteint (${rule.maxMonthly.toLocaleString("fr-FR")} ${config.currency}).` }, { status: 400 });
+    }
+
+    const otpThreshold = type === "WITHDRAWAL" ? config.otpWithdrawalThreshold : type === "TRANSFER" ? config.otpTransferThreshold : 0;
+    if (otpThreshold > 0 && amount >= otpThreshold) {
       if (!otpCode) {
-        return NextResponse.json({ requiresOTP: true, message: "Un code OTP est requis pour cette opération" });
+        return NextResponse.json({
+          requiresOTP: true,
+          channel: "EMAIL",
+          message: "Un code de confirmation est requis. Utilisez « Envoyer le code ».",
+        });
       }
-      if (otpCode !== "123456") {
-        return NextResponse.json({ error: "Code OTP invalide" }, { status: 400 });
+      const verified = await confirmVerificationCode(userId, "EMAIL", otpCode);
+      if (!verified.ok) {
+        return NextResponse.json({ error: verified.error, code: verified.code }, { status: 400 });
       }
     }
 
-    // Récupérer le wallet de l'utilisateur
-    const senderWallet = await prisma.wallet.findUnique({
-      where: { userId },
-    });
+    const feeAmount = provider && type !== "TRANSFER" ? providerFee(provider, amount) : 0;
+    const netAmount = type === "DEPOSIT" ? amount : amount + feeAmount;
+    const status = type === "TRANSFER" ? "COMPLETED" : "PENDING";
 
-    if (!senderWallet) {
-      return NextResponse.json({ error: "Portefeuille introuvable" }, { status: 404 });
+    if (type === "WITHDRAWAL" || type === "TRANSFER") {
+      if (wallet.balance < netAmount) {
+        return NextResponse.json({ error: `Solde insuffisant (${wallet.balance.toLocaleString("fr-FR")} ${wallet.currency}).` }, { status: 400 });
+      }
     }
 
-    if (senderWallet.status !== "ACTIVE") {
-      return NextResponse.json({ error: "Portefeuille suspendu" }, { status: 403 });
-    }
-
-    // Traitement via transaction Prisma
     const result = await prisma.$transaction(async (tx) => {
       if (type === "DEPOSIT") {
-        // Ajouter au solde
-        const updatedWallet = await tx.wallet.update({
-          where: { id: senderWallet.id },
-          data: { balance: { increment: netAmount } },
-        });
-
+        // Le dépôt externe reste PENDING tant que le prestataire n'a pas confirmé.
         const transaction = await tx.walletTransaction.create({
           data: {
-            walletId: senderWallet.id,
-            amount,
-            feeAmount,
-            netAmount,
-            type: "DEPOSIT",
-            status: "COMPLETED",
-            description: description || "Rechargement du compte",
-            reference,
+            walletId: wallet.id,
+            amount, feeAmount, netAmount: amount, type: "DEPOSIT", status,
+            description: description || `Dépôt ${provider?.label ?? ""}`.trim(),
+            reference: provider?.id ?? null,
           },
         });
-
-        return { wallet: updatedWallet, transaction };
-      } 
-      
-      else if (type === "WITHDRAWAL") {
-        if (senderWallet.balance < totalAmount) {
-          throw new Error("Solde insuffisant pour couvrir le montant et les frais");
-        }
-
-        const updatedWallet = await tx.wallet.update({
-          where: { id: senderWallet.id },
-          data: { balance: { decrement: totalAmount } }, // Déduction du montant + frais
-        });
-
-        const transaction = await tx.walletTransaction.create({
-          data: {
-            walletId: senderWallet.id,
-            amount,
-            feeAmount,
-            netAmount,
-            type: "WITHDRAWAL",
-            status: "COMPLETED",
-            description: description || "Retrait de fonds",
-            reference,
-          },
-        });
-
-        return { wallet: updatedWallet, transaction };
+        return { wallet, transaction, pending: status === "PENDING" };
       }
 
-      else if (type === "TRANSFER") {
-        if (!receiverId) throw new Error("Bénéficiaire manquant");
-        if (receiverId === userId) throw new Error("Vous ne pouvez pas vous transférer de l'argent à vous-même");
-        
-        // Aucun frais sur les transferts P2P selon spec
-        if (senderWallet.balance < netAmount) {
-          throw new Error("Solde insuffisant");
-        }
-
-        const receiverWallet = await tx.wallet.findUnique({ where: { userId: receiverId } });
-
-        if (!receiverWallet || receiverWallet.status !== "ACTIVE") {
-          throw new Error("Le portefeuille du bénéficiaire est introuvable ou suspendu");
-        }
-
-        const updatedSenderWallet = await tx.wallet.update({
-          where: { id: senderWallet.id },
+      if (type === "WITHDRAWAL") {
+        const updatedWallet = await tx.wallet.update({
+          where: { id: wallet.id },
           data: { balance: { decrement: netAmount } },
         });
-
-        await tx.wallet.update({
-          where: { id: receiverWallet.id },
-          data: { balance: { increment: netAmount } },
-        });
-
-        const txOut = await tx.walletTransaction.create({
+        const transaction = await tx.walletTransaction.create({
           data: {
-            walletId: senderWallet.id,
-            amount,
-            feeAmount: 0,
-            netAmount,
-            type: "TRANSFER_OUT",
-            status: "COMPLETED",
-            description: description || "Transfert envoyé",
+            walletId: wallet.id,
+            amount, feeAmount, netAmount, type: "WITHDRAWAL", status,
+            description: description || `Retrait ${provider?.label ?? ""}`.trim(),
+            reference: provider?.id ?? null,
           },
         });
-
-        const txIn = await tx.walletTransaction.create({
-          data: {
-            walletId: receiverWallet.id,
-            amount,
-            feeAmount: 0,
-            netAmount,
-            type: "TRANSFER_IN",
-            status: "COMPLETED",
-            description: description || "Transfert reçu",
-            relatedTxId: txOut.id,
-          },
-        });
-
-        await tx.walletTransaction.update({
-          where: { id: txOut.id },
-          data: { relatedTxId: txIn.id },
-        });
-
-        return { wallet: updatedSenderWallet, transaction: txOut };
+        return { wallet: updatedWallet, transaction, pending: status === "PENDING" };
       }
+
+      if (!receiverId) throw new Error("Bénéficiaire manquant");
+      if (receiverId === userId) throw new Error("Vous ne pouvez pas vous transférer de l'argent à vous-même");
+      const receiver = await prisma.user.findFirst({
+        where: { OR: [{ id: receiverId }, { email: receiverId.toLowerCase() }] },
+        select: { id: true, name: true },
+      });
+      if (!receiver) throw new Error("Bénéficiaire introuvable");
+      const receiverWallet = await tx.wallet.findUnique({ where: { userId: receiver.id } });
+      if (!receiverWallet || receiverWallet.status !== "ACTIVE") throw new Error("Le portefeuille du bénéficiaire est introuvable ou suspendu");
+
+      const updatedWallet = await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { decrement: netAmount } } });
+      await tx.wallet.update({ where: { id: receiverWallet.id }, data: { balance: { increment: amount } } });
+      const txOut = await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_OUT", status: "COMPLETED",
+          description: description || `Virement à ${receiver.name}`,
+        },
+      });
+      const txIn = await tx.walletTransaction.create({
+        data: {
+          walletId: receiverWallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_IN", status: "COMPLETED",
+          description: description || `Virement de ${user.name}`, relatedTxId: txOut.id,
+        },
+      });
+      await tx.walletTransaction.update({ where: { id: txOut.id }, data: { relatedTxId: txIn.id } });
+      return { wallet: updatedWallet, transaction: txOut, pending: false };
     });
 
-    return NextResponse.json(result);
+    const event = type === "DEPOSIT" ? "WALLET_DEPOSIT" : type === "WITHDRAWAL" ? "WALLET_WITHDRAWAL" : "WALLET_TRANSFER";
+    await dispatchNotification({
+      event,
+      userId,
+      title: type === "DEPOSIT" ? "Dépôt enregistré" : type === "WITHDRAWAL" ? "Retrait enregistré" : "Virement effectué",
+      message: `${amount.toLocaleString("fr-FR")} ${config.currency} — ${result.pending ? "en attente de confirmation" : "opération confirmée"}.`,
+      link: "/dashboard/wallet",
+      type: "SUCCESS",
+    }).catch(() => null);
 
+    return NextResponse.json({
+      ...result,
+      message: result.pending
+        ? "Opération enregistrée. Elle sera créditée après confirmation du prestataire."
+        : "Opération effectuée.",
+    });
   } catch (error: any) {
     console.error("Erreur POST /api/wallet/transactions:", error);
-    if (error.message === "Solde insuffisant pour couvrir le montant et les frais" || error.message.includes("insuffisant") || error.message.includes("introuvable") || error.message.includes("suspendu")) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json({ error: error?.message ?? "Erreur serveur" }, { status: 400 });
   }
 }

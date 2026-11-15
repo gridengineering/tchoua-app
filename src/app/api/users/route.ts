@@ -52,6 +52,9 @@ export async function POST(req: NextRequest) {
       select: { id: true, name: true, email: true, createdAt: true },
     });
 
+    // Un seul wallet par membre, créé dès l'inscription.
+    await prisma.wallet.create({ data: { userId: user.id, balance: 0, currency: "XAF", status: "ACTIVE" } }).catch(() => {});
+
     // Give welcome scoring points
     await prisma.scoringRecord.create({
       data: {
