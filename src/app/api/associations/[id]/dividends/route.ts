@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isPlatformAdmin } from "@/lib/permissions";
 import { computeDividendPreview } from "@/lib/association/dividends";
 
 async function getMembership(userId: string, associationId: string) {
@@ -27,7 +27,7 @@ export async function GET(
 
   const { id: associationId } = await params;
   const membership = await getMembership(session.user.id, associationId);
-  if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+  if (!membership && !isPlatformAdmin(session)) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
   const year = Number(searchParams.get("year")) || new Date().getFullYear();
@@ -43,19 +43,20 @@ export async function GET(
     },
   });
 
-  const manager = canManage(session, membership);
+  const manager = canManage(session, membership) || isPlatformAdmin(session);
+  const viewerMembershipId = membership?.id ?? null;
   const visibleShares = run
     ? manager
       ? run.shares
-      : run.shares.filter((s) => s.membershipId === membership.id)
+      : run.shares.filter((s) => s.membershipId === viewerMembershipId)
     : [];
   const visiblePreview = manager
     ? preview
     : {
         ...preview,
-        shares: preview.shares.filter((share) => share.membershipId === membership.id),
-        eligibleCount: preview.shares.some((share) => share.membershipId === membership.id && share.eligible) ? 1 : 0,
-        excludedCount: preview.shares.some((share) => share.membershipId === membership.id && !share.eligible) ? 1 : 0,
+        shares: preview.shares.filter((share) => share.membershipId === viewerMembershipId),
+        eligibleCount: preview.shares.some((share) => share.membershipId === viewerMembershipId && share.eligible) ? 1 : 0,
+        excludedCount: preview.shares.some((share) => share.membershipId === viewerMembershipId && !share.eligible) ? 1 : 0,
       };
 
   return NextResponse.json({
@@ -95,7 +96,7 @@ export async function POST(
 
   const { id: associationId } = await params;
   const membership = await getMembership(session.user.id, associationId);
-  if (!canManage(session, membership)) {
+  if (!canManage(session, membership) && !isPlatformAdmin(session)) {
     return NextResponse.json({ error: "Réservé au bureau / trésorier" }, { status: 403 });
   }
 

@@ -26,6 +26,48 @@ function roundFcfa(value: number): number {
 }
 
 /**
+ * Répartit des intérêts en unités mineures sans perte d'arrondi.
+ * Les centimes restants sont attribués aux plus forts restes, avec un
+ * départage stable par identifiant de membre.
+ */
+export function allocateDividendMinor(
+  totalInterestMinor: number,
+  capitalByMember: Map<string, number>,
+  eligibleMembershipIds: string[]
+): Map<string, number> {
+  const allocation = new Map<string, number>();
+  if (totalInterestMinor <= 0 || eligibleMembershipIds.length === 0) {
+    return allocation;
+  }
+
+  const totalCapital = eligibleMembershipIds.reduce(
+    (sum, id) => sum + Math.max(0, capitalByMember.get(id) ?? 0),
+    0
+  );
+  if (totalCapital <= 0) return allocation;
+
+  const remainders: Array<{ membershipId: string; remainder: number }> = [];
+  let allocated = 0;
+  for (const membershipId of eligibleMembershipIds) {
+    const capital = Math.max(0, capitalByMember.get(membershipId) ?? 0);
+    const raw = (totalInterestMinor * capital) / totalCapital;
+    const base = Math.floor(raw);
+    allocation.set(membershipId, base);
+    allocated += base;
+    remainders.push({ membershipId, remainder: raw - base });
+  }
+
+  let remainder = totalInterestMinor - allocated;
+  remainders.sort((a, b) => b.remainder - a.remainder || a.membershipId.localeCompare(b.membershipId));
+  for (const entry of remainders) {
+    if (remainder <= 0) break;
+    allocation.set(entry.membershipId, (allocation.get(entry.membershipId) ?? 0) + 1);
+    remainder -= 1;
+  }
+  return allocation;
+}
+
+/**
  * Module 6.5 — Répartition des bénéfices.
  * Quote-part = intérêts encaissés sur l'exercice × (capital du membre / capital total éligible).
  * Les membres ayant un prêt actif ou en défaut sur la période sont exclus du capital
@@ -99,28 +141,11 @@ export async function computeDividendPreview(
   // Répartition en unités mineures (centimes) avec la méthode du plus fort
   // reste : la somme des quotes-parts est exactement égale aux intérêts.
   const totalInterestMinor = Math.round(totalInterest * 100);
-  const allocMinor = new Map<string, number>();
-  const remainders: Array<{ membershipId: string; remainder: number }> = [];
-  let allocatedMinor = 0;
-
-  if (totalInterestMinor > 0 && totalCapital > 0) {
-    for (const member of eligibleMembers) {
-      const capital = capitalByMember.get(member.id) ?? 0;
-      const raw = (totalInterestMinor * capital) / totalCapital;
-      const base = Math.floor(raw);
-      allocMinor.set(member.id, base);
-      allocatedMinor += base;
-      remainders.push({ membershipId: member.id, remainder: raw - base });
-    }
-
-    let remainder = totalInterestMinor - allocatedMinor;
-    remainders.sort((a, b) => b.remainder - a.remainder || a.membershipId.localeCompare(b.membershipId));
-    for (const entry of remainders) {
-      if (remainder <= 0) break;
-      allocMinor.set(entry.membershipId, (allocMinor.get(entry.membershipId) ?? 0) + 1);
-      remainder -= 1;
-    }
-  }
+  const allocMinor = allocateDividendMinor(
+    totalInterestMinor,
+    capitalByMember,
+    eligibleMembers.map((member) => member.id)
+  );
 
   const shares: DividendSharePreview[] = memberships
     .map((m) => {
