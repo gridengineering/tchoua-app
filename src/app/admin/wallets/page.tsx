@@ -30,6 +30,7 @@ export default function AdminWalletsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [pending, setPending] = useState<any>({ member: [], association: [] });
 
   const fetchWallets = async () => {
     try {
@@ -38,6 +39,8 @@ export default function AdminWalletsPage() {
         const data = await res.json();
         setWallets(data.wallets);
         setTotalBalance(data.totalBalance);
+        const pendingRes = await fetch("/api/admin/wallets/transactions");
+        if (pendingRes.ok) setPending(await pendingRes.json());
       }
     } catch (err) {
       console.error(err);
@@ -78,6 +81,16 @@ export default function AdminWalletsPage() {
     w.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (w.user.phone && w.user.phone.includes(searchTerm))
   );
+
+  const decideTransaction = async (id: string, walletType: "MEMBER" | "ASSOCIATION", decision: "APPROVE" | "REJECT") => {
+    const res = await fetch("/api/admin/wallets/transactions", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transactionId: id, walletType, decision }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { alert(data.error || "Action impossible"); return; }
+    await fetchWallets();
+  };
 
   if (loading) {
     return (
@@ -218,6 +231,36 @@ export default function AdminWalletsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-black text-gray-900">Opérations en attente de confirmation</h2>
+        {pending.member.length + pending.association.length === 0 ? (
+          <p className="text-sm font-semibold text-gray-400">Aucune opération en attente.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead><tr className="border-b border-gray-100 text-xs uppercase text-gray-400">
+                <th className="p-3">Propriétaire</th><th className="p-3">Type</th><th className="p-3">Montant</th><th className="p-3">Prestataire</th><th className="p-3 text-right">Décision</th>
+              </tr></thead>
+              <tbody className="divide-y divide-gray-50">
+                {[...pending.member.map((tx: any) => ({ ...tx, walletType: "MEMBER", owner: tx.wallet?.user?.name ?? "Membre" })),
+                  ...pending.association.map((tx: any) => ({ ...tx, walletType: "ASSOCIATION", owner: tx.wallet?.association?.name ?? "Association" }))].map((tx: any) => (
+                  <tr key={`${tx.walletType}-${tx.id}`}>
+                    <td className="p-3 font-bold">{tx.owner}</td>
+                    <td className="p-3">{tx.type}</td>
+                    <td className="p-3 font-black">{tx.amount.toLocaleString("fr-FR")}</td>
+                    <td className="p-3">{tx.provider ?? "—"}</td>
+                    <td className="p-3 text-right">
+                      <button onClick={() => decideTransaction(tx.id, tx.walletType, "APPROVE")} className="mr-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white">Confirmer</button>
+                      <button onClick={() => decideTransaction(tx.id, tx.walletType, "REJECT")} className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white">Refuser</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
