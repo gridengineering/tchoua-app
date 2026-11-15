@@ -27,14 +27,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const membership = await getMembership(session.user.id, id);
-  if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+  if (!membership && !isPlatformAdmin(session)) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
 
-  const isBureau = BUREAU_ROLES.includes(membership.role);
+  const isBureau = Boolean(membership && BUREAU_ROLES.includes(membership.role)) || isPlatformAdmin(session);
 
   const loans = await prisma.assocLoan.findMany({
     where: {
       activity: { associationId: id },
-      ...(!isBureau && { borrowerMembershipId: membership.id }),
+      ...(!isBureau && { borrowerMembershipId: membership?.id }),
     },
     include: {
       borrowerMembership: { include: { user: { select: { name: true, email: true } } } },

@@ -22,14 +22,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
 
   const membership = await getMembership(session.user.id, id);
-  if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+  if (!membership && !isPlatformAdmin(session)) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
 
-  const isBureau = BUREAU_ROLES.includes(membership.role);
+  const isBureau = Boolean(membership && BUREAU_ROLES.includes(membership.role)) || isPlatformAdmin(session);
 
   const requests = await prisma.assocSocialAidRequest.findMany({
     where: {
       associationId: id,
-      ...(!isBureau && { membershipId: membership.id }),
+      ...(!isBureau && { membershipId: membership?.id }),
     },
     include: {
       membership: {
