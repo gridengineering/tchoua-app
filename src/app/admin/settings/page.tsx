@@ -222,7 +222,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Paramètres de la plateforme</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Configuration globale : identité, accès, limites, fonctionnalités et maintenance.
+            Configuration globale : identité, accès, limites, fonctionnalités, RTC, gouvernance, wallet et maintenance.
             {meta?.updatedAt && (
               <span className="ml-1 text-slate-400">
                 Dernière mise à jour : {new Date(meta.updatedAt).toLocaleString("fr-FR")}

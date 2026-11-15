@@ -1119,7 +1119,8 @@ export function AssociationFormWorkspace({
               </div>
               <p className="mt-3 text-xs leading-relaxed text-[#7a7368]">
                 Un seul rôle de bureau par membre. Pour cumuler des permissions supplémentaires, utilisez les
-                <Link href={`/associations/${associationId}/parametres`} className="mx-1 font-semibold text-[#0d3d28] underline">rôles personnalisés</Link>.
+                <Link href={`/associations/${associationId}/parametres`} className="mx-1 font-semibold text-[#0d3d28] underline">rôles personnalisés</Link>
+                ou la <Link href={`/associations/${associationId}/parametres`} className="mx-1 font-semibold text-[#0d3d28] underline">protection du fondateur</Link>.
                 Le fondateur conserve son rôle et ne peut pas être remplacé depuis cet écran.
               </p>
             </Section>
