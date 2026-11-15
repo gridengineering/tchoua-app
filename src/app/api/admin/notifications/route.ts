@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSystemAdmin } from "@/lib/admin-auth";
+import { publishToUser } from "@/lib/rtc/centrifugo";
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,6 +68,11 @@ export async function POST(request: NextRequest) {
         link: link ?? null,
       })),
     });
+
+    await Promise.all(userIds.slice(0, 500).map((userId) => publishToUser(userId, {
+      type: "system_notification",
+      notification: { title, message, type: "SYSTEM", link: link ?? null, createdAt: new Date().toISOString() },
+    }).catch(() => null)));
 
     // Audit
     await prisma.auditLog.create({

@@ -203,15 +203,35 @@ export default function GovernancePage() {
                     <div key={level.level} className="rounded-xl border border-slate-100 p-3">
                       <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{level.shortLabel} · autorisations</div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        {(["deposit", "withdrawal", "transfer", "video", "chat", "loan", "socialAid", "joinAssociation"] as const).map((key) => (
+                        {(["deposit", "withdrawal", "transfer", "video", "chat", "loan", "socialAid", "joinAssociation", "createAssociation"] as const).map((key) => (
                           <label key={key} className="flex items-center gap-2">
                             <input type="checkbox" checked={level.access[key]} onChange={(e) => update(`kyc.levels.${index}.access.${key}`, e.target.checked)} className="accent-indigo-600" />
-                            {({ deposit: "Dépôt", withdrawal: "Retrait", transfer: "Virement", video: "Visio", chat: "Chat", loan: "Prêt", socialAid: "Aide", joinAssociation: "Adhésion" } as any)[key]}
+                            {({ deposit: "Dépôt", withdrawal: "Retrait", transfer: "Virement", video: "Visio", chat: "Chat", loan: "Prêt", socialAid: "Aide", joinAssociation: "Adhésion", createAssociation: "Création asso." } as any)[key]}
                           </label>
                         ))}
                       </div>
                     </div>
                   ))}
+                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className={label}>Canaux de vérification par niveau</label>
+                    {config.kyc.levels.map((level, index) => (
+                      <div key={level.level} className="mt-2 flex items-center gap-2">
+                        <span className="w-14 text-xs font-bold">{level.shortLabel}</span>
+                        <input className={input} value={level.channels.join(", ")} onChange={(e) => update(`kyc.levels.${index}.channels`, e.target.value.split(",").map((v) => v.trim().toUpperCase()).filter(Boolean))} placeholder="EMAIL, PHONE, WHATSAPP" />
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <label className={label}>Exigences libres par niveau</label>
+                    {config.kyc.levels.map((level, index) => (
+                      <div key={level.level} className="mt-2 flex items-center gap-2">
+                        <span className="w-14 text-xs font-bold">{level.shortLabel}</span>
+                        <input className={input} value={level.requirements.join(", ")} onChange={(e) => update(`kyc.levels.${index}.requirements`, e.target.value.split(",").map((v) => v.trim()).filter(Boolean))} placeholder="Nom légal, téléphone…" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="mt-5">
                   <label className={label}>Exigences documentaires par niveau (séparées par des virgules)</label>
