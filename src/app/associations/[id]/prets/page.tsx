@@ -67,6 +67,7 @@ export default function PretsPage() {
   const [selected, setSelected] = useState<Loan | null>(null);
   const [showRepay, setShowRepay] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isBureau, setIsBureau] = useState(false);
 
   const [form, setForm] = useState({
     amount: "",
@@ -78,10 +79,17 @@ export default function PretsPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetch(`/api/associations/${assocId}/loans`);
+    const [res, associationRes] = await Promise.all([
+      fetch(`/api/associations/${assocId}/loans`),
+      fetch(`/api/associations/${assocId}`),
+    ]);
     if (res.ok) {
       const data = await res.json();
       setLoans(data.loans ?? []);
+    }
+    if (associationRes.ok) {
+      const association = await associationRes.json();
+      setIsBureau(["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "TREASURER"].includes(association.myRole));
     }
     setLoading(false);
   }, [assocId]);
@@ -116,6 +124,27 @@ export default function PretsPage() {
       setForm({ amount: "", duration: "3", purpose: "" });
       setShowCreate(false);
       load();
+    }
+  }
+
+  async function approveLoan() {
+    if (!selected) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/associations/${assocId}/loans`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loanId: selected.id, action: "APPROVE" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Approbation impossible");
+      setSelected(null);
+      await load();
+      alert(data.requiresMoreApprovals ? data.message : "Prêt approuvé et décaissé.");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Approbation impossible");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -333,6 +362,15 @@ export default function PretsPage() {
                   <div className="flex justify-between"><span className="text-ash">Échéance</span><span className="font-semibold">{new Date(selected.dueDate).toLocaleDateString("fr-FR")}</span></div>
                 )}
               </div>
+              {isBureau && selected.status === "PENDING" && (
+                <button
+                  onClick={approveLoan}
+                  disabled={saving}
+                  className="mt-6 w-full px-4 py-3 rounded-xl bg-forest text-white text-sm font-semibold disabled:opacity-50"
+                >
+                  {saving ? "Approbation..." : "Approuver ce prêt"}
+                </button>
+              )}
               {(selected.status === "ACTIVE" || selected.status === "APPROVED") && (
                 <div className="mt-6">
                   {!showRepay ? (
