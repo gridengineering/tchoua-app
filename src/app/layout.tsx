@@ -5,6 +5,9 @@ import { Providers } from "@/components/providers";
 export const metadata: Metadata = {
   title: "Tchoua - Gestion de Tontines",
   description: "Système de gestion de tontines africaines - Finance, Nature, Services & Solidarité",
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || "QtqlmqkMVZ9N4KbFz6tGwqULIrDRXRhFjGXSzwBdkRU",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
