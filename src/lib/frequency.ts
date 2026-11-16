@@ -377,7 +377,8 @@ function nextOccurrence(c: FrequencyConfigV2, from: Date): Date | null {
           candidates.push(nthWeekdayOfMonth(y, c.sub.month - 1, c.sub.weekday, c.sub.position));
         } else {
           for (const m of c.sub.months) {
-            candidates.push(applyMonthlyRule(y, m - 1, c.sub.rule));
+            const occurrence = applyMonthlyRuleSafe(y, m - 1, c.sub.rule);
+            if (occurrence) candidates.push(occurrence);
           }
         }
       }
