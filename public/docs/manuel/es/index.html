@@ -101,12 +101,6 @@ footer.manual a{color:#f4d58d}
 .langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
 .langs a.active{background:#e68a00;color:#0d3d28}
 @media(max-width:720px){.langs{display:none}}
-
-.langs{display:flex;gap:4px;align-items:center;margin-left:4px}
-.langs a{font-size:11px;font-weight:800;color:#cfe0d6;padding:5px 7px;border-radius:6px}
-.langs a:hover{background:rgba(255,255,255,.1);text-decoration:none}
-.langs a.active{background:#e68a00;color:#0d3d28}
-@media(max-width:720px){.langs{display:none}}
 .langs-mobile{display:none}
 @media(max-width:720px){.langs-mobile{display:flex;justify-content:center;background:#0d3d28;padding:0 12px 8px}.langs-mobile .langs{display:flex!important;margin:0}.langs-mobile .langs a{color:#e8f0ea}}
 </style>
@@ -126,15 +120,15 @@ footer.manual a{color:#f4d58d}
     <div class="kicker">Documentación oficial · Edición 2026</div>
     <h1>El sistema existente<br><span>Documentación completa 2026</span></h1>
     <p>El funcionamiento real de Tchoua: asociaciones, marco ARP, tontinas, cotizaciones, préstamos, solidaridad, reuniones, informes, administración y configuración.</p>
-    <div class="chips"><span class="chip">21 capítulos</span><span class="chip">39 capturas reales</span><span class="chip">10 esquemas</span><span class="chip">Versión 2.0 · Noviembre 2026</span></div>
+    <div class="chips"><span class="chip">21 capítulos</span><span class="chip">41 capturas reales</span><span class="chip">11 esquemas</span><span class="chip">Versión 2.1 · Noviembre 2026</span></div>
     <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_ES.pdf">Descargar el PDF</a>
     <a class="btn ghost" href="#ch01">Índice</a>
   </div>
   <div class="hero-card">
     <div class="label">Documentación</div>
     <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Anexos</span></div>
-    <div class="small">21 capítulos · 10 esquemas</div>
-    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Versión 2.0 · Noviembre 2026</div>
+    <div class="small">21 capítulos · 11 esquemas</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Versión 2.1 · Noviembre 2026</div>
   </div>
 </div></section>
 <main class="layout">
@@ -1615,11 +1609,43 @@ footer.manual a{color:#f4d58d}
   <h2>18.5 Gobernanza del documento</h2>
   <p>Este manual es la referencia funcional. Toda evolución del producto debe reflejarse en el capítulo correspondiente, actualizando la versión y la fecha. Las capturas de pantalla deben rehacerse cuando cambia la interfaz; los diagramas se pueden regenerar por script.</p>
   <ul>
-    <li>Versión 1.0 — noviembre de 2026 — estado de la producción.</li>
+    <li>Versión 2.1 — noviembre de 2026 — estado de la producción.</li>
     <li>Revisión trimestral: funciones, cifras, capturas.</li>
     <li>Revisión anual: arquitectura, seguridad, hoja de ruta.</li>
     <li>Validación: producto, operaciones, dirección.</li>
   </ul>
+  <h2>18.6 Actualizaciones de noviembre de 2026 — edición 2.1</h2>
+  <p>Esta edición conserva el manual existente y añade únicamente las novedades desplegadas: inicio de sesión social, invitaciones e importación de miembros, referidos, correcciones ARP y operaciones wallet más seguras.</p>
+
+  <h3>Inicio de sesión social y vinculación de cuentas</h3>
+  <p>La página de acceso ofrece ahora <strong>Google</strong>, <strong>Facebook</strong> y <strong>LinkedIn</strong> además del correo. El proveedor autentica la identidad; Tchoua busca la cuenta existente por correo verificado o crea una cuenta de miembro si es necesario. Las cuentas inactivas o en cuarentena siguen bloqueadas. Los consentimientos y el KYC se aplican después del acceso.</p>
+  <figure>
+    <img loading="lazy" class="shot-compact" style="max-width:118mm;max-height:76mm;width:auto;height:auto;display:block;margin:0 auto;" src="/docs/manuel/assets/shots/02_login.jpg" alt="Acceso con Google, Facebook y LinkedIn">
+    <figcaption><b>Figura 18.2</b> — Acceso social: tres proveedores OAuth, sin duplicar la cuenta si el correo ya existe.</figcaption>
+  </figure>
+
+  <h3>Invitaciones, importación y referidos</h3>
+  <p>La junta puede invitar mediante un enlace seguro o una invitación nominal e importar una lista CSV. La invitación crea una adhesión pendiente; el miembro confirma el acceso, pasa al nivel KYC 1 y sigue sujeto a la validación de la junta. Las cuentas existentes se vinculan a la asociación sin duplicarse. El referido genera un código personal, un enlace de registro y puntos de gamificación; los envíos quedan trazados.</p>
+  <figure>
+    <img loading="lazy" class="shot-compact" style="max-width:118mm;max-height:76mm;width:auto;height:auto;display:block;margin:0 auto;" src="/docs/manuel/assets/shots/10_ndi_members.jpg" alt="Directorio de miembros e invitaciones">
+    <figcaption><b>Figura 18.3</b> — Directorio: invitación, importación, roles, estado de adhesión y puntuación de fiabilidad.</figcaption>
+  </figure>
+
+  <h3>Marco ARP, préstamos y wallet</h3>
+  <ul>
+    <li>Las correcciones D14, D15 y D20 mejoran las dimensiones ARP, la designación de beneficiarios y los cálculos de reparto.</li>
+    <li>Las aprobaciones de préstamos siguen siendo nominativas y distintas; un miembro no puede aprobar su propio préstamo.</li>
+    <li>Las transferencias wallet usan una clave de idempotencia y conservan el beneficiario en la transacción, evitando duplicados al reintentar sin conexión.</li>
+    <li>Las ayudas sociales mantienen PENDING → APPROVED/REJECTED → PAID, con control de la caja.</li>
+  </ul>
+
+  <section class="diagram-page">
+    <img width="3200" height="1800" loading="lazy" src="/docs/manuel/assets/diagrams/updates.png" alt="Flujo de novedades 2026.2">
+    <div class="cap"><b>Figura 18.4</b> — Flujo simplificado: acceso, invitación, validación y acceso controlado por KYC y consentimientos.</div>
+  </section>
+
+  <div class="callout info"><span class="tag">Compatibilidad</span><p>Las capturas y los capítulos anteriores siguen siendo válidos. Las novedades están activas en producción; los roles, KYC, límites y recompensas siguen siendo configurables.</p></div>
+
   <div class="callout dark"><span class="tag">Conclusión</span><p>Tchoua no es solo un software de tontinas: es una forma de hacer verificable la solidaridad, legible la gobernanza y transmisible la confianza. La plataforma está lista para servir; la documentación existe para que cada persona pueda usarla.</p></div>
 </section>
 
