@@ -7,29 +7,37 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { User, Mail, Lock, Phone, MapPin } from "lucide-react";
+import { detectLocaleDefaults } from "@/lib/identity";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     name: "", email: "", phone: "", password: "", confirmPassword: "",
     profession: "", location: "", referralCode: "",
+    country: "", dialCode: "", city: "", language: "fr",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const ref = new URLSearchParams(window.location.search).get("ref");
-      if (ref) setForm(f => ({ ...f, referralCode: ref }));
-    }
+    if (typeof window === "undefined") return;
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const defaults = detectLocaleDefaults(timeZone, navigator.language);
+    setForm((f) => ({
+      ...f,
+      ...(ref ? { referralCode: ref } : {}),
+      city: f.city,
+      language: defaults.language,
+    }));
   }, []);
 
   const handleSocialRegister = async (provider: "google" | "facebook" | "linkedin" | "instagram") => {
     setSocialLoading(provider);
     setError("");
     try {
-      await signIn(provider, { callbackUrl: "/choose-space" });
+      await signIn(provider, { callbackUrl: "/consentements" });
     } catch {
       setError(`Erreur lors de l'inscription avec ${provider}`);
       setSocialLoading(null);
@@ -44,6 +52,14 @@ export default function RegisterPage() {
 
     if (form.password !== form.confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
+      return;
+    }
+    if (!form.email.trim() && !form.phone.trim()) {
+      setError("Renseignez une adresse e-mail ou un numéro de téléphone.");
+      return;
+    }
+    if (!form.city.trim()) {
+      setError("La ville est obligatoire.");
       return;
     }
 
@@ -63,10 +79,11 @@ export default function RegisterPage() {
       }
 
       await signIn("credentials", {
-        email: form.email,
+        identifier: form.email.trim() || form.phone.trim(),
+        countryCode: form.dialCode,
         password: form.password,
         redirect: true,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/consentements",
       });
 
       // NextAuth gère la redirection automatique
@@ -107,22 +124,24 @@ export default function RegisterPage() {
               />
             </div>
             <Input
-              label="Email *"
+              label="Email (recommandé)"
               type="email"
               placeholder="jean@exemple.cm"
               leftIcon={<Mail className="w-4 h-4" />}
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
-              required
             />
             <Input
-              label="Téléphone"
+              label="Téléphone (indicatif inclus)"
               type="tel"
-              placeholder="+237 6XXXXXXXX"
+              placeholder="237677112255"
               leftIcon={<Phone className="w-4 h-4" />}
               value={form.phone}
               onChange={(e) => update("phone", e.target.value)}
             />
+            <p className="col-span-2 -mt-1 text-[11px] leading-4 text-gray-500">
+              Renseignez au moins un email ou un téléphone. Les deux sont uniques et servent d’identifiant de connexion.
+            </p>
             <Input
               label="Mot de passe *"
               type="password"
@@ -139,6 +158,40 @@ export default function RegisterPage() {
               leftIcon={<Lock className="w-4 h-4" />}
               value={form.confirmPassword}
               onChange={(e) => update("confirmPassword", e.target.value)}
+              required
+            />
+            <Input
+              label="Pays *"
+              placeholder="Ex. Cameroun, France, Nigéria…"
+              value={form.country}
+              onChange={(e) => update("country", e.target.value)}
+              required
+            />
+            <Input
+              label="Indicatif pays (téléphone)"
+              placeholder="Ex. 237, 33, 1…"
+              inputMode="numeric"
+              value={form.dialCode}
+              onChange={(e) => update("dialCode", e.target.value)}
+            />
+            <Input
+              label="Ville *"
+              placeholder="Douala, Yaoundé..."
+              leftIcon={<MapPin className="w-4 h-4" />}
+              value={form.city}
+              onChange={(e) => update("city", e.target.value)}
+              required
+            />
+            <Select
+              label="Langue *"
+              value={form.language}
+              onChange={(e) => update("language", e.target.value)}
+              options={[
+                { value: "fr", label: "Français" },
+                { value: "en", label: "English" },
+                { value: "es", label: "Español" },
+                { value: "de", label: "Deutsch" },
+              ]}
               required
             />
             <Select
@@ -158,13 +211,14 @@ export default function RegisterPage() {
                 { value: "autre", label: "Autre" },
               ]}
             />
-            <Input
-              label="Ville / Région"
-              placeholder="Douala, Yaoundé..."
-              leftIcon={<MapPin className="w-4 h-4" />}
-              value={form.location}
-              onChange={(e) => update("location", e.target.value)}
-            />
+            <div className="col-span-2">
+              <Input
+                label="Quartier / adresse (optionnel)"
+                placeholder="Ex. Bonapriso, rue 12"
+                value={form.location}
+                onChange={(e) => update("location", e.target.value)}
+              />
+            </div>
             <div className="col-span-2">
               <Input
                 label="Code de parrainage (optionnel)"
@@ -223,15 +277,17 @@ export default function RegisterPage() {
               <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#0A66C2] text-white text-[11px] font-bold">in</span>
               LinkedIn
             </button>
-            <button
-              type="button"
-              disabled={loading || !!socialLoading}
-              onClick={() => handleSocialRegister("instagram")}
-              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
-            >
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
-              Instagram
-            </button>
+            {process.env.NEXT_PUBLIC_SSO_INSTAGRAM === "true" && (
+              <button
+                type="button"
+                disabled={loading || !!socialLoading}
+                onClick={() => handleSocialRegister("instagram")}
+                className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+              >
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
+                Instagram
+              </button>
+            )}
           </div>
         </div>
 

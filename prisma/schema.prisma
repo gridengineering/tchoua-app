@@ -17,6 +17,8 @@ model User {
   bio             String?
   profession      String?
   location        String?
+  country         String?
+  city            String?
   familyInfo      String?   // JSON: { firstSpouseName, fatherName, motherName, childrenCount }
   emergencyContact String?  // JSON: { name, phone, relationship }
   language        String    @default("fr")
@@ -1980,6 +1982,7 @@ model WalletTransaction {
   reference     String?  // Ex: ID de transaction Mobile Money
   description   String?
   associationId String?  // Si lié à une association
+  receiverId    String?  // Bénéficiaire d'un virement interne
   relatedTxId   String?  // Pour relier un TRANSFER_OUT à un TRANSFER_IN
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

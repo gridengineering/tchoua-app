@@ -34,13 +34,16 @@ export default function MobilePage() {
               partout où vous êtes, même avec une connexion limitée.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
-                <Download className="w-5 h-5" /> App Store
-              </button>
-              <button className="flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
-                <Download className="w-5 h-5" /> Google Play
+              <a href="/downloads/tchoua-android-1.0.0.apk" download className="flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+                <Download className="w-5 h-5" /> Télécharger Android
+              </a>
+              <button type="button" disabled title="La version iOS doit être signée avec un certificat Apple Developer." className="flex cursor-not-allowed items-center gap-3 px-8 py-4 bg-gray-200 text-gray-500 rounded-2xl font-black text-sm uppercase tracking-widest">
+                <Download className="w-5 h-5" /> iOS — signature Apple requise
               </button>
             </div>
+            <p className="text-xs font-semibold leading-5 text-gray-400">
+              Android 1.0.0 · APK direct. La version iOS nécessite un compte Apple Developer et une compilation Xcode/EAS signée.
+            </p>
           </motion.div>
           
           <div className="relative flex justify-center">
@@ -183,9 +186,9 @@ export default function MobilePage() {
         <section className="text-center py-20 bg-blue-50 rounded-[3rem] border-2 border-blue-100">
            <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-8">Disponible partout.</h2>
            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
-                Télécharger l&apos;App
-              </button>
+              <a href="/downloads/tchoua-android-1.0.0.apk" download className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+                Télécharger l&apos;App Android
+              </a>
               <Link href="/register" className="px-10 py-5 bg-white border-2 border-gray-900 text-gray-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all">
                 Tester la Web App
               </Link>

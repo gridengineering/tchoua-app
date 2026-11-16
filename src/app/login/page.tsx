@@ -34,7 +34,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -45,16 +45,18 @@ function LoginContent() {
 
   useEffect(() => {
     if (mounted && status === "authenticated") {
-      router.push("/choose-space");
+      router.push("/consentements");
     }
   }, [mounted, status, router]);
 
   useEffect(() => {
     const errorParam = searchParams.get("error");
     if (errorParam === "CredentialsSignin") {
-      setError("Email ou mot de passe incorrect");
+      setError("Email/téléphone ou mot de passe incorrect");
     } else if (errorParam) {
       setError("Une erreur est survenue lors de la connexion");
+    } else if (searchParams.get("verified") === "1") {
+      setError("");
     }
   }, [searchParams]);
 
@@ -65,14 +67,15 @@ function LoginContent() {
 
     try {
       const res = await signIn("credentials", {
-        email: form.email,
+        identifier: form.identifier,
+        countryCode: "",
         password: form.password,
         redirect: true,
-        callbackUrl: "/choose-space",
+        callbackUrl: "/consentements",
       });
 
       if (res?.error) {
-        setError("Email ou mot de passe incorrect");
+        setError("Email/téléphone ou mot de passe incorrect");
         setLoading(false);
       }
     } catch (err) {
@@ -87,7 +90,7 @@ function LoginContent() {
     setError("");
 
     try {
-      await signIn(providerName, { callbackUrl: "/choose-space" });
+      await signIn(providerName, { callbackUrl: "/consentements" });
     } catch {
       setError("Échec de la connexion sociale");
       setSocialLoading(null);
@@ -160,14 +163,18 @@ function LoginContent() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Adresse email"
-              type="email"
-              placeholder="votremail@exemple.cm"
+              label="Email ou téléphone"
+              type="text"
+              placeholder="votremail@exemple.cm ou 237677112255"
               leftIcon={<Mail className="w-4 h-4" />}
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              value={form.identifier}
+              onChange={(e) => setForm({ ...form, identifier: e.target.value })}
+              autoComplete="username"
               required
             />
+            <p className="-mt-2 text-[11px] leading-4 text-gray-400">
+              Pour un téléphone, saisissez le numéro avec son indicatif pays, sans espace : 237677112255, 33612345678, 14155552671…
+            </p>
             <Input
               label="Mot de passe"
               type="password"
@@ -245,19 +252,21 @@ function LoginContent() {
                 )}
                 <span className="text-sm">LinkedIn</span>
               </button>
-              <button
-                type="button"
-                disabled={loading || !!socialLoading}
-                onClick={() => handleSocialLogin("instagram")}
-                className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60"
-              >
-                {socialLoading === "instagram" ? (
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-                ) : (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
-                )}
-                <span className="text-sm">Instagram</span>
-              </button>
+              {process.env.NEXT_PUBLIC_SSO_INSTAGRAM === "true" && (
+                <button
+                  type="button"
+                  disabled={loading || !!socialLoading}
+                  onClick={() => handleSocialLogin("instagram")}
+                  className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60"
+                >
+                  {socialLoading === "instagram" ? (
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
+                  )}
+                  <span className="text-sm">Instagram</span>
+                </button>
+              )}
             </div>
           </div>
 
