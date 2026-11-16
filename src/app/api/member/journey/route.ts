@@ -129,6 +129,25 @@ export async function GET() {
     },
   ];
 
+  // Le parcours est séquentiel : une seule étape est « À faire » ; les
+  // suivantes restent « À venir » tant que la précédente n'est pas terminée.
+  const completed = [
+    true, // le compte existe ; la vérification e-mail/téléphone est proposée mais non bloquante
+    consentsDone,
+    kycDone,
+    activeMemberships.length > 0,
+    activeSubs > 0,
+    activeMemberships.some((m) => m.activitySubs.some((sub) => sub.allocationType !== "NONE")) ||
+      activeMemberships.some((m) => m.loanRepaymentMode === "RESIDUAL"),
+    Boolean(nextMeeting),
+  ];
+  const firstPending = completed.findIndex((value) => !value);
+  steps.forEach((step, index) => {
+    if (completed[index]) step.status = "DONE";
+    else if (index === firstPending) step.status = "CURRENT";
+    else step.status = index === 0 ? "CURRENT" : "UPCOMING";
+  });
+
   const required = steps.slice(0, 4);
   const done = required.filter((s) => s.status === "DONE").length;
   const next = steps.find((s) => s.status === "CURRENT") ?? steps.find((s) => s.status === "UPCOMING") ?? steps[0];
