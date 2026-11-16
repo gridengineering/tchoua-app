@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { PUBLIC_PAGES, publicPageMetadata, type SeoLanguage } from "@/lib/seo";
 
-export const metadata = {
-  title: "Politique de confidentialité — Tchoua",
-  description: "Politique de confidentialité de la plateforme Tchoua : données collectées, usages, partage, conservation et droits des utilisateurs.",
-};
+const seo = PUBLIC_PAGES.find((item) => item.path === "/confidentialite")!;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const language = ((await headers()).get("x-tchoua-lang") || "fr") as SeoLanguage;
+  return publicPageMetadata(seo, language);
+}
 
 export default function PrivacyPolicyPage() {
   return (

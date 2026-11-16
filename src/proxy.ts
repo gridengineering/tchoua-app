@@ -38,6 +38,9 @@ function applyCorsHeaders(res: NextResponse, origin: string | null) {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const origin = request.headers.get("origin");
+  const pageHeaders = new Headers(request.headers);
+  pageHeaders.set("x-tchoua-path", pathname);
+  pageHeaders.set("x-tchoua-lang", request.nextUrl.searchParams.get("lang") || "fr");
 
   // ─── API CORS + Mobile Bearer Token forwarding ───────────────────────────
   if (pathname.startsWith("/api")) {
@@ -129,11 +132,27 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: pageHeaders } });
 }
 
 export const config = {
   matcher: [
+    "/",
+    "/about",
+    "/security",
+    "/mobile",
+    "/documentation",
+    "/fonctionnalites",
+    "/how-it-works",
+    "/academie",
+    "/developpeurs",
+    "/templates",
+    "/aide",
+    "/confidentialite",
+    "/conditions-utilisation",
+    "/privacy",
+    "/terms",
+    "/cgu",
     "/api/:path*",
     "/admin/:path*",
     "/api/admin/:path*",

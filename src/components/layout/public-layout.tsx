@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n/context";
 import { Check, ChevronDown, Globe, Menu, X } from "lucide-react";
 import { HEADER_COPY, HOME_COPY, publicLang } from "@/lib/i18n/public-copy";
+import { PUBLIC_PAGES, SITE_URL } from "@/lib/seo";
 import { DOCS_COPY } from "@/lib/i18n/docs-copy";
 
 type SubLink = { href: string; key: string };
@@ -19,6 +20,7 @@ const NAV: { key: string; href: string }[] = [
 
 export function PublicHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { lang, setLang, availableLangs, t } = useI18n();
   const h = HEADER_COPY[publicLang(lang)];
   const c = HOME_COPY[publicLang(lang)];
@@ -58,12 +60,19 @@ export function PublicHeader() {
 
   const label = (key: string) => key === "documentation" ? DOCS_COPY[publicLang(lang)].nav : (t.nav as Record<string, string>)[key] ?? key;
 
+  const changeLang = (code: string) => {
+    setLang(code);
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    params.set("lang", code);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const LanguageList = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={mobile ? "grid grid-cols-2 gap-2" : "max-h-80 w-64 overflow-y-auto py-1"}>
       {availableLangs.map((l) => (
         <button
           key={l.code}
-          onClick={() => { setLang(l.code); setLangOpen(false); setMobileOpen(false); }}
+          onClick={() => { changeLang(l.code); setLangOpen(false); setMobileOpen(false); }}
           className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-[#f7f3eb] ${
             lang === l.code ? "font-semibold text-[#0d3d28]" : "text-gray-600"
           }`}
@@ -187,7 +196,15 @@ export function PublicHeader() {
 }
 
 export function PublicFooter() {
+  const pathname = usePathname();
+  const router = useRouter();
   const { lang, setLang, availableLangs, t } = useI18n();
+  const changeLang = (code: string) => {
+    setLang(code);
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    params.set("lang", code);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
   const c = HOME_COPY[publicLang(lang)];
 
   const productLinks = [
@@ -251,7 +268,7 @@ export function PublicFooter() {
             </h4>
             <div className="grid grid-cols-2 gap-1.5">
               {availableLangs.map((l) => (
-                <button key={l.code} onClick={() => setLang(l.code)}
+                <button key={l.code} onClick={() => changeLang(l.code)}
                   className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-xs transition-colors ${
                     lang === l.code ? "bg-white/10 font-semibold text-white" : "text-gray-400 hover:bg-white/5 hover:text-white"
                   }`}>
@@ -276,6 +293,38 @@ export function PublicFooter() {
 }
 
 export function PublicLayout({ children, title }: { children: React.ReactNode; title?: string }) {
+  const pathname = usePathname();
+  const { lang } = useI18n();
+
+  useEffect(() => {
+    const seo = PUBLIC_PAGES.find((item) => item.path === pathname);
+    if (!seo) return;
+    const locale = publicLang(lang);
+    const localizedTitle = `${seo.titles[locale]} | Tchoua`;
+    document.title = localizedTitle;
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.setAttribute("content", seo.descriptions[locale]);
+    const canonicalUrl = `${SITE_URL}${pathname === "/" ? "/" : pathname}${locale === "fr" ? "" : `?lang=${locale}`}`;
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
+
+    for (const code of ["fr", "en", "es", "de"] as const) {
+      let alternate = document.querySelector(`link[rel="alternate"][hreflang="${code}"]`) as HTMLLinkElement | null;
+      if (!alternate) {
+        alternate = document.createElement("link");
+        alternate.rel = "alternate";
+        alternate.hreflang = code;
+        document.head.appendChild(alternate);
+      }
+      alternate.href = `${SITE_URL}${pathname === "/" ? "/" : pathname}?lang=${code}`;
+    }
+  }, [pathname, lang]);
+
   return (
     <div className="flex min-h-screen flex-col" style={{ background: "#f7f3eb" }}>
       <PublicHeader />

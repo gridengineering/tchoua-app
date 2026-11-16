@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { PUBLIC_PAGES, publicPageMetadata, type SeoLanguage } from "@/lib/seo";
 
-export const metadata = {
-  title: "Conditions d’utilisation — Tchoua",
-  description: "Conditions d’utilisation de la plateforme Tchoua : compte, services de tontine, obligations, responsabilité et droit applicable.",
-};
+const seo = PUBLIC_PAGES.find((item) => item.path === "/conditions-utilisation")!;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const language = ((await headers()).get("x-tchoua-lang") || "fr") as SeoLanguage;
+  return publicPageMetadata(seo, language);
+}
 
 export default function TermsPage() {
   return (
