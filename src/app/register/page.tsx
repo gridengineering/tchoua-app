@@ -223,15 +223,17 @@ export default function RegisterPage() {
               <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#0A66C2] text-white text-[11px] font-bold">in</span>
               LinkedIn
             </button>
-            <button
-              type="button"
-              disabled={loading || !!socialLoading}
-              onClick={() => handleSocialRegister("instagram")}
-              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
-            >
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
-              Instagram
-            </button>
+            {process.env.NEXT_PUBLIC_SSO_INSTAGRAM === "true" && (
+              <button
+                type="button"
+                disabled={loading || !!socialLoading}
+                onClick={() => handleSocialRegister("instagram")}
+                className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+              >
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
+                Instagram
+              </button>
+            )}
           </div>
         </div>
 

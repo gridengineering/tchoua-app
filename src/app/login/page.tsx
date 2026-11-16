@@ -245,19 +245,21 @@ function LoginContent() {
                 )}
                 <span className="text-sm">LinkedIn</span>
               </button>
-              <button
-                type="button"
-                disabled={loading || !!socialLoading}
-                onClick={() => handleSocialLogin("instagram")}
-                className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60"
-              >
-                {socialLoading === "instagram" ? (
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-                ) : (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
-                )}
-                <span className="text-sm">Instagram</span>
-              </button>
+              {process.env.NEXT_PUBLIC_SSO_INSTAGRAM === "true" && (
+                <button
+                  type="button"
+                  disabled={loading || !!socialLoading}
+                  onClick={() => handleSocialLogin("instagram")}
+                  className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60"
+                >
+                  {socialLoading === "instagram" ? (
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
+                  )}
+                  <span className="text-sm">Instagram</span>
+                </button>
+              )}
             </div>
           </div>
 
