@@ -60,7 +60,7 @@ export function isEmailIdentifier(value: string): boolean {
  * Normalise un numéro au format international sans « + ».
  * Exemples : 237677112255, +237 677 11 22 55, 0677112255 avec l'indicatif 237.
  */
-export function normalizePhone(raw: unknown, defaultDial = "237"): string | undefined {
+export function normalizePhone(raw: unknown, defaultDial = ""): string | undefined {
   const input = String(raw ?? "").trim();
   if (!input) return undefined;
 
@@ -74,10 +74,17 @@ export function normalizePhone(raw: unknown, defaultDial = "237"): string | unde
     normalized = normalized.slice(2);
   } else if (normalized.startsWith("0")) {
     normalized = `${defaultDial}${normalized.replace(/^0+/, "")}`;
-  } else if (normalized.length <= 9) {
+  } else if (defaultDial && normalized.length <= 10) {
+    // Numéro national sans indicatif : on ajoute l'indicatif choisi.
+    // Au-delà de 10 chiffres, on considère que l'indicatif est déjà présent.
     normalized = `${defaultDial}${normalized}`;
   }
 
+  // Un numéro international complet (indicatif déjà présent) reste accepté
+  // même sans indicatif séparé : 237677112255, 33612345678, 14155552671…
+  if (!defaultDial && !input.startsWith("+") && normalized.length < 10) {
+    return undefined;
+  }
   return normalized.length >= 8 && normalized.length <= 15 ? normalized : undefined;
 }
 
@@ -86,8 +93,13 @@ export function phoneLookupValues(phone: string): string[] {
   return Array.from(new Set([digits, `+${digits}`]));
 }
 
+export function normalizeDialCode(raw: unknown): string | undefined {
+  const digits = String(raw ?? "").replace(/\D/g, "").replace(/^00/, "");
+  return digits.length >= 1 && digits.length <= 4 ? digits : undefined;
+}
+
 export function detectLocaleDefaults(timeZone?: string, browserLanguage?: string): {
-  country: CountryOption;
+  country?: CountryOption;
   city: string;
   language: SupportedLanguage;
 } {
@@ -95,7 +107,7 @@ export function detectLocaleDefaults(timeZone?: string, browserLanguage?: string
   const match = COUNTRY_OPTIONS.find((item) => item.timezone === tz);
   const language = normalizeLanguage(browserLanguage);
   return {
-    country: match ?? COUNTRY_OPTIONS[0],
+    country: match,
     city: match?.city ?? "",
     language,
   };

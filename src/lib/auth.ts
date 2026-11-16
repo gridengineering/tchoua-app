@@ -130,7 +130,7 @@ export const authOptions: NextAuthOptions = {
         const emailLogin = isEmailIdentifier(rawIdentifier);
         const normalizedPhone = emailLogin
           ? undefined
-          : normalizePhone(rawIdentifier, String(credentials.countryCode ?? "237"));
+          : normalizePhone(rawIdentifier, String(credentials.countryCode ?? ""));
         if (!emailLogin && !normalizedPhone) return null;
 
         console.log(`[AUTH] Attempting login for identifier`);

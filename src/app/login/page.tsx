@@ -68,7 +68,7 @@ function LoginContent() {
     try {
       const res = await signIn("credentials", {
         identifier: form.identifier,
-        countryCode: "237",
+        countryCode: "",
         password: form.password,
         redirect: true,
         callbackUrl: "/consentements",
@@ -173,7 +173,7 @@ function LoginContent() {
               required
             />
             <p className="-mt-2 text-[11px] leading-4 text-gray-400">
-              Pour un téléphone, saisissez l’indicatif pays sans espace : 237677112255 (Cameroun), +33612345678 (France).
+              Pour un téléphone, saisissez le numéro avec son indicatif pays, sans espace : 237677112255, 33612345678, 14155552671…
             </p>
             <Input
               label="Mot de passe"

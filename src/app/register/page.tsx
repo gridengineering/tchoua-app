@@ -7,14 +7,14 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { User, Mail, Lock, Phone, MapPin } from "lucide-react";
-import { COUNTRY_OPTIONS, countryByCode, detectLocaleDefaults } from "@/lib/identity";
+import { detectLocaleDefaults } from "@/lib/identity";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     name: "", email: "", phone: "", password: "", confirmPassword: "",
     profession: "", location: "", referralCode: "",
-    country: "CM", city: "", language: "fr",
+    country: "", dialCode: "", city: "", language: "fr",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,8 +28,7 @@ export default function RegisterPage() {
     setForm((f) => ({
       ...f,
       ...(ref ? { referralCode: ref } : {}),
-      country: defaults.country.code,
-      city: f.city || defaults.city,
+      city: f.city,
       language: defaults.language,
     }));
   }, []);
@@ -81,7 +80,7 @@ export default function RegisterPage() {
 
       await signIn("credentials", {
         identifier: form.email.trim() || form.phone.trim(),
-        countryCode: countryByCode(form.country).dial,
+        countryCode: form.dialCode,
         password: form.password,
         redirect: true,
         callbackUrl: "/consentements",
@@ -161,11 +160,19 @@ export default function RegisterPage() {
               onChange={(e) => update("confirmPassword", e.target.value)}
               required
             />
-            <Select
+            <Input
               label="Pays *"
+              placeholder="Ex. Cameroun, France, Nigéria…"
               value={form.country}
               onChange={(e) => update("country", e.target.value)}
-              options={COUNTRY_OPTIONS.map((item) => ({ value: item.code, label: `${item.name} (+${item.dial})` }))}
+              required
+            />
+            <Input
+              label="Indicatif pays (téléphone) *"
+              placeholder="Ex. 237, 33, 1…"
+              inputMode="numeric"
+              value={form.dialCode}
+              onChange={(e) => update("dialCode", e.target.value)}
               required
             />
             <Input

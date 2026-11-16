@@ -4,7 +4,7 @@ import { getPlatformSettings } from "@/lib/platform-settings";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import {
-  countryByCode,
+  normalizeDialCode,
   normalizePhone,
   phoneLookupValues,
   normalizeLanguage,
@@ -17,6 +17,7 @@ const registerSchema = z.object({
   phone: z.string().optional(),
   country: z.string().min(1, "Le pays est obligatoire"),
   city: z.string().min(1, "La ville est obligatoire"),
+  dialCode: z.string().optional(),
   language: z.string().min(2).default("fr"),
   password: z.string().min(6, "Mot de passe min 6 caractères"),
   profession: z.string().optional(),
@@ -38,8 +39,9 @@ export async function POST(req: NextRequest) {
     const data = registerSchema.parse(body);
 
     const email = data.email?.trim().toLowerCase() || undefined;
-    const country = countryByCode(data.country);
-    const phone = data.phone ? normalizePhone(data.phone, country.dial) : undefined;
+    const country = data.country.trim();
+    const dialCode = normalizeDialCode(data.dialCode) ?? "";
+    const phone = data.phone ? normalizePhone(data.phone, dialCode) : undefined;
 
     if (!email && !phone) {
       return NextResponse.json(
@@ -84,9 +86,9 @@ export async function POST(req: NextRequest) {
         name: data.name.trim(),
         email: userEmail,
         phone: phone || null,
-        country: country.name,
+        country,
         city: data.city.trim(),
-        location: data.location?.trim() || `${data.city.trim()}, ${country.name}`,
+        location: data.location?.trim() || `${data.city.trim()}, ${country}`,
         language,
         password: hashed,
         profession: data.profession,

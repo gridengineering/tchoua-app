@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     const emailLogin = isEmailIdentifier(rawIdentifier);
-    const phone = emailLogin ? undefined : normalizePhone(rawIdentifier, String(body?.countryCode ?? "237"));
+    const phone = emailLogin ? undefined : normalizePhone(rawIdentifier, String(body?.countryCode ?? ""));
     if (!emailLogin && !phone) {
       return NextResponse.json({ error: "Identifiant invalide." }, { status: 400 });
     }
