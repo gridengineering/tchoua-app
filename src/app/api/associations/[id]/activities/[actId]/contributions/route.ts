@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
+import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
 
 const TREASURER_ROLES = ["PRESIDENT", "FOUNDER", "TREASURER"];
 
@@ -65,11 +66,16 @@ export async function POST(
 
   const activity = await prisma.associationActivity.findFirst({
     where: { id: actId, associationId: id },
+    include: { association: { select: { bankConfig: true } } },
   });
   if (!activity) return NextResponse.json({ error: "Activité introuvable" }, { status: 404 });
 
   const body = await req.json();
   const { membershipId, amount, paymentMethod, reference, sessionId, paidAt, unit, notes } = body;
+
+  if (isBankOnlyPaymentMode(activity.association.bankConfig) && !isBankPaymentMethod(paymentMethod)) {
+    return NextResponse.json(bankOnlyPaymentError(), { status: 422 });
+  }
 
   if (!membershipId || typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
     return NextResponse.json({ error: "membershipId et amount sont requis" }, { status: 400 });

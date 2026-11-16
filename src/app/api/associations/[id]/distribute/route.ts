@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { distributeContribution } from "@/lib/distribution-engine";
 import { prisma } from "@/lib/prisma";
+import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -25,10 +26,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   try {
     const body = await req.json();
-    const { membershipId, amount, paymentMethod = "CASH", reference, meetingId } = body;
+    const { membershipId, amount, paymentMethod, reference, meetingId } = body;
 
     if (!membershipId || !amount || amount <= 0) {
       return NextResponse.json({ error: "Paramètres invalides" }, { status: 400 });
+    }
+
+    const association = await prisma.association.findUnique({
+      where: { id: associationId },
+      select: { bankConfig: true },
+    });
+    const bankOnly = isBankOnlyPaymentMode(association?.bankConfig);
+    const effectivePaymentMethod = paymentMethod ?? (bankOnly ? "BANK_TRANSFER" : "CASH");
+    if (bankOnly && !isBankPaymentMethod(effectivePaymentMethod)) {
+      return NextResponse.json(bankOnlyPaymentError(), { status: 422 });
     }
 
     // Appel du moteur de répartition
@@ -36,7 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       associationId,
       membershipId,
       Number(amount),
-      paymentMethod,
+      effectivePaymentMethod,
       reference,
       meetingId
     );

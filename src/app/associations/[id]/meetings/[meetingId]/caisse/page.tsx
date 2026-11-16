@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Coins, CheckCircle, AlertTriangle, Users, FileText, Download } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { isBankOnlyPaymentMode } from "@/lib/payment-policy";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ export default function MeetingCaissePage() {
   const [selectedMemberId, setSelectedMemberId] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
+  const [bankOnly, setBankOnly] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -43,6 +45,15 @@ export default function MeetingCaissePage() {
 
   useEffect(() => {
     fetchMeetingData();
+    fetch(`/api/associations/${id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (isBankOnlyPaymentMode(d?.association?.bankConfig)) {
+          setBankOnly(true);
+          setPaymentMethod("BANK_TRANSFER");
+        }
+      })
+      .catch(() => {});
   }, [id, meetingId]);
 
   const handleDistribute = async (e: React.FormEvent) => {
@@ -193,10 +204,17 @@ export default function MeetingCaissePage() {
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 >
-                  <option value="CASH">Espèces (Cash)</option>
-                  <option value="MOBILE_MONEY">Mobile Money</option>
-                  <option value="BANK_TRANSFER">Virement Bancaire</option>
+                  {bankOnly ? (
+                    <option value="BANK_TRANSFER">Virement bancaire (exclusif)</option>
+                  ) : (
+                    <>
+                      <option value="CASH">Espèces (Cash)</option>
+                      <option value="MOBILE_MONEY">Mobile Money</option>
+                      <option value="BANK_TRANSFER">Virement Bancaire</option>
+                    </>
+                  )}
                 </select>
+                {bankOnly && <p className="mt-1.5 text-xs font-medium text-[#8a6410]">Versements bancaires uniquement.</p>}
               </div>
 
               <button 

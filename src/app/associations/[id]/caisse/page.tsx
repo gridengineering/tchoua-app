@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle, AlertTriangle, Coins, RefreshCw } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { isBankOnlyPaymentMode } from "@/lib/payment-policy";
 
 type Member = {
   id: string;
@@ -35,6 +36,7 @@ export default function CaissePage() {
   const [selectedMemberId, setSelectedMemberId] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
+  const [bankOnly, setBankOnly] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AllocationResult | null>(null);
@@ -44,6 +46,10 @@ export default function CaissePage() {
     fetch(`/api/associations/${id}`)
       .then((r) => r.json())
       .then((d) => {
+        if (isBankOnlyPaymentMode(d.association?.bankConfig)) {
+          setBankOnly(true);
+          setPaymentMethod("BANK_TRANSFER");
+        }
         if (d.association?.memberships) {
           const formatted = d.association.memberships.map((m: any) => ({
             id: m.id,
@@ -157,10 +163,17 @@ export default function CaissePage() {
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 >
-                  <option value="CASH">Espèces (Cash)</option>
-                  <option value="MOBILE_MONEY">Mobile Money</option>
-                  <option value="BANK_TRANSFER">Virement Bancaire</option>
+                  {bankOnly ? (
+                    <option value="BANK_TRANSFER">Virement bancaire (exclusif)</option>
+                  ) : (
+                    <>
+                      <option value="CASH">Espèces (Cash)</option>
+                      <option value="MOBILE_MONEY">Mobile Money</option>
+                      <option value="BANK_TRANSFER">Virement Bancaire</option>
+                    </>
+                  )}
                 </select>
+                {bankOnly && <p className="mt-1.5 text-xs font-medium text-[#8a6410]">Cette association accepte uniquement les versements bancaires.</p>}
               </div>
 
               <button 

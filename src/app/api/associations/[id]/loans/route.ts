@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { isPlatformAdmin } from "@/lib/permissions";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
+import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
@@ -201,7 +202,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const loan = await prisma.assocLoan.findFirst({
     where: { id: loanId, activity: { associationId: id } },
-    include: { activity: { select: { loanApprovalMode: true } } },
+    include: {
+      activity: {
+        select: {
+          loanApprovalMode: true,
+          association: { select: { bankConfig: true } },
+        },
+      },
+    },
   });
   if (!loan) return NextResponse.json({ error: "Prêt introuvable" }, { status: 404 });
 
@@ -287,6 +295,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (action === "REPAY") {
+    const bankOnly = isBankOnlyPaymentMode(loan.activity.association?.bankConfig);
+    const effectivePaymentMethod = paymentMethod ?? (bankOnly ? "BANK_TRANSFER" : "CASH");
+    if (bankOnly && !isBankPaymentMethod(effectivePaymentMethod)) {
+      return NextResponse.json(bankOnlyPaymentError(), { status: 422 });
+    }
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
       return NextResponse.json({ error: "Le montant doit être strictement positif" }, { status: 400 });
@@ -309,7 +322,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         if (idempotencyKey) {
           const replay = await tx.assocLoanRepayment.findUnique({ where: { idempotencyKey } });
           if (replay) {
-            if (replay.loanId !== loanId || replay.amount !== numericAmount || replay.paymentMethod !== (paymentMethod ?? "CASH")) {
+            if (replay.loanId !== loanId || replay.amount !== numericAmount || replay.paymentMethod !== effectivePaymentMethod) {
               throw new Error("IDEMPOTENCY_CONFLICT");
             }
             const paid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
@@ -336,7 +349,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             amount: numericAmount,
             principal,
             interest,
-            paymentMethod: paymentMethod ?? "CASH",
+            paymentMethod: effectivePaymentMethod,
             paidAt: new Date(),
           },
         });

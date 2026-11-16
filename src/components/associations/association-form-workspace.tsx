@@ -1202,7 +1202,7 @@ export function AssociationFormWorkspace({
                 <TextInput label="Banque" value={bank.bankName} onChange={(v) => setBank({ ...bank, bankName: v })} placeholder="Nom de la banque" />
                 <TextInput label="RIB / IBAN" value={bank.rib} onChange={(v) => setBank({ ...bank, rib: v })} placeholder="Numéro de compte" />
                 <TextInput label="Titulaire" value={bank.accountHolder} onChange={(v) => setBank({ ...bank, accountHolder: v })} placeholder="Nom du titulaire" />
-                <SelectInput label="Mode de paiement" value={bank.paymentMode} onChange={(v) => setBank({ ...bank, paymentMode: v })} options={[{ value: "VIREMENT", label: "Virement" }, { value: "CHEQUE", label: "Chèque" }, { value: "ESPECES", label: "Espèces" }, { value: "MOBILE_MONEY", label: "Mobile Money" }]} />
+                <SelectInput label="Mode de paiement" value={bank.paymentMode} onChange={(v) => setBank({ ...bank, paymentMode: v })} options={[{ value: "BANQUE_EXCLUSIVE", label: "Banque uniquement (virement obligatoire)" }, { value: "VIREMENT", label: "Virement" }, { value: "CHEQUE", label: "Chèque" }, { value: "ESPECES", label: "Espèces" }, { value: "MOBILE_MONEY", label: "Mobile Money" }]} />
               </div>
             </Section>
           </div>
