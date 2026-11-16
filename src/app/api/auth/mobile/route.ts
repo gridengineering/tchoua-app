@@ -4,6 +4,7 @@ import { encode } from "next-auth/jwt";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isEmailIdentifier, normalizePhone, phoneLookupValues } from "@/lib/identity";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -36,20 +37,33 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const rawIdentifier = typeof (body?.identifier ?? body?.email) === "string"
+      ? String(body.identifier ?? body.email).trim()
+      : "";
     const password = typeof body?.password === "string" ? body.password : "";
 
-    if (!email || !password) {
+    if (!rawIdentifier || !password) {
       return NextResponse.json(
-        { error: "Email et mot de passe requis." },
+        { error: "Email/téléphone et mot de passe requis." },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: { systemRole: { include: { permissions: true } } },
-    });
+    const emailLogin = isEmailIdentifier(rawIdentifier);
+    const phone = emailLogin ? undefined : normalizePhone(rawIdentifier, String(body?.countryCode ?? "237"));
+    if (!emailLogin && !phone) {
+      return NextResponse.json({ error: "Identifiant invalide." }, { status: 400 });
+    }
+
+    const user = emailLogin
+      ? await prisma.user.findUnique({
+          where: { email: rawIdentifier.toLowerCase() },
+          include: { systemRole: { include: { permissions: true } } },
+        })
+      : await prisma.user.findFirst({
+          where: { phone: { in: phoneLookupValues(phone!) } },
+          include: { systemRole: { include: { permissions: true } } },
+        });
 
     if (!user || !user.isActive) {
       return NextResponse.json(

@@ -17,6 +17,8 @@ model User {
   bio             String?
   profession      String?
   location        String?
+  country         String?
+  city            String?
   familyInfo      String?   // JSON: { firstSpouseName, fatherName, motherName, childrenCount }
   emergencyContact String?  // JSON: { name, phone, relationship }
   language        String    @default("fr")

@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import InstagramProvider from "next-auth/providers/instagram";
 import { prisma } from "@/lib/prisma";
+import { isEmailIdentifier, normalizePhone, phoneLookupValues } from "@/lib/identity";
 import bcrypt from "bcryptjs";
 
 const oauthProviders: NextAuthOptions["providers"] = [];
@@ -73,29 +74,34 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
+        identifier: { label: "Email ou téléphone", type: "text" },
         email: { label: "Email", type: "email" },
+        countryCode: { label: "Indicatif pays", type: "text" },
         password: { label: "Mot de passe", type: "password" },
         firebaseToken: { label: "Firebase Token", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        const rawIdentifier = String(credentials?.identifier ?? credentials?.email ?? "").trim();
+        if (!rawIdentifier) return null;
 
         // Si on a un token Firebase, on bypass le mot de passe (on devrait vérifier le token ici avec firebase-admin)
-        if (credentials.firebaseToken) {
-          console.log(`[AUTH] Firebase login for: ${credentials.email}`);
+        if (credentials?.firebaseToken) {
+          const firebaseEmail = String(credentials.email ?? "").trim().toLowerCase();
+          if (!firebaseEmail) return null;
+          console.log(`[AUTH] Firebase login for: ${firebaseEmail}`);
           
           let user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            where: { email: firebaseEmail },
             include: { systemRole: { include: { permissions: true } } },
           });
 
           // Si l'utilisateur n'existe pas encore, on le crée
           if (!user) {
-            console.log(`[AUTH] Creating new user via Social Login: ${credentials.email}`);
+            console.log(`[AUTH] Creating new user via Social Login: ${firebaseEmail}`);
             user = await prisma.user.create({
               data: {
-                email: credentials.email,
-                name: credentials.email.split("@")[0], // Placeholder name
+                email: firebaseEmail,
+                name: firebaseEmail.split("@")[0], // Placeholder name
                 password: await bcrypt.hash(Math.random().toString(36), 10), // Random password
                 role: "MEMBER",
                 isActive: true,
@@ -121,30 +127,41 @@ export const authOptions: NextAuthOptions = {
 
         if (!credentials?.password) return null;
 
-        console.log(`[AUTH] Attempting login for: ${credentials.email}`);
+        const emailLogin = isEmailIdentifier(rawIdentifier);
+        const normalizedPhone = emailLogin
+          ? undefined
+          : normalizePhone(rawIdentifier, String(credentials.countryCode ?? "237"));
+        if (!emailLogin && !normalizedPhone) return null;
+
+        console.log(`[AUTH] Attempting login for identifier`);
         
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-          include: { systemRole: { include: { permissions: true } } },
-        });
+        const user = emailLogin
+          ? await prisma.user.findUnique({
+              where: { email: rawIdentifier.toLowerCase() },
+              include: { systemRole: { include: { permissions: true } } },
+            })
+          : await prisma.user.findFirst({
+              where: { phone: { in: phoneLookupValues(normalizedPhone!) } },
+              include: { systemRole: { include: { permissions: true } } },
+            });
 
         if (!user) {
-          console.log(`[AUTH] User not found: ${credentials.email}`);
+          console.log(`[AUTH] User not found`);
           return null;
         }
         
         if (!user.isActive || user.quarantinedAt) {
-          console.log(`[AUTH] User is inactive or quarantined: ${credentials.email}`);
+          console.log(`[AUTH] User is inactive or quarantined`);
           return null;
         }
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) {
-          console.log(`[AUTH] Invalid password for: ${credentials.email}`);
+          console.log(`[AUTH] Invalid password`);
           return null;
         }
 
-        console.log(`[AUTH] Login successful: ${credentials.email} (Role: ${user.role})`);
+        console.log(`[AUTH] Login successful (Role: ${user.role})`);
 
         return {
           id: user.id,
