@@ -6,6 +6,7 @@ import { PublicFooter, PublicHeader } from "@/components/layout/public-layout";
 import { useI18n } from "@/lib/i18n/context";
 import { HOME_COPY, publicLang } from "@/lib/i18n/public-copy";
 import { DOCS_COPY } from "@/lib/i18n/docs-copy";
+import { PRESENTATION_VIDEOS } from "@/lib/i18n/video-copy";
 
 const TYPE_ICONS = ["💰", "🌾", "🤝"];
 const TYPE_BGS = [
@@ -23,6 +24,7 @@ export default function HomePage() {
   const { lang } = useI18n();
   const c = HOME_COPY[publicLang(lang)];
   const docs = DOCS_COPY[publicLang(lang)];
+  const presentation = PRESENTATION_VIDEOS[publicLang(lang)];
 
   return (
     <div className="min-h-screen" style={{ background: "#f7f3eb", color: "#1a1a1a" }}>
@@ -105,6 +107,41 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* VIDEO DE PRÉSENTATION */}
+      <section id="video" className="px-6 py-16" style={{ background: "#071c14" }}>
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <span className="mb-4 inline-block rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest"
+              style={{ background: "rgba(233,165,26,0.18)", color: "#f0c56a", border: "1px solid rgba(233,165,26,0.3)" }}>
+              {presentation.badge}
+            </span>
+            <h2 className="mb-4 text-3xl font-black text-white md:text-4xl">{presentation.title}</h2>
+            <p className="max-w-md text-base leading-relaxed text-white/65">{presentation.desc}</p>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-[#e9a51a]">{presentation.note}</p>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+            <video
+              key={presentation.src}
+              controls
+              playsInline
+              preload="metadata"
+              poster={presentation.poster}
+              className="aspect-video w-full"
+            >
+              <source src={presentation.src} type="video/mp4" />
+              <track
+                kind="captions"
+                src={presentation.captions}
+                srcLang={presentation.lang}
+                label={presentation.lang.toUpperCase()}
+                default
+              />
+              Votre navigateur ne prend pas en charge la vidéo HTML5.
+            </video>
           </div>
         </div>
       </section>
