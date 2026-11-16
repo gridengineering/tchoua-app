@@ -7,8 +7,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, CheckCircle, Globe } from "lucide-react";
-import { auth, googleProvider, facebookProvider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
 
 const GoogleIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -22,6 +20,12 @@ const GoogleIcon = () => (
 const FacebookIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#1877F2">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+  </svg>
+);
+
+const LinkedInIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#0A66C2">
+    <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.95v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/>
   </svg>
 );
 
@@ -78,35 +82,14 @@ function LoginContent() {
     }
   };
 
-  const handleSocialLogin = async (providerName: "google" | "facebook") => {
+  const handleSocialLogin = async (providerName: "google" | "facebook" | "linkedin") => {
     setSocialLoading(providerName);
     setError("");
-    
+
     try {
-      const provider = providerName === "google" ? googleProvider : facebookProvider;
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const token = await user.getIdToken();
-
-      // On transmet le login à NextAuth via le provider credentials (logic adapté dans lib/auth.ts)
-      const res = await signIn("credentials", {
-        email: user.email,
-        firebaseToken: token,
-        redirect: true,
-        callbackUrl: "/choose-space",
-      });
-
-      if (res?.error) {
-        setError("Erreur lors de la synchronisation du compte social");
-      }
-    } catch (err: any) {
-      console.error(`[SOCIAL_LOGIN_ERROR] ${providerName}`, err);
-      if (err.code === "auth/popup-closed-by-user") {
-        setError("Connexion annulée");
-      } else {
-        setError("Échec de la connexion sociale");
-      }
-    } finally {
+      await signIn(providerName, { callbackUrl: "/choose-space" });
+    } catch {
+      setError("Échec de la connexion sociale");
       setSocialLoading(null);
     }
   };
@@ -222,7 +205,7 @@ function LoginContent() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <button
                 type="button"
                 disabled={loading || !!socialLoading}
@@ -248,6 +231,19 @@ function LoginContent() {
                   <FacebookIcon />
                 )}
                 <span className="text-sm">Facebook</span>
+              </button>
+              <button
+                type="button"
+                disabled={loading || !!socialLoading}
+                onClick={() => handleSocialLogin("linkedin")}
+                className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 sm:col-span-1"
+              >
+                {socialLoading === "linkedin" ? (
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                ) : (
+                  <LinkedInIcon />
+                )}
+                <span className="text-sm">LinkedIn</span>
               </button>
             </div>
           </div>

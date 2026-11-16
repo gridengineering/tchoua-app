@@ -1,7 +1,66 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+
+const oauthProviders: NextAuthOptions["providers"] = [];
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  oauthProviders.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: { params: { scope: "openid email profile" } },
+    })
+  );
+}
+
+if (process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET) {
+  oauthProviders.push(
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      authorization: {
+        url: "https://www.facebook.com/v23.0/dialog/oauth",
+        params: { scope: "email,public_profile" },
+      },
+      token: "https://graph.facebook.com/v23.0/oauth/access_token",
+      userinfo: {
+        url: "https://graph.facebook.com/v23.0/me",
+        params: { fields: "id,name,email,picture" },
+      },
+    })
+  );
+}
+
+if (process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET) {
+  oauthProviders.push({
+    id: "linkedin",
+    name: "LinkedIn",
+    type: "oauth",
+    wellKnown: "https://www.linkedin.com/oauth/.well-known/openid-configuration",
+    authorization: { params: { scope: "openid profile email" } },
+    idToken: true,
+    checks: ["pkce", "state"],
+    clientId: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    profile(profile: {
+      sub: string;
+      name?: string;
+      email?: string;
+      picture?: string;
+    }) {
+      return {
+        id: profile.sub,
+        name: profile.name ?? profile.email ?? "Membre LinkedIn",
+        email: profile.email ?? null,
+        image: profile.picture ?? null,
+      };
+    },
+  } as NextAuthOptions["providers"][number]);
+}
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -99,8 +158,46 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    ...oauthProviders,
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (!account || account.provider === "credentials") return true;
+
+      const email = user.email?.trim().toLowerCase();
+      if (!email) return false;
+
+      let dbUser = await prisma.user.findUnique({
+        where: { email },
+        include: { systemRole: { include: { permissions: true } } },
+      });
+
+      if (!dbUser) {
+        dbUser = await prisma.user.create({
+          data: {
+            email,
+            name: user.name?.trim() || email.split("@")[0],
+            password: await bcrypt.hash(Math.random().toString(36) + Date.now().toString(36), 10),
+            role: "MEMBER",
+            isActive: true,
+            avatar: user.image ?? null,
+          },
+          include: { systemRole: { include: { permissions: true } } },
+        });
+      }
+
+      if (!dbUser.isActive || dbUser.quarantinedAt) return false;
+
+      (user as any).id = dbUser.id;
+      (user as any).role = dbUser.role;
+      (user as any).level = dbUser.level;
+      (user as any).score = dbUser.score;
+      (user as any).avatar = dbUser.avatar;
+      (user as any).systemRoleId = dbUser.systemRoleId;
+      (user as any).systemRoleName = dbUser.systemRole?.name ?? null;
+
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
