@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, PiggyBank, RotateCcw, Landmark, Heart, BarChart3,
   Settings, LogOut, ChevronLeft, ChevronDown, MessageCircle, Calendar, Bot,
   FileText, Building2, UserCircle, Check, ShieldCheck, Plus, ShoppingBag,
-  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight, History, TrendingUp,
+  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight, History, TrendingUp, Route,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: any; feature?: string };
@@ -31,6 +31,7 @@ const GLOBAL_GROUPS: Group[] = [
     title: "Pilotage",
     items: [
       { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+      { href: "/parcours", label: "Mon parcours", icon: Route },
       { href: "/associations", label: "Mes associations", icon: Building2 },
       { href: "/dashboard/calendrier", label: "Calendrier", icon: Calendar },
       { href: "/kyc", label: "Vérification KYC", icon: ShieldCheck },

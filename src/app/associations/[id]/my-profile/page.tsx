@@ -14,6 +14,7 @@ export default function MyProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editedSubs, setEditedSubs] = useState<any[]>([]);
+  const [loanMode, setLoanMode] = useState("PRIORITY");
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
   useEffect(() => {
@@ -22,6 +23,7 @@ export default function MyProfilePage() {
       .then(data => {
         if (data.membership) {
           setMembership(data.membership);
+          setLoanMode(data.membership.loanRepaymentMode || "PRIORITY");
           // Initialiser l'état éditable pour les souscriptions
           setEditedSubs(data.membership.activitySubs.map((sub: any) => ({
             id: sub.id,
@@ -50,7 +52,7 @@ export default function MyProfilePage() {
       const res = await fetch(`/api/associations/${id}/my-profile`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptions: editedSubs }),
+        body: JSON.stringify({ subscriptions: editedSubs, loanRepaymentMode: loanMode }),
       });
       
       if (res.ok) {
@@ -69,8 +71,9 @@ export default function MyProfilePage() {
   if (loading) return <DashboardLayout title="Chargement..."><div /></DashboardLayout>;
   if (!membership) return <DashboardLayout title="Profil"><p>Profil introuvable</p></DashboardLayout>;
 
-  // Filtrer pour n'afficher que les activités de Priorité 4 (Optionnelle Partielle) ou celles configurables
-  const configurableSubs = editedSubs.filter(sub => sub.priority === 4 || sub.activityType === "EPARGNE");
+  // Toutes les activités souscrites participent à la clé ; les postes
+  // obligatoires gardent leur minimum statutaire côté moteur.
+  const configurableSubs = editedSubs;
 
   return (
     <DashboardLayout title="Mon Profil Financier">
@@ -123,10 +126,10 @@ export default function MyProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="w-5 h-5 text-[#0d3d28]" />
-                Clés de Répartition (Activités Optionnelles)
+                Clé de répartition du membre
               </CardTitle>
               <p className="text-sm text-graphite">
-                Configurez comment vos excédents de versement doivent être alloués automatiquement.
+                Définissez ce que chaque poste reçoit lors de votre versement unique. L’association impose l’ordre et les minima obligatoires ; vous ajustez le reste.
               </p>
             </CardHeader>
             <CardContent>
@@ -136,8 +139,24 @@ export default function MyProfilePage() {
                 </div>
               )}
 
+              <div className="p-4 border rounded-xl bg-warm-white mb-6">
+                <label className="block text-xs font-semibold text-graphite uppercase mb-1">Remboursement de prêt</label>
+                <select
+                  value={loanMode}
+                  onChange={(e) => setLoanMode(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border bg-white focus:ring-2 focus:ring-[#0d3d28] focus:outline-none text-sm"
+                >
+                  <option value="PRIORITY">Priorité 1 — rembourser avant les activités</option>
+                  <option value="RESIDUAL">Résiduel — rembourser avec ce qui reste</option>
+                </select>
+                <p className="text-xs text-graphite mt-2">
+                  En mode résiduel, le prêt prend le reliquat après la tontine, l’investissement et la solidarité, sans priver l’épargne ou la ration.
+                </p>
+                <p className="text-xs text-graphite mt-2 font-semibold">Mode actuel : {loanMode === "RESIDUAL" ? "résiduel" : "priorité 1"}</p>
+              </div>
+
               {configurableSubs.length === 0 ? (
-                <p className="text-sm text-graphite italic">Vous n'êtes souscrit à aucune activité optionnelle configurable (ex: Épargne).</p>
+                <p className="text-sm text-graphite italic">Vous n'êtes souscrit à aucune activité pour le moment.</p>
               ) : (
                 <div className="space-y-6">
                   {configurableSubs.map(sub => (
@@ -178,18 +197,18 @@ export default function MyProfilePage() {
                     </div>
                   ))}
 
-                  <div className="flex justify-end pt-4">
-                    <button
-                      onClick={handleSave}
-                      disabled={saving}
-                      className="flex items-center gap-2 bg-forest text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition-colors disabled:opacity-50"
-                    >
-                      <Save className="w-4 h-4" />
-                      {saving ? "Sauvegarde..." : "Enregistrer les clés"}
-                    </button>
-                  </div>
                 </div>
               )}
+              <div className="flex justify-end pt-6">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex items-center gap-2 bg-forest text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0a2f1f] transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? "Sauvegarde..." : "Enregistrer ma clé de répartition"}
+                </button>
+              </div>
             </CardContent>
           </Card>
         </div>

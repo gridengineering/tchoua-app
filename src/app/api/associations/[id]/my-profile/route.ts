@@ -39,29 +39,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   try {
     const body = await req.json();
-    const { subscriptions } = body; // Array of { id, allocationType, allocationValue }
+    const { subscriptions, loanRepaymentMode } = body; // Array of { id, allocationType, allocationValue }
 
-    if (subscriptions && Array.isArray(subscriptions)) {
-      // Validate that these subscriptions belong to the user
-      const membership = await prisma.associationMembership.findFirst({
-        where: { userId: session.user.id, associationId }
-      });
+    const membership = await prisma.associationMembership.findFirst({
+      where: { userId: session.user.id, associationId }
+    });
 
-      if (!membership) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+    if (!membership) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
 
-      // Update in a transaction
-      await prisma.$transaction(
-        subscriptions.map((sub: any) => 
-          prisma.activitySubscription.updateMany({
-            where: { id: sub.id, membershipId: membership.id },
-            data: { 
-              allocationType: sub.allocationType,
-              allocationValue: sub.allocationValue !== undefined ? Number(sub.allocationValue) : null
-            }
-          })
-        )
-      );
+    if (loanRepaymentMode && !["PRIORITY", "RESIDUAL"].includes(loanRepaymentMode)) {
+      return NextResponse.json({ error: "Mode de remboursement invalide" }, { status: 400 });
     }
+
+    const updates: any[] = [];
+    if (subscriptions && Array.isArray(subscriptions)) {
+      updates.push(...subscriptions.map((sub: any) =>
+        prisma.activitySubscription.updateMany({
+          where: { id: sub.id, membershipId: membership.id },
+          data: {
+            allocationType: sub.allocationType,
+            allocationValue: sub.allocationValue !== undefined ? Number(sub.allocationValue) : null
+          }
+        })
+      ));
+    }
+    if (loanRepaymentMode) {
+      updates.push(prisma.associationMembership.update({
+        where: { id: membership.id },
+        data: { loanRepaymentMode }
+      }));
+    }
+    if (updates.length > 0) await prisma.$transaction(updates);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

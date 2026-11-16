@@ -889,6 +889,9 @@ model AssociationMembership {
   reliabilityScore Float    @default(100)  // 0-100, fiabilité
   memberNumber    String?   // numéro d'ordre dans l'association
   excessBalance   Float     @default(0)    // Excédent (reliquat non alloué)
+  // PRIORITY : rembourse le prêt avant les activités (défaut historique)
+  // RESIDUAL : rembourse le prêt avec ce qui reste après les activités
+  loanRepaymentMode String  @default("PRIORITY")
   notes           String?
   // Blacklist / exclusion
   blacklistedAt   DateTime?

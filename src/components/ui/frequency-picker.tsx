@@ -10,6 +10,7 @@ import {
   PRESET_FREQUENCIES,
   frequencyLabel,
   getNextSessions,
+  monthlyRules,
   migrateConfig,
   FrequencyConfig as AnyFrequencyConfig,
 } from "@/lib/frequency";
@@ -44,6 +45,9 @@ const I18N: Record<Lang, {
   nthWeekday: string;
   fortnight: string;
   firstAfter: string;
+  nthAfter: string;
+  addRule: string;
+  removeRule: string;
   position: string;
   weekday: string;
   half: string;
@@ -74,7 +78,7 @@ const I18N: Record<Lang, {
     excludeHolidays: "Exclure les jours fériés", intervalDays: "Intervalle (jours)",
     every: "Tous les", weeks: "semaine(s)", months: "mois", years: "année(s)",
     monthlyRule: "Règle mensuelle", fixedDay: "Jour fixe", nthWeekday: "Position + jour",
-    fortnight: "Quinzaine", firstAfter: "1er jour après le N",
+    fortnight: "Quinzaine", firstAfter: "1er jour après le N", nthAfter: "Nᵉ jour après le N", addRule: "+ Ajouter une occurrence", removeRule: "Supprimer",
     position: "Position", weekday: "Jour de semaine", half: "Quinzaine",
     half1: "1ère (1–15)", half2: "2ème (16–fin)", afterDay: "Après le jour",
     dayOfMonth: "Jour du mois", annualSub: "Sous-règle annuelle",
@@ -94,7 +98,7 @@ const I18N: Record<Lang, {
     excludeHolidays: "Exclude holidays", intervalDays: "Interval (days)",
     every: "Every", weeks: "week(s)", months: "month(s)", years: "year(s)",
     monthlyRule: "Monthly rule", fixedDay: "Fixed day", nthWeekday: "Position + weekday",
-    fortnight: "Fortnight", firstAfter: "1st weekday after day N",
+    fortnight: "Fortnight", firstAfter: "1st weekday after day N", nthAfter: "Nth weekday after day N", addRule: "+ Add occurrence", removeRule: "Remove",
     position: "Position", weekday: "Weekday", half: "Half",
     half1: "1st (1–15)", half2: "2nd (16–end)", afterDay: "After day",
     dayOfMonth: "Day of month", annualSub: "Annual sub-rule",
@@ -114,7 +118,7 @@ const I18N: Record<Lang, {
     excludeHolidays: "Excluir feriados", intervalDays: "Intervalo (días)",
     every: "Cada", weeks: "semana(s)", months: "mes(es)", years: "año(s)",
     monthlyRule: "Regla mensual", fixedDay: "Día fijo", nthWeekday: "Posición + día",
-    fortnight: "Quincena", firstAfter: "1er día tras N",
+    fortnight: "Quincena", firstAfter: "1er día tras N", nthAfter: "N-ésimo día tras N", addRule: "+ Añadir ocurrencia", removeRule: "Eliminar",
     position: "Posición", weekday: "Día semana", half: "Quincena",
     half1: "1ª (1–15)", half2: "2ª (16–fin)", afterDay: "Tras el día",
     dayOfMonth: "Día del mes", annualSub: "Sub-regla anual",
@@ -134,7 +138,7 @@ const I18N: Record<Lang, {
     excludeHolidays: "Feiertage ausschließen", intervalDays: "Intervall (Tage)",
     every: "Alle", weeks: "Woche(n)", months: "Monat(e)", years: "Jahr(e)",
     monthlyRule: "Monatsregel", fixedDay: "Fester Tag", nthWeekday: "Position + Wochentag",
-    fortnight: "Halbmonat", firstAfter: "1. Wochentag nach Tag N",
+    fortnight: "Halbmonat", firstAfter: "1. Wochentag nach Tag N", nthAfter: "N. Wochentag nach Tag N", addRule: "+ Vorkommen hinzufügen", removeRule: "Entfernen",
     position: "Position", weekday: "Wochentag", half: "Hälfte",
     half1: "1. (1–15)", half2: "2. (16–Ende)", afterDay: "Nach Tag",
     dayOfMonth: "Tag des Monats", annualSub: "Jahres-Unterregel",
@@ -482,6 +486,7 @@ function MonthlyRuleEditor({
             if (k === "FIXED_DAY") onChange({ kind: "FIXED_DAY", day: 1 });
             else if (k === "NTH_WEEKDAY") onChange({ kind: "NTH_WEEKDAY", position: 1, weekday: 6 });
             else if (k === "FORTNIGHT") onChange({ kind: "FORTNIGHT", half: 1, weekday: 6 });
+            else if (k === "NTH_AFTER") onChange({ kind: "NTH_AFTER", position: 1, weekday: 0, afterDay: 15 });
             else onChange({ kind: "FIRST_AFTER", weekday: 1, afterDay: 5 });
           }}
         >
@@ -489,6 +494,7 @@ function MonthlyRuleEditor({
           <option value="NTH_WEEKDAY">{T.nthWeekday}</option>
           <option value="FORTNIGHT">{T.fortnight}</option>
           <option value="FIRST_AFTER">{T.firstAfter}</option>
+          <option value="NTH_AFTER">{T.nthAfter}</option>
         </select>
       </div>
 
@@ -574,7 +580,7 @@ function MonthlyRuleEditor({
         </div>
       )}
 
-      {rule.kind === "FIRST_AFTER" && (
+      {(rule.kind === "FIRST_AFTER" || rule.kind === "NTH_AFTER") && (
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
@@ -603,6 +609,21 @@ function MonthlyRuleEditor({
               onChange={(e) => onChange({ ...rule, afterDay: Math.max(1, Math.min(28, parseInt(e.target.value) || 1)) })}
             />
           </div>
+          {rule.kind === "NTH_AFTER" && (
+            <div className="col-span-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
+                {T.position}
+              </label>
+              <select
+                className={inputClass}
+                style={inputStyle}
+                value={rule.position}
+                onChange={(e) => onChange({ ...rule, position: parseInt(e.target.value) as Position })}
+              >
+                {[1, 2, 3, 4, 5].map((p) => <option key={p} value={p}>{T.positions[p - 1]}</option>)}
+              </select>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -618,9 +639,25 @@ function MonthlyFields({
   onChange: (c: FrequencyConfigV2) => void;
   T: T_;
 }) {
+  const rules = monthlyRules(config);
   return (
     <div className="space-y-3">
-      <MonthlyRuleEditor rule={config.rule} onChange={(rule) => onChange({ ...config, rule })} T={T} />
+      {rules.map((rule, index) => (
+        <div key={index} className="rounded-xl border border-[#e2ddd4] bg-white p-3 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-[#a97b18]">#{index + 1}</span>
+            {rules.length > 1 && (
+              <button type="button" onClick={() => onChange({ ...config, rules: rules.filter((_, i) => i !== index), rule: rules.filter((_, i) => i !== index)[0] })} className="text-[11px] font-semibold text-red-600">
+                {T.removeRule}
+              </button>
+            )}
+          </div>
+          <MonthlyRuleEditor rule={rule} onChange={(next) => { const nextRules = rules.map((item, i) => i === index ? next : item); onChange({ ...config, rules: nextRules, rule: nextRules[0] }); }} T={T} />
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange({ ...config, rules: [...rules, { kind: "NTH_WEEKDAY", position: 1, weekday: 0 }], rule: rules[0] })} className="text-xs font-semibold text-[#0d3d28] underline">
+        {T.addRule}
+      </button>
       <div>
         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">
           {T.every} N {T.months}

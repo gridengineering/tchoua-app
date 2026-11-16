@@ -13,7 +13,8 @@ export type MonthlySubRule =
   | { kind: "FIXED_DAY"; day: number }
   | { kind: "NTH_WEEKDAY"; position: Position; weekday: Weekday }
   | { kind: "FORTNIGHT"; half: 1 | 2; weekday: Weekday }
-  | { kind: "FIRST_AFTER"; weekday: Weekday; afterDay: number };
+  | { kind: "FIRST_AFTER"; weekday: Weekday; afterDay: number }
+  | { kind: "NTH_AFTER"; position: Position; weekday: Weekday; afterDay: number };
 
 export type FrequencyConfigV2 =
   | {
@@ -40,7 +41,10 @@ export type FrequencyConfigV2 =
   | {
       mode: "MONTHLY";
       every?: number;               // N mois (1=chaque, 3=trimestre, 6=semestre…)
-      rule: MonthlySubRule;
+      /** Ancienne forme à une règle, conservée pour la rétrocompatibilité. */
+      rule?: MonthlySubRule;
+      /** Nouvelle forme : plusieurs occurrences peuvent tomber dans le même mois. */
+      rules?: MonthlySubRule[];
       startTime?: string;
       holidayBehavior?: HolidayBehavior;
     }
@@ -178,7 +182,28 @@ function firstWeekdayAfterDay(year: number, month0: number, dow: Weekday, after:
   return startOfDay(d);
 }
 
+function nthWeekdayAfterDay(
+  year: number,
+  month0: number,
+  dow: Weekday,
+  after: number,
+  nth: Position
+): Date | null {
+  let count = 0;
+  for (let day = after + 1; day <= lastDayOfMonth(year, month0); day++) {
+    const d = new Date(year, month0, day);
+    if (d.getDay() !== dow) continue;
+    count++;
+    if (count === nth) return startOfDay(d);
+  }
+  return null;
+}
+
 function applyMonthlyRule(year: number, month0: number, rule: MonthlySubRule): Date {
+  // NTH_AFTER peut ne pas exister dans le mois : il est traité par applyMonthlyRuleSafe.
+  if (rule.kind === "NTH_AFTER") {
+    return nthWeekdayAfterDay(year, month0, rule.weekday, rule.afterDay, rule.position) ?? startOfDay(new Date(year, month0, 1));
+  }
   switch (rule.kind) {
     case "FIXED_DAY": {
       const day = Math.min(rule.day, lastDayOfMonth(year, month0));
@@ -191,6 +216,26 @@ function applyMonthlyRule(year: number, month0: number, rule: MonthlySubRule): D
     case "FIRST_AFTER":
       return firstWeekdayAfterDay(year, month0, rule.weekday, rule.afterDay);
   }
+}
+
+function applyMonthlyRuleSafe(year: number, month0: number, rule: MonthlySubRule): Date | null {
+  if (rule.kind === "NTH_AFTER") {
+    return nthWeekdayAfterDay(year, month0, rule.weekday, rule.afterDay, rule.position);
+  }
+  return applyMonthlyRule(year, month0, rule);
+}
+
+export function monthlyRules(config: Extract<FrequencyConfigV2, { mode: "MONTHLY" }>): MonthlySubRule[] {
+  if (config.rules?.length) return config.rules;
+  return config.rule ? [config.rule] : [{ kind: "FIXED_DAY", day: 1 }];
+}
+
+function applyMonthlyRules(year: number, month0: number, rules: MonthlySubRule[]): Date[] {
+  const dates = rules
+    .map((rule) => applyMonthlyRuleSafe(year, month0, rule))
+    .filter((date): date is Date => date !== null);
+  const unique = new Map(dates.map((date) => [date.getTime(), date]));
+  return [...unique.values()].sort((a, b) => a.getTime() - b.getTime());
 }
 
 function isHoliday(d: Date, holidays: Date[] | undefined): boolean {
@@ -304,12 +349,15 @@ function nextOccurrence(c: FrequencyConfigV2, from: Date): Date | null {
     }
     case "MONTHLY": {
       const every = Math.max(1, c.every ?? 1);
+      const rules = monthlyRules(c);
       let y = from.getFullYear();
       let m = from.getMonth();
       for (let i = 0; i < 12 * every * 6; i++) {
-        const candidate = applyMonthlyRule(y, m, c.rule);
-        if (candidate >= from && monthDiff(from, candidate) % every === 0) {
-          return candidate;
+        if (monthDiff(from, new Date(y, m, 1)) % every === 0) {
+          const candidates = applyMonthlyRules(y, m, rules)
+            .filter((candidate) => candidate >= from)
+            .sort((a, b) => a.getTime() - b.getTime());
+          if (candidates.length > 0) return candidates[0];
         }
         m++;
         if (m > 11) { m = 0; y++; }
@@ -420,7 +468,7 @@ export function frequencyLabel(c: FrequencyConfig, lang: string = "fr"): string 
     }
     case "MONTHLY": {
       const every = config.every ?? 1;
-      const ruleLabel = monthlyRuleLabel(config.rule, T);
+      const ruleLabel = monthlyRules(config).map((rule) => monthlyRuleLabel(rule, T)).join(" + ");
       return every === 1 ? `${T.monthly} : ${ruleLabel}` : `${T.everyN(every, "mois")} : ${ruleLabel}`;
     }
     case "ANNUAL": {
@@ -442,6 +490,7 @@ function monthlyRuleLabel(rule: MonthlySubRule, T: Bundle): string {
     case "NTH_WEEKDAY": return `${T.nth[rule.position]} ${T.days[rule.weekday]}`;
     case "FORTNIGHT":   return `${T.days[rule.weekday]} (${T.fortnight(rule.half)})`;
     case "FIRST_AFTER": return `1er ${T.days[rule.weekday]} ${T.after(rule.afterDay)}`;
+    case "NTH_AFTER": return `${T.nth[rule.position]} ${T.days[rule.weekday]} ${T.after(rule.afterDay)}`;
   }
 }
 

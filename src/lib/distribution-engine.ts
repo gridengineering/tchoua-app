@@ -30,7 +30,11 @@ export async function distributeContribution(
   const allocations: DistributionResult["allocations"] = [];
 
   // 1. Récupérer les souscriptions, prêts, et sanctions impayées
-  const [subscriptions, activeLoans, pendingSanctions] = await Promise.all([
+  const [membership, subscriptions, activeLoans, pendingSanctions] = await Promise.all([
+    prisma.associationMembership.findUnique({
+      where: { id: membershipId },
+      select: { loanRepaymentMode: true },
+    }),
     prisma.activitySubscription.findMany({
       where: { membershipId, status: "ACTIVE", activity: { associationId, status: "ACTIVE" } },
       include: { activity: true },
@@ -79,22 +83,43 @@ export async function distributeContribution(
     let priority = 4;
     let minAmount: number | undefined = undefined;
 
+    // Clé de répartition personnelle du membre. Les postes obligatoires gardent
+    // toujours leur minimum statutaire ; seuls les postes optionnels peuvent être
+    // librement fixés, pondérés ou laissés en résiduel.
+    const allocationType = sub.allocationType || "NONE";
+    const allocationValue = Number(sub.allocationValue || 0);
+
     if (act.participation === "MANDATORY") {
       if (act.type.startsWith("TONTINE") || act.type === "INVESTISSEMENT") {
-        priority = 1; 
+        priority = 1;
       } else if (act.type === "AIDE_SOLIDAIRE") {
-        priority = 2; 
-        minAmount = expected; 
-        expected = Infinity; 
+        priority = 2;
+        minAmount = expected;
+        expected = Infinity;
       } else {
         priority = 1;
       }
+      // Un membre peut volontairement cotiser plus que son minimum obligatoire.
+      if (allocationType === "FIXED" && allocationValue > 0 && Number.isFinite(expected)) {
+        expected = Math.max(expected, allocationValue);
+      } else if (allocationType === "PERCENTAGE" && allocationValue > 0 && Number.isFinite(expected)) {
+        expected = Math.max(expected, (totalPaid * allocationValue) / 100);
+      }
     } else {
       if (act.type === "EPARGNE" || act.type === "COLLECTION") {
-        priority = 4; 
-        expected = Infinity; 
+        priority = 4;
+        expected = Infinity;
       } else {
-        priority = 3; 
+        priority = 3;
+      }
+
+      if (allocationType === "FIXED" && allocationValue > 0) {
+        expected = allocationValue;
+      } else if (allocationType === "PERCENTAGE" && allocationValue > 0) {
+        expected = (totalPaid * allocationValue) / 100;
+      } else if (allocationType === "RESIDUAL") {
+        expected = Infinity;
+        priority = 4;
       }
     }
 
@@ -112,7 +137,8 @@ export async function distributeContribution(
     }
   }
 
-  // 2c. Prêts -> Priorité 1
+  // 2c. Prêts -> Priorité 1 par défaut, ou résiduel (4.5) après les activités
+  const loanRepaymentResidual = membership?.loanRepaymentMode === "RESIDUAL";
   for (const loan of activeLoans) {
     const totalRepaid = loan.repayments.reduce((acc, rep) => acc + rep.amount, 0);
     const balanceDue = loan.totalDue - totalRepaid;
@@ -122,7 +148,7 @@ export async function distributeContribution(
         id: loan.id,
         name: `Remboursement Prêt: ${loan.activity.name}`,
         expectedAmount: balanceDue,
-        priority: 1,
+        priority: loanRepaymentResidual ? 4.5 : 1,
         activityId: loan.activityId,
         loan: loan,
       });
@@ -234,6 +260,11 @@ export async function distributeContribution(
             status = "SKIPPED";
             allocated = 0;
           }
+        } else if (obs.priority === 4.5) {
+          // Remboursement de prêt en résiduel : il prend ce qui reste, sans
+          // sanction s'il n'y a plus de fonds après les activités.
+          allocated = Math.min(remainingBalance, obs.expectedAmount);
+          status = allocated === 0 ? "SKIPPED" : allocated < obs.expectedAmount ? "PARTIAL" : "SUCCESS";
         } else if (obs.priority === 4) {
           const allocType = obs.subscription?.allocationType || "NONE";
           const allocVal = obs.subscription?.allocationValue || 0;
