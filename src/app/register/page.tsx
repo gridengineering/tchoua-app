@@ -168,12 +168,11 @@ export default function RegisterPage() {
               required
             />
             <Input
-              label="Indicatif pays (téléphone) *"
+              label="Indicatif pays (téléphone)"
               placeholder="Ex. 237, 33, 1…"
               inputMode="numeric"
               value={form.dialCode}
               onChange={(e) => update("dialCode", e.target.value)}
-              required
             />
             <Input
               label="Ville *"
