@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isPlatformAdmin } from "@/lib/permissions";
+import { hasPermission } from "@/lib/permissions";
 import {
   federationReportToCsv,
   generateFederationReport,
@@ -19,11 +19,12 @@ export async function GET(
 
   const { id } = await params;
   const membership = await prisma.associationMembership.findFirst({
-    where: { userId: session.user.id, associationId: id, status: { not: "LEFT" } },
+    where: { userId: session.user.id, associationId: id, status: "ACTIVE" },
+    include: { customRole: true },
   });
 
-  if (!membership && !isPlatformAdmin(session)) {
-    return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
+  if (!hasPermission(session, membership, "VIEW_FINANCES")) {
+    return NextResponse.json({ error: "Permission de consultation des finances requise" }, { status: 403 });
   }
 
   try {

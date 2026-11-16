@@ -12,6 +12,43 @@ export default function MembresPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
+  const [refEmails, setRefEmails] = useState(["", "", "", "", ""]);
+  const [refStatus, setRefStatus] = useState<{ msg: string; score?: number } | null>(null);
+  const [refLoading, setRefLoading] = useState(false);
+
+  const sendDiscoveryInvite = async (channel: "EMAIL" | "WHATSAPP") => {
+    const emails = refEmails.map((e) => e.trim()).filter(Boolean);
+    if (channel === "EMAIL" && emails.length === 0) {
+      setRefStatus({ msg: "Veuillez saisir au moins un email (max 5)." });
+      return;
+    }
+    setRefLoading(true);
+    setRefStatus(null);
+    try {
+      const res = await fetch("/api/referrals/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel, emails }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setRefStatus({ msg: data.error || "Erreur lors de l'envoi." });
+      } else {
+        setRefStatus({
+          msg: `+${data.pointsAwarded} points Gamification ! Score total : ${data.newScore} pts`,
+          score: data.newScore,
+        });
+        if (channel === "EMAIL") setRefEmails(["", "", "", "", ""]);
+        if (channel === "WHATSAPP" && data.whatsappUrl) {
+          window.open(data.whatsappUrl, "_blank", "noopener,noreferrer");
+        }
+      }
+    } catch {
+      setRefStatus({ msg: "Erreur réseau." });
+    } finally {
+      setRefLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/tontines?mine=true")
@@ -75,6 +112,54 @@ export default function MembresPage() {
         </div>
 
         {/* Controls */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Faire découvrir Tchoua & gagner des points</h2>
+              <p className="text-xs text-slate-500">
+                Invitez jusqu&apos;à 5 personnes par email ou partagez votre lien sur WhatsApp (Web & Mobile) pour gagner des points Gamification.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={refLoading}
+              onClick={() => sendDiscoveryInvite("WHATSAPP")}
+              className="rounded-xl bg-green-600 px-4 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              Partager sur WhatsApp (+15 pts)
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            {refEmails.map((val, idx) => (
+              <input
+                key={idx}
+                type="email"
+                placeholder={`Email ${idx + 1}`}
+                value={val}
+                onChange={(e) => {
+                  const next = [...refEmails];
+                  next[idx] = e.target.value;
+                  setRefEmails(next);
+                }}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-xs"
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              disabled={refLoading}
+              onClick={() => sendDiscoveryInvite("EMAIL")}
+              className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+            >
+              {refLoading ? "Envoi..." : "Envoyer les invitations (+10 pts / ami)"}
+            </button>
+            {refStatus && (
+              <span className="text-xs font-semibold text-emerald-700">{refStatus.msg}</span>
+            )}
+          </div>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-ash" />

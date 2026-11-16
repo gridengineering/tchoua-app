@@ -1,3 +1,4 @@
+import { toMinor } from "@/lib/arp/money";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,7 +12,7 @@ const AID_APPROVER_ROLES = ["PRESIDENT", "FOUNDER", "TREASURER", "SOLIDARITY_OFF
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
-    where: { userId, associationId, status: { not: "LEFT" } },
+    where: { userId, associationId, status: "ACTIVE" },
   });
 }
 
@@ -64,10 +65,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
   if (idempotencyKey) {
     const existing = await prisma.assocSocialAidRequest.findUnique({ where: { idempotencyKey } });
-    if (existing) return NextResponse.json({ request: existing, replayed: true });
+    if (existing) {
+      if (existing.associationId !== id || existing.membershipId !== membership.id ||
+          existing.category !== category || existing.requestedAmount !== requestedAmount ||
+          (existing.justification ?? null) !== (justification ?? null) ||
+          existing.urgencyLevel !== (urgencyLevel ?? "NORMAL") ||
+          (existing.documentUrl ?? null) !== (documentUrl ?? null)) {
+        return NextResponse.json({ error: "Clé de requête déjà utilisée pour une autre opération" }, { status: 409 });
+      }
+      return NextResponse.json({ request: existing, replayed: true });
+    }
   }
 
-  if (!category || !requestedAmount) {
+  if (!category || typeof requestedAmount !== "number" || !Number.isFinite(requestedAmount) || requestedAmount <= 0) {
     return NextResponse.json({ error: "category et requestedAmount sont requis" }, { status: 400 });
   }
 
@@ -175,9 +185,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         );
       }
 
+      const updated = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM associations WHERE id = ${id} FOR UPDATE`;
       if (cap > 0) {
         const yearStart = new Date(new Date().getFullYear(), 0, 1);
-        const used = await prisma.assocSocialAidRequest.aggregate({
+        const used = await tx.assocSocialAidRequest.aggregate({
           where: {
             associationId: id,
             membershipId: aidRequest.membershipId,
@@ -190,14 +202,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         });
         const alreadyApproved = used._sum.approvedAmount ?? 0;
         if (alreadyApproved + amount > cap) {
-          return NextResponse.json(
-            { error: `Plafond annuel dépassé pour cette catégorie (${cap} FCFA, déjà ${alreadyApproved} FCFA)` },
-            { status: 409 }
-          );
+          throw new Error("AID_ANNUAL_CAP");
         }
       }
 
-      const updated = await prisma.$transaction(async (tx) => {
         const changed = await tx.assocSocialAidRequest.updateMany({
           where: { id: requestId, associationId: id, status: "PENDING" },
           data: {
@@ -247,12 +255,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
 
       const result = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM associations WHERE id = ${id} FOR UPDATE`;
         const solidarity = await tx.associationActivity.findFirst({
           where: { associationId: id, type: { in: ["AIDE_SOLIDAIRE", "SOLIDARITY"] }, status: "ACTIVE" },
           select: { id: true, caisseBalance: true },
         });
         if (!solidarity) throw new Error("AID_TREASURY_NOT_FOUND");
-        if (solidarity.caisseBalance < amount) throw new Error("AID_TREASURY_INSUFFICIENT");
+        
 
         const changed = await tx.assocSocialAidRequest.updateMany({
           where: { id: requestId, associationId: id, status: "APPROVED" },
@@ -260,10 +269,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         });
         if (changed.count === 0) throw new Error("AID_STATE_CHANGED");
 
-        await tx.associationActivity.update({
-          where: { id: solidarity.id },
+        const debited = await tx.associationActivity.updateMany({
+          where: { id: solidarity.id, caisseBalance: { gte: amount } },
           data: { caisseBalance: { decrement: amount } },
         });
+        if (debited.count !== 1) throw new Error("AID_TREASURY_INSUFFICIENT");
 
         // Si un fonds ARP est rattaché à la caisse de solidarité, la sortie
         // est également inscrite au journal du fonds.
@@ -272,7 +282,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           select: { id: true, currency: true },
         });
         if (fund) {
-          const amountMinor = BigInt(Math.round(amount * 100));
+          await tx.$queryRaw`SELECT id FROM arp_funds WHERE id = ${fund.id} FOR UPDATE`;
+          const amountMinor = toMinor(amount, fund.currency);
           const [inflow, outflow, reserved] = await Promise.all([
             tx.arpFundMovement.aggregate({ where: { fundId: fund.id, direction: "IN" }, _sum: { amountMinor: true } }),
             tx.arpFundMovement.aggregate({ where: { fundId: fund.id, direction: "OUT" }, _sum: { amountMinor: true } }),
@@ -306,6 +317,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ request: result });
     }
   } catch (error: any) {
+    if (error?.message === "AID_ANNUAL_CAP") {
+      return NextResponse.json({ error: "Le plafond annuel de cette catégorie est dépassé" }, { status: 409 });
+    }
     if (error?.message === "AID_STATE_CHANGED") {
       return NextResponse.json({ error: "La demande a déjà changé d'état" }, { status: 409 });
     }

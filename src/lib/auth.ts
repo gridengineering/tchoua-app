@@ -1,5 +1,9 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
+import LinkedInProvider from "next-auth/providers/linkedin";
+import InstagramProvider from "next-auth/providers/instagram";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
@@ -99,8 +103,70 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET
+      ? [
+          FacebookProvider({
+            clientId: process.env.FACEBOOK_CLIENT_ID,
+            clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET
+      ? [
+          LinkedInProvider({
+            clientId: process.env.LINKEDIN_CLIENT_ID,
+            clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_SECRET
+      ? [
+          InstagramProvider({
+            clientId: process.env.INSTAGRAM_CLIENT_ID,
+            clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account && account.provider !== "credentials") {
+        const email = user.email?.trim().toLowerCase() || `${account.provider}-${account.providerAccountId}@sso.tchoua.local`;
+        const existing = await prisma.user.findUnique({ where: { email } });
+        if (!existing) {
+          const created = await prisma.user.create({
+            data: {
+              email,
+              name: user.name || email.split("@")[0],
+              avatar: user.image || null,
+              password: await bcrypt.hash(Math.random().toString(36), 10),
+              role: "MEMBER",
+              isActive: true,
+              isVerified: Boolean(user.email),
+              emailVerifiedAt: user.email ? new Date() : null,
+              kycLevel: user.email ? 1 : 0,
+              kycStatus: user.email ? "VERIFIED" : "NONE",
+            },
+          });
+          user.id = created.id;
+        } else {
+          if (!existing.isActive || existing.quarantinedAt) return false;
+          user.id = existing.id;
+          (user as any).role = existing.role;
+          (user as any).level = existing.level;
+          (user as any).score = existing.score;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

@@ -1,8 +1,10 @@
+import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
+import { rankCandidatesByHmac } from "@/lib/association/beneficiary-designation";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -93,8 +95,13 @@ export async function POST(
     });
 
     if (eligibleSubs.length > 0) {
-      const winner = eligibleSubs[Math.floor(Math.random() * eligibleSubs.length)];
+      const seed = `${actId}:${sessionNumber}:${randomBytes(16).toString("hex")}`;
+      const ranks = rankCandidatesByHmac(seed, eligibleSubs.map((s) => s.membershipId));
+      const winner = eligibleSubs.find((s) => s.membershipId === ranks[0].membershipId) ?? eligibleSubs[0];
       drawResult = JSON.stringify({
+        algorithm: "HMAC_SHA256",
+        seed,
+        ranks,
         membershipId: winner.membershipId,
         userName: winner.membership.user.name,
       });

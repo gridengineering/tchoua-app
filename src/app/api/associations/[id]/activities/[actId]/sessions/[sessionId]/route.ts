@@ -46,11 +46,21 @@ export async function PATCH(
     const body = await req.json();
     const { status, drawResult, auctionResult, distributed, reliquat } = body;
 
-    if (status === "HELD" && existingSession.status === "HELD") {
+    if (existingSession.status === "HELD") {
       return NextResponse.json({ error: "Cette séance est déjà clôturée" }, { status: 409 });
+    }
+    if (status !== undefined && !["UPCOMING", "HELD", "CANCELLED"].includes(status)) {
+      return NextResponse.json({ error: "Statut de séance invalide" }, { status: 400 });
+    }
+    if ([distributed, reliquat].some(value => value !== undefined &&
+        (typeof value !== "number" || !Number.isFinite(value) || value < 0))) {
+      return NextResponse.json({ error: "Montant de séance invalide" }, { status: 400 });
     }
 
     const updatedSession = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM activity_sessions WHERE id = ${sessionId} FOR UPDATE`;
+      const current = await tx.activitySession.findUniqueOrThrow({ where: { id: sessionId }, include: { beneficiaries: true } });
+      if (current.status === "HELD" || current.beneficiaries.length > 0) throw new Error("ALREADY_CLOSED");
       if (status !== "HELD") {
         return tx.activitySession.update({
           where: { id: sessionId },

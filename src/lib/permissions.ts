@@ -36,6 +36,8 @@ const ROLE_PERMISSIONS: Record<string, Permission[]> = {
 
 export type Membership = {
   role: string;
+  status?: string;
+  founderRevokedAt?: Date | string | null;
   customRoleId?: string | null;
   customRole?: { permissions: string } | null;
 };
@@ -68,7 +70,8 @@ export function parsePermissions(json: string | null | undefined): Permission[] 
 
 export function permissionsForMembership(m: Membership | null | undefined): Permission[] {
   if (!m) return [];
-  const base = ROLE_PERMISSIONS[m.role] ?? [];
+  if (m.status && m.status !== "ACTIVE") return [];
+  const base = m.role === "FOUNDER" && m.founderRevokedAt ? [] : ROLE_PERMISSIONS[m.role] ?? [];
   const custom = m.customRole ? parsePermissions(m.customRole.permissions) : [];
   return Array.from(new Set([...base, ...custom]));
 }
@@ -80,6 +83,7 @@ export function hasPermission(
 ): boolean {
   if (isPlatformAdmin(session)) return true;
   if (!membership) return false;
+  if (membership.status && membership.status !== "ACTIVE") return false;
   if (membership.role === "FOUNDER" && !(membership as any).founderRevokedAt) return true; // créateur : droits complets jusqu'à révocation par 2 membres du bureau
   return permissionsForMembership(membership).includes(perm);
 }

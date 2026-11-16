@@ -46,11 +46,14 @@ export function currencyExponent(code: string): number {
 /** Convertit un montant saisi (nombre ou chaîne décimale) en unités mineures entières. */
 export function toMinor(amount: number | string, currency: string): bigint {
   const exponent = currencyExponent(currency);
+  if (typeof amount === "number" && !Number.isFinite(amount)) {
+    throw new Error(`Montant invalide : ${String(amount)}`);
+  }
   const raw =
     typeof amount === "number"
       ? Number.isFinite(amount)
         ? amount.toFixed(exponent)
-        : "0"
+        : ""
       : String(amount).trim().replace(/\s/g, "").replace(",", ".");
   if (!/^-?\d+(\.\d+)?$/.test(raw)) {
     throw new Error(`Montant invalide : ${String(amount)}`);
@@ -58,6 +61,9 @@ export function toMinor(amount: number | string, currency: string): bigint {
   const negative = raw.startsWith("-");
   const unsigned = negative ? raw.slice(1) : raw;
   const [integerPart, fractionPart = ""] = unsigned.split(".");
+  if (typeof amount === "string" && /[1-9]/.test(fractionPart.slice(exponent))) {
+    throw new Error(`Précision monétaire excessive pour ${currency}`);
+  }
   const padded = (fractionPart + "0".repeat(exponent)).slice(0, exponent);
   const value = BigInt(integerPart || "0") * TEN ** BigInt(exponent) + BigInt(padded || "0");
   return negative ? -value : value;

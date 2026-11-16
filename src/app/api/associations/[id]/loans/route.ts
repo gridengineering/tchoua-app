@@ -8,7 +8,6 @@ import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
-  validateDoubleValidation,
   calculateLoanPriorityScore,
   API_ERROR_CODES,
 } from "@/lib/association/rules";
@@ -17,7 +16,7 @@ const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "TREASURER"];
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
-    where: { userId, associationId, status: { not: "LEFT" } },
+    where: { userId, associationId, status: "ACTIVE" },
   });
 }
 
@@ -40,6 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       borrowerMembership: { include: { user: { select: { name: true, email: true } } } },
       activity: { select: { name: true, type: true } },
       repayments: { orderBy: { paidAt: "desc" } },
+      approvals: { orderBy: { createdAt: "asc" } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -97,8 +97,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const body = await req.json();
   const { activityId, amount, duration, purpose, customRate } = body;
 
-  if (!activityId || !amount || !duration) {
+  if (!activityId || typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0 || !Number.isSafeInteger(duration) || duration <= 0) {
     return NextResponse.json({ error: "activityId, amount et duration sont requis" }, { status: 400 });
+  }
+
+  // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
+  const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
+  if (idempotencyKey) {
+    const existing = await prisma.assocLoan.findUnique({ where: { idempotencyKey } });
+    if (existing) {
+      if (existing.borrowerMembershipId !== membership.id || existing.activityId !== activityId ||
+          existing.amount !== amount || existing.duration !== duration ||
+          (existing.purpose ?? null) !== (purpose ?? null) ||
+          (customRate !== undefined && existing.interestRate !== Number(customRate))) {
+        return NextResponse.json({ error: "Clé de requête déjà utilisée pour une autre opération" }, { status: 409 });
+      }
+      return NextResponse.json({ loan: existing, replayed: true });
+    }
   }
 
   const eligibility = await checkAssociationEligibility(session.user.id, id, { amount: Number(amount) });
@@ -119,6 +134,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       : (activity.loanRate2 ?? activity.caisseLoanRate ?? 8);
 
   // R-022 : Taux d'intérêt plafonné à 10%/mois par défaut
+  if (!Number.isFinite(rate) || rate < 0) return NextResponse.json({ error: "Taux invalide" }, { status: 400 });
   const rateCheck = validateInterestRateCap(rate);
   if (!rateCheck.valid) {
     return NextResponse.json({ error: rateCheck.error }, { status: 400 });
@@ -140,13 +156,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (activeCount >= activity.loanMaxActive) {
       return NextResponse.json({ error: `Maximum ${activity.loanMaxActive} prêt(s) actif(s) autorisé(s)` }, { status: 400 });
     }
-  }
-
-  // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
-  const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
-  if (idempotencyKey) {
-    const existing = await prisma.assocLoan.findUnique({ where: { idempotencyKey } });
-    if (existing) return NextResponse.json({ loan: existing, replayed: true });
   }
 
   // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
@@ -185,7 +194,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!membership) return NextResponse.json({ error: "Accès réservé aux membres" }, { status: 403 });
 
   const body = await req.json();
-  const { loanId, action, amount, paymentMethod, validators } = body;
+  const { loanId, action, amount, paymentMethod } = body;
   const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
 
   if (!loanId || !action) return NextResponse.json({ error: "loanId et action requis" }, { status: 400 });
@@ -224,6 +233,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     try {
       const result = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM assoc_loans WHERE id = ${loanId} FOR UPDATE`;
         const current = await tx.assocLoan.findUnique({
           where: { id: loanId },
           include: { approvals: true },
@@ -287,17 +297,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!canRepay) {
       return NextResponse.json({ error: "Vous ne pouvez pas rembourser ce prêt" }, { status: 403 });
     }
-    if (loan.status !== "ACTIVE") {
-      return NextResponse.json({ error: "Seul un prêt actif peut être remboursé" }, { status: 409 });
-    }
 
     try {
       const result = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM assoc_loans WHERE id = ${loanId} FOR UPDATE`;
         const current = await tx.assocLoan.findUnique({
           where: { id: loanId },
           include: { repayments: true },
         });
         if (!current) throw new Error("LOAN_NOT_FOUND");
+        if (idempotencyKey) {
+          const replay = await tx.assocLoanRepayment.findUnique({ where: { idempotencyKey } });
+          if (replay) {
+            if (replay.loanId !== loanId || replay.amount !== numericAmount || replay.paymentMethod !== (paymentMethod ?? "CASH")) {
+              throw new Error("IDEMPOTENCY_CONFLICT");
+            }
+            const paid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
+            return { remaining: current.status === "REPAID" ? 0 : Math.max(0, current.totalDue - paid), repaidNow: replay.amount, replayed: true };
+          }
+        }
         if (current.status !== "ACTIVE") throw new Error("LOAN_NOT_ACTIVE");
 
         const alreadyPaid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
@@ -311,10 +329,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const principal = Math.round(numericAmount * (current.amount / effectiveTotalDue));
         const interest = numericAmount - principal;
 
-        if (idempotencyKey) {
-          const replay = await tx.assocLoanRepayment.findUnique({ where: { idempotencyKey } });
-          if (replay) return { remaining: Math.max(0, effectiveTotalDue - alreadyPaid), repaidNow: replay.amount, replayed: true };
-        }
         await tx.assocLoanRepayment.create({
           data: {
             idempotencyKey,
@@ -340,6 +354,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
       return NextResponse.json({ ok: true, ...result });
     } catch (error: any) {
+      if (error?.message === "IDEMPOTENCY_CONFLICT") return NextResponse.json({ error: "Clé de requête déjà utilisée pour une autre opération" }, { status: 409 });
       if (error?.message === "LOAN_OVERPAY") {
         return NextResponse.json({ error: "Le montant dépasse le solde restant du prêt" }, { status: 400 });
       }

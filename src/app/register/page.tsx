@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -16,6 +16,25 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const ref = new URLSearchParams(window.location.search).get("ref");
+      if (ref) setForm(f => ({ ...f, referralCode: ref }));
+    }
+  }, []);
+
+  const handleSocialRegister = async (provider: "google" | "facebook" | "linkedin" | "instagram") => {
+    setSocialLoading(provider);
+    setError("");
+    try {
+      await signIn(provider, { callbackUrl: "/choose-space" });
+    } catch {
+      setError(`Erreur lors de l'inscription avec ${provider}`);
+      setSocialLoading(null);
+    }
+  };
 
   const update = (field: string, val: string) => setForm(f => ({ ...f, [field]: val }));
 
@@ -166,6 +185,55 @@ export default function RegisterPage() {
             Créer mon compte
           </Button>
         </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-3 text-gray-400 font-medium">Ou s&apos;inscrire avec (SSO)</span>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              disabled={loading || !!socialLoading}
+              onClick={() => handleSocialRegister("google")}
+              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-[11px] font-bold">G</span>
+              Google
+            </button>
+            <button
+              type="button"
+              disabled={loading || !!socialLoading}
+              onClick={() => handleSocialRegister("facebook")}
+              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#1877F2] text-white text-[11px] font-bold">f</span>
+              Facebook
+            </button>
+            <button
+              type="button"
+              disabled={loading || !!socialLoading}
+              onClick={() => handleSocialRegister("linkedin")}
+              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#0A66C2] text-white text-[11px] font-bold">in</span>
+              LinkedIn
+            </button>
+            <button
+              type="button"
+              disabled={loading || !!socialLoading}
+              onClick={() => handleSocialRegister("instagram")}
+              className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all disabled:opacity-60 text-sm"
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white text-[11px] font-bold">IG</span>
+              Instagram
+            </button>
+          </div>
+        </div>
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Déjà inscrit ?{" "}

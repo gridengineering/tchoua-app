@@ -50,6 +50,10 @@ export async function POST(req: Request) {
         include: { wallet: true },
       });
       if (existing) {
+        if (existing.wallet.userId !== userId || existing.type !== type || existing.amount !== amount ||
+            (existing.receiverId ?? null) !== (receiverId ?? null)) {
+          return NextResponse.json({ error: "Clé de requête déjà utilisée pour une autre opération" }, { status: 409 });
+        }
         return NextResponse.json({ wallet: existing.wallet, transaction: existing, replayed: true });
       }
     }

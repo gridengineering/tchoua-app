@@ -8,7 +8,7 @@ const TREASURER_ROLES = ["PRESIDENT", "FOUNDER", "TREASURER"];
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
-    where: { userId, associationId, status: { not: "LEFT" } },
+    where: { userId, associationId, status: "ACTIVE" },
   });
 }
 
@@ -32,6 +32,7 @@ export async function GET(
   const contributions = await prisma.activityContribution.findMany({
     where: {
       activityId: actId,
+      activity: { associationId: id },
       ...(sessionId && { sessionId }),
       ...(membershipId && { membershipId }),
       ...(status && { status }),
@@ -70,12 +71,12 @@ export async function POST(
   const body = await req.json();
   const { membershipId, amount, paymentMethod, reference, sessionId, paidAt, unit, notes } = body;
 
-  if (!membershipId || !amount) {
+  if (!membershipId || typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
     return NextResponse.json({ error: "membershipId et amount sont requis" }, { status: 400 });
   }
 
   const targetMembership = await prisma.associationMembership.findFirst({
-    where: { id: membershipId, associationId: id },
+    where: { id: membershipId, associationId: id, status: "ACTIVE" },
   });
   if (!targetMembership) return NextResponse.json({ error: "Membre introuvable" }, { status: 404 });
 
@@ -86,7 +87,15 @@ export async function POST(
     return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
   }
 
-  const contribution = await prisma.activityContribution.create({
+  if (sessionId) {
+    const targetSession = await prisma.activitySession.findFirst({ where: { id: sessionId, activityId: actId } });
+    if (!targetSession) return NextResponse.json({ error: "Séance étrangère à l'activité" }, { status: 422 });
+  }
+  if (paidAt && Number.isNaN(new Date(paidAt).getTime())) {
+    return NextResponse.json({ error: "Date de paiement invalide" }, { status: 400 });
+  }
+  const contribution = await prisma.$transaction(async (tx) => {
+  const created = await tx.activityContribution.create({
     data: {
       activityId: actId,
       membershipId,
@@ -108,11 +117,13 @@ export async function POST(
 
   // Update caisse balance if applicable
   if (activity.type === "CAISSE") {
-    await prisma.associationActivity.update({
+    await tx.associationActivity.update({
       where: { id: actId },
       data: { caisseBalance: { increment: amount } },
     });
   }
 
+  return created;
+  });
   return NextResponse.json({ contribution }, { status: 201 });
 }

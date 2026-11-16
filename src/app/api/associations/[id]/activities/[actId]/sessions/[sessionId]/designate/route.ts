@@ -45,13 +45,20 @@ export async function POST(
       modeOverride: body.mode,
       bids: Array.isArray(body.bids) ? body.bids : undefined,
       requirePaidContribution: Boolean(body.requirePaidContribution),
-      allowCycleWrap: body.allowCycleWrap !== false,
+      allowCycleWrap: false,
       finalize: Boolean(body.finalize),
     });
 
     return NextResponse.json(result);
   } catch (err: any) {
     const msg = String(err?.message ?? "");
+    const validationErrors: Record<string, string> = {
+      DESIGNATION_MODE_MISMATCH: "Le mode doit correspondre au règlement de l'activité.",
+      INVALID_POT_AMOUNT: "La cagnotte doit être strictement positive.",
+      INVALID_AUCTION_BID: "Offre invalide, hors cagnotte ou membre inéligible.",
+      AUCTION_TIE: "Les meilleures offres sont à égalité : un nouveau tour est nécessaire.",
+    };
+    if (validationErrors[msg]) return NextResponse.json({ error: validationErrors[msg] }, { status: 422 });
     if (msg === "SESSION_NOT_FOUND") {
       return NextResponse.json({ error: "Séance introuvable" }, { status: 404 });
     }
