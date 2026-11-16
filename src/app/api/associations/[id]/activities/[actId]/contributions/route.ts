@@ -73,7 +73,9 @@ export async function POST(
   const body = await req.json();
   const { membershipId, amount, paymentMethod, reference, sessionId, paidAt, unit, notes } = body;
 
-  if (isBankOnlyPaymentMode(activity.association.bankConfig) && !isBankPaymentMethod(paymentMethod)) {
+  const bankOnly = isBankOnlyPaymentMode(activity.association.bankConfig);
+  const effectivePaymentMethod = paymentMethod ?? (bankOnly ? "BANK" : undefined);
+  if (bankOnly && !isBankPaymentMethod(effectivePaymentMethod)) {
     return NextResponse.json(bankOnlyPaymentError(), { status: 422 });
   }
 
@@ -108,7 +110,7 @@ export async function POST(
       amount,
       unit: unit ?? activity.contributionUnit ?? "CASH",
       status: "PAID",
-      paymentMethod,
+      paymentMethod: effectivePaymentMethod,
       reference,
       sessionId,
       paidAt: paidAt ? new Date(paidAt) : new Date(),
