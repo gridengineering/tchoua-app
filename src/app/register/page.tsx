@@ -7,7 +7,19 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
 import { User, Mail, Lock, Phone, MapPin } from "lucide-react";
-import { detectLocaleDefaults } from "@/lib/identity";
+import { COUNTRY_OPTIONS, detectLocaleDefaults } from "@/lib/identity";
+
+const COUNTRY_SELECT_OPTIONS = [
+  { value: "", label: "Sélectionner un pays…" },
+  ...COUNTRY_OPTIONS.map((item) => ({ value: item.name, label: `${item.name} (+${item.dial})` })),
+];
+
+const DIAL_SELECT_OPTIONS = [
+  { value: "", label: "Sélectionner l’indicatif…" },
+  ...Array.from(new Map(COUNTRY_OPTIONS.map((item) => [item.dial, item])).values())
+    .sort((a, b) => a.dial.localeCompare(b.dial, "fr", { numeric: true }))
+    .map((item) => ({ value: item.dial, label: `+${item.dial}` })),
+];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -160,19 +172,25 @@ export default function RegisterPage() {
               onChange={(e) => update("confirmPassword", e.target.value)}
               required
             />
-            <Input
+            <Select
               label="Pays *"
-              placeholder="Ex. Cameroun, France, Nigéria…"
               value={form.country}
-              onChange={(e) => update("country", e.target.value)}
+              onChange={(e) => {
+                const selected = COUNTRY_OPTIONS.find((item) => item.name === e.target.value);
+                setForm((current) => ({
+                  ...current,
+                  country: e.target.value,
+                  dialCode: selected?.dial ?? "",
+                }));
+              }}
+              options={COUNTRY_SELECT_OPTIONS}
               required
             />
-            <Input
+            <Select
               label="Indicatif pays (téléphone)"
-              placeholder="Ex. 237, 33, 1…"
-              inputMode="numeric"
               value={form.dialCode}
               onChange={(e) => update("dialCode", e.target.value)}
+              options={DIAL_SELECT_OPTIONS}
             />
             <Input
               label="Ville *"
