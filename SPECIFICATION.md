@@ -691,3 +691,103 @@ Vous pouvez commencer à modifier l'application en éditant `app/page.tsx` ou le
 La façon la plus simple de déployer cette application Next.js est d'utiliser la [Plateforme Vercel](https://vercel.com/new).
 
 Pour plus de détails, consultez la [Documentation de déploiement Next.js](https://nextjs.org/docs/app/building-your-application/deploying).
+
+
+---
+
+# PARTIE II — ARCHITECTURE ARP (ASSOCIATION RESOURCE PLANNING)
+*Adapté de l'étude fonctionnelle et technique de référence : `Tchoua_Etude_Complete_ARP_168_pages.pdf` (36 domaines de conception, 144 invariants métier, 180 scénarios de recette, 23 328 configurations combinatoires).*
+
+## 15. DÉCISIONS STRUCTURANTES & NOYAU COMMUN DE GESTION
+
+L'évolution de Tchoua vers un **ARP (Association Resource Planning)** complet repose sur six décisions structurantes :
+1. **Noyau commun de gestion** : séparer strictement **Personne**, **Compte utilisateur**, **Adhésion datée**, **Activité / Contrat**, **Obligation (créance)**, **Paiement (flux confirmé)** et **Affectation**.
+2. **Fonds, Comptes et Budgets distincts** : le lieu de conservation (espèce, banque, Mobile Money) ne définit pas l'usage autorisé. Liquidité comptable, montant réservé et disponibilité prudente sont mesurés séparément.
+3. **Règles versionnées et datées** : chaque règle stocke assiette, taux, unité, date d'effet, exceptions et autorité d'approbation afin de pouvoir rejouer tout calcul historique sans réécrire le passé.
+4. **Invariants non désactivables** : isolation stricte des associations, unicité des paiements, traçabilité d'audit, conservation des sommes et contrôle de concurrence.
+5. **Arbitrages documentaires explicites** :
+   - Automatisation tontine : distinguer calcul du pot opérationnel et sélection/attribution atomique.
+   - Multi-devises : devise fonctionnelle par entité et conversion explicite tracée (aucune addition directe de devises).
+   - Visibilité des historiques : transparence agrégée pour les membres, accès restreint aux pièces médicales/personnelles.
+   - Assiette des enchères : toujours nommer l'assiette (cotisation, droit brut, pot ou forfait) plutôt qu'un pourcentage ambigu.
+   - Âge enfant (aides) : configurer explicitement le cas limite exact de 10 ans.
+   - Sanctions successives : choisir explicitement le mode de cumul (additif, remplacement ou maximum).
+   - Dividendes HORIZON : justifier tout écart entre intérêts encaissés et base distribuée sans inventer de produit.
+   - Délai de convocation AG : la règle spécifique validée (ex. FEV 45 jours) prime sur le défaut générique (30 jours).
+
+### Profils associatifs de départ
+Tchoua propose 10 modèles paramétrables (sans conférer automatiquement une qualification juridique) :
+- **Tontine de quartier**, **Amicale familiale**, **Section de type SLD**, **Fédération de type FEV**, **Investissement de type HORIZON**, **Groupement agricole**, **Club culturel ou sportif**, **Association de développement**, **Réseau professionnel**, **Diaspora multi-pays** *(plus profils Coopérative / Mutuelle à adapter selon le cadre légal).*
+
+---
+
+## 16. RÉFÉRENTIEL DES 36 DOMAINES ET 144 INVARIANTS MÉTIER
+
+### Bloc A — Organisation, Membres et Gouvernance (D01–D09)
+| Domaine | Objet | Invariants obligatoires |
+| :--- | :--- | :--- |
+| **D01** | Identité et formes d'organisation | `ORG01` Identifiant stable survit au renommage · `ORG02` Activation exige responsables, règles, devise et décision · `ORG03` Dissolution bloque nouveaux engagements mais autorise liquidation · `ORG04` Modèle ≠ statut juridique déposé. |
+| **D02** | Fédérations, sections et héritage | `FED01` Aucun cycle hiérarchique · `FED02` Règle nationale bloquante prime ; contrats conclus gardent leur version · `FED03` Transfert modifie deux positions réciproques sans produit fictif · `FED04` Changement de parent daté sans rétroactivité. |
+| **D03** | Adhésions, membres et sorties | `MEM01` Matricule unique par association (distinct de l'ID global) · `MEM02` Acceptation ≠ paiement du droit d'entrée · `MEM03` Suspension ne détruit ni épargne ni dette · `MEM04` Sortie produit un relevé contradictoire. |
+| **D04** | Familles, ayants droit et confidentialité | `FAM01` Âge calculé à la date de l'événement · `FAM02` Seuil exact de 10 ans explicité · `FAM03` Relation contestée masquée de l'annuaire · `FAM04` Changement de destinataire ne modifie pas l'ouvrant droit. |
+| **D05** | Gouvernance, mandats et votes | `GOV01` Liste électorale et politique figées avant ouverture · `GOV02` Unicité du droit de vote (direct ou procuration) · `GOV03` Déport et recalcul du dénominateur · `GOV04` Admin technique ne peut fabriquer un scrutin ni modifier un résultat clos. |
+| **D06** | Réunions, calendrier et présence | `REU01` Récurrence en fuseau local, stockage UTC · `REU02` Report ne duplique pas la cotisation · `REU03` Présence ≠ encaissement · `REU04` Amendes automatiques contestables et liées au constat. |
+| **D07** | Discipline, sanctions et recours | `SAN01` Un constat = une seule sanction par règle/version · `SAN02` Référence à l'article applicable · `SAN03` L'auteur du constat ne tranche pas seul son recours · `SAN04` Annulation par contrepassation auditée. |
+| **D08** | Documents, règlements et signatures | `DOC01` Empreinte (hash) détecte modification sans prouver l'identité · `DOC02` Règle active à sa date d'effet après approbation · `DOC03` Pièces exécutables/infectées en quarantaine · `DOC04` Suppression de compte préserve les pièces d'audit. |
+| **D09** | Moteur de règles et contrats d'activité | `REG01` Chaque opération garde version de règle, entrées et résultat arrondi · `REG02` Incompatibilité bloquante empêche publication · `REG03` Arithmétique décimale/entière exacte (jamais de flottants binaires) · `REG04` Invariants de sécurité non désactivables. |
+
+### Bloc B — Flux Financiers, Tontines, Épargne et Crédit (D10–D21)
+| Domaine | Objet | Invariants obligatoires |
+| :--- | :--- | :--- |
+| **D10** | Cotisations, appels et affectations | `COT01` Dû net = appel + ajustements - remises - affectations · `COT02` Trop-perçu = crédit (reste dû ≥ 0) · `COT03` Unicité (membre, activité, échéance, version) · `COT04` Paiement groupé conserve payeur réel et bénéficiaires. |
+| **D11** | Paiements reçus et rapprochement | `PAY01` Unicité de référence prestataire · `PAY02` Timeout réseau ≠ échec financier · `PAY03` Frais explicites sans réduction silencieuse de cotisation · `PAY04` Remboursement lie paiement initial et écritures inverses. |
+| **D12** | Caisses, budgets et écritures | `FIN01` Total débit = total crédit par pièce et devise · `FIN02` Transfert interne ≠ produit/charge · `FIN03` Réservation réduit le disponible sans changer la trésorerie · `FIN04` Aucun fonds affecté consommé sans autorisation. |
+| **D13** | Souscriptions, parts et fractions | `PAR01` Droits distribués + restants = droits contractuels · `PAR02` Bénéficiaire précoce reste redevable des cotisations futures · `PAR03` Montant fixe exige plan de financement compatible · `PAR04` Fraction non arrondie en part entière à l'avantage. |
+| **D14** | Attributions, rotations et tirages | `ATT01` Quantité limitée par pot finançable, plafond et droits restants · `ATT02` Réservation/consommation atomiques · `ATT03` Tirage refusé non répétable discrètement · `ATT04` Paiement échoué ≠ succès fictif. |
+| **D15** | Enchères, décotes et partage | `ENC01` Net = droit brut - décote - frais supportés · `ENC02` Décote reste en trésorerie (pas de double encaissement) · `ENC03` Offre gagnante irrévocable · `ENC04` Horodatage serveur immuable et égalités déterministes. |
+| **D16** | Cycles, clôtures et défaillances | `CYC01` Clôture réconcilie encaissements, distributions, reports, frais et transferts · `CYC02` Droit non servi tracé · `CYC03` Dette d'un défaillant survit à la clôture · `CYC04` Solde repris par écriture identifiée. |
+| **D17** | Épargne, dépôts, retraits et rémunération | `EPA01` Disponible = acquis - bloqués - réservés · `EPA02` Dépôt non confirmé ne produit ni dispo ni intérêt · `EPA03` Capitalisation séparée · `EPA04` Remboursement exige liquidité réelle. |
+| **D18** | Prêts : demandes, plafonds et décision | `PRE01` Autorisable = min(liquidité, limite membre, limite produit, concentration) · `PRE02` Offre expirée libère réservation · `PRE03` Demandeur ne valide pas seul son prêt · `PRE04` Cautions et encours intégrés sans double comptage. |
+| **D19** | Échéanciers, intérêts et coût du crédit | `ECH01` Principal constant : `a = P/n`, `I(t) = CRD(t-1)*i` · `ECH02` Annuité constante : `A = P*i/(1-(1+i)^-n)` (si `i=0`, `P/n`) · `ECH03` Aucun frais caché dans le principal · `ECH04` Rééchelonnement versionné avec comparatif. |
+| **D20** | Remboursements, retards et restructurations | `REC01` Paiement non imputé au-delà du montant confirmé disponible · `REC02` Pénalités sur assiette contractuelle plafonnée · `REC03` Restructuration conserve ancien échéancier, retards et paiements · `REC04` Recouvrement après perte tracé explicitement. |
+| **D21** | Garanties, cautions et engagements | `GAR01` Capacité disponible = valeur admissible - engagements actifs · `GAR02` Garant ne s'auto-évalue pas · `GAR03` Réalisation ≤ dette + frais autorisés · `GAR04` Garantie expirée = alerte, pas suppression du prêt. |
+
+### Bloc C — Solidarité, Investissements, Projets et Ressources (D22–D30)
+| Domaine | Objet | Invariants obligatoires |
+| :--- | :--- | :--- |
+| **D22** | Solidarité : catalogue et droits sociaux | `SOL01` Droit = min(formule, plafonds résiduels) · `SOL02` Aides approuvées non payées consomment le plafond · `SOL03` Seuil minimum de jours ≠ jours indemnisables · `SOL04` Cumul local + national seulement si autorisé. |
+| **D23** | Demandes d'aide, paiements et recours | `AID01` Évaluation avec version applicable à l'événement · `AID02` Décision, réservation et plafond atomiques · `AID03` Trésorier sans accès automatique aux pièces médicales · `AID04` Récupération d'indu = créance distincte. |
+| **D24** | Réserves solidarité et prévision | `RES01` Solde projeté = initial + entrées - sorties datées · `RES02` Créance ≠ entrée certaine (taux de recouvrement explicite) · `RES03` Aides approuvées non recomptées · `RES04` Réductions datées par décision. |
+| **D25** | Investissements, capital et dividendes | `DIV01` Quote-part = poids / somme poids (somme nulle interdite) · `DIV02` Somme répartie = montant décidé (méthode des plus forts restes) · `DIV03` Principal remboursé ≠ intérêt distribuable · `DIV04` Run immuable. |
+| **D26** | Projets, subventions, dons et campagnes | `PRO01` Promesse non encaissée ne finance pas une sortie · `PRO02` Dépense ventilée comptée une seule fois · `PRO03` Restrictions bailleur vérifiées avant engagement · `PRO04` Clôture traite avances et reliquats. |
+| **D27** | Achats groupés, stocks et nature | `ACH01` Stock final = initial + entrées - sorties - pertes · `ACH02` Coûts imputés = coût collectif · `ACH03` Réception partielle ≠ livraison totale · `ACH04` Apport nature ≠ paiement monétaire + don simultané. |
+| **D28** | Patrimoine matériel, bénévolat et temps | `PAT01` Un bien a localisation et détenteur principal · `PAT02` Heures non dupliquées sur même créneau · `PAT03` Crédit temps ≠ créance monétaire automatique · `PAT04` Cession exige décision et sortie du registre. |
+| **D29** | Événements, collation et logistique | `EVE01` Inscription ≤ capacité (sauf surbooking autorisé) · `EVE02` Forfait net hôte = forfait - retenues autorisées · `EVE03` Retenue pour arriérés diminue dette (pas nouvel encaissement) · `EVE04` Annulation sépare billets et forfaits. |
+| **D30** | Communauté, services, formation et distinctions | `COM01` Message chat ≠ décision statutaire · `COM02` Coordonnées et difficultés masquées par défaut · `COM03` Gamification ne révèle ni dettes ni dossiers sociaux · `COM04` IA limitée aux données autorisées et confirmation humaine. |
+
+### Bloc D — Pilotage, Sécurité, Architecture et Exploitation (D31–D36)
+| Domaine | Objet | Invariants obligatoires |
+| :--- | :--- | :--- |
+| **D31** | Rapports, tableaux de bord et consolidation | `REP01` Indicateur documenté (formule, source, période) · `REP02` Pas d'addition multi-devises sans conversion · `REP03` Transfert interne n'augmente pas recettes consolidées · `REP04` Masquage des petits effectifs sensibles. |
+| **D32** | Sécurité, habilitations et protection des données | `SEC01` Vérification `(utilisateur, association, objet)` sur chaque requête · `SEC02` Révocation immédiate de mandat · `SEC03` Aucune URL publique devinable pour pièces/exports · `SEC04` Corrections financières par opérations liées uniquement. |
+| **D33** | Architecture données, API et intégrations | `ARC01` État métier + événement outbox dans la même transaction · `ARC02` Consommateurs idempotents · `ARC03` Contraintes uniques et clés de périmètre · `ARC04` Montants, devises et dates valeur typés. |
+| **D34** | Mobile, accessibilité, langues et notifications | `MOB01` Synchronisation revalide identité, mandat, version et dispo · `MOB02` Brouillon synchronisé une seule fois · `MOB03` Notifications écran verrouillé sans détail sensible · `MOB04` Traduction ne modifie ni montant ni devise. |
+| **D35** | Administration, migration, exploitation et support | `OPS01` Import idempotent par lot · `OPS02` Rapprochement par membre, activité, compte et devise avant bascule · `OPS03` Restauration testée jusqu'aux pièces · `OPS04` Correctif de prod par procédure métier et audit. |
+| **D36** | Internationalisation, devises et modèles pays | `INT01` Montant sans devise invalide · `INT02` Précision monétaire issue du référentiel · `INT03` Cours figé sur opération confirmée · `INT04` Modèles pays activés après validation locale. |
+
+---
+
+## 17. ANNEXES TECHNIQUES, FIABILITÉ & RECETTE
+
+- **Modèle conceptuel cible (Annexe 11)** : `Organisation 1→N Adhésion N→1 Personne` ; `Organisation 1→N Activité 1→N Contrat` ; `Contrat 1→N Obligation` ; `Paiement N↔N Obligation` (via `Affectation`) ; `Opération 1→N Écriture` ; `Fonds 1→N Réservation`.
+- **Contrat transactionnel et reprise après panne (Annexe 12)** : soumission avec clé d'idempotence et version attendue → contrôle droits serveur → vérification invariants → engagement atomique (`état + journal + réservation + outbox`) → exécution asynchrone idempotente → rapprochement externe.
+- **Couverture combinatoire (Annexes 06–08)** : 23 328 configurations bornées sur 10 axes (`organisation`, `adhesion`, `cotisation`, `tontine`, `credit`, `aide`, `canal`, `devise`, `connexion`, `validation`), 19 cas couvrant 100 % des 351 paires, 10 triples critiques (concurrence épargne/garantie/retrait, enchères sur fractions, double fonds social, etc.) et 180 scénarios de recette.
+- **Critères d'acceptation (Annexe 14)** : zéro écart financier inexpliqué, zéro accès inter-association, zéro double consommation sous concurrence, RPO 24 h / RTO 4 h et latence p95 < 2 s à valider sur environnement cible.
+
+---
+
+## 18. EXTENSIONS PLATEFORME IMPLÉMENTÉES (WEB & MOBILE)
+
+- **Gestion libre & import de membres** (`POST /api/associations/[id]/members`, `POST /api/associations/[id]/members/import`) : réservé au bureau/fondateur ; unicité globale email/mobile (réutilisation d'un compte existant sans doublon) ; import CSV/Excel/vCard (`.vcf`) ; confirmation par email HTML élevant automatiquement à **KYC1** (`/api/invites/confirm`) et liens **WhatsApp / SMS**.
+- **Single Sign-On (SSO)** : inscription et connexion via **Google, Facebook, LinkedIn et Instagram** dans `src/lib/auth.ts`, `/login`, `/register` et `tchoua-mobile/App.tsx`.
+- **Parrainage & Gamification** (`/api/referrals/invite`) : chaque membre peut inviter jusqu'à **5 emails** par envoi ou partager les liens Web & App Mobile via **WhatsApp** et depuis les **contacts téléphone** sur mobile (`expo-contacts`), en gagnant des points Gamification (`User.score` + `ScoringRecord`).

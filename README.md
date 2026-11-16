@@ -80,6 +80,18 @@ De l'adhésion à la comptabilité, chaque aspect de votre tontine trouve sa sol
 
 ---
 
+## Architecture ARP (Association Resource Planning) & Nouveautés 2026
+
+Tchoua évolue autour d'un **noyau ARP à 36 domaines de conception** (voir [SPECIFICATION.md](SPECIFICATION.md) et [SECURITY.md](SECURITY.md)) :
+- **Noyau financier & contractuel** : séparation stricte entre identité personne, adhésion datée, contrat versionné, obligation (créance), paiement (flux confirmé) et affectation ; distinction entre **Fonds** (affectation économique), **Compte** (lieu de conservation) et **Budget** (autorisation).
+- **Consolidation fédérale & Exports comptables** : élimination des flux réciproques inter-entités et exports structurés (SYSCOHADA).
+- **Ajout libre & Import de membres (Bureau / Fondateur)** : saisie libre (nom, prénom, pays, ville, mobile, email, langue) avec unicité globale mobile/email, import CSV / Excel / vCard (`.vcf`), email HTML de confirmation élevant automatiquement le membre à **KYC1**, et liens d'invitation **WhatsApp / SMS**.
+- **Single Sign-On (SSO)** : inscription et connexion via **Google, Facebook, LinkedIn et Instagram** (`NextAuth.js`).
+- **Parrainage & Gamification** : chaque membre peut faire découvrir Tchoua (Web & Mobile) jusqu'à **5 emails** par envoi ou via lien **WhatsApp**, et cumuler des points Gamification.
+- **Application Mobile (`tchoua-mobile`)** : client Expo / React Native connecté à `www.tchoua.com`, solde Wallet en haut à droite, sélection directe depuis les **contacts téléphone** (`expo-contacts`) et mode hors-ligne cloisonné.
+
+---
+
 ## Roadmap 2026-2027
 
 ### Étape 1 : Fondation et Lancement Pilote (Q1-Q2 2026)
@@ -143,6 +155,15 @@ NEXTAUTH_URL=http://localhost:3000
 NEXT_PUBLIC_FIREBASE_API_KEY=votre_cle_firebase
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=votre-projet.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=votre-projet
+# Providers SSO (optionnels selon les réseaux activés)
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+FACEBOOK_CLIENT_ID=...
+FACEBOOK_CLIENT_SECRET=...
+LINKEDIN_CLIENT_ID=...
+LINKEDIN_CLIENT_SECRET=...
+INSTAGRAM_CLIENT_ID=...
+INSTAGRAM_CLIENT_SECRET=...
 EOF
 
 # 2. Lancer la stack complète (app + PostgreSQL)
