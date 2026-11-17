@@ -92,12 +92,34 @@ export async function currentRotation(associationId: string) {
     orderBy: [{ cycle: "desc" }, { position: "desc" }],
     select: { cycle: true },
   });
-  const cycle = latest?.cycle ?? 1;
-  const list = await prisma.hostingRotation.findMany({
+  let cycle = latest?.cycle ?? 1;
+  let list = await prisma.hostingRotation.findMany({
     where: { associationId, cycle },
     orderBy: { position: "asc" },
     include: { membership: { include: { user: { select: { id: true, name: true, email: true } } } } },
   });
+  // Une tournée terminée redémarre automatiquement un nouveau cycle, en conservant l'ordre.
+  if (list.length > 0 && !list.some((x) => x.status === "PENDING")) {
+    const nextCycle = cycle + 1;
+    await prisma.hostingRotation.createMany({
+      data: list.map((r) => ({
+        associationId,
+        membershipId: r.membershipId,
+        position: r.position,
+        cycle: nextCycle,
+        address: r.address,
+        notes: r.notes,
+        status: "PENDING",
+      })),
+      skipDuplicates: true,
+    }).catch(() => null);
+    cycle = nextCycle;
+    list = await prisma.hostingRotation.findMany({
+      where: { associationId, cycle },
+      orderBy: { position: "asc" },
+      include: { membership: { include: { user: { select: { id: true, name: true, email: true } } } } },
+    });
+  }
   return { cycle, list, next: list.find((x) => x.status === "PENDING") ?? null };
 }
 
