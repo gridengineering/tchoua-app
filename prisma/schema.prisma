@@ -844,6 +844,7 @@ model Association {
   memberships   AssociationMembership[]
   activities    AssociationActivity[]
   meetings      AssocMeeting[]
+  hostingRotations HostingRotation[]
   documents     AssocDocument[]
   accounts      AssocBankAccount[]
   wallet        AssociationWallet?
@@ -930,6 +931,7 @@ model AssociationMembership {
   mandates        MandatePeriod[]
   notifs          AssociationNotification[]
   assocWalletTx   AssociationWalletTransaction[]
+  hostingRotations HostingRotation[]
   memberAccount   AssociationMemberAccount?
   memberTransactions AssociationMemberTransaction[]
   approvalVotes   ApprovalVote[]
@@ -1190,7 +1192,18 @@ model AssocMeeting {
   location        String?
   isRotating      Boolean  @default(false)
   hostMembershipId String?
-  status          String   @default("PLANNED")  // PLANNED, HELD, CANCELLED
+  modality        String   @default("PHYSICAL") // PHYSICAL, ONLINE, ROTATING
+  onlineUrl       String?
+  status          String   @default("PLANNED")  // PLANNED, HELD, CLOSED, CANCELLED
+  openedAt        DateTime?
+  closedAt        DateTime?
+  sessionPresidentId String?
+  sessionSecretaryId String?
+  sessionCensorId    String?
+  sessionRolesExtra  String?  // JSON [{ role, membershipId }]
+  convenedById    String?     // membershipId — session extraordinaire
+  committee       String?     // JSON [membershipId,...]
+  minutesHtml     String?
   quorumRequired  Int?     // pourcentage minimum
   quorumReached   Boolean  @default(false)
   attendeeCount   Int?
@@ -1206,6 +1219,7 @@ model AssocMeeting {
 
   association   Association @relation(fields: [associationId], references: [id])
   attendances   AssocMeetingAttendance[]
+  agendaItems   AssocMeetingAgendaItem[]
   fines         AssocMeetingFine[]
   collations    AssocMeetingCollation[]
   sessionContributions AssocSessionContribution[]
@@ -1230,6 +1244,47 @@ model AssocMeetingAttendance {
 
   @@unique([meetingId, membershipId])
   @@map("assoc_meeting_attendances")
+}
+
+model AssocMeetingAgendaItem {
+  id           String   @id @default(cuid())
+  meetingId    String
+  order        Int
+  title        String
+  presenterId  String?
+  durationMin  Int?
+  content      String?
+  decision     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  meeting      AssocMeeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, order])
+  @@index([meetingId])
+  @@map("assoc_meeting_agenda_items")
+}
+
+/// Ordre de réception des sessions rotatives chez les membres.
+model HostingRotation {
+  id              String   @id @default(cuid())
+  associationId   String
+  membershipId    String
+  position        Int
+  cycle           Int      @default(1)
+  address         String?
+  status          String   @default("PENDING") // PENDING, HOSTED, SKIPPED
+  hostedMeetingId String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  association     Association           @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  membership      AssociationMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([associationId, cycle, position])
+  @@index([associationId, cycle, status])
+  @@map("assoc_hosting_rotations")
 }
 
 model AssocMeetingFine {

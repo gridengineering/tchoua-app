@@ -1,7 +1,13 @@
 import nodemailer from "nodemailer";
 import { getGovernanceConfig } from "@/lib/governance";
 
-export type MailInput = { to: string; subject: string; text: string; html?: string };
+export type MailInput = {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  attachments?: Array<{ filename: string; path: string }>;
+};
 
 /**
  * Envoi transactionnel via la configuration SMTP de la gouvernance.
@@ -29,6 +35,7 @@ export async function sendTransactionalEmail(input: MailInput): Promise<boolean>
       subject: input.subject,
       text: input.text,
       html: input.html,
+      attachments: input.attachments,
     });
     return true;
   } catch (error) {

@@ -76,6 +76,9 @@ type MeetingConfig = {
   quorumPercent: number;
   collationRate: number;
   collationHostPayout: number;
+  sessionsEnabled?: boolean;
+  modality?: "PHYSICAL" | "ONLINE" | "ROTATING";
+  agendaTemplate?: string[];
 };
 type MembershipConfig = {
   ageMin: string;
@@ -175,6 +178,16 @@ const DEFAULT_MEETING: MeetingConfig = {
   quorumPercent: 60,
   collationRate: 3000,
   collationHostPayout: 150000,
+  sessionsEnabled: true,
+  modality: "PHYSICAL",
+  agendaTemplate: [
+    "Appel et vérification du quorum",
+    "Lecture et adoption du procès-verbal précédent",
+    "Situation financière de l'association",
+    "Point sur les activités et engagements",
+    "Décisions et résolutions",
+    "Prochaine session : lieu, date et heure",
+  ],
 };
 const DEFAULT_MEMBERSHIP: MembershipConfig = {
   ageMin: "",
@@ -1136,6 +1149,17 @@ export function AssociationFormWorkspace({
               <NumberInput label="Quorum" value={meeting.quorumPercent} onChange={(v) => setMeeting({ ...meeting, quorumPercent: Number(v) })} min={0} max={100} hint="Pourcentage des membres requis." />
               <NumberInput label="Contribution collation (FCFA)" value={meeting.collationRate} onChange={(v) => setMeeting({ ...meeting, collationRate: Number(v) })} min={0} step={500} />
               <NumberInput label="Forfait hôte (FCFA)" value={meeting.collationHostPayout} onChange={(v) => setMeeting({ ...meeting, collationHostPayout: Number(v) })} min={0} step={5000} />
+              <label className="flex items-center gap-2 text-xs font-semibold text-graphite"><input type="checkbox" checked={meeting.sessionsEnabled !== false} onChange={(e) => setMeeting({ ...meeting, sessionsEnabled: e.target.checked })} /> Cette association tient des sessions de réunion</label>
+              <div>
+                <label className={labelCls}>Ordre du jour standard (un point par ligne)</label>
+                <textarea
+                  rows={7}
+                  className={inputCls}
+                  value={(meeting.agendaTemplate ?? []).join("\n")}
+                  onChange={(e) => setMeeting({ ...meeting, agendaTemplate: e.target.value.split("\n").map((x) => x.trim()).filter(Boolean) })}
+                  placeholder="Appel et vérification du quorum…"
+                />
+              </div>
             </div>
             <div className="mt-3 rounded-lg border border-[#e8e2d8] bg-[#fbf9f3] px-3 py-2 text-[11px] leading-4 text-[#7a7368]">
               Une réunion peut être liée à plusieurs activités. Un changement de date ne crée pas une nouvelle cotisation pour la même échéance (REU02).

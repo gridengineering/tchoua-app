@@ -6,8 +6,17 @@ import {
   getDefaultMeetingQuorum,
   calculateProgressiveAbsenceFine,
 } from "@/lib/association/rules";
+import {
+  agendaTemplate,
+  isMeetingBureau,
+  MEETING_BUREAU_ROLES,
+  parseMeetingConfig,
+  postMeetingMessage,
+  publicRotation,
+  suggestNextSession,
+} from "@/lib/association/meetings";
 
-const BUREAU_ROLES = ["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "SECRETARY", "TREASURER", "SOLIDARITY_OFFICER"];
+const BUREAU_ROLES = MEETING_BUREAU_ROLES;
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -38,6 +47,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         fines: {
           include: { membership: { include: { user: { select: { name: true, email: true } } } } },
         },
+        agendaItems: { orderBy: { order: "asc" } },
       },
     });
     if (!meeting) return NextResponse.json({ error: "Réunion introuvable" }, { status: 404 });
@@ -66,13 +76,39 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     take: 50,
   });
 
+  const assoc = await prisma.association.findUnique({
+    where: { id },
+    select: { meetingConfig: true, name: true },
+  });
+  const meetingConfig = parseMeetingConfig(assoc?.meetingConfig);
+  const lastMeeting = meetings.find((m) => m.scheduledAt < now);
+  const suggestion = suggestNextSession(
+    meetingConfig,
+    lastMeeting ? new Date(lastMeeting.scheduledAt.getTime() + 86_400_000) : now
+  );
+  const rotation = await prisma.hostingRotation.findMany({
+    where: { associationId: id },
+    orderBy: [{ cycle: "desc" }, { position: "asc" }],
+    include: { membership: { include: { user: { select: { id: true, name: true, email: true } } } } },
+    take: 100,
+  });
+
   const result = meetings.map((m) => ({
     ...m,
     myAttendance: m.attendances[0] ?? null,
     attendances: undefined,
   }));
 
-  return NextResponse.json({ meetings: result });
+  return NextResponse.json({
+    meetings: result,
+    nextSuggestion: suggestion ? suggestion.toISOString() : null,
+    meetingConfig: {
+      sessionsEnabled: meetingConfig.sessionsEnabled !== false,
+      modality: meetingConfig.modality ?? "PHYSICAL",
+      agendaTemplate: agendaTemplate(meetingConfig),
+    },
+    rotation: publicRotation(rotation),
+  });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -87,7 +123,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const body = await req.json();
-  const { title, type, scheduledAt, location, quorumRequired, agenda, notes, isRotating } = body;
+  const {
+    title, type, scheduledAt, location, quorumRequired, agenda, notes, isRotating,
+    modality, onlineUrl, hostMembershipId, convenedById, committee,
+  } = body;
 
   if (!title || !scheduledAt) {
     return NextResponse.json({ error: "title et scheduledAt sont requis" }, { status: 400 });
@@ -110,7 +149,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       quorumRequired: resolveQuorum(resolvedType, quorumRequired),
       agenda: agenda ? JSON.stringify(agenda) : null,
       notes,
-      isRotating: isRotating ?? false,
+      isRotating: isRotating ?? modality === "ROTATING",
+      modality: modality ?? (isRotating ? "ROTATING" : "PHYSICAL"),
+      onlineUrl: onlineUrl || null,
+      hostMembershipId: hostMembershipId || null,
+      convenedById: convenedById || null,
+      committee: committee ? JSON.stringify(committee) : null,
       status: "PLANNED",
     },
   });
@@ -135,6 +179,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const meeting = await prisma.assocMeeting.findFirst({ where: { id: meetingId, associationId: id } });
   if (!meeting) return NextResponse.json({ error: "Réunion introuvable" }, { status: 404 });
+  if (meeting.closedAt) return NextResponse.json({ error: "La session est clôturée et verrouillée." }, { status: 409 });
 
   // Update meeting status
   if (status) {
@@ -143,10 +188,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   // Record attendance
   if (membershipId && attendanceStatus) {
+    const arrivedAt = attendanceStatus === "PRESENT"
+      ? (body.arrivedAt ? new Date(body.arrivedAt) : meeting.scheduledAt)
+      : attendanceStatus === "LATE"
+      ? (body.arrivedAt ? new Date(body.arrivedAt) : new Date())
+      : null;
     await prisma.assocMeetingAttendance.upsert({
       where: { meetingId_membershipId: { meetingId, membershipId } },
-      create: { meetingId, membershipId, status: attendanceStatus },
-      update: { status: attendanceStatus },
+      create: { meetingId, membershipId, status: attendanceStatus, arrivedAt },
+      update: { status: attendanceStatus, arrivedAt },
     });
 
     // Auto-create fine for absent members (SPECIFICATION.md §3.2 & R-050)
@@ -253,6 +303,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id: meetingId },
       data: { attendeeCount: presentCount, quorumReached },
     });
+
+    const person = await prisma.associationMembership.findUnique({
+      where: { id: membershipId },
+      select: { user: { select: { name: true } } },
+    });
+    await postMeetingMessage({
+      associationId: id,
+      membershipId: membership.id,
+      content: `👥 Présence mise à jour : ${person?.user.name ?? "Membre"} — ${attendanceStatus}.`,
+    }).catch(() => {});
   }
 
   return NextResponse.json({ ok: true });

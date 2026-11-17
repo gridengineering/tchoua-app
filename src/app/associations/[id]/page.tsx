@@ -369,6 +369,7 @@ export default function AssociationDetailPage() {
   const [members, setMembers] = useState<AssocMember[]>([]);
   const [activities, setActivities] = useState<AssocActivity[]>([]);
   const [meetings, setMeetings] = useState<AssocMeetingT[]>([]);
+  const [nextMeetingSuggestion, setNextMeetingSuggestion] = useState<string | null>(null);
   const [finances, setFinances] = useState<FinanceReport | null>(null);
   const [documents, setDocuments] = useState<AssocDocument[]>([]);
   const [socialAids, setSocialAids] = useState<any[]>([]);
@@ -441,7 +442,7 @@ export default function AssociationDetailPage() {
 
   // Form states
   const [subscribeForm, setSubscribeForm] = useState({ parts: 1 });
-  const [meetingForm, setMeetingForm] = useState({ date: "", time: "", location: "", type: "GENERAL", quorum: 50, agenda: "" });
+  const [meetingForm, setMeetingForm] = useState({ date: "", time: "", location: "", type: "REGULAR", quorum: 50, agenda: "", modality: "PHYSICAL", onlineUrl: "", committee: [] as string[] });
   const [docForm, setDocForm] = useState({ name: "", type: "PV" });
   const [cotisationForm, setCotisationForm] = useState({ memberId: "", amount: "", paymentMode: "MTN_MOMO", reference: "" });
   const [socialAidForm, setSocialAidForm] = useState({ category: "SANTE", amount: "", justification: "" });
@@ -480,6 +481,7 @@ export default function AssociationDetailPage() {
         const meetRes = await fetch(`/api/associations/${id}/meetings`);
         const meetData = meetRes.ok ? await meetRes.json() : null;
         setMeetings(meetData?.meetings ?? []);
+        setNextMeetingSuggestion(meetData?.nextSuggestion ?? null);
 
         // Fetch finances
         const finRes = await fetch(`/api/associations/${id}/reports?type=ACTIVITY`);
@@ -1484,11 +1486,18 @@ export default function AssociationDetailPage() {
               )}
             </div>
 
+            {nextMeetingSuggestion && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cfe0d5] bg-[#f6fbf7] px-4 py-3 text-sm">
+                <div><span className="font-semibold text-[#0d3d28]">Prochaine session proposée :</span>{" "}{new Date(nextMeetingSuggestion).toLocaleString("fr-FR")}</div>
+                {isBureauMember && <button onClick={() => { const d = new Date(nextMeetingSuggestion); setMeetingForm(f => ({ ...f, date: d.toISOString().slice(0, 10), time: d.toTimeString().slice(0, 5) })); setModalMeeting(true); }} className="rounded-lg bg-[#0d3d28] px-3 py-1.5 text-xs font-bold text-white">Utiliser cette date</button>}
+              </div>
+            )}
+
             {/* Upcoming meetings */}
             <div>
               <h3 className="text-sm font-semibold text-graphite uppercase tracking-wide mb-3">À venir</h3>
               <div className="space-y-3">
-                {meetings.filter(m => m.status === "UPCOMING").map(meeting => (
+                {meetings.filter(m => m.status === "UPCOMING" || m.status === "PLANNED").map(meeting => (
                   <Card key={meeting.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedMeeting(meeting)}>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between">
@@ -1509,6 +1518,13 @@ export default function AssociationDetailPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-blue-800">{getMeetingTypeLabel(meeting.type)}</span>
                           <StatusBadge status={meeting.status} />
+                          <Link
+                            href={`/associations/${id}/meetings/${meeting.id}/session`}
+                            onClick={(event) => event.stopPropagation()}
+                            className="inline-flex items-center gap-1 rounded-lg bg-[#0d3d28] px-2 py-1 text-[11px] font-bold text-white hover:bg-[#0a2f1f]"
+                          >
+                            Session
+                          </Link>
                           <button
                             type="button"
                             onClick={(event) => { event.stopPropagation(); joinVideo(meeting); }}
@@ -1522,7 +1538,7 @@ export default function AssociationDetailPage() {
                     </CardContent>
                   </Card>
                 ))}
-                {meetings.filter(m => m.status === "UPCOMING").length === 0 && (
+                {meetings.filter(m => m.status === "UPCOMING" || m.status === "PLANNED").length === 0 && (
                   <div className="py-6 text-center text-ash text-sm">Aucune réunion à venir</div>
                 )}
               </div>
@@ -2174,6 +2190,26 @@ export default function AssociationDetailPage() {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Modalité</label>
+                  <select value={meetingForm.modality} onChange={e => setMeetingForm(f => ({ ...f, modality: e.target.value }))} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+                    <option value="PHYSICAL">Lieu fixe</option><option value="ONLINE">En ligne</option><option value="ROTATING">Rotative chez les membres</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Lien visio (si en ligne)</label>
+                  <input value={meetingForm.onlineUrl} onChange={e => setMeetingForm(f => ({ ...f, onlineUrl: e.target.value }))} placeholder="https://meet.tchoua.com/..." className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm" />
+                </div>
+              </div>
+              {meetingForm.type === "EXTRAORDINARY" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Comité de session extraordinaire</label>
+                  <div className="max-h-32 space-y-1 overflow-y-auto rounded-xl border border-gray-200 p-2 text-xs">
+                    {members.map(m => <label key={m.id} className="flex items-center gap-2"><input type="checkbox" checked={meetingForm.committee.includes(m.id)} onChange={e => setMeetingForm(f => ({ ...f, committee: e.target.checked ? [...f.committee, m.id] : f.committee.filter(x => x !== m.id) }))} /> {m.user.name} · {m.role}</label>)}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Ordre du jour</label>
                 <textarea
@@ -2193,7 +2229,14 @@ export default function AssociationDetailPage() {
                     fetch(`/api/associations/${id}/meetings`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(meetingForm),
+                      body: JSON.stringify({
+                        ...meetingForm,
+                        type: meetingForm.type === "GENERAL" ? "REGULAR" : meetingForm.type,
+                        scheduledAt: meetingForm.date && meetingForm.time ? new Date(`${meetingForm.date}T${meetingForm.time}`).toISOString() : undefined,
+                        convenedById: myMembership?.id,
+                        isRotating: meetingForm.modality === "ROTATING",
+                        committee: meetingForm.committee,
+                      }),
                     }).catch(() => {});
                     setModalMeeting(false);
                   }}
