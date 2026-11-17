@@ -43,7 +43,7 @@ const fr: DocsCopy = {
   read: "Parcourir le sommaire",
   notice: "Édition anonymisée : les noms des associations et des personnes ont été remplacés par des identifiants fictifs. Les montants, règles et captures restent concrets.",
   pages: "123 pages",
-  captures: "47 captures réelles",
+  captures: "46 captures réelles",
   diagrams: "12 schémas",
   version: "Version 2.2 · Novembre 2026",
   contents: "Sommaire",
@@ -117,7 +117,7 @@ const fr: DocsCopy = {
   home: {
     badge: "Documentation",
     title: "Le manuel complet, accessible à tous",
-    desc: "123 pages, 12 schémas et 47 captures réelles pour comprendre chaque module et chaque règle.",
+    desc: "123 pages, 12 schémas et 46 captures réelles pour comprendre chaque module et chaque règle.",
     cards: [
       { icon: "🔄", title: "Moteur de tontine", desc: "Parts, fractions, cycles, enchères, soldes." },
       { icon: "🏦", title: "Prêts et intérêts", desc: "Garanties, échéanciers, répartition au prorata." },
@@ -139,7 +139,7 @@ const en: DocsCopy = {
   read: "Browse the contents",
   notice: "Anonymized edition: association and people names have been replaced with fictional identifiers. Amounts, rules and screenshots remain concrete.",
   pages: "116 pages",
-  captures: "47 real screenshots",
+  captures: "46 real screenshots",
   diagrams: "12 diagrams",
   version: "Version 2.2 · November 2026",
   contents: "Contents",
@@ -198,7 +198,7 @@ const en: DocsCopy = {
   home: {
     badge: "Documentation",
     title: "The complete manual, open to everyone",
-    desc: "116 pages, 12 diagrams and 47 real screenshots to understand every module and every rule.",
+    desc: "116 pages, 12 diagrams and 46 real screenshots to understand every module and every rule.",
     cards: [
       { icon: "🔄", title: "Tontine engine", desc: "Shares, fractions, cycles, auctions, balances." },
       { icon: "🏦", title: "Loans and interest", desc: "Guarantees, schedules, pro-rata allocation." },
@@ -219,7 +219,7 @@ const es: DocsCopy = {
   readOnline: "Leer en línea",
   read: "Ver el índice",
   notice: "Edición anonimizada: los nombres de las asociaciones y de las personas fueron sustituidos por identificadores ficticios. Los montos, reglas y capturas siguen siendo concretos.",
-  pages: "118 páginas", captures: "47 capturas reales", diagrams: "12 esquemas",
+  pages: "118 páginas", captures: "46 capturas reales", diagrams: "12 esquemas",
   version: "Versión 2.2 · Noviembre 2026", contents: "Índice", chaptersWord: "capítulos", annexWord: "anexos", chWord: "cap.",
   domainsTitle: "Todo lo que cubre el manual",
   domainsDesc: "Desde la creación de la asociación hasta el cierre del ciclo, cada pantalla y cada regla están documentadas.",
@@ -271,7 +271,7 @@ const es: DocsCopy = {
   cta: "Crear mi asociación", ctaDesc: "La documentación está lista. La plataforma también.",
   home: {
     badge: "Documentación", title: "El manual completo, accesible para todos",
-    desc: "118 páginas, 12 esquemas y 47 capturas reales para comprender cada módulo y cada regla.",
+    desc: "118 páginas, 12 esquemas y 46 capturas reales para comprender cada módulo y cada regla.",
     cards: [
       { icon: "🔄", title: "Motor de tontina", desc: "Partes, fracciones, ciclos, subastas, saldos." },
       { icon: "🏦", title: "Préstamos e intereses", desc: "Garantías, calendarios, reparto proporcional." },
@@ -292,7 +292,7 @@ const de: DocsCopy = {
   readOnline: "Online lesen",
   read: "Inhaltsverzeichnis ansehen",
   notice: "Anonymisierte Ausgabe: Namen von Vereinen und Personen wurden durch fiktive Kennungen ersetzt. Beträge, Regeln und Screenshots bleiben konkret.",
-  pages: "120 Seiten", captures: "47 echte Screenshots", diagrams: "12 Diagramme",
+  pages: "120 Seiten", captures: "46 echte Screenshots", diagrams: "12 Diagramme",
   version: "Version 2.2 · November 2026", contents: "Inhalt", chaptersWord: "Kapitel", annexWord: "Anhänge", chWord: "Kap.",
   domainsTitle: "Was das Handbuch abdeckt",
   domainsDesc: "Von der Gründung des Vereins bis zum Abschluss des Zyklus werden jeder Bildschirm und jede Regel dokumentiert.",
@@ -344,7 +344,7 @@ const de: DocsCopy = {
   cta: "Meinen Verein erstellen", ctaDesc: "Die Dokumentation ist bereit. Die Plattform auch.",
   home: {
     badge: "Dokumentation", title: "Das vollständige Handbuch für alle",
-    desc: "120 Seiten, 12 Diagramme und 47 echte Screenshots, um jedes Modul und jede Regel zu verstehen.",
+    desc: "120 Seiten, 12 Diagramme und 46 echte Screenshots, um jedes Modul und jede Regel zu verstehen.",
     cards: [
       { icon: "🔄", title: "Tontinen-Motor", desc: "Anteile, Bruchteile, Zyklen, Auktionen, Salden." },
       { icon: "🏦", title: "Kredite und Zinsen", desc: "Sicherheiten, Pläne, anteilige Verteilung." },
