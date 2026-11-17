@@ -120,15 +120,15 @@ footer.manual a{color:#f4d58d}
     <div class="kicker">Official documentation · 2026 edition</div>
     <h1>The existing system<br><span>Complete documentation 2026</span></h1>
     <p>How Tchoua actually works: associations, the ARP framework, tontines, contributions, loans, solidarity, meetings, reports, administration and configuration.</p>
-    <div class="chips"><span class="chip">21 chapters</span><span class="chip">41 real screenshots</span><span class="chip">11 diagrams</span><span class="chip">Version 2.1 · November 2026</span></div>
+    <div class="chips"><span class="chip">22 chapters</span><span class="chip">47 real screenshots</span><span class="chip">12 diagrams</span><span class="chip">Version 2.2 · November 2026</span></div>
     <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_EN.pdf">Download the PDF</a>
     <a class="btn ghost" href="#ch01">Contents</a>
   </div>
   <div class="hero-card">
     <div class="label">Documentation</div>
-    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Appendices</span></div>
-    <div class="small">21 chapters · 11 diagrams</div>
-    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.1 · November 2026</div>
+    <div class="big">22<br><span style="font-size:20px;color:#e6c98f">+ Appendices</span></div>
+    <div class="small">22 chapters · 12 diagrams</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.2 · November 2026</div>
   </div>
 </div></section>
 <main class="layout">
@@ -158,6 +158,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>ARP framework: rules, combinations and versions</a>
 <a href="#ch20"><span>20</span>Creating or editing an association with tabs</a>
 <a href="#ch21"><span>21</span>Configuring each activity and managing funds</a>
+<a href="#ch22"><span>22</span>Steering, consolidated reports and distribution</a>
 <div class="toc-part">Appendices</div>
 <a href="#annexes"><span>A</span>Glossary, API and checklist</a>
     <a class="back" href="/documentation">← Back to documentation</a>
@@ -188,6 +189,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>ARP framework: rules, combinations and versions</a>
 <a href="#ch20"><span>20</span>Creating or editing an association with tabs</a>
 <a href="#ch21"><span>21</span>Configuring each activity and managing funds</a>
+<a href="#ch22"><span>22</span>Steering, consolidated reports and distribution</a>
 <div class="toc-part">Appendices</div>
 <a href="#annexes"><span>A</span>Glossary, API and checklist</a></details>
     <article class="content"><section class="chapter">
@@ -1948,6 +1950,169 @@ qualification = "conditional" if conditions ≠ ∅
     <li>The internal rules are up to date and members can approve them.</li>
     <li>Funds and reservations are created before the first disbursements.</li>
   </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapter 22</div>
+  <h1 class="chapter" id="ch22" data-short="22 · Consolidated reports">Steering, consolidated reports and distribution</h1>
+  <p class="lead">A board must be able to answer one simple question in seconds: “where does the association stand today?”. The state report brings that answer together, makes it verifiable, then distributes it without a gap between the screen, the PDF, the spreadsheet and e-mail.</p>
+
+  <h2>22.1 A position, not a history</h2>
+  <p>The state report is a snapshot of the association at generation time. It does not replace the journal: it summarises and clarifies it. Detailed movements stay in the history; commitments stay in their modules; the report connects both.</p>
+  <table>
+    <thead><tr><th>Board question</th><th>Report indicator</th><th>Underlying evidence</th></tr></thead>
+    <tbody>
+      <tr><td>How much is actually available?</td><td>Global cash = activity funds + association wallet</td><td>Validated movements and fund balances</td></tr>
+      <tr><td>How much do we owe members?</td><td>Member credits and aid payable</td><td>Member credit accounts and approved aid requests</td></tr>
+      <tr><td>How much is owed to us?</td><td>Outstanding loans and pending contributions</td><td>Active loans, schedules and contributions</td></tr>
+      <tr><td>What is the net position?</td><td>Cash + receivables − credits − commitments</td><td>The three lines above, at the same instant</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Association state report">
+    <figcaption><b>Figure 22.1</b> — HORIZON state report: global cash, member credits, outstanding loans, contributions received, financial position and governance. The screenshot is anonymized.</figcaption>
+  </figure>
+
+  <h2>22.2 Access, role and scope</h2>
+  <p>The state report is restricted to the board and platform administration. An ordinary member keeps access to their own history, interest and dividends, but cannot read the association’s consolidated position.</p>
+  <table>
+    <thead><tr><th>Profile</th><th>State report</th><th>History</th><th>Interest / dividends</th></tr></thead>
+    <tbody>
+      <tr><td>Member</td><td>No</td><td>Own operations only</td><td>Own share only</td></tr>
+      <tr><td>Board / treasurer</td><td>Yes</td><td>Whole association</td><td>All, with member filter</td></tr>
+      <tr><td>System administrator</td><td>Yes, for diagnostics</td><td>According to supervision</td><td>According to supervision</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Information</span><p>The report creates no entry and changes no balance. It reads validated data at request time; a new generation after a payment immediately reflects the movement.</p></div>
+
+  <h2>22.3 Reading the indicators</h2>
+  <div class="kpi">
+    <div><div class="v">Cash</div><div class="l">funds + wallet, really available</div></div>
+    <div><div class="v">Credits</div><div class="l">what the association owes members</div></div>
+    <div><div class="v">Outstanding</div><div class="l">what members owe the association</div></div>
+    <div><div class="v">Net position</div><div class="l">cash + receivables − commitments</div></div>
+  </div>
+  <p>The <strong>net position</strong> is not an accounting profit: it is a steering indicator. It reconciles cash, loans still due, member credits and promised aid. Any gap must always be explainable by an identified movement or commitment.</p>
+  <table>
+    <thead><tr><th>Block</th><th>What it contains</th><th>How to check it</th></tr></thead>
+    <tbody>
+      <tr><td>Financial position</td><td>Activity funds, wallet, loans disbursed, interest, benefits, dividends, aid paid and payable</td><td>Compare with the last bank reconciliation and the fund journal</td></tr>
+      <tr><td>Activities &amp; funds</td><td>Status, contributions, benefits, outstanding loans and balance per activity</td><td>Open the activity cycle and verify the session balance</td></tr>
+      <tr><td>Identity &amp; governance</td><td>Status, type, region, trust, headcount, board</td><td>Check current roles and mandates</td></tr>
+      <tr><td>Accounts &amp; details</td><td>Bank accounts, holder, number, default account</td><td>Match the transfer proof to the displayed account</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.4 Production and distribution workflow</h2>
+  <p>The report always follows the same path: observe, check, generate, distribute. This avoids partial exports sent before verification and PDFs that no longer match the day’s data.</p>
+  <section class="diagram-page">
+    <img width="1600" height="900" loading="lazy" src="/docs/manuel/assets/diagrams/reports_flow.png" alt="Consolidated report workflow">
+    <div class="cap"><b>Figure 22.2</b> — From movement to decision: one validated source, one check, one document, one traced distribution.</div>
+  </section>
+  <table>
+    <thead><tr><th>#</th><th>Actor</th><th>Action</th><th>Check / trace</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Treasurer / board</td><td>Opens Reports &gt; State report</td><td>Authorised role; selected association</td></tr>
+      <tr><td>2</td><td>Board</td><td>Checks totals, funds and commitments</td><td>Consistency with bank reconciliation</td></tr>
+      <tr><td>3</td><td>Board</td><td>Chooses Print PDF, Excel or Send by e-mail</td><td>Same data source for all three outputs</td></tr>
+      <tr><td>4</td><td>Recipient</td><td>Receives attached PDF and Excel, or reads the printed PDF</td><td>Checked address; logged send</td></tr>
+      <tr><td>5</td><td>Board</td><td>Archives the document and distribution proof</td><td>Association audit</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.5 Print, export, send</h2>
+  <p>All three actions start from the same report and keep the same totals. The PDF is paginated and print-ready; Excel contains one row per indicator or movement; e-mail attaches both files.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/66_report_email.jpg" alt="Sending the report by e-mail">
+    <figcaption><b>Figure 22.3</b> — Send by e-mail: one or more recipients, PDF and Excel attached, or send to your own address when the field is left empty.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Action</th><th>Use</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td>Print PDF</td><td>Board meeting, signature, paper archive</td><td>Paginated PDF with header, date, indicators and activity detail</td></tr>
+      <tr><td>Excel</td><td>Control, rework, accountant</td><td>`.xls` table with the same columns as the report</td></tr>
+      <tr><td>Send by e-mail</td><td>Distribution to president, treasurer, auditor or partner</td><td>Clean HTML message + PDF + Excel attachments</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Warning</span><p>A sent report does not validate the accounts. The board must reconcile totals with bank documents and funds before distributing an official document. Recipient names and addresses are kept in the audit log.</p></div>
+
+  <h2>22.6 The four financial views</h2>
+  <p>The Reports, History, Interest and Dividends tabs are not four separate applications: they share the same filters, role rules and distribution button. The view changes; the source stays unique.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/70_report_history.jpg" alt="History with exports">
+    <figcaption><b>Figure 22.4</b> — Financial history: filters by scope, member and activity, inflow/outflow totals, and Print PDF, Excel, Send by e-mail buttons.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Tab</th><th>Question it answers</th><th>Associated export</th></tr></thead>
+    <tbody>
+      <tr><td>Reports</td><td>Where does the association stand today?</td><td>Consolidated position</td></tr>
+      <tr><td>History</td><td>What happened, for whom and when?</td><td>Filtered movement journal</td></tr>
+      <tr><td>Interest</td><td>What interest was generated and what is the member’s share?</td><td>Repayment and share detail</td></tr>
+      <tr><td>Dividends</td><td>Which annual distribution was calculated or credited?</td><td>Year, capital, share, status</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.7 One hub for settings</h2>
+  <p>Association settings are no longer scattered: a shared tab bar links information, activity configuration, the ARP framework and security. Navigation remains the same when moving from one page to another.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/67_assoc_settings.jpg" alt="Association settings hub">
+    <figcaption><b>Figure 22.5</b> — Settings hub: Information, Activities &amp; frameworks, ARP framework and Security &amp; roles. The form keeps its internal tabs and permanent save button.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Tab</th><th>When to use it</th></tr></thead>
+    <tbody>
+      <tr><td>Information</td><td>Name, description, contacts, region, status, logo and association identity.</td></tr>
+      <tr><td>Activities &amp; frameworks</td><td>Edit an activity, its contributions, cycle, shares and payment methods.</td></tr>
+      <tr><td>ARP framework</td><td>Check dimensions, C01–C06 conditions, funds and versions.</td></tr>
+      <tr><td>Security &amp; roles</td><td>Custom roles, permissions, founder protection and dissolution.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.8 Accounts and payments at a glance</h2>
+  <p>A member has their wallet and their member credit account with the association. They can pay by wallet, bank with proof, or cash when the association allows it and a board member receives it. The board can settle a commitment for a member and reconcile transactions.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/69_member_accounts.jpg" alt="Accounts and payments">
+    <figcaption><b>Figure 22.6</b> — Accounts &amp; payments: member credit balance, wallet, deposits, activity settlement, member payment, PDF/Excel statement and filterable history.</figcaption>
+  </figure>
+  <div class="callout dark"><span class="tag">Rule</span><p>Every bank payment requires the association account and proof. A missing proof never credits the account. Cash movements are restricted to the board and capped by configuration.</p></div>
+
+  <h2>22.9 Administration: menus and permissions</h2>
+  <p>The system console exposes Steering &amp; Control, Audit &amp; Logs, Compliance, Wallets &amp; Fees and Governance &amp; Settings. System notifications are under Steering, not Fees. A custom role only sees menus allowed by its permissions.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/68_admin_nav.jpg" alt="Administration console navigation">
+    <figcaption><b>Figure 22.7</b> — System navigation: complete groups, notifications under Steering, granular permissions and direct access to logs and compliance.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Group</th><th>Main entries</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>Steering &amp; Control</td><td>Dashboard, Notifications</td><td>Platform health and system messages</td></tr>
+      <tr><td>Audit &amp; Logs</td><td>Financial audit, Full history, System logs</td><td>Traceability and diagnostics</td></tr>
+      <tr><td>Compliance</td><td>KYC, Trust &amp; scores, Roles</td><td>Access control and compliance</td></tr>
+      <tr><td>Wallets &amp; Fees</td><td>Wallet supervision, Fees &amp; caps</td><td>Financial monitoring</td></tr>
+      <tr><td>Governance &amp; Settings</td><td>Platform settings, Governance &amp; Mail</td><td>Global configuration and mail</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.10 Mobile: a structured Plus menu</h2>
+  <p>In the mobile app, the Plus menu groups modules by use: association life, finances, community, learning and personal space. Board-only modules are filtered by role; outside an association, only global tools are offered. The Plus tab remains available in the bottom bar even without a selected association.</p>
+  <ul>
+    <li>Members can reach their journey and association account without going through chat.</li>
+    <li>Quick actions (payment, aid, loan, association creation) are filtered by context.</li>
+    <li>A board module never appears for an ordinary member.</li>
+  </ul>
+
+  <h2>22.11 Distribution checklist</h2>
+  <ul class="checklist">
+    <li>The association and report date are correct.</li>
+    <li>Funds and wallet are reconciled with the latest bank statement.</li>
+    <li>Member credits and aid payable are backed by open commitments.</li>
+    <li>Active loans and due dates are checked.</li>
+    <li>The PDF opens, paginates and contains the right recipients.</li>
+    <li>Excel downloads and its totals match the PDF.</li>
+    <li>The e-mail is sent with PDF and Excel attached; the send is logged.</li>
+    <li>The document is archived with its date and author.</li>
+  </ul>
+  <div class="callout info"><span class="tag">Tip</span><p>For a board meeting, generate the PDF the day before and regenerate it in the morning: the report always reflects the latest receipts. Never send an export prepared before a reconciliation without checking its generation date.</p></div>
 </section>
 
 <section class="chapter">

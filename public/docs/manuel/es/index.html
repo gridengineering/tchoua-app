@@ -120,15 +120,15 @@ footer.manual a{color:#f4d58d}
     <div class="kicker">Documentación oficial · Edición 2026</div>
     <h1>El sistema existente<br><span>Documentación completa 2026</span></h1>
     <p>El funcionamiento real de Tchoua: asociaciones, marco ARP, tontinas, cotizaciones, préstamos, solidaridad, reuniones, informes, administración y configuración.</p>
-    <div class="chips"><span class="chip">21 capítulos</span><span class="chip">41 capturas reales</span><span class="chip">11 esquemas</span><span class="chip">Versión 2.1 · Noviembre 2026</span></div>
+    <div class="chips"><span class="chip">22 capítulos</span><span class="chip">47 capturas reales</span><span class="chip">12 esquemas</span><span class="chip">Versión 2.2 · Noviembre 2026</span></div>
     <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_ES.pdf">Descargar el PDF</a>
     <a class="btn ghost" href="#ch01">Índice</a>
   </div>
   <div class="hero-card">
     <div class="label">Documentación</div>
-    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Anexos</span></div>
-    <div class="small">21 capítulos · 11 esquemas</div>
-    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Versión 2.1 · Noviembre 2026</div>
+    <div class="big">22<br><span style="font-size:20px;color:#e6c98f">+ Anexos</span></div>
+    <div class="small">22 capítulos · 12 esquemas</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Versión 2.2 · Noviembre 2026</div>
   </div>
 </div></section>
 <main class="layout">
@@ -158,6 +158,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>Marco ARP: reglas, combinaciones y versiones</a>
 <a href="#ch20"><span>20</span>Crear o modificar una asociación por pestañas</a>
 <a href="#ch21"><span>21</span>Configurar cada actividad y gestionar los fondos</a>
+<a href="#ch22"><span>22</span>Pilotaje, informes consolidados y difusión</a>
 <div class="toc-part">Anexos</div>
 <a href="#annexes"><span>A</span>Glosario, API y lista de verificación</a>
     <a class="back" href="/documentation">← Volver a la documentación</a>
@@ -188,6 +189,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>Marco ARP: reglas, combinaciones y versiones</a>
 <a href="#ch20"><span>20</span>Crear o modificar una asociación por pestañas</a>
 <a href="#ch21"><span>21</span>Configurar cada actividad y gestionar los fondos</a>
+<a href="#ch22"><span>22</span>Pilotaje, informes consolidados y difusión</a>
 <div class="toc-part">Anexos</div>
 <a href="#annexes"><span>A</span>Glosario, API y lista de verificación</a></details>
     <article class="content"><section class="chapter">
@@ -1948,6 +1950,169 @@ clasificación = «condicional» si condiciones ≠ ∅
     <li>El reglamento interno está actualizado y los miembros pueden aprobarlo.</li>
     <li>Los fondos y las reservas se crean antes de los primeros desembolsos.</li>
   </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Capítulo 22</div>
+  <h1 class="chapter" id="ch22" data-short="22 · Informes consolidados">Pilotaje, informes consolidados y difusión</h1>
+  <p class="lead">Una junta debe poder responder en segundos a una pregunta sencilla: «¿dónde está hoy la asociación?». El informe de situación reúne esa respuesta, la hace verificable y la difunde sin ruptura entre la pantalla, el PDF, el Excel y el correo electrónico.</p>
+
+  <h2>22.1 Una situación, no un historial</h2>
+  <p>El informe de situación es una fotografía de la asociación en la fecha de generación. No sustituye al diario: lo resume y lo hace legible. Los movimientos detallados permanecen en el historial; los compromisos permanecen en sus módulos; el informe conecta ambos.</p>
+  <table>
+    <thead><tr><th>Pregunta de la junta</th><th>Indicador del informe</th><th>Prueba subyacente</th></tr></thead>
+    <tbody>
+      <tr><td>¿Cuánto tenemos realmente disponible?</td><td>Tesorería global = cajas de actividades + wallet de la asociación</td><td>Movimientos validados y saldos de cajas</td></tr>
+      <tr><td>¿Cuánto debemos a los miembros?</td><td>Haber de los miembros y ayudas por pagar</td><td>Cuentas de haber y solicitudes de ayuda aprobadas</td></tr>
+      <tr><td>¿Cuánto nos deben?</td><td>Saldo de préstamos y cotizaciones pendientes</td><td>Préstamos activos, calendarios y contribuciones</td></tr>
+      <tr><td>¿Cuál es la posición neta?</td><td>Tesorería + créditos − haberes − compromisos</td><td>Las tres líneas anteriores, en el mismo instante</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Informe de situación de la asociación">
+    <figcaption><b>Figura 22.1</b> — Informe de situación de HORIZON: tesorería global, haberes de los miembros, préstamos pendientes, cotizaciones cobradas, situación financiera y gobernanza. La captura está anonimizada.</figcaption>
+  </figure>
+
+  <h2>22.2 Acceso, rol y alcance</h2>
+  <p>El informe de situación está reservado a la junta y a la administración de la plataforma. Un miembro ordinario conserva el acceso a su historial, sus intereses y sus dividendos, pero no puede leer la situación consolidada de la asociación.</p>
+  <table>
+    <thead><tr><th>Perfil</th><th>Informe de situación</th><th>Historial</th><th>Intereses / dividendos</th></tr></thead>
+    <tbody>
+      <tr><td>Miembro</td><td>No</td><td>Solo sus operaciones</td><td>Solo su cuota</td></tr>
+      <tr><td>Junta / tesorero</td><td>Sí</td><td>Toda la asociación</td><td>Todo, con filtro por miembro</td></tr>
+      <tr><td>Administrador del sistema</td><td>Sí, para diagnóstico</td><td>Según supervisión</td><td>Según supervisión</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Información</span><p>El informe no crea ningún asiento ni modifica ningún saldo. Lee los datos validados en el momento de la solicitud; una nueva generación tras un cobro refleja inmediatamente el movimiento.</p></div>
+
+  <h2>22.3 Leer los indicadores</h2>
+  <div class="kpi">
+    <div><div class="v">Tesorería</div><div class="l">cajas + wallet, disponible real</div></div>
+    <div><div class="v">Haberes</div><div class="l">lo que la asociación debe a los miembros</div></div>
+    <div><div class="v">Pendiente</div><div class="l">lo que los miembros deben a la asociación</div></div>
+    <div><div class="v">Posición neta</div><div class="l">tesorería + créditos − compromisos</div></div>
+  </div>
+  <p>La <strong>posición neta</strong> no es un beneficio contable: es un indicador de pilotaje. Concilla la tesorería, los préstamos aún debidos, los haberes de los miembros y las ayudas prometidas. Toda diferencia debe poder explicarse por un movimiento o un compromiso identificado.</p>
+  <table>
+    <thead><tr><th>Bloque</th><th>Qué contiene</th><th>Cómo controlarlo</th></tr></thead>
+    <tbody>
+      <tr><td>Situación financiera</td><td>Cajas, wallet, préstamos desembolsados, intereses, beneficios, dividendos, ayudas pagadas y por pagar</td><td>Comparar con la última conciliación bancaria y el diario de cajas</td></tr>
+      <tr><td>Actividades y cajas</td><td>Estado, cotizaciones, beneficios, pendiente y saldo de cada actividad</td><td>Abrir el ciclo de la actividad y verificar el saldo de sesión</td></tr>
+      <tr><td>Identidad y gobernanza</td><td>Estado, tipo, región, confianza, efectivos, junta</td><td>Verificar roles y mandatos vigentes</td></tr>
+      <tr><td>Cuentas y datos</td><td>Cuentas bancarias, titular, número, cuenta por defecto</td><td>Conciliar la prueba de transferencia con la cuenta mostrada</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.4 Flujo de producción y difusión</h2>
+  <p>El informe sigue siempre el mismo camino: observar, controlar, generar, difundir. Este camino evita exportaciones parciales enviadas antes de la verificación y PDF que ya no coinciden con los datos del día.</p>
+  <section class="diagram-page">
+    <img width="1600" height="900" loading="lazy" src="/docs/manuel/assets/diagrams/reports_flow.png" alt="Flujo del informe consolidado">
+    <div class="cap"><b>Figura 22.2</b> — Del movimiento a la decisión: una fuente validada, un control, un documento, una difusión trazada.</div>
+  </section>
+  <table>
+    <thead><tr><th>#</th><th>Actor</th><th>Acción</th><th>Control / traza</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Tesorero / junta</td><td>Abre Informes &gt; Informe de situación</td><td>Rol autorizado; asociación seleccionada</td></tr>
+      <tr><td>2</td><td>Junta</td><td>Controla totales, cajas y compromisos</td><td>Coherencia con la conciliación bancaria</td></tr>
+      <tr><td>3</td><td>Junta</td><td>Elige Imprimir PDF, Excel o Enviar por correo</td><td>Misma fuente de datos para las tres salidas</td></tr>
+      <tr><td>4</td><td>Destinatario</td><td>Recibe PDF y Excel adjuntos, o consulta el PDF impreso</td><td>Dirección controlada; envío registrado</td></tr>
+      <tr><td>5</td><td>Junta</td><td>Archiva el documento y la prueba de difusión</td><td>Auditoría de la asociación</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.5 Imprimir, exportar, enviar</h2>
+  <p>Las tres acciones parten del mismo informe y conservan los mismos totales. El PDF está paginado y listo para imprimir; el Excel contiene una línea por indicador o movimiento; el correo adjunta ambos archivos.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/66_report_email.jpg" alt="Envío del informe por correo">
+    <figcaption><b>Figura 22.3</b> — Envío por correo: uno o varios destinatarios, PDF y Excel adjuntos, o envío a la propia dirección si el campo se deja vacío.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Acción</th><th>Uso</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Imprimir PDF</td><td>Reunión de junta, firma, archivo en papel</td><td>PDF paginado con encabezado, fecha, indicadores y detalle de actividades</td></tr>
+      <tr><td>Excel</td><td>Control, retrabajo, contador</td><td>Tabla `.xls` con las mismas columnas que el informe</td></tr>
+      <tr><td>Enviar por correo</td><td>Difusión al presidente, tesorero, auditor o socio</td><td>Mensaje HTML cuidado + PDF + Excel adjuntos</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Atención</span><p>Un informe enviado no equivale a la validación de las cuentas. La junta debe conciliar los totales con los documentos bancarios y las cajas antes de difundir un documento oficial. Los nombres y direcciones de los destinatarios se conservan en la auditoría.</p></div>
+
+  <h2>22.6 Las cuatro lecturas financieras</h2>
+  <p>Las pestañas Informes, Historial, Intereses y Dividendos no son cuatro aplicaciones separadas: comparten los mismos filtros, las mismas reglas de rol y el mismo botón de difusión. La lectura cambia; la fuente sigue siendo única.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/70_report_history.jpg" alt="Historial con exportaciones">
+    <figcaption><b>Figura 22.4</b> — Historial financiero: filtros por alcance, miembro y actividad, totales de entradas/salidas y botones Imprimir PDF, Excel, Enviar por correo.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Pestaña</th><th>Pregunta que responde</th><th>Exportación asociada</th></tr></thead>
+    <tbody>
+      <tr><td>Informes</td><td>¿Dónde está hoy la asociación?</td><td>Situación consolidada</td></tr>
+      <tr><td>Historial</td><td>¿Qué ocurrió, para quién y cuándo?</td><td>Diario de movimientos filtrado</td></tr>
+      <tr><td>Intereses</td><td>¿Qué intereses se generaron y cuál es la parte del miembro?</td><td>Detalle de reembolsos y cuotas</td></tr>
+      <tr><td>Dividendos</td><td>¿Qué reparto anual se calculó o se acreditó?</td><td>Ejercicio, capital, cuota, estado</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.7 Un solo centro para los ajustes</h2>
+  <p>Los ajustes de la asociación ya no están dispersos: una barra de pestañas común enlaza la información, la configuración de actividades, el marco ARP y la seguridad. La navegación sigue siendo la misma al pasar de una página a otra.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/67_assoc_settings.jpg" alt="Centro de ajustes de la asociación">
+    <figcaption><b>Figura 22.5</b> — Centro de ajustes: Información, Actividades &amp; marcos, Marco ARP y Seguridad &amp; roles. El formulario conserva sus pestañas internas y su botón de guardado permanente.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Pestaña</th><th>Cuándo utilizarla</th></tr></thead>
+    <tbody>
+      <tr><td>Información</td><td>Nombre, descripción, contactos, región, estado, logotipo e identidad de la asociación.</td></tr>
+      <tr><td>Actividades &amp; marcos</td><td>Editar una actividad, sus cotizaciones, ciclo, partes y modos de pago.</td></tr>
+      <tr><td>Marco ARP</td><td>Controlar dimensiones, condiciones C01–C06, fondos y versiones.</td></tr>
+      <tr><td>Seguridad &amp; roles</td><td>Roles personalizados, permisos, protección del fundador y disolución.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.8 Cuentas y pagos de un vistazo</h2>
+  <p>El miembro dispone de su wallet y de su cuenta de haber con la asociación. Puede pagar por wallet, banco con prueba, o efectivo cuando la asociación lo autoriza y un miembro de la junta lo recibe. La junta puede liquidar un compromiso por un miembro y conciliar las operaciones.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/69_member_accounts.jpg" alt="Cuentas y pagos">
+    <figcaption><b>Figura 22.6</b> — Cuentas &amp; pagos: saldo de haber, wallet, depósitos, liquidación de actividad, pago a un miembro, extracto PDF/Excel e historial filtrable.</figcaption>
+  </figure>
+  <div class="callout dark"><span class="tag">Regla</span><p>Todo pago bancario exige la cuenta de la asociación y una prueba. Una prueba ausente nunca acredita la cuenta. Los movimientos en efectivo están reservados a la junta y limitados por la configuración.</p></div>
+
+  <h2>22.9 Administración: menús y permisos</h2>
+  <p>La consola del sistema expone los grupos Pilotaje &amp; Control, Auditoría &amp; Registros, Conformidad, Wallets &amp; Cargos y Gobernanza &amp; Ajustes. Las notificaciones del sistema están en Pilotaje, no en Cargos. Un rol personalizado solo ve los menús autorizados por sus permisos.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/68_admin_nav.jpg" alt="Navegación de la consola de administración">
+    <figcaption><b>Figura 22.7</b> — Navegación del sistema: grupos completos, notificaciones en Pilotaje, permisos granulares y acceso directo a registros y conformidad.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Grupo</th><th>Entradas principales</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>Pilotaje &amp; Control</td><td>Panel, Notificaciones</td><td>Salud de la plataforma y mensajes del sistema</td></tr>
+      <tr><td>Auditoría &amp; Registros</td><td>Auditoría financiera, Historial completo, Registros del sistema</td><td>Trazabilidad y diagnóstico</td></tr>
+      <tr><td>Conformidad</td><td>KYC, Confianza &amp; puntuaciones, Roles</td><td>Control de acceso y conformidad</td></tr>
+      <tr><td>Wallets &amp; Cargos</td><td>Supervisión de wallets, Cargos &amp; límites</td><td>Vigilancia financiera</td></tr>
+      <tr><td>Gobernanza &amp; Ajustes</td><td>Ajustes de plataforma, Gobernanza &amp; Correo</td><td>Configuración global y mensajería</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.10 Móvil: un menú Plus estructurado</h2>
+  <p>En la aplicación móvil, el menú Plus agrupa los módulos por uso: vida de la asociación, finanzas, comunidad, aprendizaje y espacio personal. Los módulos reservados a la junta se filtran según el rol; fuera de una asociación solo se ofrecen las herramientas globales. La pestaña Plus sigue disponible en la barra inferior, incluso sin una asociación seleccionada.</p>
+  <ul>
+    <li>El miembro encuentra su recorrido y su cuenta de asociación sin pasar por el chat.</li>
+    <li>Las acciones rápidas (pago, ayuda, préstamo, creación de asociación) se filtran por contexto.</li>
+    <li>Un módulo de la junta nunca aparece para un miembro ordinario.</li>
+  </ul>
+
+  <h2>22.11 Lista de control de difusión</h2>
+  <ul class="checklist">
+    <li>La asociación y la fecha del informe son correctas.</li>
+    <li>Las cajas y el wallet están conciliados con el último extracto bancario.</li>
+    <li>Los haberes de los miembros y las ayudas por pagar están justificados por compromisos abiertos.</li>
+    <li>Los préstamos activos y los vencimientos están controlados.</li>
+    <li>El PDF se abre, se pagina y contiene los destinatarios correctos.</li>
+    <li>El Excel se descarga y sus totales coinciden con el PDF.</li>
+    <li>El correo se envía con PDF y Excel adjuntos; el envío queda registrado.</li>
+    <li>El documento se archiva con su fecha y autor.</li>
+  </ul>
+  <div class="callout info"><span class="tag">Consejo</span><p>Para una reunión de junta, genere el PDF la víspera y vuelva a generarlo por la mañana: el informe siempre refleja los últimos cobros. Nunca envíe una exportación preparada antes de una conciliación sin verificar su fecha de generación.</p></div>
 </section>
 
 <section class="chapter">

@@ -120,15 +120,15 @@ footer.manual a{color:#f4d58d}
     <div class="kicker">Offizielle Dokumentation · Ausgabe 2026</div>
     <h1>Das bestehende System<br><span>Vollständige Dokumentation 2026</span></h1>
     <p>So funktioniert Tchoua tatsächlich: Vereine, ARP-Rahmen, Tontinen, Beiträge, Kredite, Solidarität, Sitzungen, Berichte, Administration und Konfiguration.</p>
-    <div class="chips"><span class="chip">21 Kapitel</span><span class="chip">41 echte Screenshots</span><span class="chip">11 Diagramme</span><span class="chip">Version 2.1 · November 2026</span></div>
+    <div class="chips"><span class="chip">22 Kapitel</span><span class="chip">47 echte Screenshots</span><span class="chip">12 Diagramme</span><span class="chip">Version 2.2 · November 2026</span></div>
     <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee_DE.pdf">PDF herunterladen</a>
     <a class="btn ghost" href="#ch01">Inhalt</a>
   </div>
   <div class="hero-card">
     <div class="label">Dokumentation</div>
-    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Anhänge</span></div>
-    <div class="small">21 Kapitel · 11 Diagramme</div>
-    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.1 · November 2026</div>
+    <div class="big">22<br><span style="font-size:20px;color:#e6c98f">+ Anhänge</span></div>
+    <div class="small">22 Kapitel · 12 Diagramme</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.2 · November 2026</div>
   </div>
 </div></section>
 <main class="layout">
@@ -158,6 +158,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>ARP-Rahmen: Regeln, Kombinationen und Versionen</a>
 <a href="#ch20"><span>20</span>Einen Verein über Registerkarten erstellen oder ändern</a>
 <a href="#ch21"><span>21</span>Jede Aktivität konfigurieren und die Fonds verwalten</a>
+<a href="#ch22"><span>22</span>Steuerung, konsolidierte Berichte und Verteilung</a>
 <div class="toc-part">Anhänge</div>
 <a href="#annexes"><span>A</span>Glossar, API und Checkliste</a>
     <a class="back" href="/documentation">← Zurück zur Dokumentation</a>
@@ -188,6 +189,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>ARP-Rahmen: Regeln, Kombinationen und Versionen</a>
 <a href="#ch20"><span>20</span>Einen Verein über Registerkarten erstellen oder ändern</a>
 <a href="#ch21"><span>21</span>Jede Aktivität konfigurieren und die Fonds verwalten</a>
+<a href="#ch22"><span>22</span>Steuerung, konsolidierte Berichte und Verteilung</a>
 <div class="toc-part">Anhänge</div>
 <a href="#annexes"><span>A</span>Glossar, API und Checkliste</a></details>
     <article class="content"><section class="chapter">
@@ -1948,6 +1950,169 @@ qualification = „bedingt“, wenn conditions ≠ ∅
     <li>Die Satzung ist aktuell und die Mitglieder können sie genehmigen.</li>
     <li>Die Fonds und Reservierungen werden vor den ersten Auszahlungen erstellt.</li>
   </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Kapitel 22</div>
+  <h1 class="chapter" id="ch22" data-short="22 · Konsolidierte Berichte">Steuerung, konsolidierte Berichte und Verteilung</h1>
+  <p class="lead">Ein Vorstand muss in Sekunden eine einfache Frage beantworten können: „Wo steht der Verein heute?“. Der Lagebericht bündelt diese Antwort, macht sie prüfbar und verteilt sie ohne Bruch zwischen Bildschirm, PDF, Excel und E-Mail.</p>
+
+  <h2>22.1 Eine Lage, keine Historie</h2>
+  <p>Der Lagebericht ist eine Momentaufnahme des Vereins zum Zeitpunkt der Erstellung. Er ersetzt nicht das Journal: Er fasst es zusammen und macht es lesbar. Detaillierte Bewegungen bleiben in der Historie, Verpflichtungen in ihren Modulen; der Bericht verbindet beides.</p>
+  <table>
+    <thead><tr><th>Frage des Vorstands</th><th>Kennzahl des Berichts</th><th>Zugrunde liegender Nachweis</th></tr></thead>
+    <tbody>
+      <tr><td>Wie viel ist tatsächlich verfügbar?</td><td>Gesamtliquidität = Aktivitätskassen + Vereins-Wallet</td><td>Validierte Bewegungen und Kassensalden</td></tr>
+      <tr><td>Wie viel schulden wir den Mitgliedern?</td><td>Mitgliederguthaben und zu zahlende Hilfen</td><td>Guthabenkonten und genehmigte Hilfsanträge</td></tr>
+      <tr><td>Wie viel schuldet man uns?</td><td>Offene Kredite und ausstehende Beiträge</td><td>Aktive Kredite, Tilgungspläne und Beiträge</td></tr>
+      <tr><td>Wie ist die Nettoposition?</td><td>Liquidität + Forderungen − Guthaben − Verpflichtungen</td><td>Die drei Zeilen oben, im selben Moment</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Lagebericht des Vereins">
+    <figcaption><b>Abbildung 22.1</b> — Lagebericht von HORIZON: Gesamtliquidität, Mitgliederguthaben, offene Kredite, eingegangene Beiträge, Finanzlage und Governance. Der Screenshot ist anonymisiert.</figcaption>
+  </figure>
+
+  <h2>22.2 Zugriff, Rolle und Umfang</h2>
+  <p>Der Lagebericht ist dem Vorstand und der Plattformadministration vorbehalten. Ein ordentliches Mitglied behält Zugriff auf seine Historie, seine Zinsen und seine Dividenden, kann aber die konsolidierte Lage des Vereins nicht lesen.</p>
+  <table>
+    <thead><tr><th>Profil</th><th>Lagebericht</th><th>Historie</th><th>Zinsen / Dividenden</th></tr></thead>
+    <tbody>
+      <tr><td>Mitglied</td><td>Nein</td><td>Nur eigene Vorgänge</td><td>Nur eigener Anteil</td></tr>
+      <tr><td>Vorstand / Schatzmeister</td><td>Ja</td><td>Gesamter Verein</td><td>Alles, mit Mitgliederfilter</td></tr>
+      <tr><td>Systemadministrator</td><td>Ja, zur Diagnose</td><td>Je nach Aufsicht</td><td>Je nach Aufsicht</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Information</span><p>Der Bericht erzeugt keine Buchung und ändert keinen Saldo. Er liest die validierten Daten im Moment der Anfrage; eine neue Erstellung nach einer Zahlung zeigt die Bewegung sofort.</p></div>
+
+  <h2>22.3 Kennzahlen lesen</h2>
+  <div class="kpi">
+    <div><div class="v">Liquidität</div><div class="l">Kassen + Wallet, tatsächlich verfügbar</div></div>
+    <div><div class="v">Guthaben</div><div class="l">was der Verein den Mitgliedern schuldet</div></div>
+    <div><div class="v">Offen</div><div class="l">was Mitglieder dem Verein schulden</div></div>
+    <div><div class="v">Nettoposition</div><div class="l">Liquidität + Forderungen − Verpflichtungen</div></div>
+  </div>
+  <p>Die <strong>Nettoposition</strong> ist kein Buchgewinn, sondern eine Steuerungskennzahl. Sie gleicht Liquidität, noch geschuldete Kredite, Mitgliederguthaben und zugesagte Hilfen ab. Jede Abweichung muss durch eine identifizierte Bewegung oder Verpflichtung erklärbar sein.</p>
+  <table>
+    <thead><tr><th>Block</th><th>Inhalt</th><th>Kontrolle</th></tr></thead>
+    <tbody>
+      <tr><td>Finanzlage</td><td>Kassen, Wallet, ausgezahlte Kredite, Zinsen, Erträge, Dividenden, gezahlte und zu zahlende Hilfen</td><td>Mit letztem Bankabgleich und Kassenjournal vergleichen</td></tr>
+      <tr><td>Aktivitäten &amp; Kassen</td><td>Status, Beiträge, Erträge, offene Beträge und Saldo je Aktivität</td><td>Zyklus der Aktivität öffnen und Sitzungssaldo prüfen</td></tr>
+      <tr><td>Identität &amp; Governance</td><td>Status, Typ, Region, Vertrauen, Mitgliederzahl, Vorstand</td><td>Aktuelle Rollen und Mandate prüfen</td></tr>
+      <tr><td>Konten &amp; Angaben</td><td>Bankkonten, Inhaber, Nummer, Standardkonto</td><td>Überweisungsnachweis mit angezeigtem Konto abgleichen</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.4 Workflow für Erstellung und Verteilung</h2>
+  <p>Der Bericht folgt immer demselben Weg: beobachten, prüfen, erzeugen, verteilen. Das verhindert Teil-Exporte vor der Prüfung und PDFs, die nicht mehr zu den Tagesdaten passen.</p>
+  <section class="diagram-page">
+    <img width="1600" height="900" loading="lazy" src="/docs/manuel/assets/diagrams/reports_flow.png" alt="Workflow des konsolidierten Berichts">
+    <div class="cap"><b>Abbildung 22.2</b> — Von der Bewegung zur Entscheidung: eine validierte Quelle, eine Prüfung, ein Dokument, eine nachvollzogene Verteilung.</div>
+  </section>
+  <table>
+    <thead><tr><th>#</th><th>Akteur</th><th>Aktion</th><th>Prüfung / Nachweis</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Schatzmeister / Vorstand</td><td>Öffnet Berichte &gt; Lagebericht</td><td>Berechtigte Rolle; ausgewählter Verein</td></tr>
+      <tr><td>2</td><td>Vorstand</td><td>Prüft Summen, Kassen und Verpflichtungen</td><td>Übereinstimmung mit Bankabgleich</td></tr>
+      <tr><td>3</td><td>Vorstand</td><td>Wählt PDF drucken, Excel oder Per E-Mail senden</td><td>Gleiche Datenquelle für alle drei Ausgaben</td></tr>
+      <tr><td>4</td><td>Empfänger</td><td>Erhält PDF und Excel als Anhang oder liest das gedruckte PDF</td><td>Geprüfte Adresse; Versand protokolliert</td></tr>
+      <tr><td>5</td><td>Vorstand</td><td>Archiviert Dokument und Verteilungsnachweis</td><td>Audit des Vereins</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.5 Drucken, exportieren, senden</h2>
+  <p>Alle drei Aktionen starten aus demselben Bericht und behalten dieselben Summen. Das PDF ist paginiert und druckfertig; Excel enthält eine Zeile je Kennzahl oder Bewegung; die E-Mail hängt beide Dateien an.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/66_report_email.jpg" alt="Bericht per E-Mail senden">
+    <figcaption><b>Abbildung 22.3</b> — Per E-Mail senden: ein oder mehrere Empfänger, PDF und Excel im Anhang oder Versand an die eigene Adresse, wenn das Feld leer bleibt.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Aktion</th><th>Verwendung</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td>PDF drucken</td><td>Vorstandssitzung, Unterschrift, Papierarchiv</td><td>Paginiertes PDF mit Kopf, Datum, Kennzahlen und Aktivitätsdetail</td></tr>
+      <tr><td>Excel</td><td>Kontrolle, Nachbearbeitung, Buchhaltung</td><td>`.xls`-Tabelle mit denselben Spalten wie der Bericht</td></tr>
+      <tr><td>Per E-Mail senden</td><td>Verteilung an Präsident, Schatzmeister, Prüfer oder Partner</td><td>Saubere HTML-Nachricht + PDF + Excel im Anhang</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Achtung</span><p>Ein versendeter Bericht validiert die Konten nicht. Der Vorstand muss Summen vor der Verteilung eines offiziellen Dokuments mit Bankunterlagen und Kassen abgleichen. Empfängernamen und -adressen werden im Audit gespeichert.</p></div>
+
+  <h2>22.6 Die vier Finanzansichten</h2>
+  <p>Die Registerkarten Berichte, Historie, Zinsen und Dividenden sind keine vier getrennten Anwendungen: Sie teilen dieselben Filter, Rollenregeln und denselben Verteilungsbutton. Die Sicht ändert sich, die Quelle bleibt eindeutig.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/70_report_history.jpg" alt="Historie mit Exporten">
+    <figcaption><b>Abbildung 22.4</b> — Finanzhistorie: Filter nach Umfang, Mitglied und Aktivität, Summen Ein-/Ausgänge sowie PDF drucken, Excel, Per E-Mail senden.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Register</th><th>Beantwortete Frage</th><th>Zugehöriger Export</th></tr></thead>
+    <tbody>
+      <tr><td>Berichte</td><td>Wo steht der Verein heute?</td><td>Konsolidierte Lage</td></tr>
+      <tr><td>Historie</td><td>Was ist wann und für wen passiert?</td><td>Gefiltertes Bewegungsjournal</td></tr>
+      <tr><td>Zinsen</td><td>Welche Zinsen entstanden und wie hoch ist der Mitgliederanteil?</td><td>Rückzahlungs- und Anteilsdetail</td></tr>
+      <tr><td>Dividenden</td><td>Welche Jahresverteilung wurde berechnet oder gutgeschrieben?</td><td>Jahr, Kapital, Anteil, Status</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.7 Ein Hub für die Einstellungen</h2>
+  <p>Die Vereinseinstellungen sind nicht mehr verstreut: Eine gemeinsame Registerleiste verbindet Informationen, Aktivitätskonfiguration, ARP-Rahmen und Sicherheit. Die Navigation bleibt beim Wechsel zwischen den Seiten gleich.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/67_assoc_settings.jpg" alt="Einstellungs-Hub des Vereins">
+    <figcaption><b>Abbildung 22.5</b> — Einstellungs-Hub: Informationen, Aktivitäten &amp; Rahmen, ARP-Rahmen und Sicherheit &amp; Rollen. Das Formular behält seine internen Register und die dauerhafte Speichern-Schaltfläche.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Register</th><th>Wann verwenden</th></tr></thead>
+    <tbody>
+      <tr><td>Informationen</td><td>Name, Beschreibung, Kontakte, Region, Status, Logo und Identität des Vereins.</td></tr>
+      <tr><td>Aktivitäten &amp; Rahmen</td><td>Aktivität, Beiträge, Zyklus, Anteile und Zahlungsarten bearbeiten.</td></tr>
+      <tr><td>ARP-Rahmen</td><td>Dimensionen, Bedingungen C01–C06, Fonds und Versionen prüfen.</td></tr>
+      <tr><td>Sicherheit &amp; Rollen</td><td>Benutzerdefinierte Rollen, Berechtigungen, Gründerschutz und Auflösung.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.8 Konten und Zahlungen auf einen Blick</h2>
+  <p>Das Mitglied hat sein Wallet und sein Guthabenkonto beim Verein. Es kann per Wallet, Bank mit Nachweis oder bar zahlen, wenn der Verein dies erlaubt und ein Vorstandsmitglied den Betrag annimmt. Der Vorstand kann eine Verpflichtung für ein Mitglied begleichen und Vorgänge abgleichen.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/69_member_accounts.jpg" alt="Konten und Zahlungen">
+    <figcaption><b>Abbildung 22.6</b> — Konten &amp; Zahlungen: Guthaben, Wallet, Einzahlungen, Aktivitätsausgleich, Mitgliederzahlung, PDF-/Excel-Auszug und filterbare Historie.</figcaption>
+  </figure>
+  <div class="callout dark"><span class="tag">Regel</span><p>Jede Bankzahlung verlangt das Vereinskonto und einen Nachweis. Ein fehlender Nachweis schreibt das Konto nie gut. Barvorgänge sind dem Vorstand vorbehalten und durch die Konfiguration begrenzt.</p></div>
+
+  <h2>22.9 Administration: Menüs und Berechtigungen</h2>
+  <p>Die Systemkonsole zeigt die Gruppen Steuerung &amp; Kontrolle, Audit &amp; Protokolle, Konformität, Wallets &amp; Gebühren sowie Governance &amp; Einstellungen. Systembenachrichtigungen liegen unter Steuerung, nicht unter Gebühren. Eine benutzerdefinierte Rolle sieht nur die durch ihre Berechtigungen erlaubten Menüs.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/68_admin_nav.jpg" alt="Navigation der Administrationskonsole">
+    <figcaption><b>Abbildung 22.7</b> — Systemnavigation: vollständige Gruppen, Benachrichtigungen unter Steuerung, granulare Berechtigungen und direkter Zugriff auf Protokolle und Konformität.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Gruppe</th><th>Haupteinträge</th><th>Verwendung</th></tr></thead>
+    <tbody>
+      <tr><td>Steuerung &amp; Kontrolle</td><td>Dashboard, Benachrichtigungen</td><td>Plattformzustand und Systemmeldungen</td></tr>
+      <tr><td>Audit &amp; Protokolle</td><td>Finanzaudit, Vollständige Historie, Systemprotokolle</td><td>Nachvollziehbarkeit und Diagnose</td></tr>
+      <tr><td>Konformität</td><td>KYC, Vertrauen &amp; Scores, Rollen</td><td>Zugriffskontrolle und Konformität</td></tr>
+      <tr><td>Wallets &amp; Gebühren</td><td>Wallet-Aufsicht, Gebühren &amp; Grenzen</td><td>Finanzaufsicht</td></tr>
+      <tr><td>Governance &amp; Einstellungen</td><td>Plattformeinstellungen, Governance &amp; Mail</td><td>Globale Konfiguration und Messaging</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.10 Mobil: ein strukturiertes Plus-Menü</h2>
+  <p>In der mobilen App gruppiert das Plus-Menü Module nach Verwendung: Vereinsleben, Finanzen, Gemeinschaft, Lernen und persönlicher Bereich. Vorstandsmodule werden nach Rolle gefiltert; außerhalb eines Vereins werden nur globale Werkzeuge angeboten. Die Registerkarte Plus bleibt auch ohne ausgewählten Verein in der unteren Leiste verfügbar.</p>
+  <ul>
+    <li>Mitglieder erreichen ihren Weg und ihr Vereinskonto ohne Umweg über den Chat.</li>
+    <li>Schnellaktionen (Zahlung, Hilfe, Kredit, Vereinsgründung) werden nach Kontext gefiltert.</li>
+    <li>Ein Vorstandsmodul erscheint nie für ein ordentliches Mitglied.</li>
+  </ul>
+
+  <h2>22.11 Checkliste für die Verteilung</h2>
+  <ul class="checklist">
+    <li>Verein und Berichtsdatum sind korrekt.</li>
+    <li>Kassen und Wallet sind mit dem letzten Bankauszug abgeglichen.</li>
+    <li>Mitgliederguthaben und zu zahlende Hilfen sind durch offene Verpflichtungen belegt.</li>
+    <li>Aktive Kredite und Fälligkeiten sind geprüft.</li>
+    <li>Das PDF öffnet sich, ist paginiert und enthält die richtigen Empfänger.</li>
+    <li>Excel lädt herunter und die Summen stimmen mit dem PDF überein.</li>
+    <li>Die E-Mail wird mit PDF und Excel gesendet; der Versand wird protokolliert.</li>
+    <li>Das Dokument wird mit Datum und Autor archiviert.</li>
+  </ul>
+  <div class="callout info"><span class="tag">Tipp</span><p>Für eine Vorstandssitzung das PDF am Vortag erzeugen und am Morgen neu erstellen: Der Bericht zeigt immer die letzten Eingänge. Niemals einen vor dem Abgleich erstellten Export versenden, ohne das Erstellungsdatum zu prüfen.</p></div>
 </section>
 
 <section class="chapter">

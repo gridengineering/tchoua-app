@@ -304,31 +304,67 @@ const members: ContextualHelpEntry = {
 
 const reports: ContextualHelpEntry = {
   id: "reports",
-  title: "Rapports et dividendes",
-  subtitle: "Bilans, exports et répartition",
-  manualAnchor: "ch11",
-  manualTitle: "Chapitre 11 · Comptabilité, rapports et dividendes",
+  title: "Rapports consolidés et diffusion",
+  subtitle: "Situation en l'état, PDF, Excel et e-mail",
+  manualAnchor: "ch22",
+  manualTitle: "Chapitre 22 · Pilotage, rapports consolidés et diffusion",
   manualExcerpt:
-    "Les rapports consolident les cotisations, paiements, prêts, aides et fonds. Les dividendes sont calculés sur une base publiée, avec une quote-part par bénéficiaire et une gestion explicite des arrondis.",
+    "Le rapport en l'état donne une photographie de l'association : trésorerie globale, avoirs des membres, encours de prêts, cotisations, activités et engagements. Imprimez-le en PDF paginé, exportez-le en Excel ou envoyez-le par e-mail avec les deux pièces jointes.",
   studyAnchor: "d25",
   studyTitle: "Domaine 25 · Investissements, capital et dividendes",
-  formName: "Rapports de l’association",
+  formName: "Rapports de l'association",
   fields: [
-    { name: "Période", help: "Exercice, trimestre ou période personnalisée ; les dates sont incluses." },
-    { name: "Type de rapport", help: "Bilan de caisse, prêts, aides, cotisations, dividendes ou synthèse." },
-    { name: "Export", help: "PDF pour signature, CSV pour contrôle ou tableau de bord." },
-    { name: "Base de dividendes", help: "Base publiée et liquidité contrôlées séparément." },
+    { name: "Situation en l'état", help: "Trésorerie des activités + wallet association, avoirs membres, encours de prêts, aides à payer et position nette." },
+    { name: "Activités & caisses", help: "Statut, cotisations encaissées, bénéfices distribués, encours et solde de chaque activité." },
+    { name: "Période / membre", help: "Les onglets Historique, Intérêts et Dividendes partagent les filtres de période, de membre et d'activité." },
+    { name: "Imprimer PDF", help: "Ouvre un PDF paginé prêt à imprimer, avec en-tête, date, indicateurs et détail." },
+    { name: "Excel", help: "Télécharge un tableau .xls avec les mêmes colonnes et les mêmes totaux que le rapport." },
+    { name: "Envoyer par e-mail", help: "Joint le PDF et l'Excel. Laissez le destinataire vide pour recevoir le rapport sur votre adresse." },
   ],
   steps: [
-    "Choisissez la période et le rapport.",
-    "Vérifiez les totaux et les écarts.",
-    "Exportez en PDF ou CSV.",
-    "Pour un dividende, publiez la base puis lancez la répartition.",
+    "Ouvrez Rapports, puis vérifiez l'association et la date de situation.",
+    "Contrôlez les caisses, le wallet, les avoirs, les encours et les engagements.",
+    "Cliquez sur Imprimer PDF, Excel ou Envoyer par e-mail selon le besoin.",
+    "Pour un envoi, saisissez un ou plusieurs destinataires puis confirmez ; l'envoi est journalisé.",
+    "Archivez le PDF et sa date de génération avec les pièces de la séance.",
   ],
   tips: [
-    "La base de dividendes doit être justifiée par une décision.",
-    "Le ratio portefeuille/fonds ne prouve pas la liquidité disponible.",
-    "Afficher une quote-part arrondie ne conserve pas nécessairement la somme.",
+    "Le rapport ne crée aucune écriture : il lit les mouvements validés à l'instant de la demande.",
+    "Générez à nouveau le PDF après un encaissement : un export ancien ne reflète pas la dernière opération.",
+    "Un PDF envoyé ne remplace pas le rapprochement bancaire ni la validation du bureau.",
+  ],
+};
+
+const memberAccounts: ContextualHelpEntry = {
+  id: "member-accounts",
+  title: "Comptes & versements",
+  subtitle: "Wallet, AVOIR, banque et espèces",
+  manualAnchor: "ch22",
+  manualTitle: "Chapitre 22 · Pilotage, rapports consolidés et diffusion",
+  manualExcerpt:
+    "Chaque membre possède son wallet et son compte AVOIR auprès de l'association. Les versements se font par wallet, par banque avec preuve, ou en espèces lorsque l'association l'autorise et qu'un membre du bureau encaisse.",
+  studyAnchor: "d12",
+  studyTitle: "Domaine 12 · Caisses, budgets et écritures",
+  formName: "Comptes & versements",
+  fields: [
+    { name: "Wallet membre", help: "Solde personnel disponible pour alimenter l'association ou recevoir un remboursement." },
+    { name: "AVOIR association", help: "Solde du membre auprès de l'association ; il peut provenir d'un versement, d'un bénéfice de tontine ou d'un prêt." },
+    { name: "Versement banque", help: "Choisissez le compte bancaire de l'association et joignez une preuve image ou PDF ; le crédit reste en attente jusqu'au rapprochement." },
+    { name: "Espèces", help: "Encaissement réservé au bureau, dans la limite du montant autorisé par l'association et par la plateforme." },
+    { name: "Régler un engagement", help: "Le membre ou le bureau peut imputer une cotisation, un remboursement ou une aide sur l'AVOIR." },
+    { name: "Relevé", help: "Export PDF ou Excel, filtrable par activité, compte, moyen et période." },
+  ],
+  steps: [
+    "Vérifiez le solde AVOIR et le wallet affichés.",
+    "Choisissez Wallet, Banque ou Espèces selon les moyens autorisés.",
+    "Pour un virement, sélectionnez le compte et joignez la preuve.",
+    "Le bureau rapproche l'opération bancaire ; les espèces sont encaissées par un membre du bureau.",
+    "Téléchargez le relevé PDF ou Excel pour votre archive.",
+  ],
+  tips: [
+    "Une preuve manquante ne crédite jamais le compte.",
+    "Les espèces ne sont proposées que si l'association les autorise ; le plafond est contrôlé.",
+    "Le bureau voit les opérations de l'association ; un membre simple voit les siennes.",
   ],
 };
 
@@ -339,24 +375,27 @@ const history: ContextualHelpEntry = {
   manualAnchor: "ch12",
   manualTitle: "Chapitre 12 · Historique et analyses",
   manualExcerpt:
-    "L’historique est paginé et filtrable par périmètre, type, date, membre et activité. Les vues Liste, Kanban, Graphique et Grille permettent de contrôler les flux et de préparer un audit.",
+    "L’historique est paginé et filtrable par périmètre, type, date, membre et activité. Les vues Liste, Kanban, Graphique et Grille permettent de contrôler les flux et de préparer un audit. Les boutons Imprimer PDF, Excel et Envoyer par e-mail diffusent exactement la vue filtrée.",
   formName: "Historique",
   fields: [
     { name: "Périmètre", help: "Toute l’association, un membre ou une activité." },
     { name: "Type d’événement", help: "Cotisation, paiement, prêt, remboursement, aide, dividende." },
     { name: "Période", help: "Filtre de date inclusif ; la pagination est limitée à 100 lignes par page." },
     { name: "Membre / activité", help: "Filtres complémentaires selon le périmètre." },
+    { name: "Export", help: "PDF paginé, Excel ou e-mail avec pièces jointes ; les filtres actifs sont repris." },
   ],
   steps: [
     "Choisissez le périmètre et la période.",
     "Filtrez par type ou par membre.",
     "Basculez entre Liste, Kanban, Graphique et Grille.",
-    "Exportez ou ouvrez le détail d’une opération.",
+    "Cliquez sur Imprimer PDF, Excel ou Envoyer par e-mail : la vue filtrée est reprise.",
+    "Ouvrez le détail d’une opération pour vérifier sa pièce ou sa référence.",
   ],
   tips: [
     "Un membre simple ne voit que ses propres opérations.",
     "Les remboursements séparent le principal des intérêts.",
     "Le filtre de fin inclut toute la journée.",
+    "Un export envoyé avant un nouvel encaissement ne contient pas la dernière opération.",
   ],
 };
 
@@ -514,6 +553,7 @@ const ENTRIES: { test: RegExp; entry: ContextualHelpEntry }[] = [
   { test: /^\/associations\/[^/]+\/caisse$/, entry: cash },
   { test: /^\/associations\/[^/]+\/dividendes$/, entry: reports },
   { test: /^\/associations\/[^/]+\/interets$/, entry: reports },
+  { test: /^\/associations\/[^/]+\/comptes$/, entry: memberAccounts },
   { test: /^\/associations\/[^/]+\/parametres$/, entry: settings },
   { test: /^\/associations\/[^/]+\/my-profile$/, entry: settings },
   { test: /^\/parametres$/, entry: settings },

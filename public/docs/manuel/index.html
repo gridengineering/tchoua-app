@@ -120,15 +120,15 @@ footer.manual a{color:#f4d58d}
     <div class="kicker">Documentation officielle · Édition 2026</div>
     <h1>Manuel de l&#x27;existant<br><span>Documentation complète 2026</span></h1>
     <p>Le fonctionnement réel de Tchoua : associations, cadre ARP, tontines, cotisations, prêts, solidarité, réunions, rapports, administration et configuration.</p>
-    <div class="chips"><span class="chip">21 chapitres</span><span class="chip">41 captures réelles</span><span class="chip">11 schémas</span><span class="chip">Version 2.1 · Novembre 2026</span></div>
+    <div class="chips"><span class="chip">22 chapitres</span><span class="chip">47 captures réelles</span><span class="chip">12 schémas</span><span class="chip">Version 2.2 · Novembre 2026</span></div>
     <a class="btn gold" href="/docs/Tchoua_Documentation_Complete_2026_Anonymisee.pdf">Télécharger le PDF</a>
     <a class="btn ghost" href="#ch01">Sommaire</a>
   </div>
   <div class="hero-card">
     <div class="label">Documentation</div>
-    <div class="big">21<br><span style="font-size:20px;color:#e6c98f">+ Annexes</span></div>
-    <div class="small">21 chapitres · 11 schémas</div>
-    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.1 · Novembre 2026</div>
+    <div class="big">22<br><span style="font-size:20px;color:#e6c98f">+ Annexes</span></div>
+    <div class="small">22 chapitres · 12 schémas</div>
+    <div style="margin-top:14px;font-size:11px;color:#cfe0d6;line-height:1.5">ARP · Version 2.2 · Novembre 2026</div>
   </div>
 </div></section>
 <main class="layout">
@@ -158,6 +158,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>Cadre ARP : règles, combinaisons et versions</a>
 <a href="#ch20"><span>20</span>Créer ou modifier une association par onglets</a>
 <a href="#ch21"><span>21</span>Configurer chaque activité et gérer les fonds</a>
+<a href="#ch22"><span>22</span>Pilotage, rapports consolidés et diffusion</a>
 <div class="toc-part">Annexes</div>
 <a href="#annexes"><span>A</span>Glossaire, API et checklist</a>
     <a class="back" href="/documentation">← Retour à la documentation</a>
@@ -188,6 +189,7 @@ footer.manual a{color:#f4d58d}
 <a href="#ch19"><span>19</span>Cadre ARP : règles, combinaisons et versions</a>
 <a href="#ch20"><span>20</span>Créer ou modifier une association par onglets</a>
 <a href="#ch21"><span>21</span>Configurer chaque activité et gérer les fonds</a>
+<a href="#ch22"><span>22</span>Pilotage, rapports consolidés et diffusion</a>
 <div class="toc-part">Annexes</div>
 <a href="#annexes"><span>A</span>Glossaire, API et checklist</a></details>
     <article class="content"><section class="chapter">
@@ -1948,6 +1950,169 @@ qualification = « conditionnelle » si conditions ≠ ∅
     <li>Le règlement intérieur est à jour et les membres peuvent l'approuver.</li>
     <li>Les fonds et réservations sont créés avant les premiers décaissements.</li>
   </ul>
+</section>
+
+<section class="chapter">
+  <div class="chapter-kicker">Chapitre 22</div>
+  <h1 class="chapter" id="ch22" data-short="22 · Rapports consolidés">Pilotage, rapports consolidés et diffusion</h1>
+  <p class="lead">Un bureau doit pouvoir répondre en quelques secondes à une question simple : « où en est l'association, aujourd'hui ? ». Le rapport en l'état rassemble cette réponse, la rend vérifiable, puis la diffuse sans rupture entre l'écran, le PDF, l'Excel et l'e-mail.</p>
+
+  <h2>22.1 Une situation, pas un historique</h2>
+  <p>Le rapport en l'état est une photographie de l'association à la date de génération. Il ne remplace pas le journal : il le résume et le rend lisible. Les mouvements détaillés restent dans l'historique ; les engagements restent dans leurs modules ; le rapport relie les deux.</p>
+  <table>
+    <thead><tr><th>Question du bureau</th><th>Indicateur du rapport</th><th>Preuve sous-jacente</th></tr></thead>
+    <tbody>
+      <tr><td>Combien avons-nous réellement disponible ?</td><td>Trésorerie globale = caisses des activités + wallet association</td><td>Mouvements validés et soldes de caisses</td></tr>
+      <tr><td>Combien devons-nous aux membres ?</td><td>Avoirs des membres et aides à payer</td><td>Comptes AVOIR et demandes d'aide approuvées</td></tr>
+      <tr><td>Combien nous doit-on ?</td><td>Encours de prêts et cotisations en attente</td><td>Prêts actifs, échéanciers et contributions</td></tr>
+      <tr><td>Quelle est la position nette ?</td><td>Trésorerie + créances − avoirs − engagements</td><td>Les trois lignes ci-dessus, au même instant</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/11_ndi_reports.jpg" alt="Rapport de l'association en l'état">
+    <figcaption><b>Figure 22.1</b> — Rapport en l'état de HORIZON : trésorerie globale, avoirs des membres, encours de prêts, cotisations encaissées, situation financière et gouvernance. La capture est anonymisée.</figcaption>
+  </figure>
+
+  <h2>22.2 Accès, rôle et périmètre</h2>
+  <p>Le rapport de situation est réservé au bureau et à l'administration système. Un membre ordinaire conserve l'accès à son historique, à ses intérêts et à ses dividendes, mais ne peut pas lire la situation consolidée de l'association.</p>
+  <table>
+    <thead><tr><th>Profil</th><th>Rapport en l'état</th><th>Historique</th><th>Intérêts / dividendes</th></tr></thead>
+    <tbody>
+      <tr><td>Membre</td><td>Non</td><td>Ses opérations uniquement</td><td>Sa quote-part uniquement</td></tr>
+      <tr><td>Bureau / trésorier</td><td>Oui</td><td>Toute l'association</td><td>Tout, avec filtre membre</td></tr>
+      <tr><td>Administrateur système</td><td>Oui, pour diagnostic</td><td>Selon la supervision</td><td>Selon la supervision</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info"><span class="tag">Information</span><p>Le rapport ne crée aucune écriture et ne modifie aucun solde. Il lit les données validées à l'instant de la demande ; une nouvelle génération après un encaissement reflète immédiatement le mouvement.</p></div>
+
+  <h2>22.3 Lire les indicateurs</h2>
+  <div class="kpi">
+    <div><div class="v">Trésorerie</div><div class="l">caisses + wallet, disponible réel</div></div>
+    <div><div class="v">Avoirs</div><div class="l">ce que l'association doit aux membres</div></div>
+    <div><div class="v">Encours</div><div class="l">ce que les membres doivent à l'association</div></div>
+    <div><div class="v">Position nette</div><div class="l">trésorerie + créances − engagements</div></div>
+  </div>
+  <p>La <strong>position nette</strong> n'est pas un bénéfice comptable : c'est un indicateur de pilotage. Elle rapproche la trésorerie, les prêts encore dus, les avoirs membres et les aides promises. Un écart doit toujours pouvoir s'expliquer par un mouvement ou un engagement identifié.</p>
+  <table>
+    <thead><tr><th>Bloc</th><th>Ce qu'il contient</th><th>Comment le contrôler</th></tr></thead>
+    <tbody>
+      <tr><td>Situation financière</td><td>Caisse des activités, wallet, prêts décaissés, intérêts, bénéfices, dividendes, aides payées et à payer</td><td>Comparer avec le dernier rapprochement bancaire et le journal des caisses</td></tr>
+      <tr><td>Activités &amp; caisses</td><td>Statut, cotisations, bénéfices, encours et solde de chaque activité</td><td>Ouvrir le cycle de l'activité et vérifier le solde de session</td></tr>
+      <tr><td>Identité &amp; gouvernance</td><td>Statut, type, région, confiance, effectif, bureau</td><td>Vérifier les rôles et les mandats en cours</td></tr>
+      <tr><td>Comptes &amp; coordonnées</td><td>Comptes bancaires, titulaire, numéro, compte par défaut</td><td>Rapprocher la preuve de virement avec le compte affiché</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.4 Workflow de production et de diffusion</h2>
+  <p>Le rapport suit toujours le même chemin : observer, contrôler, générer, diffuser. Ce chemin évite les exports partiels envoyés avant vérification et les PDF qui ne correspondent plus aux données du jour.</p>
+  <section class="diagram-page">
+    <img width="1600" height="900" loading="lazy" src="/docs/manuel/assets/diagrams/reports_flow.png" alt="Workflow du rapport consolidé">
+    <div class="cap"><b>Figure 22.2</b> — Du mouvement à la décision : une donnée validée, un contrôle, un document, une diffusion tracée.</div>
+  </section>
+  <table>
+    <thead><tr><th>#</th><th>Acteur</th><th>Action</th><th>Contrôle / trace</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Trésorier / bureau</td><td>Ouvre Rapports &gt; Rapport en l'état</td><td>Rôle habilité ; association sélectionnée</td></tr>
+      <tr><td>2</td><td>Bureau</td><td>Contrôle les totaux, les caisses et les engagements</td><td>Cohérence avec le rapprochement bancaire</td></tr>
+      <tr><td>3</td><td>Bureau</td><td>Choisit Imprimer PDF, Excel ou Envoyer par e-mail</td><td>Même source de données pour les trois sorties</td></tr>
+      <tr><td>4</td><td>Destinataire</td><td>Reçoit le PDF et l'Excel joints, ou consulte le PDF imprimé</td><td>Adresse contrôlée ; envoi journalisé</td></tr>
+      <tr><td>5</td><td>Bureau</td><td>Archive le document et la preuve de diffusion</td><td>Audit de l'association</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.5 Imprimer, exporter, envoyer</h2>
+  <p>Les trois actions partent du même rapport et conservent les mêmes totaux. Le PDF est paginé et prêt à imprimer ; l'Excel contient une ligne par indicateur ou mouvement ; l'e-mail joint les deux fichiers.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/66_report_email.jpg" alt="Envoi du rapport par e-mail">
+    <figcaption><b>Figure 22.3</b> — Envoi par e-mail : un ou plusieurs destinataires, PDF et Excel joints, ou envoi à sa propre adresse si le champ est laissé vide.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Action</th><th>Usage</th><th>Ce qui est produit</th></tr></thead>
+    <tbody>
+      <tr><td>Imprimer PDF</td><td>Réunion de bureau, signature, archivage papier</td><td>PDF paginé, en-tête, date, indicateurs et détail des activités</td></tr>
+      <tr><td>Excel</td><td>Contrôle, retraitement, expert-comptable</td><td>Tableau `.xls` avec les mêmes colonnes que le rapport</td></tr>
+      <tr><td>Envoyer par e-mail</td><td>Diffusion au président, trésorier, commissaire ou partenaire</td><td>Message HTML soigné + PDF + Excel en pièces jointes</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><span class="tag">Attention</span><p>Un rapport envoyé ne vaut pas validation des comptes. Le bureau doit rapprocher les totaux des pièces bancaires et des caisses avant de diffuser un document officiel. Les noms et adresses des destinataires sont conservés dans l'audit.</p></div>
+
+  <h2>22.6 Les quatre lectures financières</h2>
+  <p>Les onglets Rapports, Historique, Intérêts et Dividendes ne sont pas quatre applications séparées : ils partagent les mêmes filtres, les mêmes règles de rôle et le même bouton de diffusion. La lecture change, la source reste unique.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/70_report_history.jpg" alt="Historique avec exports">
+    <figcaption><b>Figure 22.4</b> — Historique financier : filtres par périmètre, membre et activité, totaux entrées/sorties, et boutons Imprimer PDF, Excel, Envoyer par e-mail.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Onglet</th><th>Question à laquelle il répond</th><th>Export associé</th></tr></thead>
+    <tbody>
+      <tr><td>Rapports</td><td>Où en est l'association aujourd'hui ?</td><td>Situation consolidée</td></tr>
+      <tr><td>Historique</td><td>Que s'est-il passé, pour qui et quand ?</td><td>Journal des mouvements filtré</td></tr>
+      <tr><td>Intérêts</td><td>Quels intérêts ont été générés et quelle est la part du membre ?</td><td>Détail des remboursements et quote-parts</td></tr>
+      <tr><td>Dividendes</td><td>Quelle répartition annuelle a été calculée ou créditée ?</td><td>Exercice, capital, quote-part, statut</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.7 Un seul hub pour les réglages</h2>
+  <p>Les réglages de l'association ne sont plus dispersés : un bandeau d'onglets commun relie les informations, la configuration des activités, le cadre ARP et la sécurité. La navigation reste la même quand on passe d'une page à l'autre.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/67_assoc_settings.jpg" alt="Hub des réglages de l'association">
+    <figcaption><b>Figure 22.5</b> — Hub Réglages : Informations, Activités &amp; cadres, Cadre ARP et Sécurité &amp; rôles. Le formulaire conserve ses onglets internes et son bouton d'enregistrement permanent.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Onglet</th><th>Quand l'utiliser</th></tr></thead>
+    <tbody>
+      <tr><td>Informations</td><td>Nom, description, contacts, région, statut, logo et identité de l'association.</td></tr>
+      <tr><td>Activités &amp; cadres</td><td>Modifier une activité, ses cotisations, son cycle, ses parts et ses modes de paiement.</td></tr>
+      <tr><td>Cadre ARP</td><td>Contrôler les dimensions, les conditions C01–C06, les fonds et les versions.</td></tr>
+      <tr><td>Sécurité &amp; rôles</td><td>Rôles personnalisés, permissions, protection du fondateur et dissolution.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.8 Comptes et versements en un coup d'œil</h2>
+  <p>Le membre dispose de son wallet et de son compte AVOIR auprès de l'association. Il peut verser par wallet, banque avec preuve, ou espèces lorsque l'association l'autorise et qu'un membre du bureau encaisse. Le bureau peut régler un engagement pour un membre et rapprocher les opérations.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/69_member_accounts.jpg" alt="Comptes et versements">
+    <figcaption><b>Figure 22.6</b> — Comptes &amp; versements : solde AVOIR, wallet, versements, règlement d'activité, paiement d'un membre, relevé PDF/Excel et historique filtrable.</figcaption>
+  </figure>
+  <div class="callout dark"><span class="tag">Règle</span><p>Tout versement bancaire exige le compte de l'association et une preuve. Une preuve manquante ne crédite jamais le compte. Les mouvements d'espèces sont réservés au bureau et plafonnés par le paramétrage.</p></div>
+
+  <h2>22.9 Administration : menus et permissions</h2>
+  <p>La console système expose les groupes Pilotage &amp; Contrôle, Audit &amp; Journaux, Conformité, Wallets &amp; Frais et Gouvernance &amp; Paramètres. Les notifications système sont dans Pilotage, pas dans les frais. Un rôle personnalisé ne voit que les menus autorisés par ses permissions.</p>
+  <figure>
+    <img loading="lazy" src="/docs/manuel/assets/shots/68_admin_nav.jpg" alt="Navigation de la console d'administration">
+    <figcaption><b>Figure 22.7</b> — Navigation système : groupes complets, notifications dans Pilotage, permissions granulaires et accès direct aux journaux et à la conformité.</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Groupe</th><th>Entrées principales</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>Pilotage &amp; Contrôle</td><td>Tableau de bord, Notifications</td><td>Santé de la plateforme et messages système</td></tr>
+      <tr><td>Audit &amp; Journaux</td><td>Audit financier, Historique complet, Journaux système</td><td>Traçabilité et diagnostic</td></tr>
+      <tr><td>Conformité</td><td>KYC, Confiance &amp; scores, Rôles</td><td>Contrôle d'accès et conformité</td></tr>
+      <tr><td>Wallets &amp; Frais</td><td>Supervision wallets, Frais &amp; plafonds</td><td>Surveillance financière</td></tr>
+      <tr><td>Gouvernance &amp; Paramètres</td><td>Paramètres plateforme, Gouvernance &amp; Mail</td><td>Configuration globale et messagerie</td></tr>
+    </tbody>
+  </table>
+
+  <h2>22.10 Mobile : un menu Plus structuré</h2>
+  <p>Sur l'application mobile, le menu Plus regroupe les modules par usage : vie de l'association, finances, communauté, apprentissage et espace personnel. Les modules réservés au bureau sont filtrés selon le rôle ; hors association, seuls les outils globaux restent proposés. L'onglet Plus reste accessible dans la barre du bas, même sans association sélectionnée.</p>
+  <ul>
+    <li>Le membre retrouve son parcours et son compte association sans passer par le chat.</li>
+    <li>Les actions rapides (versement, aide, prêt, création d'association) sont filtrées par contexte.</li>
+    <li>Un module bureau n'apparaît pas pour un membre ordinaire.</li>
+  </ul>
+
+  <h2>22.11 Checklist de diffusion</h2>
+  <ul class="checklist">
+    <li>L'association et la date du rapport sont correctes.</li>
+    <li>Les caisses et le wallet sont rapprochés du dernier relevé bancaire.</li>
+    <li>Les avoirs membres et les aides à payer sont justifiés par des engagements ouverts.</li>
+    <li>Les prêts en cours et les échéances sont contrôlés.</li>
+    <li>Le PDF s'ouvre, se pagine et contient les bons destinataires.</li>
+    <li>L'Excel se télécharge et les totaux correspondent au PDF.</li>
+    <li>L'e-mail est envoyé avec PDF et Excel joints ; l'envoi est journalisé.</li>
+    <li>Le document est archivé avec sa date et son auteur.</li>
+  </ul>
+  <div class="callout info"><span class="tag">Astuce</span><p>Pour une réunion de bureau, générez le PDF la veille puis regénérez-le le matin : le rapport reflète toujours les derniers encaissements. N'envoyez jamais un export préparé avant un rapprochement sans vérifier sa date de génération.</p></div>
 </section>
 
 <section class="chapter">
