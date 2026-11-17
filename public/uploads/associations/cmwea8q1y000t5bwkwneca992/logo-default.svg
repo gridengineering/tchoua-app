@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="AMEIBANS — Amicale de l&apos;Élite Extérieure et Intérieure Bansoa">
+  <defs>
+    <linearGradient id="g1209755504" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d3d28"/><stop offset="1" stop-color="#071f16"/></linearGradient>
+    <clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#c)">
+    <rect width="512" height="512" fill="url(#g1209755504)"/>
+    <circle cx="430" cy="82" r="150" fill="#fca5a5" opacity=".16"/>
+    <circle cx="76" cy="448" r="180" fill="#ffffff" opacity=".07"/>
+    <path d="M0 360 C130 280 250 420 512 300 L512 512 L0 512 Z" fill="#000" opacity=".18"/>
+    <path d="M-40 90 C100 20 190 150 330 62" fill="none" stroke="#fca5a5" stroke-width="10" opacity=".55"/>
+  </g>
+  <rect x="1" y="1" width="510" height="510" rx="111" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="2"/>
+  <text x="256" y="276" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="154" font-weight="800" fill="#ffffff">AAD</text>
+  <text x="256" y="344" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" letter-spacing="8" fill="#fca5a5">TCHOUA</text>
+</svg>

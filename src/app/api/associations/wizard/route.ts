@@ -10,6 +10,7 @@ import {
 } from "@/lib/association/rules";
 import { generateJoinCode } from "@/lib/invite-code";
 import { ensureArpProfile } from "@/lib/arp/server";
+import { ensureAssociationLogo } from "@/lib/association/default-logo";
 
 export async function POST(req: Request) {
   try {
@@ -231,6 +232,8 @@ export async function POST(req: Request) {
 
       return newAssoc;
     });
+
+    await ensureAssociationLogo({ id: result.id, name: result.name, color: result.color, logo: result.logo }).catch(() => {});
 
     // Initialise le cadre ARP à partir des activités réellement créées.
     // Le profil reste BACKFILL/ACTIVE : il n'interrompt pas l'existant et sera

@@ -9,6 +9,7 @@ import {
   validateNotSuspendedInAnyAssociation,
 } from "@/lib/association/rules";
 import { generateJoinCode } from "@/lib/invite-code";
+import { ensureAssociationLogo } from "@/lib/association/default-logo";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -125,6 +126,8 @@ export async function POST(req: NextRequest) {
       activatedAt: new Date(),
     },
   });
+
+  await ensureAssociationLogo({ id: association.id, name: association.name, color: association.color }).catch(() => {});
 
   // Increment template usage count
   if (templateId) {

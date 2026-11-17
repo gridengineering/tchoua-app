@@ -2,6 +2,7 @@ import { createHash, randomInt, timingSafeEqual } from "crypto";
 import { spawn } from "child_process";
 import { prisma } from "@/lib/prisma";
 import { sendTransactionalEmail } from "@/lib/mailer";
+import { buildVerificationCodeHtml } from "@/lib/email-templates/verification";
 
 export type VerificationChannel = "EMAIL" | "PHONE" | "WHATSAPP";
 
@@ -29,6 +30,7 @@ export function isPhoneTarget(value: string) {
 
 async function deliverEmail(to: string, code: string) {
   const subject = "Votre code de vérification Tchoua";
+  const html = buildVerificationCodeHtml({ code, purpose: "Vérification de votre compte Tchoua" });
   const text = [
     "Bonjour,",
     "",
@@ -38,7 +40,7 @@ async function deliverEmail(to: string, code: string) {
     "",
     "— Tchoua, la plateforme des tontines et associations",
   ].join("\n");
-  if (await sendTransactionalEmail({ to, subject, text })) return true;
+  if (await sendTransactionalEmail({ to, subject, text, html })) return true;
 
   const webhook = process.env.KYC_EMAIL_WEBHOOK_URL;
   if (webhook) {
@@ -52,6 +54,7 @@ async function deliverEmail(to: string, code: string) {
         to,
         subject: "Votre code de vérification Tchoua",
         text: `Votre code de vérification Tchoua est ${code}. Il expire dans 10 minutes.`,
+        html,
         code,
       }),
     }).catch((error) => {
@@ -67,9 +70,9 @@ async function deliverEmail(to: string, code: string) {
     `To: ${to}`,
     `Subject: ${subject}`,
     "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
+    "Content-Type: text/html; charset=UTF-8",
     "",
-    text,
+    html,
   ].join("\r\n");
 
   try {

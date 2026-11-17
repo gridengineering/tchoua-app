@@ -33,6 +33,7 @@ type AssocDetail = {
   description?: string;
   type: string;
   color: string;
+  logo?: string | null;
   status: string;
   region?: string;
   bureauConfig?: string;
@@ -817,10 +818,10 @@ export default function AssociationDetailPage() {
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               {/* Logo / Initials */}
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 overflow-hidden border border-black/5"
                 style={{ backgroundColor: assoc.color }}
               >
-                {getInitials(assoc.name)}
+                {assoc.logo ? <img src={assoc.logo} alt={`Logo ${assoc.name}`} className="h-full w-full object-cover" /> : getInitials(assoc.name)}
               </div>
 
               {/* Info */}

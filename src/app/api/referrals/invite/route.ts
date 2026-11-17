@@ -5,40 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { sendTransactionalEmail } from "@/lib/mailer";
 import { normalizeEmail } from "@/lib/association/member-invite";
 
+import { buildInviteLandingHtml } from "@/lib/email-templates/invite";
+
 function buildDiscoveryHtml(inviterName: string, webUrl: string, mobileUrl: string): string {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="utf-8" /><title>Découvrez Tchoua</title></head>
-<body style="margin:0;padding:0;background:#f7f3eb;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#1f2937;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
-        <tr>
-          <td style="background:#0d3d28;padding:24px 28px;color:#ffffff;">
-            <div style="font-size:22px;font-weight:800;">Tchoua · Solidarité Digitale</div>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:28px;">
-            <h2 style="margin:0 0 12px;color:#0d3d28;">${inviterName} vous invite à découvrir Tchoua</h2>
-            <p style="font-size:15px;line-height:1.6;margin:0 0 20px;">
-              Gérez vos tontines, cotisations, prêts, aides solidaires et réunions en toute transparence sur Web ou Mobile.
-            </p>
-            <div style="text-align:center;margin:24px 0;">
-              <a href="${webUrl}" style="display:inline-block;background:#0d3d28;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 24px;border-radius:10px;margin:4px;">
-                S&apos;inscrire sur le Web
-              </a>
-              <a href="${mobileUrl}" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 24px;border-radius:10px;margin:4px;">
-                Télécharger l&apos;app Mobile
-              </a>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  return buildInviteLandingHtml({ inviterName, webUrl, mobileUrl, mode: "DISCOVERY" });
 }
 
 export async function GET() {
@@ -55,7 +25,7 @@ export async function GET() {
 
   const shareUrl = `https://www.tchoua.com/register?ref=${encodeURIComponent(user.referralCode)}`;
   const mobileDownloadUrl = "https://www.tchoua.com/mobile";
-  const shareText = `Rejoignez-moi sur Tchoua pour gérer nos associations et tontines ! Inscrivez-vous ici : ${shareUrl} ou téléchargez l'app mobile : ${mobileDownloadUrl}`;
+  const shareText = `Rejoignez-moi sur Tchoua : tontines transparentes, cotisations suivies, prêts, aides et réunions dans un seul espace sécurisé. Créez votre compte gratuitement : ${shareUrl} · Application mobile : ${mobileDownloadUrl}`;
 
   return NextResponse.json({
     referralCode: user.referralCode,
@@ -88,7 +58,7 @@ export async function POST(req: NextRequest) {
 
   const shareUrl = `https://www.tchoua.com/register?ref=${encodeURIComponent(user.referralCode)}`;
   const mobileDownloadUrl = "https://www.tchoua.com/mobile";
-  const shareText = `${user.name} vous invite à découvrir Tchoua ! Inscription Web : ${shareUrl} · App Mobile : ${mobileDownloadUrl}`;
+  const shareText = `${user.name} vous invite à découvrir Tchoua, la plateforme qui digitalise la solidarité : tontines, cotisations, prêts, aides et réunions. Inscription gratuite : ${shareUrl} · App Mobile : ${mobileDownloadUrl}`;
 
   if (channel === "WHATSAPP") {
     const pointsAwarded = 15;
@@ -141,7 +111,7 @@ export async function POST(req: NextRequest) {
   for (const email of validEmails) {
     const sent = await sendTransactionalEmail({
       to: email,
-      subject: `${user.name} vous invite à découvrir Tchoua`,
+      subject: `${user.name} vous invite à découvrir Tchoua — la solidarité en mieux`,
       text: shareText,
       html: buildDiscoveryHtml(user.name, shareUrl, mobileDownloadUrl),
     });

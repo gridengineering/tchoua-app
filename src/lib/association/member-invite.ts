@@ -2,6 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { sendTransactionalEmail } from "@/lib/mailer";
+import { buildInviteLandingHtml } from "@/lib/email-templates/invite";
 
 export type FreeMemberInput = {
   firstName?: string;
@@ -68,6 +69,24 @@ export function verifyInviteToken(token: string): MemberInviteTokenPayload | nul
 }
 
 export function buildMemberInviteHtml(params: {
+  memberName: string;
+  associationName: string;
+  inviterName: string;
+  confirmUrl: string;
+  existingAccount: boolean;
+}): string {
+  return buildInviteLandingHtml({
+    inviterName: params.inviterName,
+    memberName: params.memberName,
+    associationName: params.associationName,
+    confirmUrl: params.confirmUrl,
+    webUrl: "https://www.tchoua.com",
+    mobileUrl: "https://www.tchoua.com/mobile",
+    mode: "MEMBER",
+  });
+}
+
+function legacyMemberInviteHtml(params: {
   memberName: string;
   associationName: string;
   inviterName: string;
@@ -241,7 +260,7 @@ export async function inviteOrAttachMember(
     });
     emailSent = await sendTransactionalEmail({
       to: email,
-      subject: `Invitation à rejoindre ${association.name} sur Tchoua`,
+      subject: `${inviterName} vous invite à rejoindre ${association.name} sur Tchoua`,
       text: `Bonjour ${user.name || fullName}, ${inviterName} vous invite à rejoindre ${association.name} sur Tchoua. Confirmez votre accès et activez votre KYC1 : ${confirmUrl}`,
       html,
     });

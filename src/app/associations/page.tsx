@@ -499,9 +499,9 @@ export default function AssociationsPage() {
                 <Card className="hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer h-full">
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl overflow-hidden"
                         style={{ background: a.color ? `${a.color}18` : "rgba(13,61,40,0.08)" }}>
-                        {ASSOC_TYPE_ICON[a.type as AssocType] || "🏛️"}
+                        {a.logo ? <img src={a.logo} alt={`Logo ${a.name}`} className="h-full w-full object-cover" /> : (ASSOC_TYPE_ICON[a.type as AssocType] || "🏛️")}
                       </div>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
                         style={{
