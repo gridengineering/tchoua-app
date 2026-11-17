@@ -99,7 +99,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const account = await ensureMemberAccount(prisma, target, currency);
   const where = txWhere(associationId, canManage && search.get("scope") === "association" ? null : target.id, search);
-  const [transactions, wallet, activities, bankAccounts, aggregate, members] = await Promise.all([
+  const [transactions, wallet, activities, bankAccounts, aggregate, members, sessions] = await Promise.all([
     prisma.associationMemberTransaction.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -121,6 +121,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           orderBy: [{ joinedAt: "asc" }, { createdAt: "asc" }],
         })
       : Promise.resolve([]),
+    prisma.assocMeeting.findMany({
+      where: { associationId },
+      select: { id: true, title: true, scheduledAt: true, type: true },
+      orderBy: { scheduledAt: "desc" },
+      take: 24,
+    }),
   ]);
 
   const totalIn = Number((aggregate as any[]).find((x) => x.direction === "IN")?._sum?.amount ?? 0);
@@ -139,6 +145,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     activities,
     bankAccounts,
     members,
+    sessions,
     canManage,
     cashProvider: cashProvider ? { enabled: cashProvider.enabled, max: cashProvider.max } : null,
     summary: { totalIn, totalOut, count: transactions.length, pending },

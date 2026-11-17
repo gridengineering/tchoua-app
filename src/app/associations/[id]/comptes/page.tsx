@@ -37,13 +37,14 @@ export default function MemberAccountsPage() {
   const [activityId, setActivityId] = useState("");
   const [settleAmount, setSettleAmount] = useState("");
   const [withdrawMethod, setWithdrawMethod] = useState("WALLET");
-  const [filters, setFilters] = useState({ activityId: "", method: "", from: "", to: "" });
+  const [filters, setFilters] = useState({ activityId: "", method: "", from: "", to: "", sessionId: "" });
 
   const qs = useMemo(() => {
     const p = new URLSearchParams();
     if (targetId) p.set("membershipId", targetId);
     if (scopeAll) p.set("scope", "association");
     if (filters.activityId) p.set("activityId", filters.activityId);
+    if (filters.sessionId) p.set("sessionId", filters.sessionId);
     if (filters.method) p.set("method", filters.method);
     if (filters.from) p.set("from", filters.from);
     if (filters.to) p.set("to", filters.to);
@@ -138,6 +139,7 @@ export default function MemberAccountsPage() {
     if (targetId) p.set("membershipId", targetId);
     if (scopeAll) p.set("scope", "association");
     if (filters.activityId) p.set("activityId", filters.activityId);
+    if (filters.sessionId) p.set("sessionId", filters.sessionId);
     if (filters.method) p.set("method", filters.method);
     if (filters.from) p.set("from", filters.from);
     if (filters.to) p.set("to", filters.to);
@@ -255,7 +257,8 @@ export default function MemberAccountsPage() {
               <a href={exportUrl("EXCEL")} target="_blank" className="inline-flex items-center gap-1 rounded-lg border border-stone px-3 py-2 text-xs font-bold"><FileSpreadsheet className="h-3.5 w-3.5" /> Excel</a>
             </div>
           </div>
-          <div className="mb-4 grid gap-2 sm:grid-cols-4">
+          <div className="mb-4 grid gap-2 sm:grid-cols-5">
+            <select value={filters.sessionId} onChange={(e) => setFilters({ ...filters, sessionId: e.target.value })} className="rounded-lg border border-stone px-2 py-2 text-xs"><option value="">Toutes les sessions</option>{(data?.sessions ?? []).map((s: any) => <option key={s.id} value={s.id}>{s.title ?? "Session"} · {new Date(s.scheduledAt).toLocaleDateString("fr-FR")}</option>)}</select>
             <select value={filters.activityId} onChange={(e) => setFilters({ ...filters, activityId: e.target.value })} className="rounded-lg border border-stone px-2 py-2 text-xs"><option value="">Toutes les activités</option>{(data?.activities ?? []).map((a: Activity) => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
             <select value={filters.method} onChange={(e) => setFilters({ ...filters, method: e.target.value })} className="rounded-lg border border-stone px-2 py-2 text-xs"><option value="">Tous les comptes</option><option value="WALLET">Wallet</option><option value="BANK">Banque</option><option value="CASH">Espèces</option><option value="ACTIVITY">Activité</option></select>
             <input type="date" value={filters.from} onChange={(e) => setFilters({ ...filters, from: e.target.value })} className="rounded-lg border border-stone px-2 py-2 text-xs" />
