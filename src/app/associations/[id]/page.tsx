@@ -1551,7 +1551,7 @@ export default function AssociationDetailPage() {
             <div>
               <h3 className="text-sm font-semibold text-graphite uppercase tracking-wide mb-3">Passées</h3>
               <div className="space-y-3">
-                {meetings.filter(m => m.status === "DONE").map(meeting => (
+                {meetings.filter(m => m.status === "DONE" || m.status === "HELD" || m.status === "CLOSED" || new Date(m.scheduledAt) < new Date()).map(meeting => (
                   <Card key={meeting.id} className="cursor-pointer hover:shadow-md transition-shadow opacity-80" onClick={() => setSelectedMeeting(meeting)}>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between">
