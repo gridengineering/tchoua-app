@@ -87,6 +87,8 @@ export function GovernanceConsole({
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [mailTestTo, setMailTestTo] = useState("");
   const [mailTesting, setMailTesting] = useState(false);
+  const [mailVerifying, setMailVerifying] = useState(false);
+  const [mailChecks, setMailChecks] = useState<Array<{ ok: boolean; label: string; error?: string }> | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -112,6 +114,26 @@ export function GovernanceConsole({
 
   const dirty = useMemo(() => Boolean(config) && JSON.stringify(config) !== initial, [config, initial]);
   const update = (path: string, value: unknown) => setConfig((current) => (current ? setPath(current, path, value) : current));
+
+  const verifyMail = async () => {
+    if (!config) return;
+    setMailVerifying(true);
+    setMailChecks(null);
+    try {
+      const res = await fetch("/api/admin/governance/test-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: config.email }),
+      });
+      const data = await res.json();
+      setMailChecks([data.checks?.smtp, data.checks?.imap, data.checks?.pop3].filter(Boolean));
+      setToast({ type: res.ok ? "success" : "error", message: data.message || data.error || "Test terminé" });
+    } catch (error: any) {
+      setToast({ type: "error", message: error.message });
+    } finally {
+      setMailVerifying(false);
+    }
+  };
 
   const save = async () => {
     if (!config) return;
@@ -350,13 +372,17 @@ export function GovernanceConsole({
                 <button className={btn} disabled={mailTesting || !mailTestTo} onClick={async () => {
                   setMailTesting(true);
                   try {
-                    const res = await fetch("/api/admin/governance/test-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: mailTestTo }) });
+                    const res = await fetch("/api/admin/governance/test-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: mailTestTo, email: config.email }) });
                     const data = await res.json();
                     setToast({ type: res.ok ? "success" : "error", message: data.message || data.error || "Test terminé" });
                   } catch (error: any) { setToast({ type: "error", message: error.message }); }
                   finally { setMailTesting(false); }
-                }}>{mailTesting ? "Envoi…" : "Tester SMTP"}</button>
+                }}>{mailTesting ? "Envoi…" : "Tester l'envoi"}</button>
+                <button className={btn} disabled={mailVerifying} onClick={verifyMail}>{mailVerifying ? "Vérification…" : "Tester la configuration"}</button>
               </div>
+              {mailChecks && <div className="mt-3 grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs sm:grid-cols-3">
+                {mailChecks.map((check) => <div key={check.label} className={`rounded-lg border p-2 ${check.ok ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800"}`}><strong>{check.label} : {check.ok ? "OK" : "Échec"}</strong>{check.error ? <p className="mt-1 break-words">{check.error}</p> : null}</div>)}
+              </div>}
               {(["smtp", "imap", "pop3"] as const).map((kind) => (
                 <div key={kind} className="mt-5 rounded-xl border border-slate-200 p-4">
                   <div className="mb-3 flex items-center justify-between">
