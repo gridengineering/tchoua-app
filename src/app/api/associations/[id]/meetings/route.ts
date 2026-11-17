@@ -151,7 +151,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       scheduledAt: new Date(scheduledAt),
       location,
       quorumRequired: resolveQuorum(resolvedType, quorumRequired),
-      agenda: agenda ? JSON.stringify(agenda) : null,
+      agenda: agenda
+        ? JSON.stringify(
+            typeof agenda === "string"
+              ? agenda.split("\n").map((title: string) => ({ title: title.trim() })).filter((x: any) => x.title)
+              : agenda
+          )
+        : null,
       notes,
       isRotating: isRotating ?? modality === "ROTATING",
       modality: modality ?? (isRotating ? "ROTATING" : "PHYSICAL"),
