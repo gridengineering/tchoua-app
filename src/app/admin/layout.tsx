@@ -18,7 +18,14 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Pilotage & Contrôle",
     items: [
       { name: "Tableau de bord", href: "/admin", icon: LayoutDashboard, exact: true },
-      { name: "Audit & Journaux", href: "/admin/finance", icon: Landmark, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
+    ],
+  },
+  {
+    label: "Audit & Journaux",
+    items: [
+      { name: "Audit financier", href: "/admin/finance", icon: Landmark, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
+      { name: "Historique complet", href: "/admin/historique", icon: History, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
+      { name: "Journaux système", href: "/admin/audit", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR"] },
     ],
   },
   {
@@ -30,19 +37,27 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Conformité & Accès",
+    label: "Conformité",
     items: [
-      { name: "KYC & Confiance", href: "/admin/kyc", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
+      { name: "Conformité KYC", href: "/admin/kyc", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
+      { name: "Confiance & Scores", href: "/admin/confiance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
       { name: "Utilisateurs système", href: "/admin/users", icon: Users, roles: ["SUPER_ADMIN", "ADMIN"] },
       { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
   {
-    label: "Finances & Système",
+    label: "Wallets & Frais",
     items: [
-      { name: "Wallets & Frais", href: "/admin/wallets", icon: Wallet, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "AUDITOR"] },
+      { name: "Supervision Wallets", href: "/admin/wallets", icon: Wallet, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "AUDITOR"] },
+      { name: "Frais & Plafonds", href: "/admin/settings/wallet", icon: Sliders, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
       { name: "Notifications", href: "/admin/notifications", icon: Bell },
-      { name: "Gouvernance & Paramètres", href: "/admin/settings", icon: Settings, roles: ["SUPER_ADMIN", "ADMIN"] },
+    ],
+  },
+  {
+    label: "Gouvernance & Paramètres",
+    items: [
+      { name: "Paramètres plateforme", href: "/admin/settings", icon: Settings, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Gouvernance & Mail", href: "/admin/gouvernance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
 ];
@@ -113,18 +128,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setSearchQuery("");
   }, [pathname]);
 
-  const roleKey = String(user?.systemRoleName || "").toUpperCase();
+  const roleKey = String(user?.systemRoleName || "").trim().toUpperCase().replace(/[ _-]+/g, " ");
+  const isFullAdmin = !roleKey || roleKey.includes("ADMIN") || roleKey === "SUPER ADMIN" || roleKey === "PRINCIPAL";
   const visibleGroups = useMemo(() => {
     return NAV_GROUPS.map((group) => ({
       ...group,
       items: group.items.filter((item) => {
-        if (!item.roles || !roleKey || roleKey === "SUPER_ADMIN" || roleKey === "ADMIN" || roleKey === "ADMINISTRATEUR") {
-          return true;
-        }
+        if (!item.roles || isFullAdmin) return true;
         return item.roles.includes(roleKey);
       }),
     })).filter((g) => g.items.length > 0);
-  }, [roleKey]);
+  }, [roleKey, isFullAdmin]);
 
   const adminSearchEntries = useMemo(() => {
     const all = [
@@ -179,10 +193,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isActive = (item: NavItem) => {
     if (item.exact) return pathname === item.href;
-    if (item.href === "/admin/finance") return ["/admin/finance", "/admin/historique", "/admin/audit"].some((p) => pathname.startsWith(p));
-    if (item.href === "/admin/kyc") return ["/admin/kyc", "/admin/confiance"].some((p) => pathname.startsWith(p));
-    if (item.href === "/admin/wallets") return pathname.startsWith("/admin/wallets") || pathname.startsWith("/admin/settings/wallet");
-    if (item.href === "/admin/settings") return (pathname.startsWith("/admin/settings") && !pathname.startsWith("/admin/settings/wallet")) || pathname.startsWith("/admin/gouvernance");
+    if (item.href === "/admin/settings") {
+      return pathname === "/admin/settings" || (pathname.startsWith("/admin/settings/") && !pathname.startsWith("/admin/settings/wallet"));
+    }
+    if (item.href === "/admin/settings/wallet") return pathname.startsWith("/admin/settings/wallet");
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
 
