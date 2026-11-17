@@ -1259,11 +1259,11 @@ export function exportToCSV(data: any): string {
   return "\uFEFF" + lines.join("\n"); // BOM for Excel
 }
 
-export function exportToExcel(data: any): Buffer {
+export function exportToExcel(data: any, columns?: Array<{ key: string }>): Buffer {
   const rows: any[] = Array.isArray(data)
     ? data
     : data?.activities ?? data?.members ?? data?.flux ?? (data && typeof data === "object" ? [data] : []);
-  const headers = rows.length ? Object.keys(rows[0]) : [];
+  const headers = columns?.length ? columns.map((column) => column.key) : rows.length ? Object.keys(rows[0]) : [];
 
   const esc = (s: string) =>
     String(s)

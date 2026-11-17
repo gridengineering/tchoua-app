@@ -9,7 +9,12 @@ export type MailInput = {
   subject: string;
   text: string;
   html?: string;
-  attachments?: Array<{ filename: string; path: string }>;
+  attachments?: Array<{
+    filename: string;
+    path?: string;
+    content?: Buffer;
+    contentType?: string;
+  }>;
 };
 
 /**

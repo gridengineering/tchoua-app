@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
+import { ReportExportBar } from "@/components/associations/report-export-bar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,7 +126,9 @@ export default function DividendsPage() {
           >
             <ArrowLeft className="w-4 h-4" /> Vue d&apos;ensemble
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <ReportExportBar associationId={id} section="dividends" compact params={{ year }} />
+            <div className="flex items-center gap-2">
             <label className="text-xs font-semibold uppercase tracking-wide text-ash">Exercice</label>
             <select
               value={year}
@@ -138,6 +141,7 @@ export default function DividendsPage() {
                 </option>
               ))}
             </select>
+          </div>
           </div>
         </div>
 

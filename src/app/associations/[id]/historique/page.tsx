@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
+import { ReportExportBar } from "@/components/associations/report-export-bar";
 import {
   ArrowDownLeft, ArrowUpRight, BarChart3, Calendar, ChevronLeft, ChevronRight,
   Columns3, Download, Filter, Grid3x3, List, Search, Wallet,
@@ -121,9 +122,17 @@ export default function HistoryPage() {
             <h1 className="mt-1 text-2xl font-bold m-text">Mouvements & opérations</h1>
             <p className="mt-1 text-sm m-muted">Cotisations, prêts, remboursements, intérêts et bénéficiaires — filtres, regroupements et vues.</p>
           </div>
-          <Link href={`/associations/${id}/interets`} className="inline-flex items-center gap-2 rounded-xl m-accent-bg px-4 py-2.5 text-sm font-semibold">
-            <BarChart3 className="h-4 w-4" /> Détail des intérêts
-          </Link>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <ReportExportBar
+              associationId={id}
+              section="history"
+              compact
+              params={{ membershipId: scope === "member" ? membershipId : undefined, activityId: scope === "activity" ? activityId : undefined, from, to }}
+            />
+            <Link href={`/associations/${id}/interets`} className="inline-flex items-center gap-2 rounded-xl m-accent-bg px-4 py-2.5 text-sm font-semibold">
+              <BarChart3 className="h-4 w-4" /> Détail des intérêts
+            </Link>
+          </div>
         </div>
 
         {/* Scopes + vues */}

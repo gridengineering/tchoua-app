@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
+import { ReportExportBar } from "@/components/associations/report-export-bar";
 import { ArrowLeft, ChevronDown, ChevronUp, Info, Percent, TrendingUp, Users } from "lucide-react";
 
 type Row = {
@@ -75,6 +76,13 @@ export default function InterestsPage() {
               Chaque remboursement génère des intérêts répartis au prorata du capital détenu à la date du prêt.
             </p>
           </div>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <ReportExportBar
+              associationId={id}
+              section="interests"
+              compact
+              params={{ membershipId: membershipId || undefined, from, to }}
+            />
           <div className="flex flex-wrap gap-2">
             {data?.canViewAll && (
               <select value={membershipId} onChange={(e) => setMembershipId(e.target.value)}
@@ -89,6 +97,7 @@ export default function InterestsPage() {
             </select>
             <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="rounded-xl border m-border m-surface px-3 py-2 text-sm m-text" />
             <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="rounded-xl border m-border m-surface px-3 py-2 text-sm m-text" />
+          </div>
           </div>
         </div>
 
