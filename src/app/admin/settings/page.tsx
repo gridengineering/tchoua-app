@@ -8,8 +8,7 @@ import {
   Sparkles, ToggleLeft, ToggleRight, Users, Video, Wallet, Wrench,
 } from "lucide-react";
 import { PlatformSettings } from "@/lib/platform-settings-shared";
-import { GovernanceConsole } from "@/components/admin/governance-console";
-import { WalletSettingsPanel } from "@/components/admin/wallet-settings-panel";
+
 
 const TABS = [
   { id: "general", label: "Identité", icon: Layout },
@@ -18,15 +17,6 @@ const TABS = [
   { id: "limits", label: "Limites & finances", icon: Coins },
   { id: "features", label: "Fonctionnalités", icon: Sparkles },
   { id: "rtc", label: "RTC & Chat", icon: Video },
-  { id: "kyc", label: "KYC", icon: ShieldCheck },
-  { id: "trust", label: "Confiance", icon: SlidersHorizontal },
-  { id: "quarantine", label: "Quarantaine", icon: AlertCircle },
-  { id: "email", label: "Messagerie", icon: Mail },
-  { id: "governance-wallet", label: "Wallet & paiements", icon: Wallet },
-  { id: "rbac", label: "RBAC / IAM / ACL", icon: Users },
-  { id: "governance-notifications", label: "Notifications Tchoua Mobile", icon: Globe2 },
-  { id: "openapi", label: "OpenAPI 3.1", icon: KeyRound },
-  { id: "wallet", label: "Frais & plafonds Wallet", icon: Wallet },
   { id: "notifications", label: "Notifications système", icon: Bell },
   { id: "maintenance", label: "Maintenance", icon: Wrench },
 ] as const;
@@ -116,9 +106,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const isEmbeddedPanel =
-    tab === "wallet" ||
-    ["kyc", "trust", "quarantine", "email", "governance-wallet", "rbac", "governance-notifications", "openapi"].includes(tab);
+  const isEmbeddedPanel = false;
 
   const dirty = useMemo(
     () => Boolean(settings) && JSON.stringify(settings) !== initial,
@@ -217,7 +205,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
 
   return (
     <div className="space-y-6 pb-12">
-      <AdminSectionTabs group={initialTab === "wallet" ? "wallets" : "settings"} />
+      <AdminSectionTabs group="settings" />
       {toast && (
         <div
           className={`fixed right-6 top-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-xl ${
@@ -233,7 +221,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Paramètres de la plateforme</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Configuration globale : identité, accès, limites, fonctionnalités, RTC, gouvernance, wallet et maintenance.
+            Configuration globale : identité, accès, limites, fonctionnalités, RTC, notifications et maintenance.
             {meta?.updatedAt && (
               <span className="ml-1 text-slate-400">
                 Dernière mise à jour : {new Date(meta.updatedAt).toLocaleString("fr-FR")}
@@ -577,16 +565,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
             </div>
           )}
 
-          {tab === "kyc" && <GovernanceConsole embedded hideTabs initialTab="kyc" />}
-          {tab === "trust" && <GovernanceConsole embedded hideTabs initialTab="trust" />}
-          {tab === "quarantine" && <GovernanceConsole embedded hideTabs initialTab="quarantine" />}
-          {tab === "email" && <GovernanceConsole embedded hideTabs initialTab="email" />}
-          {tab === "governance-wallet" && <GovernanceConsole embedded hideTabs initialTab="wallet" />}
-          {tab === "rbac" && <GovernanceConsole embedded hideTabs initialTab="rbac" />}
-          {tab === "governance-notifications" && <GovernanceConsole embedded hideTabs initialTab="notifications" />}
-          {tab === "openapi" && <GovernanceConsole embedded hideTabs initialTab="openapi" />}
 
-          {tab === "wallet" && <WalletSettingsPanel embedded />}
 
           {tab === "notifications" && (
             <Section title="Notifications" icon={Bell} desc="Canaux et délais de rappel des échéances.">
