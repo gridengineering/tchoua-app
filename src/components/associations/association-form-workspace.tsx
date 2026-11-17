@@ -24,6 +24,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationSettingsTabs } from "@/components/associations/association-settings-tabs";
 import { ArpModulesPanel } from "@/components/arp/arp-modules-panel";
 import { IssueList, ProgressBar, StatusPill } from "@/components/arp/arp-ui";
 import { FrequencyPicker } from "@/components/ui/frequency-picker";
@@ -742,6 +743,7 @@ export function AssociationFormWorkspace({
   return (
     <DashboardLayout title={mode === "create" ? "Créer une association" : `Configurer — ${initial?.name ?? "association"}`}>
       <div className="mx-auto max-w-6xl pb-24">
+        {mode === "edit" && associationId ? <AssociationSettingsTabs associationId={associationId} /> : null}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link

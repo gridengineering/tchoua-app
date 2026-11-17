@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, ArrowLeft, Plus, Shield, Trash2, X } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationSettingsTabs } from "@/components/associations/association-settings-tabs";
 import { PERMISSIONS, ALL_PERMISSIONS, type Permission } from "@/lib/permissions";
 import { FounderProtection } from "@/components/associations/founder-protection";
 
@@ -62,6 +63,7 @@ export default function AssociationSecurityPage() {
   return (
     <DashboardLayout title={`Sécurité & rôles — ${association?.name ?? ""}`}>
       <div className="mx-auto max-w-4xl space-y-5">
+        <AssociationSettingsTabs associationId={id} />
         <Link href={`/associations/${id}`} className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#0d3d28]">
           <ArrowLeft className="h-4 w-4" /> Retour à l&apos;association
         </Link>

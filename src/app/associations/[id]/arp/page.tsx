@@ -17,6 +17,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationSettingsTabs } from "@/components/associations/association-settings-tabs";
 import { ArpProfilePanel } from "@/components/arp/arp-profile-panel";
 import { ArpModulesPanel } from "@/components/arp/arp-modules-panel";
 import { ArpFundsPanel } from "@/components/arp/arp-funds-panel";
@@ -217,6 +218,7 @@ export default function ArpPage() {
   return (
     <DashboardLayout title={`Cadre ARP — ${data.association.name}`}>
       <div className="mx-auto max-w-6xl space-y-4 pb-24">
+        <AssociationSettingsTabs associationId={associationId} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             href={`/associations/${associationId}?tab=overview`}

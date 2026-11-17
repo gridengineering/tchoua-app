@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useI18n } from "@/lib/i18n/context";
+import { navText } from "@/lib/i18n/member-nav";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, PiggyBank, RotateCcw, Landmark, Heart, BarChart3,
@@ -74,6 +75,7 @@ const BUREAU_ROLES = new Set([
 ]);
 
 function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string; collapsed?: boolean }) {
+  const { lang } = useI18n();
   const isBureau = !myRole || BUREAU_ROLES.has(myRole.toUpperCase());
   const groups: Group[] = [
     {
@@ -100,8 +102,7 @@ function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string
             title: "Gestion & Bureau",
             items: [
               { href: `/associations/${id}/kyc`, label: "Conformité KYC", icon: ShieldCheck },
-              { href: `/associations/${id}/modifier`, label: "Configurer", icon: Settings },
-              { href: `/associations/${id}/parametres`, label: "Sécurité & rôles", icon: ShieldCheck },
+              { href: `/associations/${id}/modifier`, label: "Réglages association", icon: Settings },
             ],
           },
         ]
@@ -113,7 +114,7 @@ function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string
       {groups.map((group) => (
         <div key={group.title}>
           {!collapsed && (
-            <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
+            <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{navText(group.title, lang)}</div>
           )}
           <div className="space-y-0.5">
             {group.items.map((item) => {
@@ -121,7 +122,7 @@ function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string
                 ? pathname === item.href
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
-                <SidebarLink key={item.href} item={item} active={active} collapsed={collapsed} />
+                <SidebarLink key={item.href} item={{ ...item, label: navText(item.label, lang) }} active={active} collapsed={collapsed} />
               );
             })}
           </div>
@@ -272,14 +273,14 @@ export function MemberSidebar({
           visibleGroups.map((group) => (
             <div key={group.title} className="mb-3">
               {!collapsed && (
-                <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
+                <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{navText(group.title, lang)}</div>
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const active = item.href === "/dashboard"
                     ? pathname === "/dashboard"
                     : pathname === item.href || (pathname.startsWith(`${item.href}/`) && item.href !== "/dashboard");
-                  return <SidebarLink key={item.href} item={item} active={active} collapsed={collapsed} />;
+                  return <SidebarLink key={item.href} item={{ ...item, label: navText(item.label, lang) }} active={active} collapsed={collapsed} />;
                 })}
               </div>
             </div>

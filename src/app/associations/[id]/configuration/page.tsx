@@ -18,6 +18,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationSettingsTabs } from "@/components/associations/association-settings-tabs";
 import {
   ActivityForm,
   type ActivityInitial,
@@ -195,6 +196,7 @@ export default function AssociationConfigurationPage() {
   return (
     <DashboardLayout title={`Configuration — ${association.name}`}>
       <div className="mx-auto max-w-6xl space-y-4 pb-16">
+        <AssociationSettingsTabs associationId={id} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href={`/associations/${id}`} className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#0d3d28]">
             <ArrowLeft className="h-4 w-4" /> {association.name}

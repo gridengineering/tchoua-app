@@ -10,7 +10,7 @@ import {
   PanelLeftOpen, Search, Settings, ShieldCheck, Sliders, Users, Wallet, X,
 } from "lucide-react";
 
-type NavItem = { name: string; href: string; icon: any; exact?: boolean; roles?: string[] };
+type NavItem = { name: string; href: string; icon: any; exact?: boolean; roles?: string[]; permission?: string };
 type NavGroup = { label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
@@ -18,46 +18,46 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Pilotage & Contrôle",
     items: [
       { name: "Tableau de bord", href: "/admin", icon: LayoutDashboard, exact: true },
+      { name: "Notifications", href: "/admin/notifications", icon: Bell },
     ],
   },
   {
     label: "Audit & Journaux",
     items: [
-      { name: "Audit financier", href: "/admin/finance", icon: Landmark, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
-      { name: "Historique complet", href: "/admin/historique", icon: History, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
-      { name: "Journaux système", href: "/admin/audit", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR"] },
+      { name: "Audit financier", href: "/admin/finance", icon: Landmark, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"], permission: "TRANSACTIONS_READ" },
+      { name: "Historique complet", href: "/admin/historique", icon: History, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"], permission: "LOGS_READ" },
+      { name: "Journaux système", href: "/admin/audit", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR"], permission: "LOGS_READ" },
     ],
   },
   {
     label: "Écosystème & ARP",
     items: [
-      { name: "Associations", href: "/admin/associations", icon: Building2 },
-      { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes, roles: ["SUPER_ADMIN", "ADMIN"] },
-      { name: "Modèles", href: "/admin/templates", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Associations", href: "/admin/associations", icon: Building2, permission: "ASSOCIATIONS_READ" },
+      { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes, roles: ["SUPER_ADMIN", "ADMIN"], permission: "ASSOCIATIONS_READ" },
+      { name: "Modèles", href: "/admin/templates", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN"], permission: "TEMPLATES_READ" },
     ],
   },
   {
     label: "Conformité",
     items: [
-      { name: "Conformité KYC", href: "/admin/kyc", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
-      { name: "Confiance & Scores", href: "/admin/confiance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
-      { name: "Utilisateurs système", href: "/admin/users", icon: Users, roles: ["SUPER_ADMIN", "ADMIN"] },
-      { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Conformité KYC", href: "/admin/kyc", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"], permission: "ASSOCIATIONS_READ" },
+      { name: "Confiance & Scores", href: "/admin/confiance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"], permission: "ASSOCIATIONS_READ" },
+      { name: "Utilisateurs système", href: "/admin/users", icon: Users, roles: ["SUPER_ADMIN", "ADMIN"], permission: "USERS_READ" },
+      { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"], permission: "SETTINGS_READ" },
     ],
   },
   {
     label: "Wallets & Frais",
     items: [
-      { name: "Supervision Wallets", href: "/admin/wallets", icon: Wallet, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "AUDITOR"] },
-      { name: "Frais & Plafonds", href: "/admin/settings/wallet", icon: Sliders, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"] },
-      { name: "Notifications", href: "/admin/notifications", icon: Bell },
+      { name: "Supervision Wallets", href: "/admin/wallets", icon: Wallet, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "AUDITOR"], permission: "TRANSACTIONS_READ" },
+      { name: "Frais & Plafonds", href: "/admin/settings/wallet", icon: Sliders, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE"], permission: "SETTINGS_UPDATE" },
     ],
   },
   {
     label: "Gouvernance & Paramètres",
     items: [
-      { name: "Paramètres plateforme", href: "/admin/settings", icon: Settings, roles: ["SUPER_ADMIN", "ADMIN"] },
-      { name: "Gouvernance & Mail", href: "/admin/gouvernance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Paramètres plateforme", href: "/admin/settings", icon: Settings, roles: ["SUPER_ADMIN", "ADMIN"], permission: "SETTINGS_READ" },
+      { name: "Gouvernance & Mail", href: "/admin/gouvernance", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"], permission: "SETTINGS_UPDATE" },
     ],
   },
 ];
@@ -88,6 +88,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
+  const [permissions, setPermissions] = useState<string[] | null>(null);
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -96,6 +97,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     setMounted(true);
     setCollapsed(localStorage.getItem("tchoua-admin-collapsed") === "1");
+    fetch("/api/admin/navigation", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (Array.isArray(d?.permissions)) setPermissions(d.permissions); })
+      .catch(() => {});
     fetch("/api/notifications?unreadOnly=true&limit=1", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (typeof d?.unreadCount === "number") setUnreadCount(d.unreadCount); })
@@ -134,11 +139,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return NAV_GROUPS.map((group) => ({
       ...group,
       items: group.items.filter((item) => {
-        if (!item.roles || isFullAdmin) return true;
+        if (isFullAdmin) return true;
+        if (item.permission && permissions) {
+          if (permissions.length === 0) return false;
+          if (!permissions.includes(item.permission)) return false;
+        }
+        if (!item.roles) return true;
         return item.roles.includes(roleKey);
       }),
     })).filter((g) => g.items.length > 0);
-  }, [roleKey, isFullAdmin]);
+  }, [roleKey, isFullAdmin, permissions]);
 
   const adminSearchEntries = useMemo(() => {
     const all = [

@@ -399,6 +399,13 @@ export default function AssociationDetailPage() {
       ? initialTab
       : "overview"
   );
+  const changeTab = (next: TabKey) => {
+    setTab(next);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    router.replace(`/associations/${id}?${params.toString()}`, { scroll: false });
+  };
+
   const [memberSearch, setMemberSearch] = useState("");
   const [memberRoleFilter, setMemberRoleFilter] = useState("ALL");
   const [memberStatusFilter, setMemberStatusFilter] = useState("ALL");
@@ -815,7 +822,8 @@ export default function AssociationDetailPage() {
         <div className="rounded-2xl overflow-hidden shadow-md">
           <div className="h-3" style={{ backgroundColor: assoc.color }} />
           <div className="bg-warm-white px-6 py-5">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start gap-4 min-w-0">
               {/* Logo / Initials */}
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 overflow-hidden border border-black/5"
@@ -847,14 +855,15 @@ export default function AssociationDetailPage() {
                   </a>
                 )}
               </div>
+              </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-2 flex-shrink-0 items-start">
+              <div className="flex flex-wrap gap-2 items-start">
                 <NotificationsBell associationId={id} />
                 <button
                   style={{ backgroundColor: "#0d3d28" }}
                   className="inline-flex items-center gap-1.5 text-white text-sm font-medium px-3 py-2 rounded-lg hover:opacity-90 transition-opacity"
-                  onClick={() => { setTab("activities"); }}
+                  onClick={() => changeTab("activities")}
                 >
                   <Plus className="w-4 h-4" /> Rejoindre une activité
                 </button>
@@ -906,7 +915,7 @@ export default function AssociationDetailPage() {
               <button
                 key={key}
                 data-testid={`tab-${key}`}
-                onClick={() => setTab(key)}
+                onClick={() => changeTab(key)}
                 className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                   tab === key
                     ? "border-[#0d3d28] text-[#0d3d28] bg-[#f7f3eb]"
@@ -961,10 +970,10 @@ export default function AssociationDetailPage() {
                     }, {});
                     const tontineCount = (counts.TONTINE_ROTATIVE ?? 0) + (counts.TONTINE_ASCA ?? 0) + (counts.TONTINE_ENCHERES ?? 0);
                     const items = [
-                      { label: "Tontines", count: tontineCount, icon: "🔄", color: "#0d3d28", href: `/associations/${id}?tab=activities&family=tontine`, onClick: () => setTab("activities") },
-                      { label: "Épargne",  count: counts.EPARGNE ?? 0, icon: "💰", color: "#15803d", href: `/associations/${id}?tab=activities&family=epargne`, onClick: () => setTab("activities") },
-                      { label: "Investissement", count: counts.INVESTISSEMENT ?? 0, icon: "📈", color: "#1e3a8a", href: `/associations/${id}?tab=activities&family=invest`, onClick: () => setTab("activities") },
-                      { label: "Nature", count: counts.NATURE ?? 0, icon: "🌾", color: "#7c2d12", href: `/associations/${id}?tab=activities&family=nature`, onClick: () => setTab("activities") },
+                      { label: "Tontines", count: tontineCount, icon: "🔄", color: "#0d3d28", href: `/associations/${id}?tab=activities&family=tontine`, onClick: () => changeTab("activities") },
+                      { label: "Épargne",  count: counts.EPARGNE ?? 0, icon: "💰", color: "#15803d", href: `/associations/${id}?tab=activities&family=epargne`, onClick: () => changeTab("activities") },
+                      { label: "Investissement", count: counts.INVESTISSEMENT ?? 0, icon: "📈", color: "#1e3a8a", href: `/associations/${id}?tab=activities&family=invest`, onClick: () => changeTab("activities") },
+                      { label: "Nature", count: counts.NATURE ?? 0, icon: "🌾", color: "#7c2d12", href: `/associations/${id}?tab=activities&family=nature`, onClick: () => changeTab("activities") },
                       { label: "Aides sociales", count: counts.AIDE_SOLIDAIRE ?? 0, icon: "❤️", color: "#be123c", href: `/associations/${id}/aides`, onClick: null as null | (() => void) },
                       { label: "Prêts", count: counts.PRET ?? 0, icon: "🏦", color: "#d4a343", href: `/associations/${id}/prets`, onClick: null },
                       { label: "Réunions", count: meetings.length, icon: "📅", color: "#3b82f6", href: `/associations/${id}/reunions`, onClick: null },
@@ -999,7 +1008,7 @@ export default function AssociationDetailPage() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Mes activités ({myActivities.length})</CardTitle>
-                      <button onClick={() => setTab("activities")} className="text-xs text-[#0d3d28] hover:underline flex items-center gap-1">
+                      <button onClick={() => changeTab("activities")} className="text-xs text-[#0d3d28] hover:underline flex items-center gap-1">
                         Voir tout <ChevronRight className="w-3 h-3" />
                       </button>
                     </div>
