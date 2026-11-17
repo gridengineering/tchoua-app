@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BarChart3, ChevronLeft, Download, FileSpreadsheet, Network, TrendingUp, Users, Activity, Star, Wallet, Sparkles } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
 import { formatCurrency } from "@/lib/utils";
 
 type ReportType = "ACTIVITY" | "MEMBER" | "CROSS" | "INVESTMENT";
@@ -158,6 +159,7 @@ export default function RapportsPage() {
 
   return (
     <DashboardLayout title="Analyses & Rapports">
+      <AssociationFinanceTabs associationId={assocId} />
       <div className="space-y-8 animate-in fade-in duration-500 pb-10">
         {/* Banner */}
         <div className="bg-gradient-to-br from-[#0d3d28] to-[#051f14] rounded-2xl p-10 text-white shadow-xl relative overflow-hidden mb-8">

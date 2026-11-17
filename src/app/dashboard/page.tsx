@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { MemberLaunchpad } from "@/components/member/member-launchpad";
 
 interface DashboardData {
-  user: { name: string; score: number; level: string; walletBalance: number };
+  user: { name: string; score: number; level: string; walletBalance: number; kycLevel?: number };
   stats: {
     tontinesCount: number;
     totalContributed: number;
@@ -100,7 +100,7 @@ export default function DashboardPage() {
                 <div className="text-3xl font-black tracking-tighter">
                   {data?.user?.walletBalance?.toLocaleString() || "0"} <span className="text-sm font-bold opacity-50">FCFA</span>
                 </div>
-                <Link href="/profil" className="inline-flex items-center gap-1.5 mt-3 text-[10px] font-black text-gold uppercase tracking-widest hover:translate-x-1 transition-transform">
+                <Link href="/dashboard/wallet" className="inline-flex items-center gap-1.5 mt-3 text-[10px] font-black text-gold uppercase tracking-widest hover:translate-x-1 transition-transform">
                   Gérer mes fonds <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -121,7 +121,9 @@ export default function DashboardPage() {
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
               <div>
                 <div className="text-[9px] font-black uppercase tracking-tighter text-white/40">Statut de vérification</div>
-                <div className="text-xs font-medium text-ash uppercase tracking-wider">Membre Certifié</div>
+                <div className="text-xs font-medium text-ash uppercase tracking-wider">
+                  {(data?.user?.kycLevel ?? 0) >= 1 ? `Vérifié (KYC ${data?.user?.kycLevel})` : "Vérification requise (KYC 0)"}
+                </div>
               </div>
             </div>
           </div>
@@ -169,27 +171,40 @@ export default function DashboardPage() {
               ) : data?.nextSession ? (
                 <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
                   <div className="flex flex-col items-center justify-center w-24 h-24 bg-forest rounded-xl text-white shadow-xl">
-                    <div className="text-[10px] font-black uppercase opacity-60">Juin</div>
-                    <div className="text-4xl font-black">12</div>
+                    <div className="text-[10px] font-black uppercase opacity-60">
+                      {data.nextSession.scheduledAt
+                        ? new Date(data.nextSession.scheduledAt).toLocaleDateString("fr-FR", { month: "short" })
+                        : "Séance"}
+                    </div>
+                    <div className="text-4xl font-black">
+                      {data.nextSession.scheduledAt
+                        ? new Date(data.nextSession.scheduledAt).getDate()
+                        : "—"}
+                    </div>
                   </div>
                   <div className="flex-1 text-center md:text-left space-y-2">
-                    <div className="text-lg font-semibold text-charcoal">{data.nextSession.tontineName || "Assemblée Générale Mensuelle"}</div>
+                    <div className="text-lg font-semibold text-charcoal">{data.nextSession.tontineName || data.nextSession.title || "Prochaine séance"}</div>
                     <div className="flex flex-wrap justify-center md:justify-start gap-4">
                       <div className="flex items-center gap-2 text-xs font-bold text-graphite">
                         <History className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>18:30 - Yaoundé, Bastos</span>
+                        <span>
+                          {data.nextSession.scheduledAt
+                            ? new Date(data.nextSession.scheduledAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+                            : "Horaire à confirmer"}
+                          {data.nextSession.location ? ` - ${data.nextSession.location}` : ""}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-graphite">
-                        <Plus className="w-3.5 h-3.5 text-blue-500" />
-                        <span>Montant dû : 25,000 CFA</span>
-                      </div>
+                      {data.nextSession.amountDue !== undefined && (
+                        <div className="flex items-center gap-2 text-xs font-bold text-graphite">
+                          <Plus className="w-3.5 h-3.5 text-blue-500" />
+                          <span>Montant dû : {Number(data.nextSession.amountDue).toLocaleString("fr-FR")} CFA</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <Button 
-                    className="px-8 h-14"
-                  >
-                    Confirmer Présence
-                  </Button>
+                  <Link href="/sessions">
+                    <Button className="px-8 h-14">Voir la séance</Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="text-center py-12">

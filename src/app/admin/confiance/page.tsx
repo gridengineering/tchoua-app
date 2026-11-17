@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Filter, RefreshCw, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { TRUST_LEVELS, trustLevelForScore, type TrustBreakdown } from "@/lib/trust-levels";
@@ -97,6 +98,7 @@ export default function AdminTrustPage() {
 
   return (
     <div className="space-y-5">
+      <AdminSectionTabs group="compliance" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Confiance & conformité des associations</h1>

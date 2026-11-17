@@ -7,50 +7,42 @@ import { useSession, signOut } from "next-auth/react";
 import {
   Activity, ArrowLeftRight, Bell, Boxes, Building2, ChevronLeft, ChevronRight,
   FileText, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
-  PanelLeftOpen, Settings, ShieldCheck, Users, Wallet, X,
+  PanelLeftOpen, Search, Settings, ShieldCheck, Sliders, Users, Wallet, X,
 } from "lucide-react";
 
-type NavItem = { name: string; href: string; icon: any; exact?: boolean };
+type NavItem = { name: string; href: string; icon: any; exact?: boolean; roles?: string[] };
 type NavGroup = { label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: "Pilotage",
+    label: "Pilotage & Contrôle",
     items: [
       { name: "Tableau de bord", href: "/admin", icon: LayoutDashboard, exact: true },
-      { name: "Audit financier", href: "/admin/finance", icon: Landmark },
+      { name: "Audit & Journaux", href: "/admin/finance", icon: Landmark, roles: ["SUPER_ADMIN", "ADMIN", "AUDITOR", "FINANCE"] },
     ],
   },
   {
-    label: "Organisation",
+    label: "Écosystème & ARP",
     items: [
       { name: "Associations", href: "/admin/associations", icon: Building2 },
-      { name: "Confiance", href: "/admin/confiance", icon: ShieldCheck },
-      { name: "Historique complet", href: "/admin/historique", icon: History },
-      { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes },
-      { name: "Modèles", href: "/admin/templates", icon: FileText },
+      { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Modèles", href: "/admin/templates", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
   {
-    label: "Accès",
+    label: "Conformité & Accès",
     items: [
-      { name: "Conformité KYC", href: "/admin/kyc", icon: ShieldCheck },
-      { name: "Utilisateurs système", href: "/admin/users", icon: Users },
-      { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck },
+      { name: "KYC & Confiance", href: "/admin/kyc", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "AUDITOR"] },
+      { name: "Utilisateurs système", href: "/admin/users", icon: Users, roles: ["SUPER_ADMIN", "ADMIN"] },
+      { name: "Rôles & permissions", href: "/admin/roles", icon: ShieldCheck, roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
   {
-    label: "Finance",
+    label: "Finances & Système",
     items: [
-      { name: "Wallets", href: "/admin/wallets", icon: Wallet },
-    ],
-  },
-  {
-    label: "Système",
-    items: [
+      { name: "Wallets & Frais", href: "/admin/wallets", icon: Wallet, roles: ["SUPER_ADMIN", "ADMIN", "FINANCE", "AUDITOR"] },
       { name: "Notifications", href: "/admin/notifications", icon: Bell },
-      { name: "Journaux", href: "/admin/audit", icon: History },
-      { name: "Paramètres", href: "/admin/settings", icon: Settings },
+      { name: "Gouvernance & Paramètres", href: "/admin/settings", icon: Settings, roles: ["SUPER_ADMIN", "ADMIN"] },
     ],
   },
 ];
@@ -66,6 +58,8 @@ const CRUMB_LABELS: Record<string, string> = {
   arp: "Référentiel ARP",
   templates: "Modèles",
   wallets: "Wallets",
+  wallet: "Frais & Plafonds Wallet",
+  gouvernance: "Gouvernance & Mail",
   finance: "Audit financier",
   notifications: "Notifications",
   audit: "Journaux",
@@ -76,6 +70,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -84,6 +81,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     setMounted(true);
     setCollapsed(localStorage.getItem("tchoua-admin-collapsed") === "1");
+    fetch("/api/notifications?unreadOnly=true&limit=1", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (typeof d?.unreadCount === "number") setUnreadCount(d.unreadCount); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
+      } else if (e.key === "Escape") {
+        setSearchOpen(false);
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   useEffect(() => {
@@ -94,7 +109,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMobileOpen(false);
+    setSearchOpen(false);
+    setSearchQuery("");
   }, [pathname]);
+
+  const roleKey = String(user?.systemRoleName || "").toUpperCase();
+  const visibleGroups = useMemo(() => {
+    return NAV_GROUPS.map((group) => ({
+      ...group,
+      items: group.items.filter((item) => {
+        if (!item.roles || !roleKey || roleKey === "SUPER_ADMIN" || roleKey === "ADMIN" || roleKey === "ADMINISTRATEUR") {
+          return true;
+        }
+        return item.roles.includes(roleKey);
+      }),
+    })).filter((g) => g.items.length > 0);
+  }, [roleKey]);
+
+  const adminSearchEntries = useMemo(() => {
+    const all = [
+      { label: "Tableau de bord", href: "/admin", tag: "Pilotage" },
+      { label: "Audit financier", href: "/admin/finance", tag: "Pilotage" },
+      { label: "Historique complet", href: "/admin/historique", tag: "Pilotage" },
+      { label: "Journaux système", href: "/admin/audit", tag: "Pilotage" },
+      { label: "Associations", href: "/admin/associations", tag: "Écosystème" },
+      { label: "Référentiel ARP", href: "/admin/arp", tag: "Écosystème" },
+      { label: "Modèles associatifs", href: "/admin/templates", tag: "Écosystème" },
+      { label: "Conformité KYC", href: "/admin/kyc", tag: "Conformité" },
+      { label: "Confiance & Scores", href: "/admin/confiance", tag: "Conformité" },
+      { label: "Utilisateurs système", href: "/admin/users", tag: "Accès" },
+      { label: "Rôles & permissions", href: "/admin/roles", tag: "Accès" },
+      { label: "Supervision Wallets", href: "/admin/wallets", tag: "Finances" },
+      { label: "Frais & Plafonds Wallet", href: "/admin/settings/wallet", tag: "Finances" },
+      { label: "Notifications", href: "/admin/notifications", tag: "Système" },
+      { label: "Gouvernance & Mail", href: "/admin/gouvernance", tag: "Système" },
+      { label: "Paramètres plateforme", href: "/admin/settings", tag: "Système" },
+    ];
+    const q = searchQuery.trim().toLowerCase();
+    return q ? all.filter((i) => i.label.toLowerCase().includes(q) || i.tag.toLowerCase().includes(q)) : all.slice(0, 10);
+  }, [searchQuery]);
 
   const breadcrumbs = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
@@ -124,8 +177,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (status === "authenticated" && !user?.systemRoleId) return null;
 
-  const isActive = (item: NavItem) =>
-    item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+  const isActive = (item: NavItem) => {
+    if (item.exact) return pathname === item.href;
+    if (item.href === "/admin/finance") return ["/admin/finance", "/admin/historique", "/admin/audit"].some((p) => pathname.startsWith(p));
+    if (item.href === "/admin/kyc") return ["/admin/kyc", "/admin/confiance"].some((p) => pathname.startsWith(p));
+    if (item.href === "/admin/wallets") return pathname.startsWith("/admin/wallets") || pathname.startsWith("/admin/settings/wallet");
+    if (item.href === "/admin/settings") return (pathname.startsWith("/admin/settings") && !pathname.startsWith("/admin/settings/wallet")) || pathname.startsWith("/admin/gouvernance");
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  };
 
   const SidebarContent = (
     <>
@@ -152,8 +211,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
       </div>
 
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
-        {NAV_GROUPS.map((group) => (
+      <nav aria-label="Navigation administration" className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+        {visibleGroups.map((group) => (
           <div key={group.label}>
             {!collapsed && (
               <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">{group.label}</p>
@@ -166,6 +225,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={item.href}
                     href={item.href}
                     title={collapsed ? item.name : undefined}
+                    aria-current={active ? "page" : undefined}
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                       active
                         ? "bg-indigo-500/15 text-white ring-1 ring-inset ring-indigo-400/30"
@@ -248,15 +308,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-900 sm:flex"
+              title="Recherche rapide (Ctrl+K)"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Rechercher…</span>
+              <kbd className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">Ctrl+K</kbd>
+            </button>
             <span className="hidden items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700 sm:flex">
               <ShieldCheck className="h-3.5 w-3.5" /> Mode administration
             </span>
             <Link
               href="/admin/notifications"
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+              className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100"
               aria-label="Notifications"
             >
               <Bell className="h-4 w-4" />
+              {unreadCount > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </Link>
             <div className="ml-1 flex items-center gap-2 border-l border-slate-200 pl-2">
               <div className="hidden text-right sm:block">
@@ -292,6 +367,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             {SidebarContent}
           </aside>
+        </div>
+      )}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/50 p-4 pt-20 backdrop-blur-sm" onClick={() => setSearchOpen(false)}>
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+              <Search className="h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Aller à un module d'administration..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && adminSearchEntries[0]) {
+                    router.push(adminSearchEntries[0].href);
+                    setSearchOpen(false);
+                  }
+                }}
+                className="w-full bg-transparent text-sm text-slate-900 focus:outline-none"
+              />
+              <button type="button" onClick={() => setSearchOpen(false)} className="text-xs text-slate-400 hover:text-slate-600">Échap</button>
+            </div>
+            <div className="max-h-80 overflow-y-auto p-2">
+              {adminSearchEntries.map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => { router.push(item.href); setSearchOpen(false); }}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm text-slate-800 hover:bg-slate-100"
+                >
+                  <span>{item.label}</span>
+                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">{item.tag}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import { useSearchParams } from "next/navigation";
 import { Building2, Download, History, Loader2, Search, ShieldAlert, User } from "lucide-react";
 
@@ -77,6 +78,7 @@ export default function AdminHistoryPage() {
 
   return (
     <div className="space-y-5">
+      <AdminSectionTabs group="audit" />
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Historique complet des activités</h1>
         <p className="mt-1 text-sm text-slate-500">Chronologie d&apos;une association ou d&apos;un membre : KYC, consentements, adhésions, cotisations, prêts, aides, réunions et audit.</p>

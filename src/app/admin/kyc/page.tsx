@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import Link from "next/link";
 import { AlertCircle, CheckCircle2, Filter, Loader2, Search, ShieldAlert, ShieldCheck, X, XCircle } from "lucide-react";
 import { KycBadge } from "@/components/kyc/kyc-badge";
@@ -118,6 +119,7 @@ export default function AdminKycPage() {
 
   return (
     <div className="space-y-5">
+      <AdminSectionTabs group="compliance" />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Conformité KYC & membres</h1>

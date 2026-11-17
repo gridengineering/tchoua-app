@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import {
   Activity, AlertCircle, Bell, CheckCircle2, Cloud, Coins, Download, Globe, Globe2, KeyRound, Layout,
   Lock, Mail, MessageSquare, RefreshCw, RotateCcw, Save, Settings2, ShieldCheck, Sliders, SlidersHorizontal,
@@ -216,6 +217,7 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
 
   return (
     <div className="space-y-6 pb-12">
+      <AdminSectionTabs group={initialTab === "wallet" ? "wallets" : "settings"} />
       {toast && (
         <div
           className={`fixed right-6 top-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-xl ${

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import { 
   Landmark, TrendingUp, TrendingDown, Wallet, 
   ArrowUpRight, ArrowDownRight, CreditCard, 
@@ -42,6 +43,7 @@ export default function AdminFinancePage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      <AdminSectionTabs group="audit" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>

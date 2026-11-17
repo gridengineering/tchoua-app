@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
 import {
   ArrowDownLeft, ArrowUpRight, BarChart3, Calendar, ChevronLeft, ChevronRight,
   Columns3, Download, Filter, Grid3x3, List, Search, Wallet,
@@ -112,6 +113,7 @@ export default function HistoryPage() {
 
   return (
     <DashboardLayout title="Historique">
+      <AssociationFinanceTabs associationId={id} />
       <div className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>

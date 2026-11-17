@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import {
   History, Filter, Search, ChevronDown,
   CheckCircle, AlertTriangle, Info, ShieldAlert,
@@ -110,6 +111,7 @@ export default function AdminAuditPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      <AdminSectionTabs group="audit" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>

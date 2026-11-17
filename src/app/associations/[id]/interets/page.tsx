@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
 import { ArrowLeft, ChevronDown, ChevronUp, Info, Percent, TrendingUp, Users } from "lucide-react";
 
 type Row = {
@@ -62,6 +63,7 @@ export default function InterestsPage() {
 
   return (
     <DashboardLayout title="Intérêts">
+      <AssociationFinanceTabs associationId={id} />
       <div className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>

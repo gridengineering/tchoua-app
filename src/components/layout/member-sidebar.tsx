@@ -68,34 +68,65 @@ const GLOBAL_GROUPS: Group[] = [
   },
 ];
 
-function AssociationNav({ id }: { id: string }) {
-  const items: NavItem[] = [
-    { href: `/associations/${id}`, label: "Vue d'ensemble", icon: LayoutDashboard },
-    { href: `/associations/${id}/activities`, label: "Activités", icon: PiggyBank },
-    { href: `/associations/${id}/modifier`, label: "Configurer", icon: Settings },
-    { href: `/associations/${id}/comptes`, label: "Comptes & versements", icon: Wallet },
-    { href: `/associations/${id}/prets`, label: "Prêts", icon: Landmark },
-    { href: `/associations/${id}/aides`, label: "Aides sociales", icon: Heart },
-    { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },
-    { href: `/associations/${id}/dividendes`, label: "Dividendes", icon: Coins },
-    { href: `/associations/${id}/members`, label: "Membres", icon: Users },
-    { href: `/associations/${id}/kyc`, label: "Conformité KYC", icon: ShieldCheck },
-    { href: `/associations/${id}/rapports`, label: "Rapports", icon: FileText },
-    { href: `/associations/${id}/historique`, label: "Historique", icon: History },
-    { href: `/associations/${id}/interets`, label: "Intérêts", icon: TrendingUp },
-    { href: `/associations/${id}/parametres`, label: "Sécurité & rôles", icon: ShieldCheck },
+const BUREAU_ROLES = new Set([
+  "FOUNDER", "PRESIDENT", "VICE_PRESIDENT", "SECRETARY", "SECRETARY_ASSISTANT",
+  "TREASURER", "TREASURER_ASSISTANT", "CENSOR", "AUDITOR", "SOLIDARITY_MANAGER", "NATURE_MANAGER",
+]);
+
+function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string; collapsed?: boolean }) {
+  const isBureau = !myRole || BUREAU_ROLES.has(myRole.toUpperCase());
+  const groups: Group[] = [
+    {
+      title: "Mon activité",
+      items: [
+        { href: `/associations/${id}`, label: "Vue d'ensemble", icon: LayoutDashboard },
+        { href: `/associations/${id}/comptes`, label: "Comptes & versements", icon: Wallet },
+        { href: `/associations/${id}/activities`, label: "Activités", icon: PiggyBank },
+        { href: `/associations/${id}/prets`, label: "Prêts", icon: Landmark },
+        { href: `/associations/${id}/aides`, label: "Aides sociales", icon: Heart },
+      ],
+    },
+    {
+      title: "Vie associative",
+      items: [
+        { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },
+        { href: `/associations/${id}/members`, label: "Membres", icon: Users },
+        { href: `/associations/${id}/rapports`, label: "Rapports & finances", icon: FileText },
+      ],
+    },
+    ...(isBureau
+      ? [
+          {
+            title: "Gestion & Bureau",
+            items: [
+              { href: `/associations/${id}/kyc`, label: "Conformité KYC", icon: ShieldCheck },
+              { href: `/associations/${id}/modifier`, label: "Configurer", icon: Settings },
+              { href: `/associations/${id}/parametres`, label: "Sécurité & rôles", icon: ShieldCheck },
+            ],
+          },
+        ]
+      : []),
   ];
   const pathname = usePathname();
   return (
-    <div className="space-y-0.5">
-      {items.map((item) => {
-        const active = item.href === `/associations/${id}`
-          ? pathname === item.href
-          : pathname === item.href || pathname.startsWith(`${item.href}/`);
-        return (
-          <SidebarLink key={item.href} item={item} active={active} />
-        );
-      })}
+    <div className="space-y-3">
+      {groups.map((group) => (
+        <div key={group.title}>
+          {!collapsed && (
+            <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
+          )}
+          <div className="space-y-0.5">
+            {group.items.map((item) => {
+              const active = item.href === `/associations/${id}`
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
+                <SidebarLink key={item.href} item={item} active={active} collapsed={collapsed} />
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -106,6 +137,7 @@ function SidebarLink({ item, active, collapsed }: { item: NavItem; active: boole
     <Link
       href={item.href}
       title={collapsed ? item.label : undefined}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors",
         collapsed && "justify-center px-2",
@@ -191,16 +223,17 @@ export function MemberSidebar({
       {!collapsed && (
         <div className="relative border-b m-border px-3 py-3">
           <button onClick={() => setAssocOpen((v) => !v)}
+            aria-expanded={assocOpen}
             className="flex w-full items-center gap-2 rounded-lg border m-border m-soft px-3 py-2 text-left text-sm m-hover">
             <Building2 className="h-4 w-4 flex-shrink-0 m-accent-text" />
-            <span className="flex-1 truncate m-text">{currentAssoc?.name ?? "Mes associations"}</span>
+            <span className="flex-1 truncate m-text">{currentAssoc?.name ?? "Mon espace personnel"}</span>
             <ChevronDown className={cn("h-3.5 w-3.5 flex-shrink-0 m-muted transition-transform", assocOpen && "rotate-180")} />
           </button>
           {assocOpen && (
             <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-xl border m-border m-surface shadow-xl">
               <button onClick={() => { setAssocOpen(false); router.push("/dashboard"); }}
                 className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm m-text m-hover">
-                <LayoutDashboard className="h-4 w-4" /> Mes associations
+                <LayoutDashboard className="h-4 w-4" /> Mon espace personnel
                 {!currentAssocId && <Check className="ml-auto h-3.5 w-3.5 m-accent-text" />}
               </button>
               <div className="max-h-56 overflow-y-auto border-t border-slate-100">
@@ -222,32 +255,36 @@ export function MemberSidebar({
         </div>
       )}
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
-        {currentAssocId && !collapsed && (
+      <nav aria-label="Navigation principale" className="flex-1 overflow-y-auto px-2 py-3">
+        {currentAssocId ? (
           <div className="mb-3">
-            <div className="mb-1 flex items-center justify-between px-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest m-muted">Association</span>
-              <Link href="/dashboard" className="text-[10px] font-medium m-accent-text hover:underline">Quitter</Link>
-            </div>
-            <AssociationNav id={currentAssocId} />
-          </div>
-        )}
-
-        {visibleGroups.map((group) => (
-          <div key={group.title} className="mb-3">
             {!collapsed && (
-              <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
+              <div className="mb-2 flex items-center justify-between px-3">
+                <span className="text-[10px] font-bold uppercase tracking-widest m-muted">Association</span>
+                <Link href="/dashboard" className="text-[11px] font-semibold m-accent-text hover:underline">
+                  ← Mon espace
+                </Link>
+              </div>
             )}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const active = item.href === "/dashboard"
-                  ? pathname === "/dashboard"
-                  : pathname === item.href || (pathname.startsWith(`${item.href}/`) && item.href !== "/dashboard");
-                return <SidebarLink key={item.href} item={item} active={active} collapsed={collapsed} />;
-              })}
-            </div>
+            <AssociationNav id={currentAssocId} myRole={currentAssoc?.myRole} collapsed={collapsed} />
           </div>
-        ))}
+        ) : (
+          visibleGroups.map((group) => (
+            <div key={group.title} className="mb-3">
+              {!collapsed && (
+                <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest m-muted">{group.title}</div>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const active = item.href === "/dashboard"
+                    ? pathname === "/dashboard"
+                    : pathname === item.href || (pathname.startsWith(`${item.href}/`) && item.href !== "/dashboard");
+                  return <SidebarLink key={item.href} item={item} active={active} collapsed={collapsed} />;
+                })}
+              </div>
+            </div>
+          ))
+        )}
       </nav>
 
       <div className="flex-shrink-0 border-t m-border p-2">

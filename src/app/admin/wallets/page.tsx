@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminSectionTabs } from "@/components/admin/admin-section-tabs";
 import { 
   Wallet, Search, ShieldAlert, CheckCircle, 
   Loader2, AlertTriangle, ArrowRightLeft, ShieldBan
@@ -102,6 +103,7 @@ export default function AdminWalletsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      <AdminSectionTabs group="wallets" />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-black text-gray-900 flex items-center gap-3">

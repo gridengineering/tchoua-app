@@ -7,6 +7,7 @@ import {
   ArrowLeft, Calculator, Coins, Info, Landmark, PieChart, Send, Trash2, Users,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { AssociationFinanceTabs } from "@/components/associations/association-finance-tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +116,7 @@ export default function DividendsPage() {
 
   return (
     <DashboardLayout title="Dividendes & quote-parts">
+      <AssociationFinanceTabs associationId={id} />
       <div className="space-y-6 pb-12">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link

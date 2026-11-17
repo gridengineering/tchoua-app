@@ -42,11 +42,7 @@ export default function AdminDashboardPage() {
   ];
 
   const recentLogs = data?.recentLogs || [];
-
-  const pendingValidations = [
-    { id: 1, type: "Retrait Exceptionnel", amount: "500,000 FCFA", association: "AMSED", maker: "Trésorier AMSED", date: "Aujourd'hui" },
-    { id: 2, type: "Modif. Statuts", amount: "-", association: "A30", maker: "Secrétaire A30", date: "Hier" },
-  ];
+  const pendingValidations: Array<{ id: string; type: string; amount: string; association: string; maker: string; date: string }> = data?.pendingValidations || [];
 
   const statIcons: any = {
     "Utilisateurs Système": ShieldCheck,
@@ -147,25 +143,30 @@ export default function AdminDashboardPage() {
             </h2>
           </div>
           <div className="flex-1 p-8 space-y-4 overflow-y-auto max-h-[500px]">
-            {pendingValidations.map((item) => (
-              <div key={item.id} className="p-6 rounded-[2rem] bg-gray-50 border border-transparent hover:border-amber-200 hover:bg-amber-50/20 transition-all group relative">
-                <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{item.association}</div>
-                <div className="text-sm font-black text-gray-900">{item.type}</div>
-                <div className="mt-4 flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                  <span className="text-[10px] font-bold text-gray-400">Par: {item.maker.split(" ")[0]}</span>
-                  <span className="text-xs font-black text-emerald-600">{item.amount}</span>
-                </div>
-                <div className="mt-6 flex gap-3">
-                  <Button size="sm" className="flex-1">Approuver</Button>
-                  <Button size="sm" variant="outline" className="flex-1">Rejeter</Button>
+            {pendingValidations.length === 0 ? (
+              <div className="py-10 text-center space-y-3">
+                <div className="text-sm font-bold text-gray-500">Aucune validation en attente.</div>
+                <div className="flex justify-center gap-2">
+                  <Link href="/admin/kyc" className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">
+                    Vérifier KYC
+                  </Link>
+                  <Link href="/admin/finance" className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">
+                    Audit financier
+                  </Link>
                 </div>
               </div>
-            ))}
-            <div className="pt-6 text-center">
-              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">
-                Vous avez <span className="text-amber-600">2 actions critiques</span><br/>en attente de validation.
-              </div>
-            </div>
+            ) : (
+              pendingValidations.map((item) => (
+                <div key={item.id} className="p-6 rounded-[2rem] bg-gray-50 border border-transparent hover:border-amber-200 hover:bg-amber-50/20 transition-all group relative">
+                  <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">{item.association}</div>
+                  <div className="text-sm font-black text-gray-900">{item.type}</div>
+                  <div className="mt-4 flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <span className="text-[10px] font-bold text-gray-400">Par: {item.maker.split(" ")[0]}</span>
+                    <span className="text-xs font-black text-emerald-600">{item.amount}</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
