@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       plannedAgenda = String(meeting.agenda).split("\n").map((x) => x.trim()).filter(Boolean);
     }
   }
-  const initialAgenda = plannedAgenda.length ? plannedAgenda : template;
+  const initialAgenda = plannedAgenda.length ? plannedAgenda : (body.loadTemplate === false ? [] : template);
   const modality = String(body.modality ?? meeting.modality ?? (meeting.isRotating ? "ROTATING" : "PHYSICAL")).toUpperCase();
   if (!["PHYSICAL", "ONLINE", "ROTATING"].includes(modality)) return NextResponse.json({ error: "Modalité invalide" }, { status: 400 });
   const rotation = await currentRotation(associationId);
