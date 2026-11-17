@@ -122,6 +122,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Réservé aux membres du bureau" }, { status: 403 });
   }
 
+  const assocConfig = await prisma.association.findUnique({ where: { id }, select: { meetingConfig: true } });
+  if (parseMeetingConfig(assocConfig?.meetingConfig).sessionsEnabled === false) {
+    return NextResponse.json({ error: "Cette association ne tient pas de sessions de réunion." }, { status: 409 });
+  }
   const body = await req.json();
   const {
     title, type, scheduledAt, location, quorumRequired, agenda, notes, isRotating,
@@ -172,6 +176,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Réservé aux membres du bureau" }, { status: 403 });
   }
 
+  const assocConfig = await prisma.association.findUnique({ where: { id }, select: { meetingConfig: true } });
+  if (parseMeetingConfig(assocConfig?.meetingConfig).sessionsEnabled === false) {
+    return NextResponse.json({ error: "Cette association ne tient pas de sessions de réunion." }, { status: 409 });
+  }
   const body = await req.json();
   const { meetingId, membershipId, attendanceStatus, status } = body;
 

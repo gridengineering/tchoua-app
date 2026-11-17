@@ -51,6 +51,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const associationConfig = parseMeetingConfig(meeting.association.meetingConfig);
   const template = agendaTemplate(associationConfig);
+  let plannedAgenda: string[] = [];
+  if (meeting.agenda) {
+    try {
+      const parsed = JSON.parse(meeting.agenda);
+      plannedAgenda = (Array.isArray(parsed) ? parsed : [])
+        .map((x) => (typeof x === "string" ? x : x?.title))
+        .filter(Boolean)
+        .map(String);
+    } catch {
+      plannedAgenda = String(meeting.agenda).split("\n").map((x) => x.trim()).filter(Boolean);
+    }
+  }
+  const initialAgenda = plannedAgenda.length ? plannedAgenda : template;
   const modality = String(body.modality ?? meeting.modality ?? (meeting.isRotating ? "ROTATING" : "PHYSICAL")).toUpperCase();
   if (!["PHYSICAL", "ONLINE", "ROTATING"].includes(modality)) return NextResponse.json({ error: "Modalité invalide" }, { status: 400 });
   const rotation = await currentRotation(associationId);
@@ -66,9 +79,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: active.map((m) => ({ meetingId, membershipId: m.id, status: "ABSENT", arrivedAt: null })),
       skipDuplicates: true,
     });
-    if (template.length > 0 && meeting.agendaItems.length === 0) {
+    if (initialAgenda.length > 0 && meeting.agendaItems.length === 0) {
       await tx.assocMeetingAgendaItem.createMany({
-        data: template.map((title, index) => ({ meetingId, order: index + 1, title })),
+        data: initialAgenda.map((title, index) => ({ meetingId, order: index + 1, title })),
       });
     }
     return tx.assocMeeting.update({

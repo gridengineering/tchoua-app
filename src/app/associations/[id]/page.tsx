@@ -370,6 +370,7 @@ export default function AssociationDetailPage() {
   const [activities, setActivities] = useState<AssocActivity[]>([]);
   const [meetings, setMeetings] = useState<AssocMeetingT[]>([]);
   const [nextMeetingSuggestion, setNextMeetingSuggestion] = useState<string | null>(null);
+  const [meetingsEnabled, setMeetingsEnabled] = useState(true);
   const [finances, setFinances] = useState<FinanceReport | null>(null);
   const [documents, setDocuments] = useState<AssocDocument[]>([]);
   const [socialAids, setSocialAids] = useState<any[]>([]);
@@ -482,6 +483,7 @@ export default function AssociationDetailPage() {
         const meetData = meetRes.ok ? await meetRes.json() : null;
         setMeetings(meetData?.meetings ?? []);
         setNextMeetingSuggestion(meetData?.nextSuggestion ?? null);
+        setMeetingsEnabled(meetData?.meetingConfig?.sessionsEnabled !== false);
 
         // Fetch finances
         const finRes = await fetch(`/api/associations/${id}/reports?type=ACTIVITY`);
@@ -1475,7 +1477,7 @@ export default function AssociationDetailPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Réunions</h2>
-              {isBureauMember && (
+              {isBureauMember && meetingsEnabled && (
                 <button
                   onClick={() => setModalMeeting(true)}
                   className="inline-flex items-center gap-1.5 text-white text-sm font-medium px-3 py-2 rounded-lg"
@@ -1485,6 +1487,7 @@ export default function AssociationDetailPage() {
                 </button>
               )}
             </div>
+            {!meetingsEnabled && <div className="rounded-xl border border-stone bg-stone/20 p-4 text-sm text-graphite">Cette association ne tient pas de sessions de réunion (configuration des paramètres).</div>}
 
             {nextMeetingSuggestion && (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#cfe0d5] bg-[#f6fbf7] px-4 py-3 text-sm">
