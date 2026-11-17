@@ -361,6 +361,8 @@ export function AssociationFormWorkspace({
   const [bureauSaving, setBureauSaving] = useState<string | null>(null);
   const [bureauNotice, setBureauNotice] = useState<string | null>(null);
   const [bureauError, setBureauError] = useState<string | null>(null);
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: initial?.name ?? "",
@@ -589,6 +591,31 @@ export function AssociationFormWorkspace({
       list.push({ ...common, name: "Collation", type: "COLLECTION", participation: "MANDATORY", contributionAmount: null, collectionAmount: 3000 });
     }
     return list;
+  };
+
+  const logoTargetId = associationId ?? initial?.id;
+  const generateLogo = async () => {
+    if (!logoTargetId) return;
+    setLogoBusy(true); setLogoError(null);
+    try {
+      const res = await fetch(`/api/associations/${logoTargetId}/logo`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ generate: true }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Génération impossible");
+      setForm((current) => ({ ...current, logo: data.logo }));
+      setNotice("Logo par défaut généré. Enregistrez pour confirmer.");
+    } catch (e: any) { setLogoError(e.message); } finally { setLogoBusy(false); }
+  };
+  const uploadLogo = async (file: File) => {
+    if (!logoTargetId) return;
+    setLogoBusy(true); setLogoError(null);
+    try {
+      const body = new FormData(); body.append("file", file);
+      const res = await fetch(`/api/associations/${logoTargetId}/logo`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Téléversement impossible");
+      setForm((current) => ({ ...current, logo: data.logo }));
+      setNotice("Logo mis à jour.");
+    } catch (e: any) { setLogoError(e.message); } finally { setLogoBusy(false); }
   };
 
   const save = async () => {
@@ -912,7 +939,23 @@ export function AssociationFormWorkspace({
               <TextInput label="Email de contact" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="contact@association.com" />
               <TextInput label="Téléphone" type="tel" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+237 XXX XX XX XX" />
               <TextInput label="Site web" type="url" value={form.website} onChange={(v) => setForm({ ...form, website: v })} placeholder="https://…" />
-              <TextInput label="Logo (URL)" value={form.logo} onChange={(v) => setForm({ ...form, logo: v })} placeholder="https://…/logo.png" />
+              <div className="md:col-span-2">
+                <label className={labelCls}>Logo de l&apos;association</label>
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[#e2ddd4] bg-white p-3">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-[#0d3d28] text-xl font-black text-white">
+                    {form.logo ? <img src={form.logo} alt="Logo association" className="h-full w-full object-cover" /> : form.name.slice(0, 3).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <input value={form.logo} onChange={(e) => setForm({ ...form, logo: e.target.value })} placeholder="URL du logo ou logo généré" className={inputCls} />
+                    <p className="mt-1 text-[11px] text-[#6b7280]">Générez un logo par défaut ou téléversez PNG/JPG/WEBP (2 Mo max).</p>
+                  </div>
+                  {logoTargetId ? <div className="flex flex-wrap gap-2">
+                    <button type="button" disabled={logoBusy} onClick={generateLogo} className="rounded-lg border border-[#0d3d28] px-3 py-2 text-xs font-bold text-[#0d3d28] disabled:opacity-50">{logoBusy ? "…" : "Générer le logo par défaut"}</button>
+                    <label className="cursor-pointer rounded-lg bg-[#0d3d28] px-3 py-2 text-xs font-bold text-white">{logoBusy ? "…" : "Téléverser"}<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} /></label>
+                  </div> : <span className="text-xs text-[#6b7280]">Logo généré automatiquement après création.</span>}
+                </div>
+                {logoError && <p className="mt-1 text-xs font-semibold text-red-600">{logoError}</p>}
+              </div>
               <Field label="Couleur du thème">
                 <div className="flex gap-2">
                   <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="h-10 w-12 cursor-pointer rounded-lg" />
