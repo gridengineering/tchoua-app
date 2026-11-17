@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { creditMemberAccount } from "@/lib/association/member-account";
 import { isPlatformAdmin } from "@/lib/permissions";
 
 export async function PATCH(
@@ -149,6 +150,17 @@ export async function PATCH(
                 ? `Déduction solidarité : ${solidarityDeduction} FCFA`
                 : undefined,
           },
+        });
+        await creditMemberAccount(tx, {
+          membershipId: beneficiaryId,
+          associationId,
+          activityId,
+          sessionId,
+          amount: finalAmount,
+          type: "TONTINE_BENEFIT",
+          method: "SYSTEM",
+          note: `Bénéfice tontine — ${finalAmount.toLocaleString("fr-FR")} FCFA`,
+          createdById: session.user.id,
         });
 
         if (solidarityDeduction > 0) {

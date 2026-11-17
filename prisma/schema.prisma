@@ -847,6 +847,8 @@ model Association {
   documents     AssocDocument[]
   accounts      AssocBankAccount[]
   wallet        AssociationWallet?
+  memberAccounts AssociationMemberAccount[]
+  memberTransactions AssociationMemberTransaction[]
   socialAidReqs AssocSocialAidRequest[]
   assocMessages AssocMessage[]
   customRoles   AssociationCustomRole[]
@@ -928,6 +930,8 @@ model AssociationMembership {
   mandates        MandatePeriod[]
   notifs          AssociationNotification[]
   assocWalletTx   AssociationWalletTransaction[]
+  memberAccount   AssociationMemberAccount?
+  memberTransactions AssociationMemberTransaction[]
   approvalVotes   ApprovalVote[]
   dividendShares  AssociationDividendShare[]
   settlements     MemberSettlement[]
@@ -1077,6 +1081,7 @@ model AssociationActivity {
   sanctions         AssocSanction[]
   waiverRequests    AssocWaiverRequest[]
   arpFunds          ArpFund[]
+  memberTransactions AssociationMemberTransaction[]
 
   @@map("association_activities")
 }
@@ -1359,6 +1364,65 @@ model AssociationWalletTransaction {
   @@map("association_wallet_transactions")
 }
 
+/// Compte de chaque membre auprès d'une association (AVOIR).
+model AssociationMemberAccount {
+  id             String   @id @default(cuid())
+  membershipId   String   @unique
+  associationId  String
+  balance        Float    @default(0)
+  currency       String   @default("XAF")
+  status         String   @default("ACTIVE") // ACTIVE, SUSPENDED, CLOSED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  membership     AssociationMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  association    Association           @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  transactions   AssociationMemberTransaction[]
+
+  @@index([associationId])
+  @@map("association_member_accounts")
+}
+
+/// Journal du compte membre : versements, retraits, règlements et affectations.
+model AssociationMemberTransaction {
+  id              String   @id @default(cuid())
+  idempotencyKey  String?  @unique
+  accountId       String
+  membershipId    String
+  associationId   String
+  activityId      String?
+  bankAccountId   String?
+  sessionId       String?
+  // DEPOSIT_WALLET, DEPOSIT_BANK, DEPOSIT_CASH, WITHDRAWAL_BANK,
+  // WITHDRAWAL_WALLET, WITHDRAWAL_CASH, SETTLEMENT, TONTINE_BENEFIT,
+  // LOAN_DISBURSEMENT, ACTIVITY_TRANSFER, ADJUSTMENT
+  type            String
+  direction       String   // IN, OUT
+  method          String   // WALLET, BANK, CASH, ACTIVITY, SYSTEM
+  amount          Float
+  balanceAfter    Float
+  status          String   @default("COMPLETED") // PENDING, COMPLETED, REJECTED
+  reference       String?
+  proofUrl        String?
+  note            String?
+  createdById     String?
+  reconciledAt    DateTime?
+  reconciledById  String?
+  createdAt       DateTime @default(now())
+
+  account         AssociationMemberAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  membership      AssociationMembership    @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  association     Association              @relation(fields: [associationId], references: [id], onDelete: Cascade)
+  activity        AssociationActivity?     @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  bankAccount     AssocBankAccount?        @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  @@index([membershipId, createdAt])
+  @@index([associationId, createdAt])
+  @@index([activityId, createdAt])
+  @@index([status])
+  @@map("association_member_transactions")
+}
+
 model AssocBankAccount {
   id              String   @id @default(cuid())
   associationId   String
@@ -1378,6 +1442,7 @@ model AssocBankAccount {
   updatedAt       DateTime @updatedAt
 
   association     Association @relation(fields: [associationId], references: [id])
+  memberTransactions AssociationMemberTransaction[]
 
   @@map("assoc_bank_accounts")
 }

@@ -73,6 +73,7 @@ function AssociationNav({ id }: { id: string }) {
     { href: `/associations/${id}`, label: "Vue d'ensemble", icon: LayoutDashboard },
     { href: `/associations/${id}/activities`, label: "Activités", icon: PiggyBank },
     { href: `/associations/${id}/modifier`, label: "Configurer", icon: Settings },
+    { href: `/associations/${id}/comptes`, label: "Comptes & versements", icon: Wallet },
     { href: `/associations/${id}/prets`, label: "Prêts", icon: Landmark },
     { href: `/associations/${id}/aides`, label: "Aides sociales", icon: Heart },
     { href: `/associations/${id}/reunions`, label: "Réunions & sessions", icon: RotateCcw },

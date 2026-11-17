@@ -110,7 +110,7 @@ type SanctionsConfig = {
   missedCommission: number;
   agNationale: number;
 };
-type BankConfig = { bankName: string; rib: string; accountHolder: string; paymentMode: string };
+type BankConfig = { bankName: string; rib: string; accountHolder: string; paymentMode: string; cashEnabled?: boolean; cashMaxAmount?: number };
 type ModuleSelection = {
   tontine: boolean;
   epargne: boolean;
@@ -209,7 +209,7 @@ const DEFAULT_SANCTIONS: SanctionsConfig = {
   missedCommission: 5000,
   agNationale: 20000,
 };
-const DEFAULT_BANK: BankConfig = { bankName: "", rib: "", accountHolder: "", paymentMode: "VIREMENT" };
+const DEFAULT_BANK: BankConfig = { bankName: "", rib: "", accountHolder: "", paymentMode: "VIREMENT", cashEnabled: true, cashMaxAmount: 0 };
 const DEFAULT_MODULES: ModuleSelection = {
   tontine: true,
   epargne: false,
@@ -1203,6 +1203,10 @@ export function AssociationFormWorkspace({
                 <TextInput label="RIB / IBAN" value={bank.rib} onChange={(v) => setBank({ ...bank, rib: v })} placeholder="Numéro de compte" />
                 <TextInput label="Titulaire" value={bank.accountHolder} onChange={(v) => setBank({ ...bank, accountHolder: v })} placeholder="Nom du titulaire" />
                 <SelectInput label="Mode de paiement" value={bank.paymentMode} onChange={(v) => setBank({ ...bank, paymentMode: v })} options={[{ value: "BANQUE_EXCLUSIVE", label: "Banque uniquement (virement obligatoire)" }, { value: "VIREMENT", label: "Virement" }, { value: "CHEQUE", label: "Chèque" }, { value: "ESPECES", label: "Espèces" }, { value: "MOBILE_MONEY", label: "Mobile Money" }]} />
+                <div className="flex items-end gap-3">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-graphite"><input type="checkbox" checked={bank.cashEnabled !== false} onChange={(e) => setBank({ ...bank, cashEnabled: e.target.checked })} /> Espèces acceptées</label>
+                  <TextInput label="Plafond espèces (0 = plafond global)" value={String(bank.cashMaxAmount ?? "")} onChange={(v) => setBank({ ...bank, cashMaxAmount: Number(v) || 0 })} placeholder="ex: 100000" />
+                </div>
               </div>
             </Section>
           </div>

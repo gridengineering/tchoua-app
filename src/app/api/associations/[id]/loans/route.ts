@@ -6,6 +6,7 @@ import { isPlatformAdmin } from "@/lib/permissions";
 import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/eligibility";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
+import { creditMemberAccount } from "@/lib/association/member-account";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
@@ -266,6 +267,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               approvedById: session.user.id,
               disbursedAt: new Date(),
             },
+          });
+          await creditMemberAccount(tx, {
+            membershipId: loan.borrowerMembershipId,
+            associationId: id,
+            activityId: loan.activityId,
+            amount: loan.amount,
+            type: "LOAN_DISBURSEMENT",
+            method: "SYSTEM",
+            note: `Décaissement prêt — ${loan.amount.toLocaleString("fr-FR")} FCFA`,
+            createdById: session.user.id,
           });
         }
 
