@@ -1,6 +1,10 @@
+function esc(value: string) {
+  return value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] ?? c));
+}
+
 export function buildVerificationCodeHtml(params: { code: string; name?: string | null; purpose?: string; expiryMinutes?: number }): string {
-  const name = params.name ? `Bonjour ${params.name},` : "Bonjour,";
-  const purpose = params.purpose ?? "Vérification de votre compte Tchoua";
+  const name = params.name ? `Bonjour ${esc(params.name)},` : "Bonjour,";
+  const purpose = esc(params.purpose ?? "Vérification de votre compte Tchoua");
   const minutes = params.expiryMinutes ?? 10;
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${purpose} — Tchoua</title></head>
