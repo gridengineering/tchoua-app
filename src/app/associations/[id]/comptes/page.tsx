@@ -93,7 +93,7 @@ export default function MemberAccountsPage() {
       const res = await fetch(`/api/associations/${id}/member-account`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
-        body: JSON.stringify({ ...body, membershipId: (body.membershipId as string | undefined) ?? (targetId || undefined) }),
+        body: JSON.stringify({ ...body, motif: (body.motif as string | undefined) ?? (note || undefined), membershipId: (body.membershipId as string | undefined) ?? (targetId || undefined) }),
       });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || "Opération impossible");
@@ -107,6 +107,7 @@ export default function MemberAccountsPage() {
     e.preventDefault();
     const value = Number(amount);
     if (!value || value <= 0) return setError("Montant invalide");
+    if (!note.trim()) return setError("Le libellé ou motif est obligatoire.");
     if (method === "WALLET") return post({ action: "DEPOSIT_WALLET", amount: value, note }, "Versement depuis votre wallet enregistré.");
     if (method === "BANK") {
       if (!bankAccountId) return setError("Choisissez un compte bancaire.");
@@ -121,15 +122,17 @@ export default function MemberAccountsPage() {
     e.preventDefault();
     const value = Number(settleAmount);
     if (!value || value <= 0 || !activityId) return setError("Choisissez une activité et un montant.");
-    await post({ action: "SETTLE", amount: value, activityId, note }, "Engagement réglé depuis votre compte association.");
+    if (!note.trim()) return setError("Le libellé ou motif est obligatoire.");
+    await post({ action: "SETTLE", amount: value, activityId, motif: note }, "Engagement réglé depuis votre compte association.");
   };
 
   const withdraw = async (e: React.FormEvent) => {
     e.preventDefault();
     const value = Number(amount);
     if (!value || value <= 0) return setError("Montant invalide");
+    if (!note.trim()) return setError("Le libellé ou motif est obligatoire.");
     if (withdrawMethod === "BANK" && (!bankAccountId || !proofUrl)) return setError("Compte bancaire et preuve requis.");
-    await post({ action: "WITHDRAW", amount: value, method: withdrawMethod, bankAccountId: withdrawMethod === "BANK" ? bankAccountId : undefined, proofUrl: withdrawMethod === "BANK" ? proofUrl : undefined, note }, "Retrait enregistré.");
+    await post({ action: "WITHDRAW", amount: value, method: withdrawMethod, bankAccountId: withdrawMethod === "BANK" ? bankAccountId : undefined, proofUrl: withdrawMethod === "BANK" ? proofUrl : undefined, motif: note }, "Retrait enregistré.");
   };
 
   const confirm = (tx: Tx) => post({ action: "CONFIRM_BANK", amount: tx.amount, transactionId: tx.id, membershipId: tx.membership?.id }, "Versement bancaire confirmé et crédité.");
@@ -208,7 +211,8 @@ export default function MemberAccountsPage() {
               </label>
             </>}
             {method === "CASH" && <p className={`mb-3 rounded-xl p-3 text-xs ${cash.enabled ? "bg-amber-50 text-amber-800" : "bg-red-50 text-red-700"}`}>{cash.enabled ? `Espèces autorisées${cash.max ? ` · plafond ${money(cash.max, currency)}` : ""}. Encaisssement par le bureau.` : "Espèces désactivées pour cette association."}</p>}
-            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Libellé (optionnel)" className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
+            <label className="mb-1 block text-xs font-semibold uppercase text-gray-500">Libellé ou motif *</label>
+            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex. cotisation de mars, remboursement du prêt…" required className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
             <button disabled={saving || (method === "CASH" && !canManage)} className="inline-flex items-center gap-2 rounded-xl bg-[#0d3d28] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50" type="submit">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowDownLeft className="h-4 w-4" />} Enregistrer le versement
             </button>
@@ -222,7 +226,8 @@ export default function MemberAccountsPage() {
                 <option value="">Choisir une activité…</option>
                 {(data?.activities ?? []).map((a: Activity) => <option key={a.id} value={a.id}>{a.name} · solde {money(a.caisseBalance, currency)}</option>)}
               </select>
-              <input type="number" min={1} value={settleAmount} onChange={(e) => setSettleAmount(e.target.value)} placeholder="Montant" className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
+              <input type="number" min={1} value={settleAmount} onChange={(e) => setSettleAmount(e.target.value)} placeholder="Montant" className="mb-2 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
+              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Libellé ou motif *" required className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
               <button disabled={saving || !activityId} className="inline-flex items-center gap-2 rounded-xl bg-[#8a6410] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50" type="submit"><ArrowUpRight className="h-4 w-4" /> Régler depuis l&apos;AVOIR</button>
             </form>
 
@@ -234,7 +239,8 @@ export default function MemberAccountsPage() {
                 <option value="BANK">Virement bancaire</option>
                 <option value="CASH">Espèces</option>
               </select>
-              {withdrawMethod === "BANK" && <select value={bankAccountId} onChange={(e) => setBankAccountId(e.target.value)} className="mb-2 w-full rounded-xl border border-stone px-3 py-2.5 text-sm">{(data?.bankAccounts ?? []).map((b: Bank) => <option key={b.id} value={b.id}>{b.label} · {b.bankName}</option>)}</select>}
+              {withdrawMethod === "BANK" && <><select value={bankAccountId} onChange={(e) => setBankAccountId(e.target.value)} className="mb-2 w-full rounded-xl border border-stone px-3 py-2.5 text-sm">{(data?.bankAccounts ?? []).map((b: Bank) => <option key={b.id} value={b.id}>{b.label} · {b.bankName}</option>)}</select><label className="mb-3 flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-stone p-2 text-xs text-graphite"><Upload className="h-3.5 w-3.5" /> {proofUrl ? "Preuve jointe" : "Joindre la preuve" }<input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => e.target.files?.[0] && uploadProof(e.target.files[0])} /></label></>}
+              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Libellé ou motif *" required className="mb-2 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
               <div className="grid grid-cols-2 gap-2"><input type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Montant" className="rounded-xl border border-stone px-3 py-2.5 text-sm" /><button disabled={saving} className="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50" type="submit">Payer</button></div>
             </form>}
           </div>

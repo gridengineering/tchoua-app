@@ -103,6 +103,10 @@ export default function WalletPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!description.trim()) {
+      setError("Le libellé ou motif est obligatoire.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/wallet/transactions", {
@@ -315,10 +319,10 @@ export default function WalletPage() {
                     )}
 
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">Description (optionnelle)</label>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Libellé ou motif *</label>
                       <input type="text" value={description} onChange={e => setDescription(e.target.value)}
                         className="w-full bg-cream border border-gray-200 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-[#165E39]/20 outline-none"
-                        placeholder="Motif de la transaction" />
+                        placeholder="Ex. frais de scolarité, remboursement, épargne…" required />
                     </div>
 
                     {parseFloat(amount) > 0 && (

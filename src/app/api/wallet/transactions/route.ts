@@ -6,7 +6,7 @@ import { getGovernanceConfig } from "@/lib/governance";
 import { getWalletConfig, providerFee, walletProvider } from "@/lib/wallet/config";
 import { kycRuleForLevel, type PaymentProvider } from "@/lib/governance-types";
 import { confirmVerificationCode } from "@/lib/verification";
-import { dispatchNotification } from "@/lib/notifications/dispatch";
+import { notifyWalletMovement } from "@/lib/notifications/funds";
 
 function startOfDay() {
   const date = new Date();
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const type = String(body.type ?? "");
     const amount = Number(body.amount);
-    const description = body.description ? String(body.description) : undefined;
+    const description = String(body.description ?? body.motif ?? "").trim();
     const receiverId = body.receiverId ? String(body.receiverId) : undefined;
     const otpCode = body.otpCode ? String(body.otpCode) : undefined;
     const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
@@ -61,6 +61,9 @@ export async function POST(req: Request) {
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
+    if (!description) {
+      return NextResponse.json({ error: "Le libellé ou motif est obligatoire" }, { status: 400 });
+    }
     if (!["DEPOSIT", "WITHDRAWAL", "TRANSFER"].includes(type)) {
       return NextResponse.json({ error: "Type de transaction invalide" }, { status: 400 });
     }
@@ -70,7 +73,7 @@ export async function POST(req: Request) {
       getWalletConfig(),
       prisma.user.findUnique({
         where: { id: userId },
-        select: { kycLevel: true, email: true, name: true },
+        select: { kycLevel: true, email: true, name: true, language: true },
       }),
     ]);
     if (!config.enabled || !user) return NextResponse.json({ error: "Wallet indisponible" }, { status: 503 });
@@ -197,14 +200,14 @@ export async function POST(req: Request) {
       if (receiverId === userId) throw new Error("Vous ne pouvez pas vous transférer de l'argent à vous-même");
       const receiver = await prisma.user.findFirst({
         where: { OR: [{ id: receiverId }, { email: receiverId.toLowerCase() }] },
-        select: { id: true, name: true },
+        select: { id: true, name: true, email: true, language: true },
       });
       if (!receiver) throw new Error("Bénéficiaire introuvable");
       const receiverWallet = await tx.wallet.findUnique({ where: { userId: receiver.id } });
       if (!receiverWallet || receiverWallet.status !== "ACTIVE") throw new Error("Le portefeuille du bénéficiaire est introuvable ou suspendu");
 
       const updatedWallet = await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { decrement: netAmount } } });
-      await tx.wallet.update({ where: { id: receiverWallet.id }, data: { balance: { increment: amount } } });
+      const updatedReceiverWallet = await tx.wallet.update({ where: { id: receiverWallet.id }, data: { balance: { increment: amount } } });
       const txOut = await tx.walletTransaction.create({
         data: {
           idempotencyKey,
@@ -220,18 +223,45 @@ export async function POST(req: Request) {
         },
       });
       await tx.walletTransaction.update({ where: { id: txOut.id }, data: { relatedTxId: txIn.id } });
-      return { wallet: updatedWallet, transaction: txOut, pending: false };
+      return { wallet: updatedWallet, transaction: txOut, pending: false, receiver, receiverWallet: updatedReceiverWallet };
     });
 
-    const event = type === "DEPOSIT" ? "WALLET_DEPOSIT" : type === "WITHDRAWAL" ? "WALLET_WITHDRAWAL" : "WALLET_TRANSFER";
-    await dispatchNotification({
-      event,
-      userId,
-      title: type === "DEPOSIT" ? "Dépôt enregistré" : type === "WITHDRAWAL" ? "Retrait enregistré" : "Virement effectué",
-      message: `${amount.toLocaleString("fr-FR")} ${config.currency} — ${result.pending ? "en attente de confirmation" : "opération confirmée"}.`,
-      link: "/dashboard/wallet",
-      type: "SUCCESS",
-    }).catch(() => null);
+    const person = { id: userId, name: user.name, email: user.email, language: user.language };
+    if (type === "DEPOSIT" || type === "WITHDRAWAL") {
+      await notifyWalletMovement({
+        kind: type === "DEPOSIT" ? "WALLET_DEPOSIT" : "WALLET_WITHDRAWAL",
+        person,
+        amount,
+        currency: config.currency,
+        motif: description,
+        balance: result.wallet?.balance ?? wallet.balance,
+      }).catch(() => null);
+    } else {
+      const receiver = (result as any).receiver;
+      const receiverWallet = (result as any).receiverWallet;
+      if (receiver) {
+        await Promise.all([
+          notifyWalletMovement({
+            kind: "WALLET_SENT",
+            person,
+            amount,
+            currency: config.currency,
+            motif: description,
+            balance: result.wallet?.balance ?? wallet.balance,
+            counterparty: receiver.name,
+          }).catch(() => null),
+          notifyWalletMovement({
+            kind: "WALLET_RECEIVED",
+            person: { id: receiver.id, name: receiver.name, email: receiver.email, language: receiver.language },
+            amount,
+            currency: config.currency,
+            motif: description,
+            balance: receiverWallet?.balance ?? null,
+            counterparty: user.name,
+          }).catch(() => null),
+        ]);
+      }
+    }
 
     return NextResponse.json({
       ...result,

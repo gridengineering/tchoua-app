@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getWalletConfig } from "@/lib/wallet/config";
+import { notifyAssociationMovement } from "@/lib/notifications/funds";
 import {
   accountCurrency,
   cashPolicy,
@@ -18,7 +19,7 @@ type TargetMembership = {
   role: string;
   status: string;
   memberNumber?: string | null;
-  user: { id: string; name: string; email: string | null; kycLevel: number };
+  user: { id: string; name: string; email: string | null; language: string; kycLevel: number };
 };
 
 async function getMembership(associationId: string, userId: string): Promise<TargetMembership | null> {
@@ -26,7 +27,7 @@ async function getMembership(associationId: string, userId: string): Promise<Tar
     where: { associationId, userId, status: { in: ["ACTIVE", "PENDING", "SUSPENDED"] } },
     select: {
       id: true, associationId: true, userId: true, role: true, status: true, memberNumber: true,
-      user: { select: { id: true, name: true, email: true, kycLevel: true } },
+      user: { select: { id: true, name: true, email: true, language: true, kycLevel: true } },
     },
   }) as Promise<TargetMembership | null>;
 }
@@ -39,7 +40,7 @@ async function targetFor(body: any, me: TargetMembership, canManage: boolean) {
     where: { id: requested, associationId: me.associationId, status: { not: "LEFT" } },
     select: {
       id: true, associationId: true, userId: true, role: true, status: true, memberNumber: true,
-      user: { select: { id: true, name: true, email: true, kycLevel: true } },
+      user: { select: { id: true, name: true, email: true, language: true, kycLevel: true } },
     },
   }) as Promise<TargetMembership | null>;
 }
@@ -162,12 +163,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const body = await req.json().catch(() => ({}));
   const action = String(body.action ?? "").toUpperCase();
+  const motif = String(body.motif ?? body.libelle ?? body.note ?? "").trim();
   const canManage = isAssociationBureau(me.role);
   const target = await targetFor(body, me, canManage);
   if (!target) return NextResponse.json({ error: "Membre cible invalide" }, { status: 403 });
 
   const amount = Number(body.amount);
   if (!Number.isFinite(amount) || amount <= 0) return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
+  const requiresMotif = ["DEPOSIT_WALLET", "DEPOSIT_BANK", "DEPOSIT_CASH", "WITHDRAW", "SETTLE", "ACTIVITY_TO_MEMBER"].includes(action);
+  if (requiresMotif && !motif) return NextResponse.json({ error: "Le libellé ou motif est obligatoire" }, { status: 400 });
   const idempotencyKey = req.headers.get("idempotency-key")?.trim() || body.idempotencyKey || undefined;
   if (idempotencyKey) {
     const existing = await prisma.associationMemberTransaction.findUnique({ where: { idempotencyKey } });
@@ -180,11 +184,38 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
   }
 
-  const association = await prisma.association.findUnique({ where: { id: associationId }, select: { bankConfig: true } });
+  const association = await prisma.association.findUnique({ where: { id: associationId }, select: { bankConfig: true, name: true } });
   const walletConfig = await getWalletConfig();
   const cashProvider = walletConfig.providers.find((p) => p.type === "CASH");
   const cash = cashPolicy(parseBankConfig(association?.bankConfig), cashProvider?.max);
   const currency = accountCurrency(walletConfig.currency);
+
+  const announce = (kind: Parameters<typeof notifyAssociationMovement>[0]["kind"], opts: {
+    method: string;
+    balance?: number | null;
+    proofUrl?: string | null;
+    activityName?: string | null;
+    actorName?: string;
+  }) => notifyAssociationMovement({
+    associationId,
+    associationName: association?.name ?? "Association",
+    actorMembershipId: me.id,
+    actorName: me.user.name,
+    target: {
+      id: target.userId,
+      name: target.user.name,
+      email: target.user.email,
+      language: target.user.language,
+    },
+    amount,
+    currency,
+    motif: motif || "Mouvement de fonds",
+    method: opts.method,
+    balance: opts.balance ?? null,
+    proofUrl: opts.proofUrl ?? null,
+    activityName: opts.activityName ?? null,
+    kind,
+  }).catch(() => null);
 
   try {
     if (action === "DEPOSIT_WALLET") {
@@ -195,11 +226,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const account = await ensureMemberAccount(tx, target, currency);
         const nextBalance = account.balance + amount;
         await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { decrement: amount } } });
-        await tx.walletTransaction.create({ data: { walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_OUT", status: "COMPLETED", description: body.description || `Versement compte association ${associationId}`, associationId } });
+        await tx.walletTransaction.create({ data: { walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_OUT", status: "COMPLETED", description: motif || `Versement compte association ${associationId}`, associationId } });
         await tx.associationMemberAccount.update({ where: { id: account.id }, data: { balance: nextBalance } });
-        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, type: "DEPOSIT_WALLET", direction: "IN", method: "WALLET", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: body.note || null, createdById: session.user.id } });
+        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, type: "DEPOSIT_WALLET", direction: "IN", method: "WALLET", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: motif || null, createdById: session.user.id } });
         return { account: { ...account, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_DEPOSIT", { method: "WALLET", balance: result.account.balance });
       return NextResponse.json(result, { status: 201 });
     }
 
@@ -210,7 +242,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       if (!bank) throw new Error("Compte bancaire étranger à l'association");
       if (!body.proofUrl) throw new Error("La preuve de transaction est obligatoire pour un versement bancaire");
       const account = await ensureMemberAccount(prisma, target, currency);
-      const transaction = await prisma.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, bankAccountId, type: "DEPOSIT_BANK", direction: "IN", method: "BANK", amount, balanceAfter: account.balance, status: "PENDING", reference: body.reference || null, proofUrl: String(body.proofUrl), note: body.note || null, createdById: session.user.id } });
+      const transaction = await prisma.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, bankAccountId, type: "DEPOSIT_BANK", direction: "IN", method: "BANK", amount, balanceAfter: account.balance, status: "PENDING", reference: body.reference || null, proofUrl: String(body.proofUrl), note: motif || null, createdById: session.user.id } });
+      await announce("ASSOC_PENDING", { method: "BANK", proofUrl: transaction.proofUrl });
       return NextResponse.json({ account, transaction, pending: true, message: "Preuve enregistrée. Le bureau doit confirmer le rapprochement." }, { status: 201 });
     }
 
@@ -225,9 +258,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const account = await ensureMemberAccount(tx, target, currency);
         const nextBalance = account.balance + amount;
         await tx.associationMemberAccount.update({ where: { id: account.id }, data: { balance: nextBalance } });
-        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, type: "DEPOSIT_CASH", direction: "IN", method: "CASH", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, proofUrl: body.proofUrl || null, note: body.note || null, createdById: session.user.id, reconciledAt: new Date(), reconciledById: session.user.id } });
+        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, type: "DEPOSIT_CASH", direction: "IN", method: "CASH", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, proofUrl: body.proofUrl || null, note: motif || null, createdById: session.user.id, reconciledAt: new Date(), reconciledById: session.user.id } });
         return { account: { ...account, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_DEPOSIT", { method: "CASH", balance: result.account.balance, proofUrl: result.transaction.proofUrl });
       return NextResponse.json(result, { status: 201 });
     }
 
@@ -246,6 +280,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const transaction = await tx.associationMemberTransaction.update({ where: { id: pending.id }, data: { status: "COMPLETED", balanceAfter: nextBalance, reconciledAt: new Date(), reconciledById: session.user.id } });
         return { account: { ...account, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_CONFIRM", { method: pending.method, balance: result.account.balance, proofUrl: pending.proofUrl });
       return NextResponse.json(result);
     }
 
@@ -266,11 +301,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           const wallet = await tx.wallet.findUnique({ where: { userId: target.userId } });
           if (!wallet || wallet.status !== "ACTIVE") throw new Error("Wallet membre introuvable ou suspendu");
           await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { increment: amount } } });
-          await tx.walletTransaction.create({ data: { walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_IN", status: "COMPLETED", description: body.description || `Retrait AVOIR association ${associationId}`, associationId } });
+          await tx.walletTransaction.create({ data: { walletId: wallet.id, amount, feeAmount: 0, netAmount: amount, type: "TRANSFER_IN", status: "COMPLETED", description: motif || `Retrait AVOIR association ${associationId}`, associationId } });
         }
-        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, bankAccountId: body.bankAccountId || null, type: `WITHDRAWAL_${method}`, direction: "OUT", method, amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, proofUrl: body.proofUrl || null, note: body.note || null, createdById: session.user.id, reconciledAt: method === "BANK" ? null : new Date(), reconciledById: session.user.id } });
+        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, bankAccountId: body.bankAccountId || null, type: `WITHDRAWAL_${method}`, direction: "OUT", method, amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, proofUrl: body.proofUrl || null, note: motif || null, createdById: session.user.id, reconciledAt: method === "BANK" ? null : new Date(), reconciledById: session.user.id } });
         return { account: { ...current, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_PAYOUT", { method, balance: result.account.balance, proofUrl: result.transaction.proofUrl });
       return NextResponse.json(result, { status: 201 });
     }
 
@@ -280,6 +316,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const activityId = body.activityId ? String(body.activityId) : null;
       const loanId = body.loanId ? String(body.loanId) : null;
       if (!activityId && !loanId) throw new Error("Choisissez une activité ou un prêt à régler");
+      let activityLabel: string | null = null;
       const result = await prisma.$transaction(async (tx) => {
         const current = await tx.associationMemberAccount.findUnique({ where: { id: account.id } });
         if (!current || current.balance < amount) throw new Error("Solde AVOIR insuffisant");
@@ -289,8 +326,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           const activity = await tx.associationActivity.findFirst({ where: { id: activityId, associationId } });
           if (!activity) throw new Error("Activité étrangère à l'association");
           await tx.associationActivity.update({ where: { id: activityId }, data: { caisseBalance: { increment: amount } } });
-          await tx.activityContribution.create({ data: { activityId, membershipId: target.id, amount, unit: "CASH", status: "PAID", paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null, notes: body.note || "Règlement depuis le compte association", paidAt: new Date() } });
+          await tx.activityContribution.create({ data: { activityId, membershipId: target.id, amount, unit: "CASH", status: "PAID", paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null, notes: motif || "Règlement depuis le compte association", paidAt: new Date() } });
           label = `Règlement ${activity.name}`;
+          activityLabel = activity.name;
         }
         if (loanId) {
           const loan = await tx.assocLoan.findFirst({ where: { id: loanId, activity: { associationId } } });
@@ -301,9 +339,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           label = "Remboursement prêt";
         }
         await tx.associationMemberAccount.update({ where: { id: account.id }, data: { balance: nextBalance } });
-        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, activityId, type: "SETTLEMENT", direction: "OUT", method: "ACTIVITY", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: body.note || label, createdById: session.user.id } });
+        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, activityId, type: "SETTLEMENT", direction: "OUT", method: "ACTIVITY", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: motif || label, createdById: session.user.id } });
         return { account: { ...current, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_SETTLE", { method: "ACTIVITY", balance: result.account.balance, activityName: activityLabel });
       return NextResponse.json(result, { status: 201 });
     }
 
@@ -317,9 +356,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const nextBalance = account.balance + amount;
         await tx.associationActivity.update({ where: { id: activityId }, data: { caisseBalance: { decrement: amount } } });
         await tx.associationMemberAccount.update({ where: { id: account.id }, data: { balance: nextBalance } });
-        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, activityId, type: "ACTIVITY_TRANSFER", direction: "IN", method: "ACTIVITY", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: body.note || `Transfert depuis ${activity.name}`, createdById: session.user.id } });
+        const transaction = await tx.associationMemberTransaction.create({ data: { idempotencyKey, accountId: account.id, membershipId: target.id, associationId, activityId, type: "ACTIVITY_TRANSFER", direction: "IN", method: "ACTIVITY", amount, balanceAfter: nextBalance, status: "COMPLETED", reference: body.reference || null, note: motif || `Transfert depuis ${activity.name}`, createdById: session.user.id } });
         return { account: { ...account, balance: nextBalance }, transaction };
       });
+      await announce("ASSOC_ACTIVITY", { method: "ACTIVITY", balance: result.account.balance, activityName: activity.name });
       return NextResponse.json(result, { status: 201 });
     }
 

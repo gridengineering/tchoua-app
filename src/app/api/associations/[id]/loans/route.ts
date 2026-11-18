@@ -7,6 +7,7 @@ import { checkAssociationEligibility, eligibilityJson } from "@/lib/association/
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
 import { creditMemberAccount } from "@/lib/association/member-account";
+import { notifyAssociationMovement } from "@/lib/notifications/funds";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
@@ -206,8 +207,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     include: {
       activity: {
         select: {
+          name: true,
           loanApprovalMode: true,
-          association: { select: { bankConfig: true } },
+          association: { select: { bankConfig: true, name: true } },
         },
       },
     },
@@ -282,6 +284,44 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         return { approvalCount, requiredApprovals, activated: approvalCount >= requiredApprovals };
       });
+
+      if (result.activated) {
+        const [borrower, association] = await Promise.all([
+          prisma.associationMembership.findUnique({
+            where: { id: loan.borrowerMembershipId },
+            select: {
+              id: true,
+              user: { select: { id: true, name: true, email: true, language: true } },
+            },
+          }),
+          prisma.association.findUnique({ where: { id }, select: { name: true } }),
+        ]);
+        if (borrower) {
+          const account = await prisma.associationMemberAccount.findUnique({
+            where: { membershipId: borrower.id },
+            select: { balance: true },
+          });
+          await notifyAssociationMovement({
+            associationId: id,
+            associationName: association?.name ?? "Association",
+            actorMembershipId: membership.id,
+            actorName: session.user.name ?? "Bureau",
+            target: {
+              id: borrower.user.id,
+              name: borrower.user.name,
+              email: borrower.user.email,
+              language: borrower.user.language,
+            },
+            amount: loan.amount,
+            currency: "XAF",
+            motif: `Décaissement du prêt${loan.purpose ? ` — ${loan.purpose}` : ""}`,
+            method: "WALLET",
+            balance: account?.balance ?? null,
+            activityName: loan.activity?.name ?? null,
+            kind: "ASSOC_PAYOUT",
+          }).catch(() => null);
+        }
+      }
 
       return NextResponse.json({
         ok: true,
@@ -375,6 +415,38 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         return { remaining: Math.max(0, effectiveTotalDue - newTotal), repaidNow: numericAmount };
       });
+
+      if (!(result as any).replayed) {
+        const borrower = await prisma.associationMembership.findUnique({
+          where: { id: loan.borrowerMembershipId },
+          select: { id: true, user: { select: { id: true, name: true, email: true, language: true } } },
+        });
+        if (borrower) {
+          const account = await prisma.associationMemberAccount.findUnique({
+            where: { membershipId: borrower.id },
+            select: { balance: true },
+          });
+          await notifyAssociationMovement({
+            associationId: id,
+            associationName: loan.activity.association?.name ?? "Association",
+            actorMembershipId: membership.id,
+            actorName: session.user.name ?? "Membre",
+            target: {
+              id: borrower.user.id,
+              name: borrower.user.name,
+              email: borrower.user.email,
+              language: borrower.user.language,
+            },
+            amount: numericAmount,
+            currency: "XAF",
+            motif: `Remboursement de prêt${loan.activity.name ? ` — ${loan.activity.name}` : ""}`,
+            method: effectivePaymentMethod,
+            balance: account?.balance ?? null,
+            activityName: loan.activity.name ?? null,
+            kind: "ASSOC_SETTLE",
+          }).catch(() => null);
+        }
+      }
 
       return NextResponse.json({ ok: true, ...result });
     } catch (error: any) {

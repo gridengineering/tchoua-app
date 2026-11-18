@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { creditMemberAccount } from "@/lib/association/member-account";
 import { isPlatformAdmin } from "@/lib/permissions";
+import { notifyAssociationMovement } from "@/lib/notifications/funds";
 
 export async function PATCH(
   req: NextRequest,
@@ -32,7 +33,7 @@ export async function PATCH(
   const [activity, existingSession] = await Promise.all([
     prisma.associationActivity.findFirst({
       where: { id: activityId, associationId },
-      select: { id: true },
+      select: { id: true, name: true },
     }),
     prisma.activitySession.findFirst({
       where: { id: sessionId, activityId },
@@ -42,6 +43,8 @@ export async function PATCH(
   if (!activity || !existingSession) {
     return NextResponse.json({ error: "Séance ou activité introuvable" }, { status: 404 });
   }
+
+  const tontineNotice: { value: { beneficiaryId: string; amount: number } | null } = { value: null };
 
   try {
     const body = await req.json();
@@ -162,6 +165,7 @@ export async function PATCH(
           note: `Bénéfice tontine — ${finalAmount.toLocaleString("fr-FR")} FCFA`,
           createdById: session.user.id,
         });
+        tontineNotice.value = { beneficiaryId, amount: finalAmount };
 
         if (solidarityDeduction > 0) {
           const solidarityAct = await tx.associationActivity.findFirst({
@@ -185,6 +189,44 @@ export async function PATCH(
 
       return closedSession;
     });
+
+    if (tontineNotice.value) {
+      const [beneficiary, association] = await Promise.all([
+        prisma.associationMembership.findUnique({
+          where: { id: tontineNotice.value.beneficiaryId },
+          select: {
+            id: true,
+            user: { select: { id: true, name: true, email: true, language: true } },
+          },
+        }),
+        prisma.association.findUnique({ where: { id: associationId }, select: { name: true } }),
+      ]);
+      if (beneficiary) {
+        const beneficiaryAccount = await prisma.associationMemberAccount.findUnique({
+          where: { membershipId: beneficiary.id },
+          select: { balance: true },
+        });
+        await notifyAssociationMovement({
+          associationId,
+          associationName: association?.name ?? "Association",
+          actorMembershipId: membership?.id ?? beneficiary.id,
+          actorName: session.user.name ?? "Bureau",
+          target: {
+            id: beneficiary.user.id,
+            name: beneficiary.user.name,
+            email: beneficiary.user.email,
+            language: beneficiary.user.language,
+          },
+          amount: tontineNotice.value.amount,
+          currency: "XAF",
+          motif: `Bénéfice de tontine${activity.name ? ` — ${activity.name}` : ""}`,
+          method: "ACTIVITY",
+          balance: beneficiaryAccount?.balance ?? null,
+          activityName: activity.name ?? null,
+          kind: "ASSOC_ACTIVITY",
+        }).catch(() => null);
+      }
+    }
 
     return NextResponse.json(updatedSession);
   } catch (error: any) {
