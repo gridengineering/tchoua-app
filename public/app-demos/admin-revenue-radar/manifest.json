@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "admin-revenue-radar",
+  "name": "Revenue Radar",
+  "scope": "ADMIN",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/admin-revenue-radar/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

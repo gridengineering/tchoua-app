@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "member-meeting-copilot",
+  "name": "Meeting Copilot",
+  "scope": "MEMBER",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/member-meeting-copilot/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

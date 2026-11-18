@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-event-planner",
+  "name": "Event Planner",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-event-planner/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

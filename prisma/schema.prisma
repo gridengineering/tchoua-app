@@ -68,6 +68,8 @@ model User {
   marketplaceConversationsAsBuyer MarketplaceConversation[] @relation("MarketplaceBuyer")
   marketplaceConversationsAsSeller MarketplaceConversation[] @relation("MarketplaceSeller")
   marketplaceMessages   MarketplaceMessage[] @relation("MarketplaceMessageSender")
+  appInstalls           AppInstallation[] @relation("AppInstaller")
+  developerApiKeys      DeveloperApiKey[]
   groupOrderItems       GroupOrderItem[]
   groupOrders           GroupOrder[]       @relation("OrderInitiator")
   culturalEventAttendees CulturalEventAttendee[]
@@ -972,6 +974,7 @@ model Association {
   socialAidReqs AssocSocialAidRequest[]
   assocMessages AssocMessage[]
   marketplaceListings MarketplaceListing[]
+  appInstalls   AppInstallation[]
   customRoles   AssociationCustomRole[]
   regulations   AssociationRegulationArticle[]
   relationsSource AssociationRelation[] @relation("RelationSource")
@@ -2543,4 +2546,82 @@ model FounderRevocationRequest {
   @@index([associationId, status])
   @@index([founderMembershipId])
   @@map("founder_revocation_requests")
+}
+
+
+// ─── Apps marketplace / extensions ─────────────────────────────────────────
+
+model PlatformApp {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  tagline        String?
+  description    String?
+  developerName  String
+  developerUrl   String?
+  repositoryUrl  String?
+  homepageUrl    String?
+  iconUrl        String?
+  coverUrl       String?
+  // ADMIN, MEMBER, ASSOCIATION
+  scope          String
+  // Productivité, Finance, Gouvernance, Communication, Données…
+  category       String   @default("Productivité")
+  // DRAFT, PUBLISHED, SUSPENDED
+  status         String   @default("PUBLISHED")
+  version        String   @default("1.0.0")
+  // Manifest JSON complet (entryUrl, permissions, settings, events…)
+  manifest       String?
+  permissions    String?
+  screenshots    String?
+  installCount   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  installations  AppInstallation[]
+
+  @@index([scope, status])
+  @@index([category, status])
+  @@map("platform_apps")
+}
+
+/// Clés API des développeurs externes pour soumettre et maintenir leurs apps.
+model DeveloperApiKey {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  prefix     String   @unique
+  keyHash    String
+  scopes     String   @default("apps:write apps:read")
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@map("developer_api_keys")
+}
+
+model AppInstallation {
+  id             String   @id @default(cuid())
+  appId          String
+  // Pour ADMIN et MEMBER : installation personnelle
+  userId         String?
+  // Pour ASSOCIATION : installation au niveau de l'association
+  associationId  String?
+  // ACTIVE, PAUSED
+  status         String   @default("ACTIVE")
+  version        String   @default("1.0.0")
+  settings       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  app            PlatformApp @relation(fields: [appId], references: [id], onDelete: Cascade)
+  user           User?       @relation("AppInstaller", fields: [userId], references: [id], onDelete: SetNull)
+  association    Association? @relation(fields: [associationId], references: [id], onDelete: Cascade)
+
+  @@index([appId, userId])
+  @@index([appId, associationId])
+  @@map("app_installations")
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight, BarChart3, Calendar, Coins, GraduationCap, Heart, Landmark,
-  MessageCircle, PiggyBank, Plus, RotateCcw, ShoppingBag, Users, Wallet,
+  MessageCircle, PiggyBank, Plus, RotateCcw, ShoppingBag, Users, Wallet, Puzzle,
 } from "lucide-react";
 
 const MODULES = [
@@ -17,6 +17,7 @@ const MODULES = [
   { href: "/rapports", label: "Rapports", desc: "Exports & analyses", icon: BarChart3 },
   { href: "/dashboard/wallet", label: "Portefeuille", desc: "Solde & opérations", icon: Wallet },
   { href: "/marketplace", label: "Marketplace", desc: "Annonces & achats groupés", icon: ShoppingBag, feature: "marketplace" },
+  { href: "/apps", label: "Apps marketplace", desc: "Extensions & intégrations", icon: Puzzle },
   { href: "/chat", label: "Chat", desc: "Canaux de l'association", icon: MessageCircle, feature: "chat" },
   { href: "/dashboard/calendrier", label: "Calendrier", desc: "Échéances & réunions", icon: Calendar },
   { href: "/academie", label: "Académie", desc: "Guides & formation", icon: GraduationCap, feature: "academy" },

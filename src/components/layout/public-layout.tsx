@@ -14,9 +14,17 @@ type SubLink = { href: string; key: string };
 const NAV: { key: string; href: string }[] = [
   { key: "fonctionnalites", href: "/#modules" },
   { key: "how_it_works", href: "/#steps" },
+  { key: "apps", href: "/apps" },
   { key: "tarifs", href: "/#pricing" },
   { key: "documentation", href: "/documentation" },
 ];
+
+const APPS_LABELS: Record<string, string> = {
+  fr: "Apps marketplace",
+  en: "Apps marketplace",
+  es: "Mercado de apps",
+  de: "Apps-Marktplatz",
+};
 
 export function PublicHeader() {
   const pathname = usePathname();
@@ -58,7 +66,12 @@ export function PublicHeader() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const label = (key: string) => key === "documentation" ? DOCS_COPY[publicLang(lang)].nav : (t.nav as Record<string, string>)[key] ?? key;
+  const label = (key: string) =>
+    key === "apps"
+      ? APPS_LABELS[publicLang(lang)] ?? "Apps marketplace"
+      : key === "documentation"
+        ? DOCS_COPY[publicLang(lang)].nav
+        : (t.nav as Record<string, string>)[key] ?? key;
 
   const changeLang = (code: string) => {
     setLang(code);
@@ -214,6 +227,7 @@ export function PublicFooter() {
     { label: c.footer.api, href: "https://github.com/gridengineering/tchoua-app" },
   ];
   const resourceLinks = [
+    { label: APPS_LABELS[publicLang(lang)] ?? "Apps marketplace", href: "/apps" },
     { label: c.footer.aboutLink, href: "/about" },
     { label: c.footer.help, href: "/aide" },
     { label: c.footer.security, href: "/security" },

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-attendance-board",
+  "name": "Attendance Board",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-attendance-board/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

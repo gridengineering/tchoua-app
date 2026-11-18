@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "member-savings-coach",
+  "name": "Savings Coach",
+  "scope": "MEMBER",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/member-savings-coach/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

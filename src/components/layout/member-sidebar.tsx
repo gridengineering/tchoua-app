@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, PiggyBank, RotateCcw, Landmark, Heart, BarChart3,
   Settings, LogOut, ChevronLeft, ChevronDown, MessageCircle, Calendar, Bot,
   FileText, Building2, UserCircle, Check, ShieldCheck, Plus, ShoppingBag,
-  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight, History, TrendingUp, Route,
+  PartyPopper, Trophy, GraduationCap, Coins, Wallet, X, ChevronRight, History, TrendingUp, Route, Puzzle,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: any; feature?: string };
@@ -54,6 +54,7 @@ const GLOBAL_GROUPS: Group[] = [
     items: [
       { href: "/membres", label: "Membres", icon: Users },
       { href: "/marketplace", label: "Marketplace", icon: ShoppingBag, feature: "marketplace" },
+      { href: "/apps", label: "Apps marketplace", icon: Puzzle },
       { href: "/evenements", label: "Événements", icon: PartyPopper, feature: "events" },
       { href: "/chat", label: "Chat de groupe", icon: MessageCircle, feature: "chat" },
     ],
@@ -102,6 +103,7 @@ function AssociationNav({ id, myRole, collapsed }: { id: string; myRole?: string
             title: "Gestion & Bureau",
             items: [
               { href: `/associations/${id}/kyc`, label: "Conformité KYC", icon: ShieldCheck },
+              { href: `/apps?scope=ASSOCIATION&associationId=${id}`, label: "Apps association", icon: Puzzle },
               { href: `/associations/${id}/modifier`, label: "Réglages association", icon: Settings },
             ],
           },

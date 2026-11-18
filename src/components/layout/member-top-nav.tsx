@@ -8,7 +8,7 @@ import {
   Bell, Building2, Calendar, Check, ChevronDown, GraduationCap, Heart,
   Landmark, LayoutDashboard, LogOut, Menu, MessageCircle,
   PiggyBank, RotateCcw, Settings, ShieldCheck, ShoppingBag,
-  Trophy, User, Users, Wallet, X, Bot, PartyPopper, FileText,
+  Trophy, User, Users, Wallet, X, Bot, PartyPopper, FileText, Puzzle,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: any; feature?: string };
@@ -27,6 +27,7 @@ const PRIMARY_NAV: NavItem[] = [
 const MORE_NAV: NavItem[] = [
   { href: "/dashboard/calendrier", label: "Calendrier", icon: Calendar },
   { href: "/marketplace", label: "Marketplace", icon: ShoppingBag, feature: "marketplace" },
+  { href: "/apps", label: "Apps marketplace", icon: Puzzle },
   { href: "/evenements", label: "Événements", icon: PartyPopper, feature: "events" },
   { href: "/chat", label: "Chat de groupe", icon: MessageCircle, feature: "chat" },
   { href: "/conseils", label: "Conseils IA", icon: Bot, feature: "ai" },

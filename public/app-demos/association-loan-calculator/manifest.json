@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-loan-calculator",
+  "name": "Loan Calculator",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-loan-calculator/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

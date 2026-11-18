@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "member-marketplace-assistant",
+  "name": "Marketplace Assistant",
+  "scope": "MEMBER",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/member-marketplace-assistant/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

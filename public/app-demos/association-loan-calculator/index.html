@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loan Calculator · Tchoua Apps</title>
+<style>
+:root{--accent:#0369a1;--ink:#14201a;--muted:#6b746e;--line:#e6e8e3;--paper:#fbfcf9;}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:#fff}
+.brand{font-weight:900;letter-spacing:-.04em;font-size:17px} .brand i{color:var(--accent);font-style:normal}
+.badge{font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,white);padding:6px 10px;border-radius:999px}
+main{max-width:1000px;margin:0 auto;padding:28px 22px 40px} .hero{margin-bottom:24px} .kicker{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)} h1{font-size:32px;line-height:1.1;letter-spacing:-.05em;margin:8px 0} .hero p{max-width:650px;color:var(--muted);font-size:14px}
+.context{display:flex;gap:8px;align-items:center;margin:12px 0 22px;color:var(--muted);font-size:11px} .dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px} .metric,.panel,.preview{border:1px solid var(--line);background:#fff;border-radius:16px;padding:16px} .metric span{display:block;color:var(--muted);font-size:11px} .metric strong{display:block;font-size:26px;letter-spacing:-.04em;margin:5px 0;color:var(--accent)} .metric small{color:var(--muted);font-size:10px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px} h2{font-size:14px;margin:0;letter-spacing:-.01em} .pill{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,white);padding:5px 8px;border-radius:999px;white-space:nowrap}
+.rows>div{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-top:1px solid #f0f1ed} .rows small{grid-column:1/-1;color:var(--muted);font-size:10px} .tag{font-size:9px;font-weight:800;padding:3px 7px;background:#eef7ef;color:#166534;border-radius:5px;white-space:nowrap} .tag.high{background:#fff1f0;color:#b42318} .tag.warn{background:#fff8e6;color:#a15c00}
+.progress{height:8px;background:#edf0ea;border-radius:99px;overflow:hidden;margin:14px 0 6px} .progress span{display:block;height:100%;background:var(--accent);border-radius:99px} .muted{color:var(--muted);font-size:10px}
+.bars{height:150px;display:flex;align-items:end;gap:12px;padding:12px 8px 0} .bars i{flex:1;background:var(--accent);border-radius:6px 6px 0 0;min-height:8px;opacity:.9} .bar-labels{display:flex;gap:12px;padding:0 8px;color:var(--muted);font-size:9px} .bar-labels span{flex:1;text-align:center}
+label{display:block;font-weight:700;font-size:11px;margin:10px 0 0} input,textarea,button{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:#fff;color:var(--ink)} textarea{resize:vertical} button{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800;cursor:pointer;margin-top:12px} .result{margin-top:12px;padding:12px;background:color-mix(in srgb,var(--accent) 7%,white);border-radius:10px;font-weight:800;color:var(--accent);font-size:13px}
+.checklist{display:grid;gap:8px;margin-bottom:8px} .checklist label{display:flex;gap:8px;align-items:center;font-weight:600;margin:0} .checklist input{width:auto;margin:0;accent-color:var(--accent)} .action{font-size:11px;color:#166534;margin-top:8px}
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .preview span{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)} .preview h3{margin:8px 0 4px;font-size:16px} .preview p{margin:0;font-weight:800} .preview small{color:var(--muted)}
+.timeline{display:grid;gap:0} .timeline div{padding:10px 0 10px 18px;border-left:2px solid var(--line);position:relative} .timeline div:before{content:"";position:absolute;left:-5px;top:14px;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--line)} .timeline .done:before{background:var(--accent);border-color:var(--accent)} .timeline b{font-size:12px} .timeline small{display:block;color:var(--muted);font-size:10px}
+footer{max-width:1000px;margin:0 auto;padding:0 22px 28px;color:var(--muted);font-size:10px} @media(max-width:700px){.metric-grid,.market-grid{grid-template-columns:1fr} h1{font-size:26px}}
+</style>
+</head>
+<body>
+<header><div class="brand">tchoua<i>.</i> apps</div><span class="badge">Loan Calculator</span></header>
+<main>
+  <div class="hero"><div class="kicker">Espace association · Finance</div><h1>Loan Calculator</h1><p>Simulez un prêt avant de l&#x27;accorder. Cette application fonctionne dans votre session Tchoua et accède au contexte autorisé par l'installation.</p></div>
+  <div class="context"><span class="dot"></span><span id="context-label">Mode démonstration · contexte en chargement…</span></div>
+  
+        <div class="panel"><div class="panel-head"><h2>Simulation de prêt</h2><span class="pill">Taux paramétrables</span></div><label>Montant (FCFA)<input id="l-amount" type="number" value="2000000"></label><label>Taux mensuel (%)<input id="l-rate" type="number" step="0.1" value="2"></label><label>Durée (mois)<input id="l-months" type="number" value="3"></label><button onclick="calcLoan()">Calculer</button><div id="loan-result" class="result">Total dû : 2 120 000 FCFA</div></div>
+</main>
+<footer>Propulsé par Tchoua Apps · <span>SDK context · manifest 1.0</span></footer>
+<script>
+const TOKEN = new URLSearchParams(location.search).get("tchoua_token");
+const base = location.hostname === "localhost" ? "https://www.tchoua.com" : location.origin;
+async function loadContext() {
+  if (!TOKEN) { document.getElementById("context-label").textContent = "Mode démonstration · aucun jeton de session"; return; }
+  try {
+    const res = await fetch(base + "/api/apps/sdk/context", { headers: { Authorization: "Bearer " + TOKEN } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Contexte indisponible");
+    const c = data.context;
+    document.getElementById("context-label").textContent = "Connecté · " + (c.user?.name || "Membre") + (c.association ? " · " + c.association.name : "");
+    window.parent.postMessage({ type: "tchoua:context", context: c }, "*");
+  } catch (e) { document.getElementById("context-label").textContent = "Mode démonstration · " + e.message; }
+}
+function calcSavings() {
+  const goal = Number(document.getElementById("goal").value || 0), saved = Number(document.getElementById("saved").value || 0), monthly = Number(document.getElementById("monthly").value || 1);
+  const left = Math.max(0, goal - saved); const months = Math.ceil(left / Math.max(1, monthly));
+  document.getElementById("savings-result").textContent = left === 0 ? "Objectif atteint ✓" : "Il vous reste " + left.toLocaleString("fr-FR") + " FCFA · environ " + months + " mois.";
+}
+function calcLoan() {
+  const amount = Number(document.getElementById("l-amount").value || 0), rate = Number(document.getElementById("l-rate").value || 0), months = Number(document.getElementById("l-months").value || 1);
+  const total = Math.round(amount * (1 + rate * months / 100));
+  document.getElementById("loan-result").textContent = "Total dû : " + total.toLocaleString("fr-FR") + " FCFA · intérêts " + (total - amount).toLocaleString("fr-FR") + " FCFA";
+}
+function previewListing() {
+  const title = document.getElementById("m-title").value, price = Number(document.getElementById("m-price").value || 0);
+  document.getElementById("listing-preview").innerHTML = '<span>VENTE · Agriculture</span><h3>' + title + '</h3><p>' + price.toLocaleString("fr-FR") + ' FCFA / unité</p><small>Prêt à publier sur la marketplace.</small>';
+}
+loadContext();
+window.parent.postMessage({ type: "tchoua:ready", slug: "association-loan-calculator" }, "*");
+</script>
+</body>
+</html>

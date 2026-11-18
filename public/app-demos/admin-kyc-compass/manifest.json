@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "admin-kyc-compass",
+  "name": "KYC Compass",
+  "scope": "ADMIN",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/admin-kyc-compass/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

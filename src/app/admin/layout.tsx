@@ -7,7 +7,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
   Activity, ArrowLeftRight, Bell, Boxes, Building2, ChevronLeft, ChevronRight,
   FileText, History, LayoutDashboard, Landmark, LogOut, Menu, PanelLeftClose,
-  PanelLeftOpen, Search, Settings, ShieldCheck, Sliders, Users, Wallet, X,
+  PanelLeftOpen, Search, Settings, ShieldCheck, Sliders, Users, Wallet, X, Puzzle,
 } from "lucide-react";
 
 type NavItem = { name: string; href: string; icon: any; exact?: boolean; roles?: string[]; permission?: string };
@@ -34,6 +34,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { name: "Associations", href: "/admin/associations", icon: Building2, permission: "ASSOCIATIONS_READ" },
       { name: "Référentiel ARP", href: "/admin/arp", icon: Boxes, roles: ["SUPER_ADMIN", "ADMIN"], permission: "ASSOCIATIONS_READ" },
+      { name: "Apps marketplace", href: "/apps?scope=ADMIN", icon: Puzzle, roles: ["SUPER_ADMIN", "ADMIN"], permission: "SETTINGS_READ" },
       { name: "Modèles", href: "/admin/templates", icon: FileText, roles: ["SUPER_ADMIN", "ADMIN"], permission: "TEMPLATES_READ" },
     ],
   },
@@ -159,6 +160,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       { label: "Associations", href: "/admin/associations", tag: "Écosystème" },
       { label: "Référentiel ARP", href: "/admin/arp", tag: "Écosystème" },
       { label: "Modèles associatifs", href: "/admin/templates", tag: "Écosystème" },
+      { label: "Apps marketplace", href: "/apps?scope=ADMIN", tag: "Écosystème" },
       { label: "Conformité KYC", href: "/admin/kyc", tag: "Conformité" },
       { label: "Confiance & Scores", href: "/admin/confiance", tag: "Conformité" },
       { label: "Utilisateurs système", href: "/admin/users", tag: "Accès" },

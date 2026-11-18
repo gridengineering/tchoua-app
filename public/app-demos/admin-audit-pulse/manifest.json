@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "admin-audit-pulse",
+  "name": "Audit Pulse",
+  "scope": "ADMIN",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/admin-audit-pulse/index.html",
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}
