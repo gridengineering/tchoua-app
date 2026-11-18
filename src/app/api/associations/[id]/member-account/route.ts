@@ -192,6 +192,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const announce = (kind: Parameters<typeof notifyAssociationMovement>[0]["kind"], opts: {
     amount?: number;
+    motif?: string;
     method: string;
     balance?: number | null;
     proofUrl?: string | null;
@@ -210,7 +211,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     },
     amount: opts.amount ?? amount,
     currency,
-    motif: motif || "Mouvement de fonds",
+    motif: opts.motif ?? (motif || "Mouvement de fonds"),
     method: opts.method,
     balance: opts.balance ?? null,
     proofUrl: opts.proofUrl ?? null,
@@ -289,7 +290,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const transaction = await tx.associationMemberTransaction.update({ where: { id: pending.id }, data: { status: "COMPLETED", balanceAfter: nextBalance, reconciledAt: new Date(), reconciledById: session.user.id } });
         return { account: { ...account, balance: nextBalance }, transaction };
       });
-      await announce("ASSOC_CONFIRM", { amount: pending.amount, method: pending.method, balance: result.account.balance, proofUrl: pending.proofUrl });
+      await announce("ASSOC_CONFIRM", { amount: pending.amount, motif: pending.note || motif || "Versement bancaire confirmé", method: pending.method, balance: result.account.balance, proofUrl: pending.proofUrl });
       return NextResponse.json(result);
     }
 
