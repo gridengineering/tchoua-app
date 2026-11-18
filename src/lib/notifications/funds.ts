@@ -350,13 +350,13 @@ export async function notifyAssociationMovement(movement: FundsMovement) {
       policy.channels,
       movement.kind
     ).catch(() => null);
+    await postAssociationFundsMessage({
+      associationId: movement.associationId,
+      membershipId: movement.actorMembershipId,
+      content: notice.group,
+      mediaUrl: movement.proofUrl || null,
+    }).catch(() => null);
   }
-  await postAssociationFundsMessage({
-    associationId: movement.associationId,
-    membershipId: movement.actorMembershipId,
-    content: notice.group,
-    mediaUrl: movement.proofUrl || null,
-  }).catch(() => null);
   return notice;
 }
 

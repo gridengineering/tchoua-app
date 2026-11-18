@@ -516,6 +516,9 @@ export function GovernanceConsole({
                   </tbody>
                 </table>
               </div>
+              <p className="mt-3 text-xs text-slate-500">
+                L’activation d’un événement contrôle aussi sa diffusion dans le chat du groupe de l’association et sa notification mobile ; les canaux sélectionnés déterminent la livraison à l’application, au chat, à la visio, à TURN et à l’e-mail.
+              </p>
             </Section>
           )}
 
