@@ -154,7 +154,7 @@ export function MemberTopNav({ title }: { title?: string }) {
                 )}
               </div>
               <Link
-                href="/dashboard/associations/create"
+                href="/dashboard/associations/new"
                 className="block border-t border-slate-100 px-4 py-2.5 text-sm font-semibold text-forest hover:bg-forest/5"
               >
                 + Créer une association

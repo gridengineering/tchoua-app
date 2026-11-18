@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight, BarChart3, Calendar, Coins, GraduationCap, Heart, Landmark,
@@ -13,26 +12,16 @@ const MODULES = [
   { href: "/prets", label: "Prêts", desc: "Demandes & remboursements", icon: Coins },
   { href: "/solidarite", label: "Solidarité", desc: "Aides & urgences", icon: Heart },
   { href: "/sessions", label: "Sessions", desc: "Séances & cotisations", icon: RotateCcw },
-  { href: "/membres", label: "Membres", desc: "Annuaire & parrainage", icon: Users },
+  { href: "/membres", label: "Membres", desc: "Annuaire & rôles", icon: Users },
   { href: "/rapports", label: "Rapports", desc: "Exports & analyses", icon: BarChart3 },
   { href: "/dashboard/wallet", label: "Portefeuille", desc: "Solde & opérations", icon: Wallet },
-  { href: "/marketplace", label: "Marketplace", desc: "Annonces & achats groupés", icon: ShoppingBag, feature: "marketplace" },
-  { href: "/chat", label: "Chat", desc: "Canaux de l'association", icon: MessageCircle, feature: "chat" },
+  { href: "/marketplace", label: "Marketplace", desc: "Annonces & achats groupés", icon: ShoppingBag },
+  { href: "/chat", label: "Chat", desc: "Canaux de l'association", icon: MessageCircle },
   { href: "/dashboard/calendrier", label: "Calendrier", desc: "Échéances & réunions", icon: Calendar },
-  { href: "/academie", label: "Académie", desc: "Guides & formation", icon: GraduationCap, feature: "academy" },
+  { href: "/academie", label: "Académie", desc: "Guides & formation", icon: GraduationCap },
 ];
 
 export function MemberLaunchpad() {
-  const [features, setFeatures] = useState<Record<string, boolean> | null>(null);
-
-  useEffect(() => {
-    fetch("/api/settings/public")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setFeatures(d?.settings?.features ?? null))
-      .catch(() => {});
-  }, []);
-
-  const visibleModules = MODULES.filter((m) => !m.feature || !features || features[m.feature] !== false);
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -48,14 +37,14 @@ export function MemberLaunchpad() {
           <Link href="/prets" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border m-border m-surface px-3 py-1.5 text-xs font-semibold m-text transition hover:brightness-105">
             <Landmark className="h-3.5 w-3.5" /> Demander un prêt
           </Link>
-          <Link href="/dashboard/associations/create" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full m-accent-bg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110">
+          <Link href="/dashboard/associations/new" className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full m-accent-bg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110">
             <Plus className="h-3.5 w-3.5" /> Nouvelle association
           </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        {visibleModules.map((m) => {
+        {MODULES.map((m) => {
           const Icon = m.icon;
           return (
             <Link

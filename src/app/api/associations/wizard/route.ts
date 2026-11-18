@@ -36,6 +36,10 @@ export async function POST(req: Request) {
       parentSubscriptionFee,
       website,
       isPublic,
+      templateUsed,
+      minKycLevel,
+      requireRegulationApproval,
+      reglementHtml,
       bankConfig,
       arpConfig,
       meetingConfig,
@@ -94,9 +98,13 @@ export async function POST(req: Request) {
           joinCode: generateJoinCode(),
           description,
           type: type || "TONTINE_CLUB",
-          color: color || "#165E39",
+          templateUsed: templateUsed || null,
+          color: color || "#0d3d28",
           logo,
           region,
+          minKycLevel: Math.max(0, Math.min(3, Number(minKycLevel) || 0)),
+          requireRegulationApproval: requireRegulationApproval !== false,
+          reglementHtml: reglementHtml || null,
           email,
           phone,
           parentId,
@@ -248,7 +256,7 @@ export async function POST(req: Request) {
       console.error("Initialisation ARP après wizard:", arpError);
     }
 
-    return NextResponse.json({ success: true, association: result });
+    return NextResponse.json({ success: true, association: result, joinCode: result.joinCode });
 
   } catch (error: any) {
     console.error("Erreur POST /api/associations/wizard:", error);
