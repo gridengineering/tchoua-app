@@ -242,7 +242,14 @@ function walletText(notice: WalletMovementNotice, lang: FundsLang): { title: str
   return dict[lang][notice.kind];
 }
 
+function escapeHtml(value: string) {
+  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] || char));
+}
+
 function emailHtml(title: string, text: string, footer: string) {
+  title = escapeHtml(title);
+  text = escapeHtml(text);
+  footer = escapeHtml(footer);
   return `<!doctype html><html><body style="margin:0;background:#f6f3ec;font-family:Arial,sans-serif;color:#16211b">
   <div style="max-width:600px;margin:0 auto;padding:22px">
     <div style="background:#0d3d28;color:#fff;border-radius:16px;padding:24px 26px">
@@ -256,10 +263,10 @@ function emailHtml(title: string, text: string, footer: string) {
   </div></body></html>`;
 }
 
-async function sendMemberNotice(person: FundsPerson, title: string, text: string, associationName?: string) {
+async function sendMemberNotice(person: FundsPerson, title: string, text: string, associationName?: string, link = "/dashboard/wallet") {
   const lang = langOf(person.language);
   const notification = await prisma.notification.create({
-    data: { userId: person.id, title, message: text, type: "INFO", link: "/dashboard/wallet" },
+    data: { userId: person.id, title, message: text, type: "INFO", link },
   });
   await publishToUser(person.id, {
     type: "notification",
@@ -301,7 +308,7 @@ export async function postAssociationFundsMessage(input: {
 export async function notifyAssociationMovement(movement: FundsMovement) {
   const lang = langOf(movement.target.language);
   const notice = textFor(movement, lang);
-  await sendMemberNotice(movement.target, notice.title, notice.text, movement.associationName).catch(() => null);
+  await sendMemberNotice(movement.target, notice.title, notice.text, movement.associationName, `/associations/${movement.associationId}/comptes`).catch(() => null);
   await postAssociationFundsMessage({
     associationId: movement.associationId,
     membershipId: movement.actorMembershipId,
