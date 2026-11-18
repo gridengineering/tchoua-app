@@ -74,6 +74,8 @@ export default function MemberAccountsPage() {
   const canManage = Boolean(data?.canManage);
   const targetIsSelf = !data?.target?.id || data?.target?.id === data?.me?.id;
   const pending = (data?.transactions ?? []).filter((t: Tx) => t.status === "PENDING");
+  const selectedActivity = (data?.activities ?? []).find((activity: Activity) => activity.id === activityId) as Activity | undefined;
+  const selectedIsLoan = selectedActivity?.type === "PRET";
 
   const uploadProof = async (file: File) => {
     setSaving(true); setError(""); setMessage("");
@@ -123,7 +125,7 @@ export default function MemberAccountsPage() {
     const value = Number(settleAmount);
     if (!value || value <= 0 || !activityId) return setError("Choisissez une activité et un montant.");
     if (!note.trim()) return setError("Le libellé ou motif est obligatoire.");
-    await post({ action: "SETTLE", amount: value, activityId, motif: note }, "Engagement réglé depuis votre compte association.");
+    await post({ action: "SETTLE", amount: value, activityId, motif: note }, selectedIsLoan ? "Remboursement de prêt enregistré depuis votre AVOIR." : "Engagement réglé depuis votre compte association.");
   };
 
   const withdraw = async (e: React.FormEvent) => {
@@ -220,15 +222,15 @@ export default function MemberAccountsPage() {
 
           <div className="space-y-5">
             <form onSubmit={settle} className="rounded-2xl border border-stone bg-white p-5 shadow-sm">
-              <h2 className="mb-1 text-lg font-bold text-charcoal">Régler mes engagements</h2>
-              <p className="mb-4 text-xs text-ash">Utilisez votre AVOIR pour une cotisation ou un remboursement. Aucun passage par votre wallet.</p>
+              <h2 className="mb-1 text-lg font-bold text-charcoal">{selectedIsLoan ? "Rembourser un prêt" : "Régler mes engagements"}</h2>
+              <p className="mb-4 text-xs text-ash">{selectedIsLoan ? "Le versement est imputé au prêt actif du membre. Aucun nouveau prêt n’est possible avant le remboursement complet." : "Utilisez votre AVOIR pour un apport ou un règlement. Aucun passage par votre wallet."}</p>
               <select value={activityId} onChange={(e) => setActivityId(e.target.value)} className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm">
                 <option value="">Choisir une activité…</option>
-                {(data?.activities ?? []).map((a: Activity) => <option key={a.id} value={a.id}>{a.name} · solde {money(a.caisseBalance, currency)}</option>)}
+                {(data?.activities ?? []).map((a: Activity) => <option key={a.id} value={a.id}>{a.type === "PRET" ? "Remboursement — " : a.type === "INVESTISSEMENT" ? "Apport en capital — " : ""}{a.name} · solde {money(a.caisseBalance, currency)}</option>)}
               </select>
               <input type="number" min={1} value={settleAmount} onChange={(e) => setSettleAmount(e.target.value)} placeholder="Montant" className="mb-2 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
               <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Libellé ou motif *" required className="mb-3 w-full rounded-xl border border-stone px-3 py-2.5 text-sm" />
-              <button disabled={saving || !activityId} className="inline-flex items-center gap-2 rounded-xl bg-[#8a6410] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50" type="submit"><ArrowUpRight className="h-4 w-4" /> Régler depuis l&apos;AVOIR</button>
+              <button disabled={saving || !activityId} className="inline-flex items-center gap-2 rounded-xl bg-[#8a6410] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50" type="submit"><ArrowUpRight className="h-4 w-4" /> {selectedIsLoan ? "Rembourser mon prêt" : "Régler depuis l’AVOIR"}</button>
             </form>
 
             {canManage && <form onSubmit={withdraw} className="rounded-2xl border border-stone bg-white p-5 shadow-sm">

@@ -346,17 +346,57 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         if (activityId) {
           const activity = await tx.associationActivity.findFirst({ where: { id: activityId, associationId } });
           if (!activity) throw new Error("Activité étrangère à l'association");
+          if (loanId) throw new Error("Choisissez soit une activité, soit un prêt, pas les deux");
           await tx.associationActivity.update({ where: { id: activityId }, data: { caisseBalance: { increment: amount } } });
-          await tx.activityContribution.create({ data: { activityId, membershipId: target.id, amount, unit: "CASH", status: "PAID", paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null, notes: motif || "Règlement depuis le compte association", paidAt: new Date() } });
-          label = `Règlement ${activity.name}`;
+
+          if (activity.type === "PRET") {
+            // Un versement sur la caisse de prêts est un remboursement, jamais
+            // une cotisation. Il doit solder le prêt actif du membre.
+            const activeLoan = await tx.assocLoan.findFirst({
+              where: { activityId, borrowerMembershipId: target.id, status: { in: ["ACTIVE", "APPROVED"] } },
+              orderBy: { createdAt: "asc" },
+            });
+            if (!activeLoan) throw new Error("Aucun prêt actif à rembourser pour ce membre.");
+            const already = await tx.assocLoanRepayment.aggregate({ where: { loanId: activeLoan.id }, _sum: { amount: true } });
+            const remaining = Math.max(0, activeLoan.totalDue - Number(already._sum.amount ?? 0));
+            if (amount > remaining + 0.01) throw new Error(`Le montant dépasse le solde du prêt (${remaining.toFixed(0)} FCFA).`);
+            const principal = Math.round(amount * (activeLoan.amount / activeLoan.totalDue));
+            const interest = amount - principal;
+            await tx.assocLoanRepayment.create({
+              data: {
+                loanId: activeLoan.id,
+                amount,
+                principal,
+                interest,
+                paymentMethod: "MEMBER_ACCOUNT",
+                reference: body.reference || null,
+                paidAt: new Date(),
+                notes: motif || "Remboursement depuis l'AVOIR",
+              },
+            });
+            const paidAfter = Number(already._sum.amount ?? 0) + amount;
+            if (paidAfter >= activeLoan.totalDue - 0.01) {
+              await tx.assocLoan.update({ where: { id: activeLoan.id }, data: { status: "REPAID", repaidAt: new Date() } });
+            }
+            label = "Remboursement prêt";
+          } else {
+            await tx.activityContribution.create({ data: { activityId, membershipId: target.id, amount, unit: "CASH", status: "PAID", paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null, notes: motif || "Règlement depuis le compte association", paidAt: new Date() } });
+            label = `Règlement ${activity.name}`;
+          }
           activityLabel = activity.name;
         }
         if (loanId) {
           const loan = await tx.assocLoan.findFirst({ where: { id: loanId, activity: { associationId } } });
           if (!loan) throw new Error("Prêt introuvable");
-          await tx.assocLoanRepayment.create({ data: { loanId, amount, paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null } });
-          const paid = await tx.assocLoanRepayment.aggregate({ where: { loanId }, _sum: { amount: true } });
-          if (Number(paid._sum.amount ?? 0) >= loan.totalDue) await tx.assocLoan.update({ where: { id: loanId }, data: { status: "REPAID", repaidAt: new Date() } });
+          if (loan.borrowerMembershipId !== target.id) throw new Error("Ce prêt appartient à un autre membre.");
+          const already = await tx.assocLoanRepayment.aggregate({ where: { loanId }, _sum: { amount: true } });
+          const remaining = Math.max(0, loan.totalDue - Number(already._sum.amount ?? 0));
+          if (amount > remaining + 0.01) throw new Error(`Le montant dépasse le solde du prêt (${remaining.toFixed(0)} FCFA).`);
+          const principal = Math.round(amount * (loan.amount / loan.totalDue));
+          await tx.assocLoanRepayment.create({ data: { loanId, amount, principal, interest: amount - principal, paymentMethod: "MEMBER_ACCOUNT", reference: body.reference || null, paidAt: new Date(), notes: motif || "Remboursement depuis l'AVOIR" } });
+          await tx.associationActivity.update({ where: { id: loan.activityId }, data: { caisseBalance: { increment: amount } } });
+          const paid = Number(already._sum.amount ?? 0) + amount;
+          if (paid >= loan.totalDue - 0.01) await tx.assocLoan.update({ where: { id: loanId }, data: { status: "REPAID", repaidAt: new Date() } });
           label = "Remboursement prêt";
         }
         await tx.associationMemberAccount.update({ where: { id: account.id }, data: { balance: nextBalance } });

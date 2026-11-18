@@ -128,6 +128,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     where: { id: activityId, associationId: id },
   });
   if (!activity) return NextResponse.json({ error: "Activité introuvable" }, { status: 404 });
+  if (Number(amount) > Number(activity.caisseBalance ?? 0)) {
+    return NextResponse.json({ error: "Le montant demandé dépasse les fonds disponibles de la caisse de prêts." }, { status: 400 });
+  }
 
   const rate =
     customRate !== undefined
@@ -208,6 +211,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       activity: {
         select: {
           name: true,
+          loanRate1: true,
+          loanRate2: true,
           loanApprovalMode: true,
           association: { select: { bankConfig: true, name: true } },
         },
@@ -261,6 +266,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const approvalCount = current.approvals.length + 1;
 
         if (approvalCount >= requiredApprovals) {
+          const loanActivity = await tx.associationActivity.findUnique({
+            where: { id: loan.activityId },
+            select: { caisseBalance: true },
+          });
+          if (!loanActivity || Number(loanActivity.caisseBalance) < Number(loan.amount)) {
+            throw new Error("INSUFFICIENT_LOAN_FUNDS");
+          }
           await tx.assocLoan.update({
             where: { id: loanId },
             data: {
@@ -269,6 +281,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               approvedById: session.user.id,
               disbursedAt: new Date(),
             },
+          });
+          await tx.associationActivity.update({
+            where: { id: loan.activityId },
+            data: { caisseBalance: { decrement: Number(loan.amount) } },
           });
           await creditMemberAccount(tx, {
             membershipId: loan.borrowerMembershipId,
@@ -341,6 +357,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       if (error?.message === "LOAN_ALREADY_APPROVED_BY_ACTOR") {
         return NextResponse.json({ error: "Vous avez déjà approuvé ce prêt" }, { status: 409 });
       }
+      if (error?.message === "INSUFFICIENT_LOAN_FUNDS") {
+        return NextResponse.json({ error: "Fonds disponibles insuffisants dans la caisse de prêts." }, { status: 400 });
+      }
       throw error;
     }
   }
@@ -384,8 +403,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         const alreadyPaid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
         const isLate = current.dueDate && new Date(current.dueDate) < new Date();
-        const initialInterest = current.totalDue - current.amount;
-        const effectiveTotalDue = isLate ? current.totalDue + initialInterest : current.totalDue;
+        // Le taux contractuel est de 2 %/mois pendant les 3 premiers mois.
+        // Au-delà de l'échéance, les mois supplémentaires sont facturés au
+        // taux de retard configuré sur l'activité (4 %/mois pour NDI MBE).
+        const overdueMonths = isLate
+          ? Math.max(1, Math.ceil((Date.now() - new Date(current.dueDate!).getTime()) / (30 * 86_400_000)))
+          : 0;
+        const lateRate = Number(loan.activity.loanRate2 ?? 0) || Number(current.interestRate ?? 0) * 2;
+        const lateInterest = isLate ? current.amount * lateRate / 100 * overdueMonths : 0;
+        const effectiveTotalDue = isLate ? current.totalDue + lateInterest : current.totalDue;
         const remaining = Math.max(0, effectiveTotalDue - alreadyPaid);
         if (remaining <= 0) throw new Error("LOAN_ALREADY_REPAID");
         if (numericAmount > remaining) throw new Error("LOAN_OVERPAY");
@@ -412,6 +438,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             data: { status: "REPAID", repaidAt: new Date() },
           });
         }
+        await tx.associationActivity.update({
+          where: { id: loan.activityId },
+          data: { caisseBalance: { increment: numericAmount } },
+        });
 
         return { remaining: Math.max(0, effectiveTotalDue - newTotal), repaidNow: numericAmount };
       });

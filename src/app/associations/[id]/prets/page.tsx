@@ -68,8 +68,10 @@ export default function PretsPage() {
   const [showRepay, setShowRepay] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isBureau, setIsBureau] = useState(false);
+  const [loanActivities, setLoanActivities] = useState<Array<{ id: string; name: string; caisseBalance: number }>>([]);
 
   const [form, setForm] = useState({
+    activityId: "",
     amount: "",
     duration: "3",
     purpose: "",
@@ -90,6 +92,11 @@ export default function PretsPage() {
     if (associationRes.ok) {
       const association = await associationRes.json();
       setIsBureau(["PRESIDENT", "FOUNDER", "VICE_PRESIDENT", "TREASURER"].includes(association.myRole));
+      const activities = Array.isArray(association.association?.activities)
+        ? association.association.activities.filter((activity: any) => activity.type === "PRET" && activity.status === "ACTIVE")
+        : [];
+      setLoanActivities(activities);
+      setForm((current) => ({ ...current, activityId: current.activityId || activities[0]?.id || "" }));
     }
     setLoading(false);
   }, [assocId]);
@@ -114,17 +121,21 @@ export default function PretsPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        activityId: form.activityId,
         amount: parseFloat(form.amount),
         duration: parseInt(form.duration),
         purpose: form.purpose,
       }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
-    if (res.ok) {
-      setForm({ amount: "", duration: "3", purpose: "" });
-      setShowCreate(false);
-      load();
+    if (!res.ok) {
+      alert(data.error || "Demande de prêt impossible.");
+      return;
     }
+    setForm((current) => ({ ...current, amount: "", duration: "3", purpose: "" }));
+    setShowCreate(false);
+    load();
   }
 
   async function approveLoan() {
@@ -161,13 +172,16 @@ export default function PretsPage() {
         amount: parseFloat(repayForm.amount),
       }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
-    if (res.ok) {
-      setRepayForm({ amount: "" });
-      setShowRepay(false);
-      setSelected(null);
-      load();
+    if (!res.ok) {
+      alert(data.error || "Remboursement impossible.");
+      return;
     }
+    setRepayForm({ amount: "" });
+    setShowRepay(false);
+    setSelected(null);
+    load();
   }
 
   if (loading) {
@@ -294,6 +308,21 @@ export default function PretsPage() {
               <h3 className="text-xl font-bold text-forest mb-6">Demander un prêt</h3>
               <form onSubmit={createLoan} className="space-y-4">
                 <div>
+                  <label className="block text-sm font-semibold text-forest mb-1">Caisse de prêts</label>
+                  <select
+                    required
+                    value={form.activityId}
+                    onChange={(e) => setForm((f) => ({ ...f, activityId: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-stone bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0d3d28]/20"
+                  >
+                    <option value="">Choisir la caisse de prêts…</option>
+                    {loanActivities.map((activity) => (
+                      <option key={activity.id} value={activity.id}>{activity.name} · disponible {formatCurrency(activity.caisseBalance)}</option>
+                    ))}
+                  </select>
+                  {loanActivities.length === 0 && <p className="mt-1 text-xs text-red-600">Aucune caisse de prêts active. Créez ou activez une activité PRET dans la configuration.</p>}
+                </div>
+                <div>
                   <label className="block text-sm font-semibold text-forest mb-1">Montant (FCFA)</label>
                   <input
                     type="number"
@@ -332,7 +361,7 @@ export default function PretsPage() {
                   </button>
                   <button
                     type="submit"
-                    disabled={saving}
+                    disabled={saving || !form.activityId}
                     className="flex-1 px-4 py-3 rounded-xl bg-[#0d3d28] text-white text-sm font-semibold hover:bg-[#0d3d28]/90 transition-colors disabled:opacity-50"
                   >
                     {saving ? "Envoi..." : "Soumettre"}
