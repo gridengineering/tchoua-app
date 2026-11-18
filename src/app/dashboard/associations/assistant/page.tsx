@@ -356,7 +356,7 @@ export default function AssociationAssistantPage() {
 
             {step === 4 && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                <div><p className="text-[10px] font-black uppercase tracking-widest text-[#a47718]">Étape 4 sur 5</p><h2 className="mt-1 text-xl font-black text-slate-900">Réunions &amp; sessions</h2><p className="mt-1 text-sm text-slate-500">Comment et quand les membres se retrouvent-ils ?</p></div>
+                <div><p className="text-[10px] font-black uppercase tracking-widest text-[#a47718]">Étape 4 sur 5</p><h2 className="mt-1 text-xl font-black text-slate-900">Réunions de l&apos;association</h2><p className="mt-1 text-sm text-slate-500">Comment et quand les membres se retrouvent-ils ? Les réunions sont planifiées au niveau de l&apos;association.</p></div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field label="Fréquence des réunions *" className="sm:col-span-2"><SelectInput value={form.meetingPreset} onChange={(event) => set("meetingPreset", event.target.value)}>{MEETING_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</SelectInput></Field>
                   <Field label="Lieu habituel *"><SelectInput value={form.modality} onChange={(event) => set("modality", event.target.value)}><option value="PHYSICAL">Fixe — lieu habituel</option><option value="ONLINE">En ligne</option><option value="ROTATING">Rotatif chez les membres</option></SelectInput></Field>

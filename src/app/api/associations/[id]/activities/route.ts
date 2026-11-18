@@ -61,7 +61,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const body = await req.json();
   const {
-    name, description, type, status, participation, conditionMonths,
+    name, description, type, status, participation, conditionMonths, minKycLevel,
     contributionAmount, contributionUnit, contributionFrequency, distributionMode,
     auctionMinBidPct, auctionMinBidders, rotationOrder, frequencyConfig,
     partAmount, maxPartsPerSession, beneficiaryAmountPerShare, minShareFraction,
@@ -95,6 +95,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       status: status ?? "ACTIVE",
       participation: participation ?? "OPTIONAL",
       conditionMonths,
+      minKycLevel: Math.min(3, Math.max(0, Number(minKycLevel ?? 0))),
       contributionAmount,
       contributionUnit,
       contributionFrequency,

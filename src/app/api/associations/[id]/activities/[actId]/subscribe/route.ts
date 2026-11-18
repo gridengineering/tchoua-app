@@ -33,6 +33,7 @@ export async function POST(
 
   const eligibility = await checkAssociationEligibility(session.user.id, id, {
     amount: activity.contributionAmount ?? undefined,
+    minKycLevel: activity.minKycLevel ?? 0,
   });
   if (!eligibility.ok) {
     return NextResponse.json(eligibilityJson(eligibility), { status: 403 });

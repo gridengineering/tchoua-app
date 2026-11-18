@@ -16,8 +16,12 @@ export type PlatformSettings = {
   maxAssociationsPerMember: number;
   maxMembersPerAssociation: number;
   maxLoansPerMember: number;
+  maxLoanDurationMonths: number;
   defaultCommissionRate: number;
+  // Taux plancher mensuel applicable à toutes les associations.
   defaultLoanRate: number;
+  // Taux de retard par défaut lorsque l'activité n'en définit pas.
+  lateLoanRate: number;
   latePenaltyPercent: number;
   features: {
     marketplace: boolean;
@@ -77,8 +81,10 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   maxAssociationsPerMember: 10,
   maxMembersPerAssociation: 500,
   maxLoansPerMember: 2,
+  maxLoanDurationMonths: 12,
   defaultCommissionRate: 1.5,
   defaultLoanRate: 2,
+  lateLoanRate: 4,
   latePenaltyPercent: 10,
   features: {
     marketplace: true,

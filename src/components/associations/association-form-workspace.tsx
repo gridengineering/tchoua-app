@@ -1104,7 +1104,7 @@ export function AssociationFormWorkspace({
                   </Section>
                 ) : null}
 
-                <Section title="Fréquence des sessions" description="La fréquence est commune aux activités créées ; chaque activité peut ensuite avoir son propre cycle." icon={<CalendarClock className="h-4 w-4" />}>
+                <Section title="Fréquence des cycles financiers" description="La fréquence des cycles financiers est propre aux activités. Les sessions de réunion sont définies au niveau de l'association, dans l'onglet Réunions." icon={<CalendarClock className="h-4 w-4" />}>
                   <FrequencyPicker value={frequency} onChange={setFrequency} />
                   <div className="mt-3 rounded-lg bg-[#fbf9f3] p-3">
                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">Prochaines sessions — {frequencyLabel(frequency)}</p>
@@ -1186,7 +1186,7 @@ export function AssociationFormWorkspace({
         ) : null}
 
         {tab === "reunions" ? (
-          <Section title="Réunions, présence et collation" description="La réunion rassemble les membres ; les sessions financières restent liées aux activités." icon={<CalendarClock className="h-4 w-4" />}>
+          <Section title="Sessions de réunion (association)" description="Les réunions sont planifiées pour toute l'association. Les activités ne portent que leurs cycles financiers, jamais leurs propres réunions." icon={<CalendarClock className="h-4 w-4" />}>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <SelectInput label="Fréquence" value={meeting.frequency} onChange={(v) => setMeeting({ ...meeting, frequency: v as MeetingConfig["frequency"] })} options={[{ value: "MONTHLY", label: "Mensuelle" }, { value: "QUARTERLY", label: "Trimestrielle" }]} />
               <SelectInput label="Jour" value={String(meeting.dayOfWeek)} onChange={(v) => setMeeting({ ...meeting, dayOfWeek: Number(v) })} options={DAYS.map((day, index) => ({ value: String(index), label: day }))} />

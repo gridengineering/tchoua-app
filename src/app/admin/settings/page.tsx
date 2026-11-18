@@ -427,9 +427,17 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
                   <input type="number" min={0} step={0.1} className={inputCls} value={settings.defaultCommissionRate}
                     onChange={(e) => update("defaultCommissionRate", Number(e.target.value))} />
                 </Field>
-                <Field label="Taux de prêt par défaut (%)">
+                <Field label="Taux plancher des prêts (% / mois)">
                   <input type="number" min={0} step={0.1} className={inputCls} value={settings.defaultLoanRate}
                     onChange={(e) => update("defaultLoanRate", Number(e.target.value))} />
+                </Field>
+                <Field label="Durée maximale d'un prêt (mois)">
+                  <input type="number" min={1} className={inputCls} value={settings.maxLoanDurationMonths}
+                    onChange={(e) => update("maxLoanDurationMonths", Number(e.target.value))} />
+                </Field>
+                <Field label="Taux de retard par défaut (% / mois)">
+                  <input type="number" min={0} step={0.1} className={inputCls} value={settings.lateLoanRate}
+                    onChange={(e) => update("lateLoanRate", Number(e.target.value))} />
                 </Field>
                 <Field label="Pénalité de retard (%)">
                   <input type="number" min={0} step={0.5} className={inputCls} value={settings.latePenaltyPercent}
@@ -437,7 +445,9 @@ export default function AdminSettingsPage({ initialTab = "general" }: { initialT
                 </Field>
               </div>
               <p className="mt-4 text-xs text-slate-500">
-                La limite d&apos;associations s&apos;applique immédiatement à la création et à l&apos;adhésion.
+                Le taux plancher et la durée maximale s&apos;appliquent à toutes les associations. Chaque association
+                peut fixer ses propres taux au-dessus du plancher et une durée inférieure ou égale au maximum.
+                Elle peut aussi exiger un niveau KYC par activité ; par défaut, aucune activité n&apos;exige de KYC.
               </p>
             </Section>
           )}

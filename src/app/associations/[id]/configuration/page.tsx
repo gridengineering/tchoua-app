@@ -668,10 +668,11 @@ function MeetingRulesPanel({
       <div className="flex items-start gap-2.5">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0d3d28]/8 text-[#0d3d28]"><CalendarClock className="h-4 w-4" /></span>
         <div>
-          <h2 className="text-sm font-bold text-[#1a1a1a]">Réunions et collation</h2>
+          <h2 className="text-sm font-bold text-[#1a1a1a]">Sessions de réunion (niveau association)</h2>
           <p className="mt-0.5 text-[11.5px] leading-4 text-[#7a7368]">
-            La réunion et la session financière sont deux objets distincts. Une réunion peut
-            couvrir plusieurs activités ; une activité peut fonctionner sans réunion physique.
+            Toutes les réunions de l'association sont planifiées ici, une seule fois. Une réunion peut
+            couvrir plusieurs activités. Les activités conservent uniquement leurs cycles financiers ;
+            aucun calendrier de réunion n'est défini dans une activité.
           </p>
         </div>
       </div>

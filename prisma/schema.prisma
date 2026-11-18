@@ -1055,6 +1055,8 @@ model AssociationActivity {
   // MANDATORY, OPTIONAL, CONDITIONAL
   participation   String   @default("MANDATORY")
   conditionMonths Int?     // ancienneté requise si CONDITIONAL
+  // 0 = aucun KYC requis (défaut) ; 1 BASIC, 2 VERIFIED, 3 ENHANCED
+  minKycLevel     Int      @default(0)
 
   // Contribution
   contributionAmount    Float?

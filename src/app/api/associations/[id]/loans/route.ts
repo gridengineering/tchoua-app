@@ -8,6 +8,7 @@ import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import { bankOnlyPaymentError, isBankOnlyPaymentMode, isBankPaymentMethod } from "@/lib/payment-policy";
 import { creditMemberAccount } from "@/lib/association/member-account";
 import { notifyAssociationMovement } from "@/lib/notifications/funds";
+import { getPlatformSettings } from "@/lib/platform-settings";
 import {
   validateLoanToFundRatio,
   validateInterestRateCap,
@@ -40,17 +41,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     },
     include: {
       borrowerMembership: { include: { user: { select: { name: true, email: true } } } },
-      activity: { select: { name: true, type: true } },
+      activity: { select: { name: true, type: true, loanRate1: true, loanRate2: true } },
       repayments: { orderBy: { paidAt: "desc" } },
       approvals: { orderBy: { createdAt: "asc" } },
     },
     orderBy: { createdAt: "desc" },
   });
 
+  const platformSettings = await getPlatformSettings();
+  const defaultLateRate = Number(platformSettings.lateLoanRate ?? 0);
   const now = new Date();
   const loansWithStatus = loans.map((l) => {
     const isLate = l.status === "ACTIVE" && l.dueDate && new Date(l.dueDate) < now;
-    const currentRate = isLate ? l.interestRate * 2 : l.interestRate;
+    // Le taux de retard est celui configuré sur l'activité ; à défaut, le
+    // taux général de la plateforme. Aucune règle propre à une association.
+    const currentRate = isLate
+      ? Number(l.activity?.loanRate2 ?? defaultLateRate ?? l.interestRate)
+      : l.interestRate;
     const joinedAt = l.borrowerMembership?.joinedAt
       ? new Date(l.borrowerMembership.joinedAt)
       : now;
@@ -104,6 +111,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "activityId, amount et duration sont requis" }, { status: 400 });
   }
 
+  const platformSettings = await getPlatformSettings();
+  const floorRate = Number(platformSettings.defaultLoanRate ?? 0);
+  const maxDuration = Number(platformSettings.maxLoanDurationMonths ?? 12);
+  if (duration > maxDuration) {
+    return NextResponse.json(
+      { error: `La durée du prêt ne peut pas dépasser ${maxDuration} mois.` },
+      { status: 400 }
+    );
+  }
+
   // Simplified interest calculation: Amount * (1 + Rate * Duration / 100)
   const idempotencyKey = req.headers.get("idempotency-key")?.trim() || undefined;
   if (idempotencyKey) {
@@ -119,11 +136,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
   }
 
-  const eligibility = await checkAssociationEligibility(session.user.id, id, { amount: Number(amount) });
-  if (!eligibility.ok) {
-    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
-  }
-
   const activity = await prisma.associationActivity.findFirst({
     where: { id: activityId, associationId: id },
   });
@@ -132,15 +144,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Le montant demandé dépasse les fonds disponibles de la caisse de prêts." }, { status: 400 });
   }
 
+  // Chaque association peut exiger un KYC propre à l'activité ; 0 = aucun.
+  const eligibility = await checkAssociationEligibility(session.user.id, id, {
+    amount: Number(amount),
+    minKycLevel: activity.minKycLevel ?? 0,
+  });
+  if (!eligibility.ok) {
+    return NextResponse.json(eligibilityJson(eligibility), { status: 403 });
+  }
+
+  const lateDefaultRate = Number(platformSettings.lateLoanRate ?? 0);
   const rate =
     customRate !== undefined
       ? Number(customRate)
       : duration <= 3
-      ? (activity.loanRate1 ?? activity.caisseLoanRate ?? 5)
-      : (activity.loanRate2 ?? activity.caisseLoanRate ?? 8);
+      ? Number(activity.loanRate1 ?? activity.caisseLoanRate ?? floorRate)
+      : Number(activity.loanRate2 ?? lateDefaultRate);
 
-  // R-022 : Taux d'intérêt plafonné à 10%/mois par défaut
   if (!Number.isFinite(rate) || rate < 0) return NextResponse.json({ error: "Taux invalide" }, { status: 400 });
+  if (rate < floorRate) {
+    return NextResponse.json(
+      { error: `Le taux d'intérêt ne peut pas être inférieur au taux plancher de ${floorRate}%/mois.` },
+      { status: 400 }
+    );
+  }
+  // R-022 : Taux d'intérêt plafonné à 10%/mois par défaut
   const rateCheck = validateInterestRateCap(rate);
   if (!rateCheck.valid) {
     return NextResponse.json({ error: rateCheck.error }, { status: 400 });
@@ -365,6 +393,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (action === "REPAY") {
+    const platformSettings = await getPlatformSettings();
+    const defaultLateRate = Number(platformSettings.lateLoanRate ?? 0);
     const bankOnly = isBankOnlyPaymentMode(loan.activity.association?.bankConfig);
     const effectivePaymentMethod = paymentMethod ?? (bankOnly ? "BANK_TRANSFER" : "CASH");
     if (bankOnly && !isBankPaymentMethod(effectivePaymentMethod)) {
@@ -403,13 +433,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         const alreadyPaid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
         const isLate = current.dueDate && new Date(current.dueDate) < new Date();
-        // Le taux contractuel est de 2 %/mois pendant les 3 premiers mois.
-        // Au-delà de l'échéance, les mois supplémentaires sont facturés au
-        // taux de retard configuré sur l'activité (4 %/mois pour NDI MBE).
+        // Le taux de retard est paramétré par l'activité, avec le taux général
+        // de la plateforme comme valeur de repli. Aucune règle propre à NDI.
         const overdueMonths = isLate
           ? Math.max(1, Math.ceil((Date.now() - new Date(current.dueDate!).getTime()) / (30 * 86_400_000)))
           : 0;
-        const lateRate = Number(loan.activity.loanRate2 ?? 0) || Number(current.interestRate ?? 0) * 2;
+        const lateRate = Number(loan.activity.loanRate2 ?? defaultLateRate ?? current.interestRate ?? 0);
         const lateInterest = isLate ? current.amount * lateRate / 100 * overdueMonths : 0;
         const effectiveTotalDue = isLate ? current.totalDue + lateInterest : current.totalDue;
         const remaining = Math.max(0, effectiveTotalDue - alreadyPaid);

@@ -92,7 +92,7 @@ export async function PATCH(
 
   const body = await req.json();
   const {
-    name, description, status, conditionMonths, contributionAmount, contributionUnit,
+    name, description, status, conditionMonths, minKycLevel, contributionAmount, contributionUnit,
     contributionFrequency, distributionMode, partAmount, maxPartsPerSession,
     beneficiaryAmountPerShare, minShareFraction, maxSharesPerMember,
     maxBeneficiarySharesPerSession, allowPartialShares, allowSameBeneficiaryMultipleShares,
@@ -109,6 +109,7 @@ export async function PATCH(
       ...(description !== undefined && { description }),
       ...(status !== undefined && { status }),
       ...(conditionMonths !== undefined && { conditionMonths }),
+      ...(minKycLevel !== undefined && { minKycLevel: Math.min(3, Math.max(0, Number(minKycLevel))) }),
       ...(contributionAmount !== undefined && { contributionAmount }),
       ...(contributionUnit !== undefined && { contributionUnit }),
       ...(contributionFrequency !== undefined && { contributionFrequency }),

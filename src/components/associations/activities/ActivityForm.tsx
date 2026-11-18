@@ -54,6 +54,7 @@ export type ActivityInitial = {
   name?: string;
   status?: string;
   conditionMonths?: number | null;
+  minKycLevel?: number | null;
   collectionAmount?: number | null;
   description?: string | null;
   type?: string;
@@ -152,6 +153,7 @@ export function ActivityForm({
     name: initial?.name ?? "",
     status: initial?.status ?? "ACTIVE",
     conditionMonths: initial?.conditionMonths != null ? String(initial.conditionMonths) : "",
+    minKycLevel: initial?.minKycLevel != null ? String(initial.minKycLevel) : "0",
     description: initial?.description ?? "",
     type: initial?.type ?? "TONTINE_ROTATIVE",
     participation: initial?.participation ?? "MANDATORY",
@@ -229,6 +231,7 @@ export function ActivityForm({
         type: form.type,
         status: form.status,
         participation: form.participation,
+        minKycLevel: Number(form.minKycLevel) || 0,
         conditionMonths:
           form.participation === "CONDITIONAL" && form.conditionMonths !== ""
             ? Number(form.conditionMonths)
@@ -392,6 +395,19 @@ export function ActivityForm({
                 placeholder="Ex : 3"
                 className={inputCls}
               />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelCls}>Niveau KYC requis pour cette activité</label>
+              <select value={form.minKycLevel} onChange={(e) => set({ minKycLevel: e.target.value })} className={inputCls}>
+                <option value="0">Aucun — par défaut</option>
+                <option value="1">KYC 1 — téléphone ou e-mail vérifié</option>
+                <option value="2">KYC 2 — pièce d'identité vérifiée</option>
+                <option value="3">KYC 3 — preuve de localisation vérifiée</option>
+              </select>
+              <p className="mt-1 text-[11px] leading-4 text-[#8a8378]">
+                Ce niveau s'applique à l'adhésion, aux versements et aux demandes de prêt sur cette activité.
+                Il s'ajoute au niveau minimal de l'association ; 0 signifie qu'aucun KYC supplémentaire n'est requis.
+              </p>
             </div>
             <div>
               <label className={labelCls}>Unité de cotisation</label>
