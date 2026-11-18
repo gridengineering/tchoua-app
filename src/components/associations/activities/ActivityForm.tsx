@@ -524,7 +524,7 @@ export function ActivityForm({
                 </div>
                 <div>
                   <label className={labelCls}>
-                    {form.cycleMode === "FIXED_SESSIONS" ? "Nombre de sessions" : form.cycleMode === "FIXED_PERIOD" ? "Fin du cycle" : "Fin automatique"}
+                    {form.cycleMode === "FIXED_SESSIONS" ? "Nombre de sessions du cycle financier" : form.cycleMode === "FIXED_PERIOD" ? "Fin du cycle" : "Fin automatique"}
                   </label>
                   {form.cycleMode === "FIXED_SESSIONS" ? (
                     <input type="number" min={1} value={form.cycleSessions} onChange={(e) => set({ cycleSessions: e.target.value })} placeholder="Ex : 12" className={inputCls} />

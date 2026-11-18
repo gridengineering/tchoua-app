@@ -434,7 +434,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const alreadyPaid = current.repayments.reduce((sum, r) => sum + r.amount, 0);
         const isLate = current.dueDate && new Date(current.dueDate) < new Date();
         // Le taux de retard est paramétré par l'activité, avec le taux général
-        // de la plateforme comme valeur de repli. Aucune règle propre à NDI.
+        // de la plateforme comme valeur de repli. Aucune règle propre à une association.
         const overdueMonths = isLate
           ? Math.max(1, Math.ceil((Date.now() - new Date(current.dueDate!).getTime()) / (30 * 86_400_000)))
           : 0;
