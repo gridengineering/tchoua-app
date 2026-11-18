@@ -171,6 +171,9 @@ export type GovernanceConfig = {
   kyc: {
     enabled: boolean;
     levels: KycLevelRule[];
+    // Si false (défaut), le KYC par montant n'est pas imposé automatiquement :
+    // chaque association/activité définit son propre niveau requis.
+    amountThresholdsEnabled: boolean;
     amountThresholds: Array<{ amount: number; level: number }>;
     allowSelfUpgrade: boolean;
     requireConsents: boolean;
@@ -210,6 +213,7 @@ export const DEFAULT_GOVERNANCE_CONFIG: GovernanceConfig = {
     enabled: true,
     allowSelfUpgrade: true,
     requireConsents: true,
+    amountThresholdsEnabled: false,
     amountThresholds: [
       { amount: 250_000, level: 1 },
       { amount: 2_000_000, level: 2 },
@@ -393,6 +397,9 @@ export function kycRuleForLevel(config: GovernanceConfig, level: unknown): KycLe
 }
 
 export function kycRequiredForAmount(config: GovernanceConfig, amount?: number | null): number {
+  // Par défaut, aucun seuil automatique par montant : le KYC est piloté par
+  // l'association et par l'activité. L'administration peut réactiver ces seuils.
+  if (config.kyc.amountThresholdsEnabled !== true) return 1;
   const value = Number(amount ?? 0);
   if (!Number.isFinite(value) || value <= 0) return 1;
   let required = 1;

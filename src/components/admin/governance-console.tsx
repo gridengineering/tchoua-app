@@ -284,7 +284,15 @@ export function GovernanceConsole({
                 </div>
               </Section>
 
-              <Section title="Seuils de montant" desc="Un montant supérieur ou égal au seuil exige le niveau indiqué.">
+              <Section title="Seuils de montant" desc="Un montant supérieur ou égal au seuil exige le niveau indiqué. Désactivés par défaut.">
+                <div className="mb-4">
+                  <Toggle
+                    title="Appliquer les seuils KYC par montant"
+                    desc="Désactivé : le niveau KYC dépend uniquement de l'association et de l'activité. Activé : les seuils ci-dessous s'appliquent à toutes les opérations."
+                    checked={config.kyc.amountThresholdsEnabled === true}
+                    onChange={(value) => update("kyc.amountThresholdsEnabled", value)}
+                  />
+                </div>
                 {config.kyc.amountThresholds.map((threshold, index) => (
                   <div key={index} className="mb-2 grid grid-cols-[1fr_120px_40px] gap-2">
                     <input type="number" className={input} value={threshold.amount} onChange={(e) => update(`kyc.amountThresholds.${index}.amount`, Number(e.target.value))} />
