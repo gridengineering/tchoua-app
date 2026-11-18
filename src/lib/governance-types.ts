@@ -357,6 +357,7 @@ export const DEFAULT_GOVERNANCE_CONFIG: GovernanceConfig = {
       { key: "MEETING_REMINDER", label: "Rappel de réunion", enabled: true, channels: ["IN_APP", "CHAT", "MEET"] },
       { key: "CONTRIBUTION_DUE", label: "Cotisation à échéance", enabled: true, channels: ["IN_APP", "CHAT"] },
       { key: "SECURITY_ALERT", label: "Alerte sécurité", enabled: true, channels: ["IN_APP", "CHAT", "EMAIL"] },
+      { key: "MARKETPLACE_INTEREST", label: "Intérêt à une annonce Marketplace", enabled: true, channels: ["IN_APP", "CHAT", "EMAIL"] },
     ],
   },
   openapi: {

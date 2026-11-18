@@ -64,6 +64,10 @@ model User {
   savingsGoals          SavingsGoal[]
   investments           Investment[]
   marketplaceListings   MarketplaceListing[]
+  marketplaceInterests  MarketplaceInterest[] @relation("MarketplaceInterestUser")
+  marketplaceConversationsAsBuyer MarketplaceConversation[] @relation("MarketplaceBuyer")
+  marketplaceConversationsAsSeller MarketplaceConversation[] @relation("MarketplaceSeller")
+  marketplaceMessages   MarketplaceMessage[] @relation("MarketplaceMessageSender")
   groupOrderItems       GroupOrderItem[]
   groupOrders           GroupOrder[]       @relation("OrderInitiator")
   culturalEventAttendees CulturalEventAttendee[]
@@ -630,27 +634,98 @@ model Investment {
 model MarketplaceListing {
   id          String    @id @default(cuid())
   sellerId    String
+  // associationId = périmètre de publication (nouveau modèle multi-associations)
+  associationId String?
+  // tontineId conservé pour les anciennes annonces, jamais utilisé par le nouveau flux
   tontineId   String?
   title       String
   description String?
-  category    String    @default("PRODUIT")
-  price       Float
+  // VENTE, PUBLICATION, RECRUTEMENT, EVENEMENT, PARTENARIAT
+  type        String    @default("VENTE")
+  category    String    @default("Autres")
+  rubrique    String?
+  price       Float?
   unit        String    @default("unité")
   quantity    Float?
-  images      String?
+  images      String?   // JSON array d'URLs
   location    String?
-  status      String    @default("ACTIVE")
-  type        String    @default("VENTE")
+  deadline    DateTime?
+  contactPhone String?
+  contactEmail String?
+  contactWhatsapp String?
+  status      String    @default("ACTIVE") // ACTIVE, PAUSED, CLOSED, EXPIRED
+  views       Int       @default(0)
+  interestCount Int     @default(0)
   isGroupBuy  Boolean   @default(false)
   minGroupQty Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   seller      User      @relation(fields: [sellerId], references: [id])
+  association Association? @relation(fields: [associationId], references: [id])
   tontine     Tontine?  @relation(fields: [tontineId], references: [id])
   orderItems  GroupOrderItem[]
+  interests   MarketplaceInterest[]
+  conversations MarketplaceConversation[]
 
+  @@index([associationId, status])
+  @@index([type, category])
+  @@index([sellerId, createdAt])
   @@map("marketplace_listings")
+}
+
+/// Intérêt / réaction d'un membre à une petite annonce.
+model MarketplaceInterest {
+  id          String   @id @default(cuid())
+  listingId   String
+  userId      String
+  message     String?
+  contact     String?
+  status      String   @default("NEW") // NEW, READ, REPLIED, CLOSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user        User               @relation("MarketplaceInterestUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, userId])
+  @@index([listingId, createdAt])
+  @@map("marketplace_interests")
+}
+
+/// Conversation directe entre un acheteur intéressé et l'annonceur.
+model MarketplaceConversation {
+  id          String   @id @default(cuid())
+  listingId   String
+  buyerId     String
+  sellerId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer       User               @relation("MarketplaceBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller      User               @relation("MarketplaceSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages    MarketplaceMessage[]
+
+  @@unique([listingId, buyerId])
+  @@index([sellerId, updatedAt])
+  @@index([buyerId, updatedAt])
+  @@map("marketplace_conversations")
+}
+
+model MarketplaceMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  conversation MarketplaceConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User                    @relation("MarketplaceMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("marketplace_messages")
 }
 
 model GroupOrder {
@@ -896,6 +971,7 @@ model Association {
   memberTransactions AssociationMemberTransaction[]
   socialAidReqs AssocSocialAidRequest[]
   assocMessages AssocMessage[]
+  marketplaceListings MarketplaceListing[]
   customRoles   AssociationCustomRole[]
   regulations   AssociationRegulationArticle[]
   relationsSource AssociationRelation[] @relation("RelationSource")

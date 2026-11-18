@@ -6,7 +6,8 @@ import { sendTransactionalEmail } from "@/lib/mailer";
 export type NotificationEventKey =
   | "WALLET_DEPOSIT" | "WALLET_WITHDRAWAL" | "WALLET_TRANSFER"
   | "KYC_APPROVED" | "KYC_REJECTED" | "TRUST_CHANGED" | "QUARANTINE"
-  | "MEETING_REMINDER" | "CONTRIBUTION_DUE" | "SECURITY_ALERT";
+  | "MEETING_REMINDER" | "CONTRIBUTION_DUE" | "SECURITY_ALERT"
+  | "MARKETPLACE_INTEREST";
 
 type DispatchInput = {
   event: NotificationEventKey;
