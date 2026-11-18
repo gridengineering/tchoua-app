@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Bell, CheckCheck, ChevronDown, HelpCircle, LogOut, Menu, Search, Settings, ShieldCheck, User, Wallet } from "lucide-react";
+import { Bell, CheckCheck, ChevronDown, HelpCircle, LogOut, Menu, Plus, Search, Settings, ShieldCheck, User, Wallet } from "lucide-react";
 import { KycBadge } from "@/components/kyc/kyc-badge";
 
 const LABELS: Record<string, string> = {
@@ -186,6 +186,13 @@ export function MemberTopbar({
             <span className="hidden md:inline">Rechercher…</span>
             <kbd className="rounded bg-slate-200/70 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">Ctrl+K</kbd>
           </button>
+          <Link
+            href="/dashboard/associations/new"
+            className="hidden items-center gap-1.5 rounded-lg border m-border px-3 py-2 text-xs font-bold m-text hover:bg-black/5 md:flex"
+            title="Créer une association"
+          >
+            <Plus className="h-3.5 w-3.5 m-accent-text" /> Nouvelle association
+          </Link>
           <Link
             href="/dashboard/wallet"
             className="hidden items-center gap-1.5 rounded-full border m-border m-soft px-3 py-1.5 text-xs font-bold m-text hover:brightness-95 sm:flex"
