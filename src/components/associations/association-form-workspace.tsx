@@ -387,8 +387,17 @@ export function AssociationFormWorkspace({
     defaultArpConfig({ type: initial?.type ?? "TONTINE_CLUB", parentId: initial?.parentId ?? null })
   );
   const [meeting, setMeeting] = useState<MeetingConfig>(() => {
-    const parsed = parseJson(initial?.meetingConfig, DEFAULT_MEETING);
-    return { ...parsed, frequencyConfig: parsed.frequencyConfig ?? DEFAULT_MEETING.frequencyConfig };
+    const parsed: any = parseJson(initial?.meetingConfig, DEFAULT_MEETING);
+    const frequencyConfig: FrequencyConfigV2 =
+      parsed.frequencyConfig ??
+      (parsed.sessionRule
+        ? {
+            mode: "MONTHLY",
+            every: parsed.frequency === "QUARTERLY" ? 3 : 1,
+            rule: parsed.sessionRule,
+          }
+        : DEFAULT_MEETING.frequencyConfig!);
+    return { ...parsed, frequencyConfig };
   });
   const [membership, setMembership] = useState<MembershipConfig>(() => parseJson(initial?.membershipConfig, DEFAULT_MEMBERSHIP));
   const [socialAids, setSocialAids] = useState<SocialAidCaps>(() => parseJson(initial?.socialAidCaps, DEFAULT_AIDS));

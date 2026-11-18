@@ -639,11 +639,19 @@ function MeetingRulesPanel({
       dayRule: "",
       venue: "",
     });
-    const frequencyConfig: FrequencyConfigV2 = base.frequencyConfig ?? {
-      mode: "MONTHLY",
-      every: base.frequency === "QUARTERLY" ? 3 : 1,
-      rule: { kind: "NTH_WEEKDAY", position: 1, weekday: Number(base.dayOfWeek ?? 6) },
-    };
+    const frequencyConfig: FrequencyConfigV2 = base.frequencyConfig ?? (
+      base.sessionRule
+        ? {
+            mode: "MONTHLY",
+            every: base.frequency === "QUARTERLY" ? 3 : 1,
+            rule: base.sessionRule,
+          }
+        : {
+            mode: "MONTHLY",
+            every: base.frequency === "QUARTERLY" ? 3 : 1,
+            rule: { kind: "NTH_WEEKDAY", position: 1, weekday: Number(base.dayOfWeek ?? 6) },
+          }
+    );
     return { ...base, frequencyConfig };
   });
   const [saving, setSaving] = useState(false);
