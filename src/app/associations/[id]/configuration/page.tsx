@@ -18,6 +18,8 @@ import {
   Wallet,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { FrequencyPicker } from "@/components/ui/frequency-picker";
+import type { FrequencyConfigV2 } from "@/lib/frequency";
 import { AssociationSettingsTabs } from "@/components/associations/association-settings-tabs";
 import {
   ActivityForm,
@@ -626,8 +628,8 @@ function MeetingRulesPanel({
   association: AssociationInfo;
   onSaved: (meeting: unknown) => void;
 }) {
-  const [meeting, setMeeting] = useState(() =>
-    parseJson(association.meetingConfig, {
+  const [meeting, setMeeting] = useState<any>(() => {
+    const base: any = parseJson(association.meetingConfig, {
       frequency: "MONTHLY",
       dayOfWeek: 6,
       hour: 15,
@@ -636,8 +638,14 @@ function MeetingRulesPanel({
       collationHostPayout: 150000,
       dayRule: "",
       venue: "",
-    })
-  );
+    });
+    const frequencyConfig: FrequencyConfigV2 = base.frequencyConfig ?? {
+      mode: "MONTHLY",
+      every: base.frequency === "QUARTERLY" ? 3 : 1,
+      rule: { kind: "NTH_WEEKDAY", position: 1, weekday: Number(base.dayOfWeek ?? 6) },
+    };
+    return { ...base, frequencyConfig };
+  });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -676,23 +684,16 @@ function MeetingRulesPanel({
           </p>
         </div>
       </div>
+      <div className="mt-4 rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-4">
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">
+          Fréquence des sessions de réunion de l&apos;association
+        </p>
+        <FrequencyPicker
+          value={meeting.frequencyConfig}
+          onChange={(config) => setMeeting({ ...meeting, frequencyConfig: config, frequency: config.mode === "MONTHLY" && Number(config.every ?? 1) >= 3 ? "QUARTERLY" : "MONTHLY" })}
+        />
+      </div>
       <div className="mt-4 grid gap-4 md:grid-cols-3">
-        <label className="block">
-          <span className={labelCls}>Fréquence</span>
-          <select value={meeting.frequency} onChange={(e) => setMeeting({ ...meeting, frequency: e.target.value })} className={inputCls}>
-            <option value="MONTHLY">Mensuelle</option>
-            <option value="QUARTERLY">Trimestrielle</option>
-            <option value="ANNUAL">Annuelle</option>
-          </select>
-        </label>
-        <label className="block">
-          <span className={labelCls}>Jour</span>
-          <select value={String(meeting.dayOfWeek)} onChange={(e) => setMeeting({ ...meeting, dayOfWeek: Number(e.target.value) })} className={inputCls}>
-            {["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map((day, index) => (
-              <option key={index} value={index}>{day}</option>
-            ))}
-          </select>
-        </label>
         <label className="block">
           <span className={labelCls}>Heure</span>
           <input type="number" min={0} max={23} value={meeting.hour} onChange={(e) => setMeeting({ ...meeting, hour: Number(e.target.value) })} className={inputCls} />

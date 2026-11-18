@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { getNextSessions, type FrequencyConfig } from "@/lib/frequency";
+import {
+  getNextSessions,
+  migrateConfig,
+  parseFrequencyConfig,
+  type FrequencyConfig,
+} from "@/lib/frequency";
 
 export const MEETING_BUREAU_ROLES = [
   "FOUNDER",
@@ -57,6 +62,14 @@ export function meetingFrequency(meetingConfig: any): FrequencyConfig | null {
   if (!meetingConfig || meetingConfig.sessionsEnabled === false || meetingConfig.sessionMode === "NONE") return null;
   const hour = Number(meetingConfig.hour ?? 15);
   const startTime = `${String(Math.max(0, Math.min(23, hour))).padStart(2, "0")}:00`;
+  // La fréquence des réunions est portée par l'association (FrequencyPicker).
+  const rawFrequency = meetingConfig.frequencyConfig;
+  if (rawFrequency) {
+    const config = typeof rawFrequency === "string"
+      ? parseFrequencyConfig(rawFrequency)
+      : migrateConfig(rawFrequency as FrequencyConfig);
+    return { ...config, startTime: config.startTime ?? startTime } as FrequencyConfig;
+  }
   const every = meetingConfig.frequency === "QUARTERLY" ? 3 : 1;
   const rule = meetingConfig.sessionRule;
   if (rule && typeof rule === "object" && rule.kind) {

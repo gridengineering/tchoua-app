@@ -3,16 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertCircle, ArrowLeft, CalendarClock, Coins, HandCoins, Info, Layers,
+  AlertCircle, ArrowLeft, Coins, HandCoins, Info, Layers,
   Settings2, Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FrequencyPicker } from "@/components/ui/frequency-picker";
-import {
-  FrequencyConfigV2, frequencyLabel, getNextSessions, parseFrequencyConfig,
-} from "@/lib/frequency";
 import { formatCurrency } from "@/lib/utils";
 
 const ACTIVITY_TYPES = [
@@ -102,7 +98,7 @@ function boolFromJson(value: string | null | undefined): string[] {
   }
 }
 
-function legacyFrequency(mode: FrequencyConfigV2["mode"]): string {
+function legacyFrequency(mode: string): string {
   if (mode === "DAILY") return "DAILY";
   if (mode === "WEEKLY") return "WEEKLY";
   if (mode === "ANNUAL") return "ANNUAL";
@@ -190,12 +186,6 @@ export function ActivityForm({
     paymentMethods: boolFromJson(initial?.paymentMethods),
   });
 
-  const [frequency, setFrequency] = useState<FrequencyConfigV2>(() =>
-    initial?.frequencyConfig
-      ? parseFrequencyConfig(initial.frequencyConfig)
-      : { mode: "MONTHLY", every: 1, rule: { kind: "FIXED_DAY", day: 1 } }
-  );
-
   const typeGroup = useMemo(
     () => ACTIVITY_TYPES.find((t) => t.value === form.type)?.group ?? "other",
     [form.type]
@@ -203,8 +193,6 @@ export function ActivityForm({
 
   const isTontine = typeGroup === "tontine";
   const isLoan = typeGroup === "loan";
-  const previewDates = useMemo(() => getNextSessions(frequency, 12), [frequency]);
-
   const set = (patch: Partial<typeof form>) => setForm((f) => ({ ...f, ...patch }));
 
   const toggleMethod = (method: string) => {
@@ -238,8 +226,7 @@ export function ActivityForm({
             : null,
         contributionAmount: form.contributionAmount === "" ? null : Number(form.contributionAmount),
         contributionUnit: form.contributionUnit,
-        contributionFrequency: legacyFrequency(frequency.mode),
-        frequencyConfig: frequency,
+        contributionFrequency: "MONTHLY",
         distributionMode: isTontine ? form.distributionMode : undefined,
         auctionMinBidPct: isTontine && form.distributionMode === "AUCTION" ? Number(form.auctionMinBidPct) : undefined,
         auctionMinBidders: isTontine && form.distributionMode === "AUCTION" ? Number(form.auctionMinBidders) : undefined,
@@ -549,31 +536,6 @@ export function ActivityForm({
             </div>
           )}
 
-          <div className="rounded-xl border border-stone bg-cream/40 p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-charcoal">
-              <CalendarClock className="h-4 w-4 text-forest" /> Fréquence des sessions
-            </div>
-            <FrequencyPicker value={frequency} onChange={setFrequency} />
-            <div className="mt-4 rounded-xl bg-white p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-ash">
-                  Prochaines sessions
-                </span>
-                <span className="text-xs font-medium text-forest">{frequencyLabel(frequency)}</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {previewDates.slice(0, 12).map((d, i) => (
-                  <span
-                    key={i}
-                    className="rounded-lg bg-forest/5 px-2 py-1 text-xs font-medium text-forest"
-                  >
-                    {d.toLocaleDateString("fr-FR", { weekday: "short", day: "2-digit", month: "short" })}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
           <div>
             <label className={labelCls}>Modes de paiement acceptés</label>
             <div className="flex flex-wrap gap-2">
@@ -812,9 +774,8 @@ export function ActivityForm({
         <div className="flex items-start gap-3 rounded-xl border border-info/20 bg-info/5 px-4 py-3 text-sm text-info">
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <p>
-            Cotisation de <strong>{formatCurrency(Number(form.contributionAmount))}</strong> par session,{" "}
-            <strong>{frequencyLabel(frequency)}</strong>. Les {previewDates.length} prochaines échéances sont
-            générées à partir de la première session.
+            Cotisation de <strong>{formatCurrency(Number(form.contributionAmount))}</strong> par séance financière.
+            La fréquence des sessions de l&apos;association est définie dans « Réunions &amp; collation ».
           </p>
         </div>
       )}

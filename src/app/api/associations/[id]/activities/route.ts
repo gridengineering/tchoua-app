@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { hasPermission, isPlatformAdmin } from "@/lib/permissions";
 import { arpErrorResponse, requireArpCapability } from "@/lib/arp/server";
 import { capabilityForActivityType } from "@/lib/arp/profile";
+import { meetingFrequency, parseMeetingConfig } from "@/lib/association/meetings";
 
 async function getMembership(userId: string, associationId: string) {
   return prisma.associationMembership.findFirst({
@@ -86,6 +87,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
   }
 
+  // La fréquence des sessions est celle de l'association (Réunions & collation).
+  // Une activité créée sans fréquence hérite de la fréquence de réunion.
+  const associationConfig = await prisma.association.findUnique({
+    where: { id },
+    select: { meetingConfig: true },
+  });
+  const inheritedFrequency = frequencyConfig ?? meetingFrequency(
+    parseMeetingConfig(associationConfig?.meetingConfig)
+  );
+
   const activity = await prisma.associationActivity.create({
     data: {
       associationId: id,
@@ -103,7 +114,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       auctionMinBidPct,
       auctionMinBidders,
       rotationOrder: rotationOrder ? JSON.stringify(rotationOrder) : null,
-      frequencyConfig: frequencyConfig ? JSON.stringify(frequencyConfig) : null,
+      frequencyConfig: inheritedFrequency ? JSON.stringify(inheritedFrequency) : null,
       partAmount,
       maxPartsPerSession,
       beneficiaryAmountPerShare,

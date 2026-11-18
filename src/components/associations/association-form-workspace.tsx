@@ -28,7 +28,7 @@ import { AssociationSettingsTabs } from "@/components/associations/association-s
 import { ArpModulesPanel } from "@/components/arp/arp-modules-panel";
 import { IssueList, ProgressBar, StatusPill } from "@/components/arp/arp-ui";
 import { FrequencyPicker } from "@/components/ui/frequency-picker";
-import { FrequencyConfigV2, frequencyLabel, getNextSessions } from "@/lib/frequency";
+import type { FrequencyConfigV2 } from "@/lib/frequency";
 import {
   defaultArpConfig,
   deriveCapabilities,
@@ -72,6 +72,7 @@ export type AssociationFormInitial = {
 
 type MeetingConfig = {
   frequency: "MONTHLY" | "QUARTERLY";
+  frequencyConfig?: FrequencyConfigV2;
   dayOfWeek: number;
   hour: number;
   quorumPercent: number;
@@ -174,6 +175,7 @@ const labelCls = "mb-1 block text-[11px] font-semibold uppercase tracking-[0.08e
 
 const DEFAULT_MEETING: MeetingConfig = {
   frequency: "MONTHLY",
+  frequencyConfig: { mode: "MONTHLY", every: 1, rule: { kind: "NTH_WEEKDAY", position: 1, weekday: 6 } },
   dayOfWeek: 6,
   hour: 15,
   quorumPercent: 60,
@@ -384,7 +386,10 @@ export function AssociationFormWorkspace({
     initial?.arpConfig ??
     defaultArpConfig({ type: initial?.type ?? "TONTINE_CLUB", parentId: initial?.parentId ?? null })
   );
-  const [meeting, setMeeting] = useState<MeetingConfig>(() => parseJson(initial?.meetingConfig, DEFAULT_MEETING));
+  const [meeting, setMeeting] = useState<MeetingConfig>(() => {
+    const parsed = parseJson(initial?.meetingConfig, DEFAULT_MEETING);
+    return { ...parsed, frequencyConfig: parsed.frequencyConfig ?? DEFAULT_MEETING.frequencyConfig };
+  });
   const [membership, setMembership] = useState<MembershipConfig>(() => parseJson(initial?.membershipConfig, DEFAULT_MEMBERSHIP));
   const [socialAids, setSocialAids] = useState<SocialAidCaps>(() => parseJson(initial?.socialAidCaps, DEFAULT_AIDS));
   const [sanctions, setSanctions] = useState<SanctionsConfig>(() => parseJson(initial?.sanctionsConfig, DEFAULT_SANCTIONS));
@@ -412,12 +417,6 @@ export function AssociationFormWorkspace({
     collation: arp.modules.collation,
   }));
   const [tontine, setTontine] = useState<TontineDraft>(DEFAULT_TONTINE);
-  const [frequency, setFrequency] = useState<FrequencyConfigV2>({
-    mode: "MONTHLY",
-    every: 1,
-    rule: { kind: "FIXED_DAY", day: 1 },
-  });
-
   useEffect(() => {
     if (!associationId) return;
     fetch(`/api/associations/${associationId}/members`)
@@ -534,11 +533,9 @@ export function AssociationFormWorkspace({
   const arpValidation = useMemo(() => validateArpConfig(arp), [arp]);
   const conditions = conditionsFor(arp.dimensions);
   const capabilities = deriveCapabilities(arp);
-  const previewDates = useMemo(() => getNextSessions(frequency, 12), [frequency]);
-
   const buildActivities = () => {
     const list: Record<string, unknown>[] = [];
-    const common = { frequencyConfig: frequency, contributionFrequency: "MONTHLY" };
+    const common = { frequencyConfig: meeting.frequencyConfig, contributionFrequency: "MONTHLY" };
     if (modules.tontine) {
       list.push({
         ...common,
@@ -1104,19 +1101,6 @@ export function AssociationFormWorkspace({
                   </Section>
                 ) : null}
 
-                <Section title="Fréquence des cycles financiers" description="La fréquence des cycles financiers est propre aux activités. Les sessions de réunion sont définies au niveau de l'association, dans l'onglet Réunions." icon={<CalendarClock className="h-4 w-4" />}>
-                  <FrequencyPicker value={frequency} onChange={setFrequency} />
-                  <div className="mt-3 rounded-lg bg-[#fbf9f3] p-3">
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">Prochaines sessions — {frequencyLabel(frequency)}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {previewDates.map((date, index) => (
-                        <span key={index} className="rounded-md bg-white px-2 py-1 text-[10.5px] text-[#0d3d28]">
-                          {date.toLocaleDateString("fr-FR", { weekday: "short", day: "2-digit", month: "short" })}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </Section>
               </>
             )}
           </div>
@@ -1187,9 +1171,14 @@ export function AssociationFormWorkspace({
 
         {tab === "reunions" ? (
           <Section title="Sessions de réunion (association)" description="Les réunions sont planifiées pour toute l'association. Les activités ne portent que leurs cycles financiers, jamais leurs propres réunions." icon={<CalendarClock className="h-4 w-4" />}>
+            <div className="mb-4 rounded-xl border border-[#e8e2d8] bg-[#fbf9f3] p-4">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wide text-[#8a8378]">Fréquence des sessions de réunion</p>
+              <FrequencyPicker
+                value={meeting.frequencyConfig ?? DEFAULT_MEETING.frequencyConfig}
+                onChange={(config) => setMeeting({ ...meeting, frequencyConfig: config, frequency: config.mode === "MONTHLY" && Number(config.every ?? 1) >= 3 ? "QUARTERLY" : "MONTHLY" })}
+              />
+            </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <SelectInput label="Fréquence" value={meeting.frequency} onChange={(v) => setMeeting({ ...meeting, frequency: v as MeetingConfig["frequency"] })} options={[{ value: "MONTHLY", label: "Mensuelle" }, { value: "QUARTERLY", label: "Trimestrielle" }]} />
-              <SelectInput label="Jour" value={String(meeting.dayOfWeek)} onChange={(v) => setMeeting({ ...meeting, dayOfWeek: Number(v) })} options={DAYS.map((day, index) => ({ value: String(index), label: day }))} />
               <NumberInput label="Heure" value={meeting.hour} onChange={(v) => setMeeting({ ...meeting, hour: Number(v) })} min={0} max={23} />
               <NumberInput label="Quorum" value={meeting.quorumPercent} onChange={(v) => setMeeting({ ...meeting, quorumPercent: Number(v) })} min={0} max={100} hint="Pourcentage des membres requis." />
               <NumberInput label="Contribution collation (FCFA)" value={meeting.collationRate} onChange={(v) => setMeeting({ ...meeting, collationRate: Number(v) })} min={0} step={500} />
