@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSystemAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { filterRecordsByRules, getApplicableRecordRules } from "@/lib/record-rules";
 
 export async function GET(req: Request) {
   try {
@@ -28,8 +29,11 @@ export async function GET(req: Request) {
     });
 
     const totalBalance = totalBalanceResult._sum.balance || 0;
+    const rules = guard.isPrincipal
+      ? []
+      : await getApplicableRecordRules({ roleId: guard.roleId, groupId: guard.roleGroupId, resource: "WALLETS", operation: "READ" });
 
-    return NextResponse.json({ wallets, totalBalance });
+    return NextResponse.json({ wallets: filterRecordsByRules(wallets, rules), totalBalance, appliedRules: rules.length });
   } catch (error: any) {
     console.error("Erreur GET /api/admin/wallets:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

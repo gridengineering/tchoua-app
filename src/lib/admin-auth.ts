@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { SUPER_ADMIN_EMAIL } from "@/lib/permissions";
 
 type AdminGuard =
-  | { ok: true; session: any; user: any; roleName: string | null }
+  | { ok: true; session: any; user: any; roleName: string | null; roleId: string | null; roleGroupId: string | null; isPrincipal: boolean }
   | { ok: false; response: NextResponse };
 
 /**
@@ -34,7 +34,7 @@ export async function requireSystemAdmin(
 
   const role = await prisma.systemRole.findUnique({
     where: { id: user.systemRoleId },
-    include: { permissions: true },
+    include: { permissions: true, group: { select: { id: true } } },
   });
 
   const isPrincipal =
@@ -44,7 +44,7 @@ export async function requireSystemAdmin(
 
   if (!isPrincipal && resource && action) {
     const perms = role?.permissions ?? [];
-    if (perms.length > 0 && !perms.some((p) => p.resource === resource && p.action === action)) {
+    if (!perms.some((p) => p.resource === resource && p.action === action)) {
       return {
         ok: false,
         response: NextResponse.json(
@@ -55,5 +55,13 @@ export async function requireSystemAdmin(
     }
   }
 
-  return { ok: true, session, user, roleName: role?.name ?? null };
+  return {
+    ok: true,
+    session,
+    user,
+    roleName: role?.name ?? null,
+    roleId: role?.id ?? user.systemRoleId ?? null,
+    roleGroupId: role?.group?.id ?? null,
+    isPrincipal,
+  };
 }

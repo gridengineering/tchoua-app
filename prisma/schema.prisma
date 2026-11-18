@@ -85,16 +85,60 @@ model User {
   @@map("users")
 }
 
+model SystemRoleGroup {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  color       String   @default("#6366f1")
+  sortOrder   Int      @default(0)
+  parentId    String?
+  parent      SystemRoleGroup? @relation("RoleGroupHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    SystemRoleGroup[] @relation("RoleGroupHierarchy")
+  roles       SystemRole[]
+  recordRules SystemRecordRule[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([parentId])
+  @@map("system_role_groups")
+}
+
 model SystemRole {
   id          String   @id @default(cuid())
   name        String   @unique
   description String?
+  groupId     String?
+  group       SystemRoleGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
   permissions SystemPermission[]
+  recordRules SystemRecordRule[]
   users       User[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([groupId])
   @@map("system_roles")
+}
+
+model SystemRecordRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  resource    String
+  // Domaine Odoo sérialisé en JSON : [["country", "=", "CM"]]
+  domain      String   @default("[]")
+  // READ, WRITE, CREATE, DELETE séparés par des virgules
+  operations  String   @default("READ")
+  active      Boolean  @default(true)
+  roleId      String?
+  role        SystemRole? @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  groupId     String?
+  group       SystemRoleGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([resource, roleId])
+  @@index([resource, groupId])
+  @@map("system_record_rules")
 }
 
 model SystemPermission {

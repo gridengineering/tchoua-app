@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { requireSystemAdmin } from "@/lib/admin-auth";
+import { filterRecordsByRules, getApplicableRecordRules } from "@/lib/record-rules";
 import { getPlatformSettings } from "@/lib/platform-settings";
 
 // GET /api/admin/users — Liste des utilisateurs système
@@ -41,7 +42,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ users });
+    const rules = guard.isPrincipal
+      ? []
+      : await getApplicableRecordRules({ roleId: guard.roleId, groupId: guard.roleGroupId, resource: "USERS", operation: "READ" });
+    return NextResponse.json({ users: filterRecordsByRules(users, rules), appliedRules: rules.length });
   } catch (error) {
     console.error("[GET /api/admin/users]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

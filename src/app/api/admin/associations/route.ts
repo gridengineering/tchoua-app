@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSystemAdmin } from "@/lib/admin-auth";
+import { filterRecordsByRules, getApplicableRecordRules, isRecordAllowed } from "@/lib/record-rules";
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +36,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ associations });
+    const rules = guard.isPrincipal
+      ? []
+      : await getApplicableRecordRules({ roleId: guard.roleId, groupId: guard.roleGroupId, resource: "ASSOCIATIONS", operation: "READ" });
+    return NextResponse.json({ associations: filterRecordsByRules(associations, rules), appliedRules: rules.length });
   } catch (error) {
     console.error("[GET /api/admin/associations]", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
@@ -52,6 +56,15 @@ export async function PATCH(request: NextRequest) {
 
     if (!id || !status) {
       return NextResponse.json({ error: "ID et statut requis" }, { status: 400 });
+    }
+
+    const existing = await prisma.association.findUnique({ where: { id } });
+    if (!existing) return NextResponse.json({ error: "Association introuvable" }, { status: 404 });
+    if (!guard.isPrincipal) {
+      const rules = await getApplicableRecordRules({ roleId: guard.roleId, groupId: guard.roleGroupId, resource: "ASSOCIATIONS", operation: "WRITE" });
+      if (!isRecordAllowed(existing, rules)) {
+        return NextResponse.json({ error: "Cette association est exclue par une règle d'enregistrement." }, { status: 403 });
+      }
     }
 
     const allowed = ["ACTIVE", "SUSPENDED", "DISSOLVED", "PENDING", "DRAFT"];

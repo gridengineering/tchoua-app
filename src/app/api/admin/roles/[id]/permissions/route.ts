@@ -52,7 +52,7 @@ export async function PUT(
           set: permissionIds.map(pid => ({ id: pid })),
         },
       },
-      include: { permissions: true, _count: { select: { users: true } } },
+      include: { permissions: true, group: true, _count: { select: { users: true, recordRules: true } } },
     });
 
     return NextResponse.json({ role: updated });

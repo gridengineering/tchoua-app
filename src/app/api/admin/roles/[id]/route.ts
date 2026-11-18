@@ -15,13 +15,22 @@ export async function PATCH(
     const body = await request.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : undefined;
     const description = typeof body.description === "string" ? body.description.trim() : undefined;
+    const hasGroup = body.groupId !== undefined;
+    let groupId: string | null | undefined;
+    if (hasGroup) {
+      groupId = body.groupId ? String(body.groupId) : null;
+      if (groupId) {
+        const group = await prisma.systemRoleGroup.findUnique({ where: { id: groupId }, select: { id: true } });
+        if (!group) return NextResponse.json({ error: "Groupe de rôles introuvable" }, { status: 400 });
+      }
+    }
 
     const role = await prisma.systemRole.findUnique({ where: { id } });
     if (!role) return NextResponse.json({ error: "Rôle introuvable" }, { status: 404 });
     if (role.name === "Admin Principal" && name && name !== role.name) {
       return NextResponse.json({ error: "Le rôle Admin Principal ne peut pas être renommé" }, { status: 403 });
     }
-    if (!name && description === undefined) {
+    if (!name && description === undefined && !hasGroup) {
       return NextResponse.json({ error: "Aucun champ à modifier" }, { status: 400 });
     }
 
@@ -30,8 +39,9 @@ export async function PATCH(
       data: {
         ...(name ? { name } : {}),
         ...(description !== undefined ? { description: description || null } : {}),
+        ...(hasGroup ? { groupId } : {}),
       },
-      include: { permissions: true, _count: { select: { users: true } } },
+      include: { permissions: true, group: true, _count: { select: { users: true, recordRules: true } } },
     });
 
     await prisma.auditLog.create({
