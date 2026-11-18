@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getGovernanceConfig } from "@/lib/governance";
 import { publishToUser } from "@/lib/rtc/centrifugo";
+import { sendTransactionalEmail } from "@/lib/mailer";
 
 export type NotificationEventKey =
   | "WALLET_DEPOSIT" | "WALLET_WITHDRAWAL" | "WALLET_TRANSFER"
@@ -54,6 +55,22 @@ export async function dispatchNotification(input: DispatchInput) {
     });
   }
 
+  let emailDelivered = false;
+  if (channels.includes("EMAIL")) {
+    const user = await prisma.user.findUnique({
+      where: { id: input.userId },
+      select: { email: true },
+    }).catch(() => null);
+    if (user?.email && !user.email.endsWith("@phone.tchoua.local")) {
+      emailDelivered = await sendTransactionalEmail({
+        to: user.email,
+        subject: input.title,
+        text: input.message,
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;border:1px solid #e4ded1;border-radius:14px"><h2 style="color:#0d3d28;margin:0 0 12px">${input.title.replace(/[<>&]/g, "")}</h2><p style="line-height:1.6;color:#16211b">${input.message.replace(/[<>&]/g, "")}</p></div>`,
+      }).catch(() => false);
+    }
+  }
+
   let associationNotification = null;
   if (input.associationId) {
     const membership = await prisma.associationMembership.findUnique({
@@ -74,5 +91,5 @@ export async function dispatchNotification(input: DispatchInput) {
     }
   }
 
-  return { delivered: true, notification, associationNotification, channels, chatDelivered };
+  return { delivered: true, notification, associationNotification, channels, chatDelivered, emailDelivered };
 }

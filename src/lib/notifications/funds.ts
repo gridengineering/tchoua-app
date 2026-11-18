@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { publishAssociationEvent, publishToUser } from "@/lib/rtc/centrifugo";
 import { sendTransactionalEmail } from "@/lib/mailer";
+import { getGovernanceConfig } from "@/lib/governance";
 
 export type FundsLang = "fr" | "en" | "es" | "de";
 
@@ -263,25 +264,54 @@ function emailHtml(title: string, text: string, footer: string) {
   </div></body></html>`;
 }
 
-async function sendMemberNotice(person: FundsPerson, title: string, text: string, associationName?: string, link = "/dashboard/wallet") {
-  const lang = langOf(person.language);
-  const notification = await prisma.notification.create({
-    data: { userId: person.id, title, message: text, type: "INFO", link },
-  });
-  await publishToUser(person.id, {
-    type: "notification",
-    notification: { id: notification.id, title, message: text, type: "INFO", event: "FUNDS_MOVEMENT", createdAt: notification.createdAt },
-    data: { event: "FUNDS_MOVEMENT" },
-  }).catch(() => false);
+const DEFAULT_CHANNELS = ["IN_APP", "CHAT", "EMAIL"];
 
-  const email = (person.email || "").trim();
-  if (!email || email.endsWith("@phone.tchoua.local")) return notification;
-  await sendTransactionalEmail({
-    to: email,
-    subject: title,
-    text,
-    html: emailHtml(title, text, `${associationName ? `${associationName} · ` : ""}Tchoua · ${new Date().toLocaleString(lang === "fr" ? "fr-FR" : lang === "es" ? "es-ES" : lang === "de" ? "de-DE" : "en-US")}`),
-  }).catch(() => false);
+function notificationPolicy(governance: any, event: string) {
+  if (!governance) return { enabled: true, channels: DEFAULT_CHANNELS };
+  const rule = governance.notifications?.events?.find((item: any) => item.key === event);
+  return {
+    enabled: Boolean(governance.notifications?.enabled) && (rule?.enabled ?? true),
+    channels: Array.isArray(rule?.channels) && rule.channels.length ? rule.channels : DEFAULT_CHANNELS,
+  };
+}
+
+async function sendMemberNotice(
+  person: FundsPerson,
+  title: string,
+  text: string,
+  associationName?: string,
+  link = "/dashboard/wallet",
+  channels: readonly string[] = DEFAULT_CHANNELS,
+  event = "FUNDS_MOVEMENT"
+) {
+  const lang = langOf(person.language);
+  let notification: { id: string; createdAt: Date } | null = null;
+
+  if (channels.includes("IN_APP")) {
+    notification = await prisma.notification.create({
+      data: { userId: person.id, title, message: text, type: "INFO", link },
+    });
+  }
+
+  if (channels.includes("CHAT")) {
+    await publishToUser(person.id, {
+      type: "notification",
+      notification: { id: notification?.id ?? `${Date.now()}-${person.id}`, title, message: text, type: "INFO", link, event, createdAt: notification?.createdAt ?? new Date() },
+      data: { event, associationId: null },
+    }).catch(() => false);
+  }
+
+  if (channels.includes("EMAIL")) {
+    const email = (person.email || "").trim();
+    if (email && !email.endsWith("@phone.tchoua.local")) {
+      await sendTransactionalEmail({
+        to: email,
+        subject: title,
+        text,
+        html: emailHtml(title, text, `${associationName ? `${associationName} · ` : ""}Tchoua · ${new Date().toLocaleString(lang === "fr" ? "fr-FR" : lang === "es" ? "es-ES" : lang === "de" ? "de-DE" : "en-US")}`),
+      }).catch(() => false);
+    }
+  }
   return notification;
 }
 
@@ -308,7 +338,19 @@ export async function postAssociationFundsMessage(input: {
 export async function notifyAssociationMovement(movement: FundsMovement) {
   const lang = langOf(movement.target.language);
   const notice = textFor(movement, lang);
-  await sendMemberNotice(movement.target, notice.title, notice.text, movement.associationName, `/associations/${movement.associationId}/comptes`).catch(() => null);
+  const governance = await getGovernanceConfig().catch(() => null);
+  const policy = notificationPolicy(governance, movement.kind);
+  if (policy.enabled) {
+    await sendMemberNotice(
+      movement.target,
+      notice.title,
+      notice.text,
+      movement.associationName,
+      `/associations/${movement.associationId}/comptes`,
+      policy.channels,
+      movement.kind
+    ).catch(() => null);
+  }
   await postAssociationFundsMessage({
     associationId: movement.associationId,
     membershipId: movement.actorMembershipId,
@@ -321,6 +363,16 @@ export async function notifyAssociationMovement(movement: FundsMovement) {
 export async function notifyWalletMovement(notice: WalletMovementNotice) {
   const lang = langOf(notice.person.language);
   const text = walletText(notice, lang);
-  await sendMemberNotice(notice.person, text.title, text.text).catch(() => null);
+  const event =
+    notice.kind === "WALLET_DEPOSIT"
+      ? "WALLET_DEPOSIT"
+      : notice.kind === "WALLET_WITHDRAWAL"
+        ? "WALLET_WITHDRAWAL"
+        : "WALLET_TRANSFER";
+  const governance = await getGovernanceConfig().catch(() => null);
+  const policy = notificationPolicy(governance, event);
+  if (policy.enabled) {
+    await sendMemberNotice(notice.person, text.title, text.text, undefined, "/dashboard/wallet", policy.channels, event).catch(() => null);
+  }
   return text;
 }

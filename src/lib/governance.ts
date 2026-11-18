@@ -11,7 +11,22 @@ export async function getGovernanceConfig(): Promise<GovernanceConfig> {
   try {
     const row = await prisma.systemSetting.findUnique({ where: { key: GOVERNANCE_KEY } });
     if (!row) return structuredClone(DEFAULT_GOVERNANCE_CONFIG);
-    return mergeGovernance(DEFAULT_GOVERNANCE_CONFIG, JSON.parse(row.value));
+    const parsed = JSON.parse(row.value);
+    const merged = mergeGovernance(DEFAULT_GOVERNANCE_CONFIG, parsed);
+    // Les nouvelles catégories de notifications doivent apparaître dans
+    // l'administration même si la configuration a été enregistrée avant leur
+    // ajout. On conserve les réglages existants et on complète uniquement les
+    // événements manquants.
+    const savedEvents = Array.isArray(parsed?.notifications?.events) ? parsed.notifications.events : [];
+    const defaults = DEFAULT_GOVERNANCE_CONFIG.notifications.events;
+    merged.notifications.events = [
+      ...defaults.map((event) => {
+        const saved = savedEvents.find((item: any) => item?.key === event.key);
+        return saved ? { ...event, ...saved } : event;
+      }),
+      ...savedEvents.filter((item: any) => item?.key && !defaults.some((event) => event.key === item.key)),
+    ];
+    return merged;
   } catch (error) {
     console.error("[GOVERNANCE] load failed", error);
     return structuredClone(DEFAULT_GOVERNANCE_CONFIG);

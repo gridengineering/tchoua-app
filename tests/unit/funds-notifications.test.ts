@@ -14,6 +14,18 @@ jest.mock("@/lib/mailer", () => ({
   sendTransactionalEmail: jest.fn(async () => true),
 }));
 
+jest.mock("@/lib/governance", () => ({
+  getGovernanceConfig: jest.fn(async () => ({
+    notifications: {
+      enabled: true,
+      events: [
+        { key: "WALLET_TRANSFER", label: "Virement wallet", enabled: true, channels: ["IN_APP", "CHAT", "EMAIL"] },
+        { key: "ASSOC_DEPOSIT", label: "Versement association", enabled: true, channels: ["IN_APP", "CHAT", "EMAIL"] },
+      ],
+    },
+  })),
+}));
+
 import { prisma } from "@/lib/prisma";
 import { publishAssociationEvent, publishToUser } from "@/lib/rtc/centrifugo";
 import { sendTransactionalEmail } from "@/lib/mailer";
