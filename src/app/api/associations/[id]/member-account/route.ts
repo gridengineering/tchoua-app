@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getWalletConfig } from "@/lib/wallet/config";
-import { notifyAssociationMovement } from "@/lib/notifications/funds";
+import { notifyAssociationMovement, notifyWalletMovement } from "@/lib/notifications/funds";
 import {
   accountCurrency,
   cashPolicy,
@@ -233,6 +233,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         return { account: { ...account, balance: nextBalance }, transaction };
       });
       await announce("ASSOC_DEPOSIT", { method: "WALLET", balance: result.account.balance });
+      await notifyWalletMovement({
+        kind: "WALLET_WITHDRAWAL",
+        person: { id: target.userId, name: target.user.name, email: target.user.email, language: target.user.language },
+        amount,
+        currency,
+        motif: `${motif} — versement au compte association`,
+        balance: wallet.balance - amount,
+      }).catch(() => null);
       return NextResponse.json(result, { status: 201 });
     }
 
@@ -308,6 +316,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         return { account: { ...current, balance: nextBalance }, transaction };
       });
       await announce("ASSOC_PAYOUT", { method, balance: result.account.balance, proofUrl: result.transaction.proofUrl });
+      if (method === "WALLET") {
+        const wallet = await prisma.wallet.findUnique({ where: { userId: target.userId }, select: { balance: true } });
+        await notifyWalletMovement({
+          kind: "WALLET_DEPOSIT",
+          person: { id: target.userId, name: target.user.name, email: target.user.email, language: target.user.language },
+          amount,
+          currency,
+          motif: `${motif} — paiement de l'association`,
+          balance: wallet?.balance ?? null,
+        }).catch(() => null);
+      }
       return NextResponse.json(result, { status: 201 });
     }
 
