@@ -2551,6 +2551,70 @@ model FounderRevocationRequest {
 
 // ─── Apps marketplace / extensions ─────────────────────────────────────────
 
+model FundraisingProject {
+  id                   String   @id @default(cuid())
+  associationId        String
+  createdById          String?
+  title                String
+  // AIDE, PROJET, MAIN_LEVEE, AUTRE
+  type                 String   @default("PROJET")
+  contextJustification String   @default("")
+  objectives           String   @default("")
+  expectedResults      String   @default("")
+  beneficiaries        String   @default("")
+  targetAmount         Float    @default(0)
+  currency             String   @default("XAF")
+  startDate            DateTime
+  endDate              DateTime
+  // FIXE, LIBRE
+  contributionMode     String   @default("LIBRE")
+  fixedAmount          Float?
+  // ANONYME, IDENTIFIE, AU_CHOIX
+  contributorMode      String   @default("IDENTIFIE")
+  // ASSOCIATION, ALL_ASSOCIATIONS, PUBLIC
+  scope                String   @default("ASSOCIATION")
+  // DRAFT, PUBLISHED, CLOSED, CANCELLED
+  status               String   @default("DRAFT")
+  coverUrl             String?
+  publishedAt          DateTime?
+  closedAt             DateTime?
+  notificationCount    Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  contributions        FundraisingContribution[]
+
+  @@index([associationId, status])
+  @@index([scope, status, endDate])
+  @@map("fundraising_projects")
+}
+
+model FundraisingContribution {
+  id                 String   @id @default(cuid())
+  projectId          String
+  contributorUserId  String?
+  contributorName    String?
+  contributorEmail   String?
+  contributorPhone   String?
+  associationId      String?
+  amount             Float
+  currency           String   @default("XAF")
+  isAnonymous        Boolean  @default(false)
+  message            String?
+  // PLEDGED, RECEIVED, CANCELLED
+  status             String   @default("PLEDGED")
+  paymentMethod      String?
+  paymentReference   String?
+  confirmedAt        DateTime?
+  createdAt          DateTime @default(now())
+
+  project            FundraisingProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@index([contributorUserId])
+  @@map("fundraising_contributions")
+}
+
 model PlatformApp {
   id             String   @id @default(cuid())
   slug           String   @unique

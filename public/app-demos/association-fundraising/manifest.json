@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-fundraising",
+  "name": "Fundraising",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-fundraising/index.html",
+  "descriptionUrl": "/app-demos/association-fundraising/description.html",
+  "screenshots": ["/app-demos/association-fundraising/preview.svg"],
+  "permissions": ["context:read", "fundraising:read", "fundraising:write", "notifications:group"],
+  "developer": "Tchoua Labs"
+}

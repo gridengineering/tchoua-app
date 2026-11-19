@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fundraising · Tchoua Apps</title>
+<style>
+:root{--accent:#0d3d28;--accent2:#b7791f;--ink:#142019;--muted:#6f7d73;--line:#dfe8e1;--paper:#f7faf6;--soft:#eef5ef;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 28px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.9);position:sticky;top:0;z-index:20;backdrop-filter:blur(12px)}
+.brand{font-weight:950;letter-spacing:-.06em;font-size:18px}.brand i{color:var(--accent);font-style:normal}.badge,.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;background:var(--soft);color:var(--accent)}
+.context{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+main{max-width:1180px;margin:0 auto;padding:28px 22px 60px}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:20px;align-items:end;margin-bottom:18px}
+.kicker{font-size:10px;font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:var(--accent2);margin:0}
+h1{font-size:42px;line-height:1.02;letter-spacing:-.065em;margin:7px 0 9px}.lead{max-width:660px;color:var(--muted);font-size:13px;line-height:1.7;margin:0}
+.hero-note{border:1px solid var(--line);border-radius:18px;background:var(--white);padding:15px 17px;color:var(--muted);font-size:11px;line-height:1.65}.hero-note strong{color:var(--accent);display:block;margin-bottom:4px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.stat,.panel{border:1px solid var(--line);background:var(--white);border-radius:18px}.stat{padding:15px}.stat span{display:block;color:var(--muted);font-size:10px;font-weight:700}.stat strong{display:block;font-size:26px;letter-spacing:-.05em;margin:5px 0 2px;color:var(--accent)}.stat small{font-size:10px;color:var(--muted)}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0 14px}.tab{border:1px solid var(--line);background:var(--white);color:var(--muted);border-radius:999px;padding:9px 14px;font-size:11px;font-weight:900}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{padding:18px;margin-bottom:14px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}h2{font-size:15px;letter-spacing:-.02em;margin:0}.subtle{font-size:11px;color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar input,.toolbar select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff;font-size:11px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.project{border:1px solid var(--line);border-radius:18px;background:#fff;padding:15px;display:flex;flex-direction:column;min-height:240px;transition:.18s}.project:hover{border-color:#acc8b3;box-shadow:0 12px 30px #0d3d2812;transform:translateY(-1px)}.project-top{display:flex;justify-content:space-between;gap:8px;align-items:start}.project h3{font-size:16px;line-height:1.2;letter-spacing:-.03em;margin:11px 0 5px}.project p{font-size:11px;line-height:1.6;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.project .meta{margin-top:auto;padding-top:14px}.money{font-size:19px;font-weight:950;letter-spacing:-.04em;color:var(--accent)}.bar{height:8px;border-radius:99px;overflow:hidden;background:#eaf0eb;margin-top:9px}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}.row{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--muted);margin-top:6px}.btn{border:0;border-radius:10px;padding:10px 12px;font-size:11px;font-weight:900;background:var(--accent);color:#fff}.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--accent)}.btn.gold{background:var(--accent2)}.btn.small{padding:7px 9px;font-size:10px;border-radius:8px}.btn-danger{background:#b42318}.linkish{background:none;border:0;color:var(--accent);font-size:11px;font-weight:900;padding:0;text-align:left}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid.three{grid-template-columns:repeat(3,1fr)}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#526257}.field input,.field textarea,.field select{border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:#fff;color:var(--ink);font-size:12px;width:100%}.field textarea{resize:vertical;min-height:84px}.hint{font-size:10px;color:var(--muted);line-height:1.5}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}.empty{border:1px dashed #c8d8cb;border-radius:18px;padding:24px;text-align:center;color:var(--muted);font-size:12px}.notice{font-size:10px;color:var(--muted);line-height:1.6;border-left:3px solid var(--accent2);padding-left:10px;margin:10px 0}
+.modal-back{position:fixed;inset:0;background:#08140d99;z-index:60;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto}.modal-back.open{display:flex}.modal{width:min(760px,100%);background:#fff;border-radius:22px;padding:20px;box-shadow:0 24px 80px #0005;position:relative}.modal-close{position:absolute;right:13px;top:12px;border:0;background:#f1f5f2;border-radius:50%;width:30px;height:30px;font-size:17px;color:#3c4c42}.detail h2{font-size:26px;letter-spacing:-.05em;margin:6px 0 4px}.detail h4{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 4px}.detail p{white-space:pre-line;font-size:12px;line-height:1.7;margin:0;color:#3c4c42}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-box{background:#f6faf7;border:1px solid var(--line);border-radius:12px;padding:10px}.detail-box span{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:900;letter-spacing:.1em}.detail-box strong{font-size:12px;display:block;margin-top:3px}.contrib-table{width:100%;border-collapse:collapse;font-size:11px}.contrib-table th,.contrib-table td{text-align:left;padding:8px 5px;border-bottom:1px solid #edf2ee;vertical-align:top}.contrib-table th{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.toast{position:fixed;right:18px;bottom:18px;z-index:80;background:#0d3d28;color:#fff;border-radius:12px;padding:11px 14px;font-size:11px;font-weight:800;display:none;max-width:360px}.toast.error{background:#b42318}.toast.show{display:block}footer{max-width:1180px;margin:0 auto;padding:0 22px 28px;color:var(--muted);font-size:10px}.hidden{display:none!important}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}}@media(max-width:620px){h1{font-size:32px}main{padding:20px 14px 44px}header{padding:14px 16px}.grid,.form-grid,.form-grid.three,.detail-grid{grid-template-columns:1fr}.modal{padding:16px}.project{min-height:0}}
+</style>
+</head>
+<body>
+<header><div class="brand">Tchoua<i>Apps</i></div><span class="badge">Espace association</span><div class="context"><span class="dot"></span><span id="ctx-user">Chargement…</span><span>·</span><span id="ctx-assoc">—</span></div></header>
+<main>
+  <section class="hero">
+    <div><p class="kicker">Levées de fonds · solidarité · projets</p><h1>Fundraising</h1><p class="lead">Initiez une aide, un projet ou une main levée. Publiez votre cagnotte, suivez les contributions et informez toutes les associations ciblées dans leur groupe.</p></div>
+    <div class="hero-note"><strong>Diffusion automatique</strong>À la publication, chaque association ciblée reçoit une notification et un message dans son canal général. Les membres peuvent suivre le compte à rebours et contribuer selon vos règles.</div>
+  </section>
+  <section class="stats">
+    <div class="stat"><span>Levées ouvertes</span><strong id="stat-open">0</strong><small>campagnes publiées</small></div>
+    <div class="stat"><span>Collecté</span><strong id="stat-collected">0</strong><small>promesses + reçus</small></div>
+    <div class="stat"><span>Contributions</span><strong id="stat-contrib">0</strong><small>sur toutes les levées</small></div>
+    <div class="stat"><span>Taux moyen</span><strong id="stat-rate">0%</strong><small>de la cagnotte cible</small></div>
+  </section>
+  <nav class="tabs"><button class="tab active" data-tab="projects">Projets</button><button class="tab" data-tab="create">Nouvelle levée</button><button class="tab" data-tab="reports">Rapports & suivi</button></nav>
+
+  <section id="tab-projects">
+    <div class="panel"><div class="panel-head"><div><h2>Levées de fonds</h2><span class="subtle">Vos campagnes et celles des associations ciblées.</span></div><div class="toolbar"><input id="search" placeholder="Rechercher…"><select id="filter-type"><option value="">Tous les types</option><option value="AIDE">Aide</option><option value="PROJET">Projet</option><option value="MAIN_LEVEE">Main levée</option><option value="AUTRE">Autre</option></select><select id="filter-scope"><option value="">Toutes les portées</option><option value="ASSOCIATION">Mon association</option><option value="ALL_ASSOCIATIONS">Toutes les associations</option><option value="PUBLIC">Public</option></select><button class="btn ghost small" id="refresh">Actualiser</button></div></div><div id="project-list" class="grid"></div></div>
+  </section>
+
+  <section id="tab-create" class="hidden">
+    <form id="create-form" class="panel">
+      <div class="panel-head"><div><h2>Créer une levée de fonds</h2><span class="subtle">Tous les champs sont paramétrables et modifiables après création.</span></div><span class="pill">Nouveau</span></div>
+      <div class="form-grid three">
+        <div class="field full"><label for="f-title">Titre de la levée *</label><input id="f-title" required maxlength="160" placeholder="Ex. Aide aux familles touchées par les inondations"></div>
+        <div class="field"><label for="f-type">Type *</label><select id="f-type" required><option value="AIDE">Aide</option><option value="PROJET" selected>Projet</option><option value="MAIN_LEVEE">Main levée</option><option value="AUTRE">Autre</option></select></div>
+        <div class="field"><label for="f-scope">Portée *</label><select id="f-scope" required><option value="ASSOCIATION">Mon association</option><option value="ALL_ASSOCIATIONS">Toutes les associations</option><option value="PUBLIC">Espace public</option></select></div>
+        <div class="field"><label for="f-target">Cagnotte cible (FCFA) *</label><input id="f-target" type="number" min="1" step="1" required placeholder="500000"></div>
+        <div class="field"><label for="f-start">Date de début *</label><input id="f-start" type="date" required></div>
+        <div class="field"><label for="f-end">Date de fin *</label><input id="f-end" type="date" required></div>
+        <div class="field"><label for="f-contribution-mode">Contribution *</label><select id="f-contribution-mode"><option value="LIBRE">Libre</option><option value="FIXE">Montant fixe</option></select></div>
+        <div class="field hidden" id="fixed-wrap"><label for="f-fixed">Montant fixe (FCFA) *</label><input id="f-fixed" type="number" min="1" step="1" placeholder="10000"></div>
+        <div class="field"><label for="f-contributor-mode">Contributeur *</label><select id="f-contributor-mode"><option value="IDENTIFIE">Identifié</option><option value="ANONYME">Anonyme</option><option value="AU_CHOIX">Au choix</option></select></div>
+        <div class="field full"><label for="f-context">Contexte & justification *</label><textarea id="f-context" required placeholder="Pourquoi cette levée est nécessaire, situation actuelle, éléments de justification…"></textarea></div>
+        <div class="field full"><label for="f-objectives">Objectifs *</label><textarea id="f-objectives" required placeholder="Objectifs mesurables de la collecte…"></textarea></div>
+        <div class="field"><label for="f-results">Résultats attendus *</label><textarea id="f-results" required placeholder="Ce qui changera concrètement…"></textarea></div>
+        <div class="field"><label for="f-beneficiaries">Bénéficiaires *</label><textarea id="f-beneficiaries" required placeholder="Qui bénéficie et comment…"></textarea></div>
+      </div>
+      <p class="notice">À la publication, une notification sera envoyée dans le groupe de chaque association ciblée. Les contributeurs anonymes ne sont jamais identifiés dans les rapports publics.</p>
+      <div class="actions"><button type="button" class="btn ghost" id="save-draft">Enregistrer en brouillon</button><button type="submit" class="btn gold">Publier la levée</button></div>
+    </form>
+  </section>
+
+  <section id="tab-reports" class="hidden">
+    <div class="panel"><div class="panel-head"><div><h2>Rapports de suivi</h2><span class="subtle">Sélectionnez une levée pour voir la progression et les contributions.</span></div><div class="toolbar"><select id="report-select"><option value="">Choisir une levée…</option></select><button class="btn ghost small" id="export-csv">Exporter CSV</button></div></div><div id="report-body" class="empty">Aucune levée sélectionnée.</div></div>
+  </section>
+</main>
+<footer>Tchoua Apps · Fundraising · les contributions sont des promesses à confirmer par le bureau de l’association.</footer>
+<div class="modal-back" id="modal-back"><div class="modal"><button class="modal-close" id="modal-close">×</button><div id="modal-content"></div></div></div>
+<div class="toast" id="toast"></div>
+<script src="./app.js"></script>
+</body>
+</html>
