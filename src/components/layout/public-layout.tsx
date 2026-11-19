@@ -15,9 +15,17 @@ const NAV: { key: string; href: string }[] = [
   { key: "fonctionnalites", href: "/#modules" },
   { key: "how_it_works", href: "/#steps" },
   { key: "apps", href: "/apps" },
+  { key: "projets", href: "/projets" },
   { key: "tarifs", href: "/#pricing" },
   { key: "documentation", href: "/documentation" },
 ];
+
+const PROJETS_LABELS: Record<string, string> = {
+  fr: "Projets solidaires",
+  en: "Community projects",
+  es: "Proyectos solidarios",
+  de: "Gemeinschaftsprojekte",
+};
 
 const APPS_LABELS: Record<string, string> = {
   fr: "Apps marketplace",
@@ -69,6 +77,8 @@ export function PublicHeader() {
   const label = (key: string) =>
     key === "apps"
       ? APPS_LABELS[publicLang(lang)] ?? "Apps marketplace"
+      : key === "projets"
+        ? PROJETS_LABELS[publicLang(lang)] ?? "Projets solidaires"
       : key === "documentation"
         ? DOCS_COPY[publicLang(lang)].nav
         : (t.nav as Record<string, string>)[key] ?? key;
