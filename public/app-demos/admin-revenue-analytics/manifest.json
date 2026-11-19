@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "admin-revenue-analytics",
+  "name": "Revenue Analytics",
+  "scope": "ADMIN",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/admin-revenue-analytics/index.html",
+  "descriptionUrl": "/app-demos/admin-revenue-analytics/description.html",
+  "screenshots": [
+    "/app-demos/admin-revenue-analytics/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "tchoua-app-member-budget-planner",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 4173"
+  },
+  "license": "MIT"
+}

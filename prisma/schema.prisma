@@ -2574,6 +2574,9 @@ model PlatformApp {
   manifest       String?
   permissions    String?
   screenshots    String?
+  // Fiche Info apps : HTML fourni par le développeur ou URL de fichier HTML
+  descriptionHtml String?
+  descriptionUrl  String?
   installCount   Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

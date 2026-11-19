@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-meeting-minutes",
+  "name": "Meeting Minutes",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-meeting-minutes/index.html",
+  "descriptionUrl": "/app-demos/association-meeting-minutes/description.html",
+  "screenshots": [
+    "/app-demos/association-meeting-minutes/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

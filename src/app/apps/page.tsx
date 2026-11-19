@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import {
-  Download, ExternalLink, LayoutGrid, Loader2,
+  Download, ExternalLink, Info, LayoutGrid, Loader2,
   Puzzle, RefreshCw, Search, ShieldCheck, Sparkles, Trash2, UserRound,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
@@ -246,6 +246,7 @@ export default function AppsMarketplacePage() {
                     <div><p className="text-[11px] font-semibold text-slate-600">{app.developerName}</p><p className="text-[10px] text-slate-400">v{app.version} · {app.installCount} install.</p></div>
                     <div className="flex items-center gap-1.5">
                       {app.repositoryUrl ? <a href={app.repositoryUrl} target="_blank" rel="noreferrer" title="Dépôt GitHub" className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"><ExternalLink className="h-3.5 w-3.5" /></a> : null}
+                      <Link href={`/apps/${app.slug}/info`} title="Info apps" className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-2 text-[10px] font-bold text-[#0d3d28] hover:bg-[#f3f8f4]"><Info className="h-3.5 w-3.5" /> Info app</Link>
                       {app.installed ? (
                         <>
                           <button onClick={() => openApp(app)} className="rounded-lg bg-[#0d3d28] px-3 py-2 text-xs font-bold text-white hover:bg-[#0a3020]">Ouvrir</button>

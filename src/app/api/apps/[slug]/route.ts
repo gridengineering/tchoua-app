@@ -51,6 +51,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sl
       ...(body.manifest !== undefined && { manifest: JSON.stringify(body.manifest) }),
       ...(body.permissions !== undefined && { permissions: JSON.stringify(body.permissions) }),
       ...(body.screenshots !== undefined && { screenshots: JSON.stringify(body.screenshots) }),
+      ...(body.descriptionHtml !== undefined && { descriptionHtml: body.descriptionHtml || null }),
+      ...(body.descriptionUrl !== undefined && { descriptionUrl: body.descriptionUrl || null }),
     },
   });
   return NextResponse.json({ app: normalizeApp(updated, []) });

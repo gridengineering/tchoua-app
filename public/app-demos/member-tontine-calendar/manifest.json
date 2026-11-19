@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "member-tontine-calendar",
+  "name": "Tontine Calendar",
+  "scope": "MEMBER",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/member-tontine-calendar/index.html",
+  "descriptionUrl": "/app-demos/member-tontine-calendar/description.html",
+  "screenshots": [
+    "/app-demos/member-tontine-calendar/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

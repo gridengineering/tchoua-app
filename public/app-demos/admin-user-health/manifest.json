@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "admin-user-health",
+  "name": "User Health",
+  "scope": "ADMIN",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/admin-user-health/index.html",
+  "descriptionUrl": "/app-demos/admin-user-health/description.html",
+  "screenshots": [
+    "/app-demos/admin-user-health/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

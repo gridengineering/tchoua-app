@@ -117,6 +117,8 @@ export async function POST(req: NextRequest) {
       manifest: body.manifest ? JSON.stringify(body.manifest) : null,
       permissions: body.permissions ? JSON.stringify(body.permissions) : null,
       screenshots: body.screenshots ? JSON.stringify(body.screenshots) : null,
+      descriptionHtml: body.descriptionHtml ?? null,
+      descriptionUrl: body.descriptionUrl ?? null,
     },
     create: {
       slug,
@@ -136,6 +138,8 @@ export async function POST(req: NextRequest) {
       manifest: body.manifest ? JSON.stringify(body.manifest) : null,
       permissions: body.permissions ? JSON.stringify(body.permissions) : null,
       screenshots: body.screenshots ? JSON.stringify(body.screenshots) : null,
+      descriptionHtml: body.descriptionHtml ?? null,
+      descriptionUrl: body.descriptionUrl ?? null,
     },
   });
   return NextResponse.json({ app: normalizeApp(app, []) }, { status: 201 });

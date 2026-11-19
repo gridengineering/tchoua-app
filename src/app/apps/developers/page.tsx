@@ -26,7 +26,7 @@ const DOCS: Record<Lang, { eyebrow: string; title: string; intro: string; sectio
     intro: "Les apps Tchoua sont des applications web indépendantes, embarquées dans un iframe sécurisé et reliées à la plateforme par un manifest, un jeton de lancement et le SDK de contexte. Ce guide couvre les trois espaces : administration, membre et association.",
     sections: [
       { title: "1. Choisir le bon périmètre", body: "Chaque app déclare un scope unique. Le scope détermine qui peut voir, installer et ouvrir l'app.", bullets: ["ADMIN : réservé aux utilisateurs avec un rôle système d'administration.", "MEMBER : disponible à tout membre connecté ; installation personnelle.", "ASSOCIATION : réservé au fondateur et au bureau ; installation au niveau de l'association."] },
-      { title: "2. Créer le manifest", body: "Le manifest est le contrat entre votre app et Tchoua. Il est stocké dans la registry et contrôlé avant publication.", code: `{
+      { title: "2. Créer le manifest", body: "Le manifest est le contrat entre votre app et Tchoua. Il est stocké dans la registry et contrôlé avant publication. Pour la fiche « Info apps », fournissez `descriptionHtml` (HTML direct) ou `descriptionUrl` (fichier HTML public) et le tableau `screenshots` lors de la soumission.", code: `{
   "schemaVersion": "1.0",
   "slug": "member-meeting-copilot",
   "name": "Meeting Copilot",
@@ -58,7 +58,7 @@ const { context } = await res.json();
     intro: "Tchoua apps are independent web applications embedded in a secure iframe and connected to the platform through a manifest, a launch token and the context SDK. This guide covers all three spaces: admin, member and association.",
     sections: [
       { title: "1. Pick the right scope", body: "Every app declares one scope. The scope determines who can discover, install and open it.", bullets: ["ADMIN: system administrators only.", "MEMBER: any signed-in member; personal installation.", "ASSOCIATION: founder and board only; installation at association level."] },
-      { title: "2. Write the manifest", body: "The manifest is the contract between your app and Tchoua. It is stored in the registry and validated before publication.", code: `{
+      { title: "2. Write the manifest", body: "The manifest is the contract between your app and Tchoua. It is stored in the registry and validated before publication. For the “Info apps” page, provide `descriptionHtml` (inline HTML) or `descriptionUrl` (public HTML file) and a `screenshots` array in the submission.", code: `{
   "schemaVersion": "1.0",
   "slug": "member-meeting-copilot",
   "name": "Meeting Copilot",
@@ -85,7 +85,7 @@ const { context } = await res.json();` },
     intro: "Las apps Tchoua son aplicaciones web independientes, integradas en un iframe seguro y conectadas a la plataforma mediante un manifest, un token de lanzamiento y el SDK de contexto. Esta guía cubre los tres espacios: administración, miembro y asociación.",
     sections: [
       { title: "1. Elegir el ámbito correcto", body: "Cada app declara un único ámbito. El ámbito determina quién puede descubrirla, instalarla y abrirla.", bullets: ["ADMIN: solo administradores del sistema.", "MEMBER: cualquier miembro conectado; instalación personal.", "ASSOCIATION: solo fundador y junta; instalación a nivel de asociación."] },
-      { title: "2. Crear el manifest", body: "El manifest es el contrato entre tu app y Tchoua. Se almacena en el registro y se valida antes de publicar.", code: `{
+      { title: "2. Crear el manifest", body: "El manifest es el contrato entre tu app y Tchoua. Se almacena en el registro y se valida antes de publicar. Para la ficha «Info apps», envía `descriptionHtml` (HTML directo) o `descriptionUrl` (archivo HTML público) y el array `screenshots` al publicar.", code: `{
   "schemaVersion": "1.0",
   "slug": "member-meeting-copilot",
   "name": "Meeting Copilot",
@@ -109,7 +109,7 @@ const { context } = await res.json();` },
     intro: "Tchoua Apps sind unabhängige Webanwendungen, die in einem sicheren iframe eingebettet und über Manifest, Launch-Token und Context-SDK mit der Plattform verbunden sind. Dieses Handbuch behandelt alle drei Bereiche: Administration, Mitglied und Verein.",
     sections: [
       { title: "1. Den richtigen Bereich wählen", body: "Jede App deklariert genau einen Scope. Dieser bestimmt, wer die App finden, installieren und öffnen darf.", bullets: ["ADMIN: nur Systemadministratoren.", "MEMBER: jedes angemeldete Mitglied; persönliche Installation.", "ASSOCIATION: nur Gründer und Vorstand; Installation auf Vereinsebene."] },
-      { title: "2. Das Manifest erstellen", body: "Das Manifest ist der Vertrag zwischen App und Tchoua. Es wird in der Registry gespeichert und vor der Veröffentlichung geprüft.", code: `{
+      { title: "2. Das Manifest erstellen", body: "Das Manifest ist der Vertrag zwischen App und Tchoua. Es wird in der Registry gespeichert und vor der Veröffentlichung geprüft. Für die Seite „Info apps“ übergib `descriptionHtml` (direktes HTML) oder `descriptionUrl` (öffentliche HTML-Datei) und ein `screenshots`-Array bei der Einreichung.", code: `{
   "schemaVersion": "1.0",
   "slug": "member-meeting-copilot",
   "name": "Meeting Copilot",

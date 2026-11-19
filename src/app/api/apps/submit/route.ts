@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
       manifest: JSON.stringify(manifest),
       permissions: JSON.stringify(manifest.permissions || []),
       screenshots: JSON.stringify(body.screenshots || []),
+      descriptionHtml: body.descriptionHtml || null,
+      descriptionUrl: body.descriptionUrl || null,
     },
     create: {
       slug,
@@ -57,6 +59,8 @@ export async function POST(req: NextRequest) {
       manifest: JSON.stringify(manifest),
       permissions: JSON.stringify(manifest.permissions || []),
       screenshots: JSON.stringify(body.screenshots || []),
+      descriptionHtml: body.descriptionHtml || null,
+      descriptionUrl: body.descriptionUrl || null,
     },
   });
   return NextResponse.json({ app, message: "App soumise en brouillon. L'administration doit la publier." }, { status: 201 });

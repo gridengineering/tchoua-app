@@ -75,6 +75,8 @@ export function normalizeApp(app: any, installations: any[] = []) {
     manifest,
     permissions: parseAppJson<string[]>(app.permissions, manifest.permissions ?? []),
     screenshots: parseAppJson<string[]>(app.screenshots, []),
+    descriptionHtml: app.descriptionHtml ?? null,
+    descriptionUrl: app.descriptionUrl ?? null,
     entryUrl: manifest.entryUrl ?? app.homepageUrl ?? null,
     installed: installations.some((installation) => installation.appId === app.id && installation.status === "ACTIVE"),
     installation: installations.find((installation) => installation.appId === app.id) ?? null,

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "association-contribution-tracker",
+  "name": "Contribution Tracker",
+  "scope": "ASSOCIATION",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/association-contribution-tracker/index.html",
+  "descriptionUrl": "/app-demos/association-contribution-tracker/description.html",
+  "screenshots": [
+    "/app-demos/association-contribution-tracker/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

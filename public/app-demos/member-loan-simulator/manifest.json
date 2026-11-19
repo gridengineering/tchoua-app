@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "member-loan-simulator",
+  "name": "Loan Simulator",
+  "scope": "MEMBER",
+  "version": "1.0.0",
+  "entryUrl": "/app-demos/member-loan-simulator/index.html",
+  "descriptionUrl": "/app-demos/member-loan-simulator/description.html",
+  "screenshots": [
+    "/app-demos/member-loan-simulator/preview.svg"
+  ],
+  "permissions": [
+    "context:read"
+  ],
+  "developer": "Tchoua Labs"
+}

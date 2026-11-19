@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Budget Planner · Tchoua Apps</title>
+<style>
+:root{--accent:#0d9488;--ink:#14201a;--muted:#6b746e;--line:#e6e8e3;--paper:#fbfcf9}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:#fff} .brand{font-weight:900;letter-spacing:-.04em;font-size:17px}.brand i{color:var(--accent);font-style:normal}.badge{font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,white);padding:6px 10px;border-radius:999px}
+main{max-width:1020px;margin:0 auto;padding:30px 22px 44px}.hero{margin-bottom:22px}.kicker{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}h1{font-size:34px;line-height:1.08;letter-spacing:-.055em;margin:8px 0}.hero p{max-width:680px;color:var(--muted)}.context{display:flex;gap:8px;align-items:center;margin:12px 0 22px;color:var(--muted);font-size:11px}.dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.metric,.panel{border:1px solid var(--line);background:#fff;border-radius:16px;padding:16px}.metric span{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:27px;letter-spacing:-.04em;margin:5px 0;color:var(--accent)}.metric small{color:var(--muted);font-size:10px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}h2{font-size:14px;margin:0}.pill{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,white);padding:5px 8px;border-radius:999px}
+.rows>div{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:11px 0;border-top:1px solid #f0f1ed}.rows span{color:var(--muted);font-size:11px}.rows strong{font-size:12px}.ok{color:#166534}.warn{color:#a15c00}.high{color:#b42318}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}label{display:block;font-weight:700;font-size:11px}input,textarea{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:#fff;color:var(--ink)}textarea{resize:vertical}button{margin-top:12px;background:var(--accent);border:0;color:#fff;font-weight:800;padding:10px 13px;border-radius:10px;cursor:pointer}.result{margin-top:12px;padding:12px;background:color-mix(in srgb,var(--accent) 7%,white);border-radius:10px;font-weight:800;color:var(--accent)}
+.checklist{display:grid;gap:9px;margin:10px 0}.checklist label{display:flex;gap:9px;align-items:center;font-weight:500;color:var(--muted)}.muted{color:var(--muted);font-size:11px}
+.bars{height:140px;display:flex;align-items:end;gap:12px;padding:12px 8px 0}.bars i{flex:1;background:var(--accent);border-radius:6px 6px 0 0;min-height:8px;opacity:.9}.bar-labels{display:flex;gap:12px;padding:0 8px;color:var(--muted);font-size:9px}.bar-labels span{flex:1;text-align:center}
+footer{max-width:1020px;margin:0 auto;padding:0 22px 30px;color:var(--muted);font-size:10px}
+@media(max-width:720px){.metrics,.form-grid{grid-template-columns:1fr 1fr}h1{font-size:27px}}
+</style></head>
+<body><header><div class="brand">Tchoua<i>Apps</i></div><span class="badge">Espace membre</span></header>
+<main><div class="hero"><p class="kicker">Extension Tchoua · Finance</p><h1>Budget Planner</h1><p>Un budget personnel clair, mois après mois.</p><div class="context"><span class="dot"></span><span id="ctx-user">Chargement du contexte…</span><span>·</span><span id="ctx-assoc">—</span></div></div>
+<div class="metrics"><div class="metric"><span>Activité</span><strong>24</strong><small>cette semaine</small></div><div class="metric"><span>Actions</span><strong>6</strong><small>à traiter</small></div><div class="metric"><span>Score</span><strong>86 %</strong><small>bonne santé</small></div></div><section class="panel"><div class="panel-head"><h2>Vue du module</h2><span class="pill">Aperçu</span></div><div class="form-grid"><label>Budget mensuel (FCFA)<input id="budget" type="number" value="250000"></label><label>Dépenses (FCFA)<input id="expenses" type="number" value="168000"></label></div><button id="calc">Calculer le reste à vivre</button><p class="result" id="calc-result">Reste à vivre : 82 000 FCFA</p></section>
+<section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Fonctionnalités</h2><span class="pill">Module</span></div><ul style="margin:0;padding:0;list-style:none;display:grid;gap:8px"><li><span>✓</span>Budget mensuel</li><li><span>✓</span>Dépenses par catégorie</li><li><span>✓</span>Reste à vivre</li><li><span>✓</span>Objectifs d'épargne</li></ul></section>
+</main><footer>Tchoua Apps · Les données affichées sont des exemples de démonstration. Le contexte réel est fourni par le jeton de lancement.</footer>
+<script>
+const qp = new URLSearchParams(location.search);
+const token = qp.get('tchoua_token');
+async function context() {
+  if (!token) return;
+  try {
+    const r = await fetch('https://www.tchoua.com/api/apps/sdk/context', { headers: { Authorization: 'Bearer ' + token } });
+    const d = await r.json();
+    if (d.context) {
+      document.getElementById('ctx-user').textContent = d.context.user.name;
+      document.getElementById('ctx-assoc').textContent = d.context.association?.name || 'Espace personnel';
+    }
+  } catch (e) {}
+}
+context();
+const calc = document.getElementById('calc');
+if (calc) calc.onclick = () => { const b=+document.getElementById('budget').value||0, x=+document.getElementById('expenses').value||0; document.getElementById('calc-result').textContent='Reste à vivre : '+(b-x).toLocaleString('fr-FR')+' FCFA'; };
+const loan = document.getElementById('calc-loan');
+if (loan) loan.onclick = () => { const a=+document.getElementById('amount').value||0, r=+document.getElementById('rate').value||0, m=+document.getElementById('months').value||0; const total=Math.round(a*(1+r*m/100)); document.getElementById('loan-result').textContent='Total : '+total.toLocaleString('fr-FR')+' FCFA'; };
+const next = document.getElementById('next');
+if (next) next.onclick = () => { document.getElementById('next-result').textContent='Étape suivante validée. Le bureau est notifié.'; };
+const save = document.getElementById('save-minutes');
+if (save) save.onclick = () => { document.getElementById('minutes-result').textContent='Compte rendu prêt à être partagé au bureau.'; };
+</script></body></html>
