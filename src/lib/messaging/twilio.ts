@@ -13,6 +13,8 @@ export type TwilioMessageInput = {
   channel: "SMS" | "WHATSAPP";
   to: string;
   body: string;
+  /** Variables du template WhatsApp approuvé, ex. { "1": "123456" }. */
+  templateVariables?: Record<string, string>;
 };
 
 export type TwilioMessageResult =
@@ -91,7 +93,17 @@ export async function sendTwilioMessage(input: TwilioMessageInput): Promise<Twil
     return { ok: false, error: `Aucun expéditeur ${input.channel} configuré.`, code: "SENDER_MISSING", channel: input.channel, to };
   }
 
-  const body = new URLSearchParams({ To: to, From: from, Body: input.body });
+  const body = new URLSearchParams({ To: to, From: from });
+  const contentSid = input.channel === "WHATSAPP"
+    ? process.env.TWILIO_WHATSAPP_CONTENT_SID?.trim()
+    : "";
+  if (contentSid) {
+    // Hors fenêtre de 24 h, WhatsApp exige un template approuvé par Meta.
+    body.set("ContentSid", contentSid);
+    body.set("ContentVariables", JSON.stringify(input.templateVariables || {}));
+  } else {
+    body.set("Body", input.body);
+  }
   const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
   if (input.channel === "SMS" && messagingServiceSid) {
     body.set("MessagingServiceSid", messagingServiceSid);

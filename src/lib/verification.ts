@@ -107,6 +107,7 @@ async function deliverWebhook(channel: "PHONE" | "WHATSAPP", to: string, code: s
     channel: channel === "WHATSAPP" ? "WHATSAPP" : "SMS",
     to,
     body: text,
+    templateVariables: { "1": code },
   });
   if (twilio.ok) return true;
 
