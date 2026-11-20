@@ -2,6 +2,7 @@ import { createHash, randomInt, timingSafeEqual } from "crypto";
 import { spawn } from "child_process";
 import { prisma } from "@/lib/prisma";
 import { sendTransactionalEmail } from "@/lib/mailer";
+import { sendTwilioMessage } from "@/lib/messaging/twilio";
 import { buildVerificationCodeHtml } from "@/lib/email-templates/verification";
 
 export type VerificationChannel = "EMAIL" | "PHONE" | "WHATSAPP";
@@ -99,10 +100,26 @@ async function deliverEmail(to: string, code: string) {
 }
 
 async function deliverWebhook(channel: "PHONE" | "WHATSAPP", to: string, code: string) {
+  const text = `Votre code de vérification Tchoua est ${code}. Il expire dans 10 minutes.`;
+
+  // Fournisseur principal : Twilio (SMS / WhatsApp).
+  const twilio = await sendTwilioMessage({
+    channel: channel === "WHATSAPP" ? "WHATSAPP" : "SMS",
+    to,
+    body: text,
+  });
+  if (twilio.ok) return true;
+
+  // Repli webhook interne pour les installations qui utilisent un fournisseur
+  // local ou un agrégateur africain. Twilio reste prioritaire lorsqu'il est
+  // configuré, mais un échec Twilio ne doit pas bloquer ce repli.
   const url = channel === "WHATSAPP"
     ? process.env.KYC_WHATSAPP_WEBHOOK_URL
     : process.env.KYC_SMS_WEBHOOK_URL;
-  if (!url) return false;
+  if (!url) {
+    console.error("[KYC][MESSAGING] aucun fournisseur disponible", { channel, twilioCode: twilio.code });
+    return false;
+  }
 
   const token = process.env.KYC_MESSAGING_TOKEN;
   const response = await fetch(url, {
@@ -111,12 +128,7 @@ async function deliverWebhook(channel: "PHONE" | "WHATSAPP", to: string, code: s
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({
-      channel,
-      to,
-      message: `Votre code de vérification Tchoua est ${code}. Il expire dans 10 minutes.`,
-      code,
-    }),
+    body: JSON.stringify({ channel, to, message: text, code }),
   }).catch((error) => {
     console.error("[KYC][MESSAGING] webhook failed", error);
     return null;
